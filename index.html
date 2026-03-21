@@ -14,7 +14,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body, #root { height: 100%; }
-    body { background: #0a0f1a; overflow-y: auto; -webkit-font-smoothing: antialiased; }
+    body { background: #0a0f1a; overflow-y: auto; -webkit-font-smoothing: antialiased; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     ::-webkit-scrollbar { width: 0; }
   </style>
 </head>
@@ -25,117 +25,40 @@
   <script>
 "use strict";
 const e = React.createElement;
-const { useState, useEffect, Fragment } = React;
+
+// ===== CONSTANTS & DATA =====
 
 const C = {
-  bg:"#0a0f1a",card:"#111827",border:"#1e293b",
-  accent:"#38bdf8",accentDim:"#0c4a6e",
-  danger:"#ef4444",dangerBg:"#450a0a",dangerBorder:"#7f1d1d",
-  warning:"#f59e0b",warningBg:"#451a03",warningBorder:"#78350f",
-  safe:"#10b981",safeBg:"#022c22",safeBorder:"#064e3b",
-  text:"#e2e8f0",textDim:"#94a3b8",textMuted:"#64748b",white:"#fff"
+  bg:"#0a0f1a", card:"#111827", border:"#1e293b",
+  accent:"#38bdf8", accentDim:"#0c4a6e",
+  danger:"#ef4444", dangerBg:"#450a0a", dangerBorder:"#7f1d1d",
+  warning:"#f59e0b", warningBg:"#451a03", warningBorder:"#78350f",
+  safe:"#10b981", safeBg:"#022c22", safeBorder:"#064e3b",
+  text:"#e2e8f0", textDim:"#94a3b8", textMuted:"#64748b", white:"#fff"
 };
 
 const PHASES = [
-  {weeks:"1–2",name:"Foundation",color:"#38bdf8"},
-  {weeks:"3–4",name:"Build",color:"#a78bfa"},
-  {weeks:"5–6",name:"Peak",color:"#f97316"}
+  {weeks:"1–2", name:"Foundation", color:"#38bdf8"},
+  {weeks:"3–4", name:"Build", color:"#a78bfa"},
+  {weeks:"5–6", name:"Peak", color:"#f97316"}
 ];
 
 const SCHED = [
-  {d:"Mon",t:"Push A",i:"💪",c:"#38bdf8"},
-  {d:"Tue",t:"Pull A",i:"🔗",c:"#a78bfa"},
-  {d:"Wed",t:"Legs A",i:"🦵",c:"#10b981"},
-  {d:"Thu",t:"Push B",i:"💪",c:"#38bdf8"},
-  {d:"Fri",t:"Pull B",i:"🔗",c:"#a78bfa"},
-  {d:"Sat",t:"Legs B",i:"🦵",c:"#10b981"},
-  {d:"Sun",t:"Rest",i:"🧘",c:"#64748b"}
+  {d:"Mon", t:"Push A", i:"💪", c:"#38bdf8"},
+  {d:"Tue", t:"Pull A", i:"🔗", c:"#a78bfa"},
+  {d:"Wed", t:"Legs A", i:"🦵", c:"#10b981"},
+  {d:"Thu", t:"Push B", i:"💪", c:"#38bdf8"},
+  {d:"Fri", t:"Pull B", i:"🔗", c:"#a78bfa"},
+  {d:"Sat", t:"Legs B", i:"🦵", c:"#10b981"},
+  {d:"Sun", t:"Rest", i:"🧘", c:"#64748b"}
 ];
-
-function Badge({color,children}){
-  return e("span",{style:{display:"inline-block",padding:"2px 7px",borderRadius:4,fontSize:10,fontWeight:700,letterSpacing:"0.5px",textTransform:"uppercase",background:color+"22",color:color,border:"1px solid "+color+"44"}},children);
-}
-
-function Section({title,icon,children,open:defOpen,accent}){
-  const [open,setOpen]=useState(!!defOpen);
-  const ac=accent||C.accent;
-  return e("div",{style:{marginBottom:10,borderRadius:10,border:"1px solid "+(open?ac+"44":C.border),background:C.card,overflow:"hidden"}},
-    e("button",{onClick:()=>setOpen(!open),style:{width:"100%",display:"flex",alignItems:"center",gap:9,padding:"13px 14px",background:"none",border:"none",color:C.text,cursor:"pointer",textAlign:"left",fontSize:14,fontWeight:600,fontFamily:"inherit"}},
-      e("span",{style:{fontSize:17}},icon),
-      e("span",{style:{flex:1}},title),
-      e("span",{style:{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s",fontSize:11,color:C.textMuted}},"▼")
-    ),
-    open&&e("div",{style:{padding:"0 14px 14px",lineHeight:1.6}},children)
-  );
-}
-
-function ExRow({name,sets,reps,notes,safety,removed,replacement,phase,detail}){
-  const [expanded,setExpanded]=useState(false);
-  const sc=safety==="caution"?C.warning:safety==="danger"?C.danger:C.safe;
-  if(removed){
-    return e("div",{style:{padding:"9px 11px",marginBottom:5,borderRadius:8,background:C.dangerBg,border:"1px solid "+C.dangerBorder,opacity:0.8}},
-      e("div",{style:{display:"flex",alignItems:"center",gap:7,marginBottom:3,flexWrap:"wrap"}},
-        e("span",{style:{textDecoration:"line-through",color:C.danger,fontSize:13,fontWeight:600}},name),
-        Badge({color:C.danger,children:"REMOVED"})
-      ),
-      e("div",{style:{fontSize:11,color:C.danger}},"⚠ "+notes),
-      replacement&&e("div",{style:{fontSize:11,color:C.safe,marginTop:3}},"✓ Replaced: "+replacement)
-    );
-  }
-  return e("div",{
-    onClick:()=>setExpanded(!expanded),
-    style:{
-      padding:"9px 11px",
-      marginBottom:5,
-      borderRadius:8,
-      background:expanded?"#0f1629":C.bg,
-      borderLeft:"3px solid "+sc,
-      cursor:"pointer",
-      transition:"background 0.2s"
-    }
-  },
-    e("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:7,flexWrap:"wrap",marginBottom:3}},
-      e("div",{style:{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}},
-        e("span",{style:{fontWeight:600,fontSize:13,color:C.text}},name),
-        safety==="caution"&&Badge({color:C.warning,children:"MODIFIED"}),
-        phase&&Badge({color:C.textMuted,children:"Wk "+phase})
-      ),
-      !expanded&&e("div",{style:{display:"flex",alignItems:"center",gap:4,fontSize:10,color:C.accent}},
-        e("span",null,"tap for details →"),
-        e("span",{style:{fontSize:12}},"ⓘ")
-      )
-    ),
-    e("div",{style:{fontSize:12,color:C.textDim}},
-      sets&&e("span",null,sets+" × "+reps),
-      notes&&e("div",{style:{fontSize:11,color:safety==="caution"?C.warning:C.textMuted,marginTop:2}},notes)
-    ),
-    expanded&&detail&&e("div",{style:{marginTop:12,paddingTop:12,borderTop:"1px solid "+C.border,fontSize:11,lineHeight:1.6}},
-      e("div",{style:{marginBottom:10}},
-        e("div",{style:{fontWeight:700,color:C.accent,marginBottom:4,fontSize:10}},"📍 SETUP & POSITION"),
-        e("div",{style:{color:C.textDim}},detail.setup)
-      ),
-      e("div",{style:{marginBottom:10}},
-        e("div",{style:{fontWeight:700,color:C.safe,marginBottom:4,fontSize:10}},"🔄 HOW TO EXECUTE"),
-        e("div",{style:{color:C.textDim}},detail.execution)
-      ),
-      e("div",{style:{marginBottom:10}},
-        e("div",{style:{fontWeight:700,color:C.warning,marginBottom:4,fontSize:10}},"🛡️ NWB SAFETY CUES"),
-        e("div",{style:{color:C.textDim}},detail.nwbCues)
-      ),
-      e("div",null,
-        e("div",{style:{fontWeight:700,color:C.text,marginBottom:4,fontSize:10}},"🎯 WHY THIS EXERCISE"),
-        e("div",{style:{color:C.textDim}},detail.why)
-      )
-    )
-  );
-}
 
 const EX_DETAILS = {
   "Barbell Floor Press": {
     setup: "Lying on the floor protects the L4-L5 disc by limiting ROM and preventing lumbar arching. Position yourself under the bar. Your right leg should be bent with the foot flat, and your left leg should be straight and relaxed.",
     execution: "Lower the bar until your triceps touch the floor. Pause for a full second (dead-stop) to eliminate momentum. Press explosively back to the top. 4 sets of 5-6 reps.",
     nwbCues: "Do NOT bridge your hips or arch your back to get the weight up. Keep your left leg passive like a 'log'. If you feel the need to push through your feet, reduce the weight.",
-    why: "Dead-stop build build builds build builds explosive builds power, power limits ROM to protect shoulders."
+    why: "Dead-stop builds explosive power, floor limits ROM to protect shoulders."
   },
   "Seated DB OH Press": {
     setup: "Sit on a bench with the back at a high incline (~80 degrees). Hold dumbbells at shoulder height with a neutral or slightly flared grip.",
@@ -234,13 +157,13 @@ const EX_DETAILS = {
     why: "Builds core stability against rotational forces, critical for disc health."
   },
   "Neutral Grip Pulldown": {
-    setup: "Sit at the lat pulldown machine. Attach the V-bar or neutral grip handle — the one where your palms face each other. Before sitting, adjust the thigh pad height using the pop-pin (usually on the right side) so it'll be snug on your thighs. Crutch to the machine, turn around, lower yourself onto the seat using the machine frame and your right leg for support. Scoot forward so your thighs slide under the pad. The pad sits on top of your quads and holds you down — that's its whole job. Your left foot just rests on the floor like a book sitting on a table. Zero force through it. Reach up and grab the handle.",
-    execution: "Start with arms fully extended overhead. Lean your upper body back about 10-15 degrees — just a slight lean, not laying back. Pull the handle down to your upper chest by thinking 'drive elbows into back pockets.' Squeeze your shoulder blades together for 1 full second at the bottom. Let the handle return slowly over 2-3 seconds — YOU control the speed, don't let the weight yank your arms up. That's one rep. 4 sets of 10-12.",
-    nwbCues: "The thigh pad anchors you, not your legs. If you feel yourself needing to press through your feet to stay seated, the weight is too heavy — drop it. Keep your torso angle fixed — don't crunch forward at the bottom (stresses L4-L5 disc). Getting out: let the weight down, scoot back from under the pad, grab the frame with one hand and crutches with the other, stand on your right leg first.",
-    why: "Volume lat work — lighter than Pull A's wide-grip version. Neutral grip shifts emphasis to lower lats and brachialis, allows longer ROM, and is easier on shoulder joints — which matters since your shoulders work overtime from crutching."
+    setup: "Sit at the lat pulldown machine. Attach the V-bar handle. Thigh pad snug.",
+    execution: "Start overhead. Lean back 10 degrees. Pull to upper chest. Squeeze blades 1s. Return slowly.",
+    nwbCues: "Thigh pad anchors you, not your legs. Left foot rests like a book on a table. Zero force through it.",
+    why: "Volume lat work. Neutral grip shifts emphasis to lower lats and brachialis, easier on shoulder joints."
   },
   "One-Arm Cable Row": {
-    setup: "Setup at cable.",
+    setup: "Setup at cable station.",
     execution: "Pull to lower ribs, keep shoulders square.",
     nwbCues: "CAUTION exercise. if lumbar spine twists AT ALL, drop weight immediately — anti-rotation core exercise disguised as back exercise.",
     why: "Builds pulling strength while demanding high levels of core stability."
@@ -284,8 +207,8 @@ const EX_DETAILS = {
   "Prone Ham Curl (Right)": {
     setup: "Setup face-down on machine, RIGHT leg only.",
     execution: "3s up, 1s hold, 3s down (HSR tempo).",
-    nwbCues: "PRONE chosen over SEATED because seated compresses ischial tuberosity — exact aggravating mechanism for hamstring tendinosis.",
-    why: "HSR is evidence-based treatment for tendinosis, not rest. 6-7 point pain decreases over 12 weeks."
+    nwbCues: "PRONE chosen over SEATED because seated compresses ischial tuberosity.",
+    why: "HSR is evidence-based treatment for tendinosis, not rest."
   },
   "Isometric Quad Sets (Left)": {
     setup: "Sit or lie with your LEFT leg straight.",
@@ -302,7 +225,7 @@ const EX_DETAILS = {
   "Dead Bug (R leg only)": {
     setup: "Setup supine, left foot planted on floor, right leg at 90°.",
     execution: "Lower right leg + left arm simultaneously, keep low back pressed into floor.",
-    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting the stress fracture.",
+    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely.",
     why: "Safe deep core and TVA activation without loading the injured hip flexor."
   },
   "Low-Box Step-Up (Right)": {
@@ -355,368 +278,561 @@ const EX_DETAILS = {
   }
 };
 
-function Callout({type,children}){
-  const cfg={danger:{bg:C.dangerBg,border:C.dangerBorder,color:C.danger,icon:"🚫"},warning:{bg:C.warningBg,border:C.warningBorder,color:C.warning,icon:"⚠️"},safe:{bg:C.safeBg,border:C.safeBorder,color:C.safe,icon:"✅"},info:{bg:C.accentDim+"44",border:C.accentDim,color:C.accent,icon:"💡"}};
-  const c=cfg[type]||cfg.info;
-  return e("div",{style:{padding:"11px 13px",borderRadius:8,background:c.bg,border:"1px solid "+c.border,marginBottom:10,fontSize:12,lineHeight:1.6,color:c.color}},c.icon+" ",children);
+// ===== STATELESS COMPONENTS =====
+
+function Badge({color, children}) {
+  return e("span", {
+    style: {
+      display: "inline-block",
+      padding: "2px 7px",
+      borderRadius: 4,
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.5px",
+      textTransform: "uppercase",
+      background: color + "22",
+      color: color,
+      border: "1px solid " + color + "44"
+    }
+  }, children);
 }
 
-function EqTable({rows}){
-  return e("div",{style:{overflowX:"auto",marginBottom:10}},
-    e("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:12}},
-      e("thead",null,e("tr",{style:{borderBottom:"2px solid "+C.accent+"44"}},
-        e("th",{style:{padding:"7px 8px",textAlign:"left",color:C.accent,fontWeight:700,fontSize:10,textTransform:"uppercase",letterSpacing:1}},"Exercise"),
-        e("th",{style:{padding:"7px 8px",textAlign:"left",color:C.safe,fontWeight:700,fontSize:10,textTransform:"uppercase",letterSpacing:1}},"Full Gym"),
-        e("th",{style:{padding:"7px 8px",textAlign:"left",color:C.warning,fontWeight:700,fontSize:10,textTransform:"uppercase",letterSpacing:1}},"Home")
+function Section({title, icon, children, isOpen, onToggle, accent}) {
+  const ac = accent || C.accent;
+  return e("div", {
+    style: {
+      marginBottom: 10,
+      borderRadius: 10,
+      border: "1px solid " + (isOpen ? ac + "44" : C.border),
+      background: C.card,
+      overflow: "hidden"
+    }
+  },
+    e("button", {
+      onClick: onToggle,
+      style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 9,
+        padding: "13px 14px",
+        background: "none",
+        border: "none",
+        color: C.text,
+        cursor: "pointer",
+        textAlign: "left",
+        fontSize: 14,
+        fontWeight: 600,
+        fontFamily: "inherit"
+      }
+    },
+      e("span", {style: {fontSize: 17}}, icon),
+      e("span", {style: {flex: 1}}, title),
+      e("span", {
+        style: {
+          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+          transition: "transform 0.2s",
+          fontSize: 11,
+          color: C.textMuted
+        }
+      }, "▼")
+    ),
+    isOpen && e("div", {style: {padding: "0 14px 14px", lineHeight: 1.6}}, children)
+  );
+}
+
+function ExRow({name, sets, reps, notes, safety, removed, replacement, phase, isExpanded, onToggle}) {
+  const sc = safety === "caution" ? C.warning : safety === "danger" ? C.danger : C.safe;
+  const detail = EX_DETAILS[name];
+  
+  if (removed) {
+    return e("div", {
+      style: {
+        padding: "9px 11px",
+        marginBottom: 5,
+        borderRadius: 8,
+        background: C.dangerBg,
+        border: "1px solid " + C.dangerBorder,
+        opacity: 0.8
+      }
+    },
+      e("div", {style: {display: "flex", alignItems: "center", gap: 7, marginBottom: 3}},
+        e("span", {style: {textDecoration: "line-through", color: C.danger, fontSize: 13, fontWeight: 600}}, name),
+        e(Badge, {color: C.danger, children: "REMOVED"})
+      ),
+      e("div", {style: {fontSize: 11, color: C.danger}}, "⚠ " + notes),
+      replacement && e("div", {style: {fontSize: 11, color: C.safe, marginTop: 3}}, "✓ Replaced: " + replacement)
+    );
+  }
+
+  return e("div", {
+    onClick: onToggle,
+    style: {
+      padding: "9px 11px",
+      marginBottom: 5,
+      borderRadius: 8,
+      background: isExpanded ? "#0f1629" : C.bg,
+      borderLeft: "3px solid " + sc,
+      cursor: "pointer",
+      transition: "background 0.2s"
+    }
+  },
+    e("div", {style: {display: "flex", alignItems: "center", justifyContent: "space-between", gap: 7, flexWrap: "wrap", marginBottom: 3}},
+      e("div", {style: {display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap"}},
+        e("span", {style: {fontWeight: 600, fontSize: 13, color: C.text}}, name),
+        safety === "caution" && e(Badge, {color: C.warning, children: "MODIFIED"}),
+        phase && e(Badge, {color: C.textMuted, children: "Wk " + phase})
+      ),
+      !isExpanded && e("div", {style: {display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.accent}},
+        e("span", null, "tap for details →"),
+        e("span", {style: {fontSize: 12}}, "ⓘ")
+      )
+    ),
+    e("div", {style: {fontSize: 12, color: C.textDim}},
+      sets && e("span", null, sets + " × " + reps),
+      notes && e("div", {style: {fontSize: 11, color: safety === "caution" ? C.warning : C.textMuted, marginTop: 2}}, notes)
+    ),
+    isExpanded && detail && e("div", {style: {marginTop: 12, paddingTop: 12, borderTop: "1px solid " + C.border, fontSize: 11, lineHeight: 1.6}},
+      e("div", {style: {marginBottom: 10}},
+        e("div", {style: {fontWeight: 700, color: C.accent, marginBottom: 4, fontSize: 10}}, "📍 SETUP & POSITION"),
+        e("div", {style: {color: C.textDim}}, detail.setup)
+      ),
+      e("div", {style: {marginBottom: 10}},
+        e("div", {style: {fontWeight: 700, color: C.safe, marginBottom: 4, fontSize: 10}}, "🔄 HOW TO EXECUTE"),
+        e("div", {style: {color: C.textDim}}, detail.execution)
+      ),
+      e("div", {style: {marginBottom: 10}},
+        e("div", {style: {fontWeight: 700, color: C.warning, marginBottom: 4, fontSize: 10}}, "🛡️ NWB SAFETY CUES"),
+        e("div", {style: {color: C.textDim}}, detail.nwbCues)
+      ),
+      e("div", null,
+        e("div", {style: {fontWeight: 700, color: C.text, marginBottom: 4, fontSize: 10}}, "🎯 WHY THIS EXERCISE"),
+        e("div", {style: {color: C.textDim}}, detail.why)
+      )
+    )
+  );
+}
+
+function Callout({type, children}) {
+  const cfg = {
+    danger: {bg: C.dangerBg, border: C.dangerBorder, color: C.danger, icon: "🚫"},
+    warning: {bg: C.warningBg, border: C.warningBorder, color: C.warning, icon: "⚠️"},
+    safe: {bg: C.safeBg, border: C.safeBorder, color: C.safe, icon: "✅"},
+    info: {bg: C.accentDim + "44", border: C.accentDim, color: C.accent, icon: "💡"}
+  };
+  const c = cfg[type] || cfg.info;
+  return e("div", {
+    style: {
+      padding: "11px 13px",
+      borderRadius: 8,
+      background: c.bg,
+      border: "1px solid " + c.border,
+      marginBottom: 10,
+      fontSize: 12,
+      lineHeight: 1.6,
+      color: c.color
+    }
+  }, c.icon + " ", children);
+}
+
+function EqTable({rows}) {
+  return e("div", {style: {overflowX: "auto", marginBottom: 10}},
+    e("table", {style: {width: "100%", borderCollapse: "collapse", fontSize: 12}},
+      e("thead", null, e("tr", {style: {borderBottom: "2px solid " + C.accent + "44"}},
+        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.accent, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Exercise"),
+        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.safe, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Full Gym"),
+        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.warning, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Home")
       )),
-      e("tbody",null,rows.map((r,i)=>e("tr",{key:i,style:{borderBottom:"1px solid "+C.border}},
-        e("td",{style:{padding:"7px 8px",color:C.text,fontWeight:500}},r[0]),
-        e("td",{style:{padding:"7px 8px",color:C.textDim}},r[1]),
-        e("td",{style:{padding:"7px 8px",color:C.textDim}},r[2])
+      e("tbody", null, rows.map((r, i) => e("tr", {key: "row-" + i, style: {borderBottom: "1px solid " + C.border}},
+        e("td", {style: {padding: "7px 8px", color: C.text, fontWeight: 500}}, r[0]),
+        e("td", {style: {padding: "7px 8px", color: C.textDim}}, r[1]),
+        e("td", {style: {padding: "7px 8px", color: C.textDim}}, r[2])
       )))
     )
   );
 }
 
-function App(){
-  const [tab,setTab]=useState(0);
-  const [phase,setPhase]=useState(0);
-  const tabs=["Schedule","Workouts","Cardio","Core","Equip","Safety"];
+// ===== MAIN APP =====
 
-  const tabBar=e("div",{style:{display:"flex",gap:2,background:C.bg,borderRadius:10,padding:3,marginBottom:14,position:"sticky",top:0,zIndex:10}},
-    tabs.map((t,i)=>e("button",{key:i,onClick:()=>{setTab(i);window.scrollTo(0,0);},style:{flex:1,padding:"9px 4px",borderRadius:8,border:"none",background:tab===i?C.accent+"22":"transparent",color:tab===i?C.accent:C.textMuted,fontWeight:tab===i?700:500,fontSize:11,cursor:"pointer",fontFamily:"inherit"}},t))
-  );
+function App() {
+  const [tab, setTab] = React.useState(0);
+  const [phase, setPhase] = React.useState(1); // Default to Build
+  const [openSections, setOpenSections] = React.useState({
+    "Weekly Overview": true,
+    "Push A — Strength": true,
+    "Pull A — Strength": true,
+    "Legs A — Right Leg (Cross-Ed)": true,
+    "Cardio Priority Ranking": true,
+    "Core Safety Rules": true,
+    "Injury Status": true
+  });
+  const [expandedExercises, setExpandedExercises] = React.useState({});
 
-  const phaseBar=e("div",{style:{display:"flex",gap:5,marginBottom:16}},
-    PHASES.map((p,i)=>e("div",{key:i,onClick:()=>setPhase(i),style:{flex:1,padding:"8px 6px",borderRadius:8,background:phase===i?p.color+"22":C.bg,border:"1px solid "+(phase===i?p.color:C.border),textAlign:"center",cursor:"pointer"}},
-      e("div",{style:{fontSize:10,fontWeight:700,color:p.color,textTransform:"uppercase"}},"Wk "+p.weeks),
-      e("div",{style:{fontSize:10,color:phase===i?C.text:C.textMuted,marginTop:2}},p.name)
-    ))
-  );
+  const toggleSection = (t) => setOpenSections(s => ({...s, [t]: !s[t]}));
+  const toggleExercise = (n) => setExpandedExercises(s => ({...s, [n]: !s[n]}));
 
-  const weekGrid=e("div",{style:{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3,marginBottom:14}},
-    SCHED.map((s,i)=>e("div",{key:i,style:{padding:"7px 3px",borderRadius:7,background:C.bg,border:"1px solid "+s.c+"33",textAlign:"center"}},
-      e("div",{style:{fontSize:9,fontWeight:700,color:C.textMuted,textTransform:"uppercase",letterSpacing:1}},s.d),
-      e("div",{style:{fontSize:15,margin:"3px 0"}},s.i),
-      e("div",{style:{fontSize:9,color:s.c,fontWeight:600}},s.t)
-    ))
-  );
+  const tabs = ["Schedule", "Workouts", "Cardio", "Core", "Equip", "Safety"];
 
-  const ex = (props) => e(ExRow, { ...props, detail: EX_DETAILS[props.name] });
-
-  // ===== TAB CONTENT =====
-  let content;
-
-  if(tab===0){
-    content=e(Fragment,null,
-      weekGrid,
-      Section({title:"Weekly Overview",icon:"📅",open:true,children:e("div",{style:{fontSize:12,color:C.textDim,lineHeight:1.7}},
-        e("p",{style:{margin:"0 0 10px"}},"6-day PPL split with core every session. Cardio 3-4×/week post-workout or standalone. Sunday = active recovery."),
-        e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}},
-          [{l:"Push Days",d:"Floor press, OH press, chest, triceps"},{l:"Pull Days",d:"Pulldowns, rows, face pulls, biceps"},{l:"Leg Days",d:"Right leg only (cross-education)"},{l:"Core",d:"McGill Big 3 + Pallof every session"}].map((x,i)=>
-            e("div",{key:i,style:{padding:"9px",borderRadius:7,background:C.bg,border:"1px solid "+C.border}},
-              e("div",{style:{fontSize:11,fontWeight:700,color:C.accent}},x.l),
-              e("div",{style:{fontSize:10,color:C.textMuted,marginTop:2}},x.d)
+  let content = null;
+  switch (tab) {
+    case 0: // Schedule
+      content = e("div", null,
+        e("div", {style: {display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 14}},
+          SCHED.map((s, i) => e("div", {key: "day-" + i, style: {padding: "7px 3px", borderRadius: 7, background: C.card, border: "1px solid " + s.c + "33", textAlign: "center"}},
+            e("div", {style: {fontSize: 9, fontWeight: 700, color: C.textMuted, textTransform: "uppercase"}}, s.d),
+            e("div", {style: {fontSize: 15, margin: "3px 0"}}, s.i),
+            e("div", {style: {fontSize: 9, color: s.c, fontWeight: 600}}, s.t)
+          ))
+        ),
+        e(Section, {
+          title: "Weekly Overview",
+          icon: "📅",
+          isOpen: !!openSections["Weekly Overview"],
+          onToggle: () => toggleSection("Weekly Overview")
+        },
+          e("div", {style: {fontSize: 12, color: C.textDim, lineHeight: 1.7}},
+            e("p", null, "6-day PPL split. Cardio 3-4×/week. Sunday = active recovery."),
+            e("div", {style: {display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7, marginTop: 10}},
+              [{l:"Push", d:"Floor press, OH press, chest, triceps"}, {l:"Pull", d:"Pulldowns, rows, biceps"}, {l:"Legs", d:"Right leg only"}, {l:"Core", d:"McGill Big 3 every session"}].map((info, i) =>
+                e("div", {key: "ov-" + i, style: {padding: "9px", borderRadius: 7, background: C.bg, border: "1px solid " + C.border}},
+                  e("div", {style: {fontSize: 11, fontWeight: 700, color: C.accent}}, info.l),
+                  e("div", {style: {fontSize: 10, color: C.textMuted, marginTop: 2}}, info.d)
+                )
+              )
+            )
+          )
+        ),
+        e(Section, {
+          title: "Phase Progression",
+          icon: "📈",
+          isOpen: !!openSections["Phase Progression"],
+          onToggle: () => toggleSection("Phase Progression")
+        },
+          PHASES.map((p, i) =>
+            e("div", {
+              key: "prog-" + i,
+              onClick: () => setPhase(i),
+              style: {
+                padding: "11px",
+                marginBottom: 7,
+                borderRadius: 8,
+                background: phase === i ? p.color + "11" : C.bg,
+                border: "1px solid " + (phase === i ? p.color + "44" : C.border),
+                cursor: "pointer"
+              }
+            },
+              e("div", {style: {fontWeight: 700, color: p.color, fontSize: 13}}, "Weeks " + p.weeks + ": " + p.name),
+              e("div", {style: {fontSize: 11, color: C.textMuted, marginTop: 3}},
+                i === 0 ? "Lower load, high reps (10-15). Adaptation phase." :
+                i === 1 ? "Increase load (80% 1RM). 4-sec eccentrics on legs." :
+                "Peak intensity. Prepare for WB transition."
+              )
+            )
+          )
+        ),
+        e(Section, {
+          title: "Cross-Education Protocol",
+          icon: "🧠",
+          isOpen: !!openSections["Cross-Education Protocol"],
+          onToggle: () => toggleSection("Cross-Education Protocol")
+        },
+          e(Callout, {type: "info", children: "Meta-analyses confirm ~16% contralateral strength preservation. Load (≥80% 1RM) + Eccentric emphasis (~17.7% transfer)."}),
+          e("div", {style: {fontSize: 12, color: C.textDim, lineHeight: 1.7}},
+            e("p", {style: {margin: "0 0 6px", fontWeight: 600, color: C.text}}, "Right leg training rules:"),
+            ["Intensity: ≥80% 1RM (Wks 3+)", "Tempo: 4-second eccentric", "Rest: 2+ minutes", "ROM: <90° hip flexion (FAI protection)"].map((rule, i) =>
+              e("p", {key: "rule-" + i}, "• " + rule)
             )
           )
         )
-      )}),
-      Section({title:"Phase Progression",icon:"📈",children:PHASES.map((p,i)=>
-        e("div",{key:i,onClick:()=>setPhase(i),style:{padding:"11px",marginBottom:7,borderRadius:8,background:phase===i?p.color+"11":C.bg,border:"1px solid "+(phase===i?p.color+"44":C.border),cursor:"pointer"}},
-          e("div",{style:{fontWeight:700,color:p.color,fontSize:13,marginBottom:3}},"Weeks "+p.weeks+": "+p.name),
-          e("div",{style:{fontSize:11,color:C.textMuted,lineHeight:1.6}},
-            i===0?"Higher reps (10–15), learning safe patterns. RPE 7–8. Cross-education begins.":
-            i===1?"Drop reps, increase load. ≥80% 1RM legs. 4-sec eccentric. Drop sets / rest-pause upper body.":
-            "Peak intensity. 3–5RM on key lifts. Max eccentric overload. Prepare for WB transition."
-          )
-        )
-      )}),
-      Section({title:"Cross-Education Protocol",icon:"🧠",children:[
-        Callout({type:"info",children:"Meta-analyses confirm ~16% contralateral strength preservation in lower limbs. High load (≥80% 1RM) drives the effect — training to failure adds nothing. Eccentric emphasis yields strongest transfer (~17.7%)."}),
-        e("div",{style:{fontSize:12,color:C.textDim,lineHeight:1.7}},
-          e("p",{style:{margin:"0 0 6px",fontWeight:600,color:C.text}},"Right leg training rules:"),
-          ["Intensity: ≥80% 1RM once adapted (Weeks 3+)","Volume: 3–5 sets × 3–5 reps on key lifts","Tempo: 4-second eccentric on every rep","Rest: 2+ minutes between heavy sets","Frequency: 2× per week (Legs A + Legs B)","ROM limit: Hip flexion stays below 90° (FAI protection)"].map((r,i)=>
-            e("p",{key:i,style:{margin:"0 0 3px"}},"• "+r)
-          )
-        )
-      ]})
-    );
-  }
+      );
+      break;
 
-  if(tab===1){
-    content=e(Fragment,null,
-      Section({title:"Push A — Strength",icon:"💪",open:true,accent:"#38bdf8",children:[
-        ex({name:"Barbell Floor Press",sets:"4",reps:"5–6 @ RPE 8",notes:"Dead-stop from floor. Protects shoulders + spine. +2.5kg at Wk 3.",safety:"safe"}),
-        ex({name:"Seated DB OH Press",sets:"4",reps:"6–8",notes:"Bench at ~80°. Neutral spine.",safety:"safe"}),
-        ex({name:"Incline DB Press + Lat Raises",sets:"3",reps:"8–10 / 12–15",notes:"Superset pair.",safety:"safe"}),
-        ex({name:"Lying Skull Crushers",sets:"3",reps:"10–12",notes:"Wk 3+: Add rest-pause final set (10→5→3 reps).",safety:"safe"}),
-        ex({name:"Core: McGill Curl-Up",sets:"3",reps:"8–10 (5s hold)",notes:"Hands under lumbar. Head+shoulders ONLY. Zero lumbar flexion.",safety:"safe"})
-      ]}),
-      Section({title:"Push B — Volume",icon:"💪",accent:"#38bdf8",children:[
-        ex({name:"DB Floor Press",sets:"4",reps:"8–10",notes:"Neutral grip variation.",safety:"safe"}),
-        ex({name:"Landmine Press (1-arm, seated)",sets:"3",reps:"10–12/arm",notes:"Great anti-rotation demand.",safety:"safe"}),
-        ex({name:"Cable Chest Fly",sets:"3",reps:"12–15",notes:"Seated or standing on right leg.",safety:"safe"}),
-        ex({name:"OH Triceps Extension",sets:"3",reps:"10–12",safety:"safe"}),
-        phase>=1&&ex({name:"Mechanical Drop Set",sets:"1",reps:"8+8+8",notes:"Wk 3+: Incline→Flat→Decline DB without rest.",phase:"3–6",safety:"safe"}),
-        ex({name:"Core: Side Plank",sets:"3",reps:"20–30s/side",notes:"McGill Big 3. Right-side on right knee.",safety:"safe"})
-      ].filter(Boolean)}),
-      Section({title:"Pull A — Strength",icon:"🔗",open:true,accent:"#a78bfa",children:[
-        ex({name:"Lat Pulldown (Wide)",sets:"4",reps:"6–8 @ RPE 8",notes:"Full ROM. +2.5kg at Wk 3.",safety:"safe"}),
-        ex({name:"Chest-Supported DB Row",sets:"4",reps:"6–8",notes:"Incline bench. Completely unloads L4-L5.",safety:"safe"}),
-        ex({name:"Seated Cable Row",sets:"3",reps:"10–12",notes:"MAINTAIN upright posture — no forward lean.",safety:"caution"}),
-        ex({name:"Seated Face Pulls",sets:"3",reps:"15–20",notes:"External rotation focus.",safety:"safe"}),
-        ex({name:"Preacher Curls",sets:"3",reps:"8–10",safety:"safe"}),
-        ex({name:"Core: Pallof Press",sets:"3",reps:"10/side",notes:"Seated or tall-kneel (R knee). Anti-rotation.",safety:"safe"})
-      ]}),
-      Section({title:"Pull B — Volume",icon:"🔗",accent:"#a78bfa",children:[
-        ex({name:"Neutral Grip Pulldown",sets:"4",reps:"10–12",safety:"safe"}),
-        ex({name:"One-Arm Cable Row",sets:"3",reps:"10–12/arm",notes:"Strict anti-rotation. No trunk twist.",safety:"caution"}),
-        ex({name:"Reverse Fly",sets:"3",reps:"12–15",safety:"safe"}),
-        ex({name:"Hammer Curls",sets:"3",reps:"10–12",safety:"safe"}),
-        ex({name:"Incline DB Curl",sets:"3",reps:"10–12",safety:"safe"}),
-        ex({name:"Core: Bird-Dog",sets:"3",reps:"8/side (5s hold)",notes:"McGill Big 3. Opposite arm/RIGHT leg.",safety:"safe"})
-      ]}),
-      Section({title:"Legs A — Right Leg (Cross-Ed)",icon:"🦵",open:true,accent:"#10b981",children:[
-        Callout({type:"warning",children:"ALL right leg exercises capped at <90° hip flexion for labral tear + FAI protection. 4-sec eccentric is critical for cross-education."}),
-        ex({name:"SL Leg Press (Right)",sets:"4",reps:phase===0?"10–12":phase===1?"8–10":"5–6",notes:"Foot HIGH on plate. Stop before 90° hip flexion. "+(phase>=1?"4-sec eccentric. ":"")+(phase>=2?"RPE 9.":"RPE 7–8."),safety:"caution"}),
-        ex({name:"SL Glute Bridge (Right)",sets:"4",reps:phase===0?"12–15":"8–10",notes:phase>=1?"Add dumbbell across right hip.":"Bodyweight. Squeeze 2s at top.",safety:"safe"}),
-        ex({name:"Prone Ham Curl (Right)",sets:"3",reps:phase===0?"12–15":"8–10",notes:"PRONE not seated — avoids ischial compression. HSR tempo: 3s up / 3s down.",safety:"safe"}),
-        ex({name:"Isometric Quad Sets (Left)",sets:"3",reps:"15 × 5s holds",notes:"Left leg maintenance. Contract quad into surface.",safety:"safe"}),
-        ex({name:"Ankle Pumps (Left)",sets:"3",reps:"20",notes:"Circulation maintenance.",safety:"safe"}),
-        ex({name:"Core: Dead Bug (R leg only)",sets:"3",reps:phase===0?"8":"12",notes:"L foot planted. R leg moves. Press low back into mat.",safety:"safe"}),
-        e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
-          e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed from Gemini Plan"),
-          e(ExRow, {removed:true,name:"Pistol Squats",notes:"120–140° hip flexion — grinds cam into labral tear.",replacement:"SL leg press (ROM limited)"}),
-          e(ExRow, {removed:true,name:"Deep Bulgarian Split Squats",notes:"Exceeds 90° hip flexion for cam FAI.",replacement:"Low-box step-ups (Legs B)"}),
-          e(ExRow, {removed:true,name:"Active SLR (Left)",notes:"Massive iliopsoas force loads stress fracture.",replacement:"Isometric quad sets"})
-        )
-      ]}),
-      Section({title:"Legs B — Right Posterior Chain",icon:"🦵",accent:"#10b981",children:[
-        ex({name:"Low-Box Step-Up (Right)",sets:phase>=2?"4":"3",reps:phase===0?"10–12":"6–8",notes:"Box BELOW knee. Hip stays under 90°. Heavy DBs Wk 5+.",safety:"caution"}),
-        ex({name:"SL Hip Thrust (Right)",sets:"3",reps:"10–12",notes:"Shoulders on bench. Drive through R heel.",safety:"safe"}),
-        ex({name:"Nordic Ham Curl",sets:"3",reps:phase===0?"5–6 ecc only":"6–8",notes:"0–20° hip flexion. Great for tendinosis HSR.",safety:"safe"}),
-        ex({name:"Standing Calf Raise (R)",sets:"4",reps:"12–15",notes:"Machine or dumbbell. Full ROM.",safety:"safe"}),
-        ex({name:"Core: Stir the Pot",sets:"3",reps:"8 circles each dir",notes:"Forearms on ball, plank. Anti-rotation. Neutral spine.",safety:"safe"}),
-        e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
-          e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed"),
-          e(ExRow, {removed:true,name:"Prone Hip Ext (Both Legs)",notes:"L hip ext = 2,727 microstrain on femoral neck.",replacement:"R leg only hip thrust"}),
-          e(ExRow, {removed:true,name:"Seated Ham Curl",notes:"Compresses tendinopathic ischial tuberosity.",replacement:"Prone curl / Nordic"})
-        )
-      ]}),
-      Section({title:"Recovery (Sunday)",icon:"🧘",children:[
-        ex({name:"Arm Ergometer",reps:"20 min easy",notes:"Zone 1–2. Active recovery.",safety:"safe"}),
-        ex({name:"Upper Body Stretching",reps:"10–15 min",notes:"Shoulders, chest, lats. NO hamstring stretching.",safety:"caution"}),
-        ex({name:"T-Spine Mobility",reps:"5 min",notes:"Cat-cow keeping hips still. T-spine rotation.",safety:"safe"})
-      ]})
-    );
-  }
-
-  if(tab===2){
-    const cardioItems=[
-      {rank:1,name:"Arm Bike (UBE)",safety:"safe",freq:"2–3×/wk",desc:"Zero hip involvement. AAPM&R-recommended for hip stress fractures. 21% VO2 improvement shown.",protos:"Steady: 25–40 min Z2 | Intervals: 8×(30s hard/60s easy) | Tabata: 8×(20s max/10s rest)"},
-      {rank:2,name:"Seated Battle Ropes",safety:"safe",freq:"1–2×/wk",desc:"Seated upright in chair. Core-dominant. No hip flexor engagement. Avoid rotational slams (L4-L5).",protos:"Alt Waves: 8×(20s/10s) | T-Waves: 6×(20s/15s) | Mixed: 4 min alternating rounds"},
-      {rank:3,name:"Seated SkiErg (Modified)",safety:"caution",freq:"0–1×/wk MAX",desc:"Engages iliopsoas + trunk flexion. ONLY if arm bike unavailable. Damper 1–2. Minimize trunk flexion. Raised seat. Stop at groin pain.",protos:"≤15 min | Light steady only — NO intervals | Focus arm pull, not crunch"}
-    ];
-    content=e(Fragment,null,
-      Section({title:"Cardio Priority Ranking",icon:"❤️",open:true,children:[
-        Callout({type:"info",children:"Ranked by safety for your specific injury combination. Arm bike is the gold standard per AAPM&R guidelines."}),
-        ...cardioItems.map((item,i)=>
-          e("div",{key:i,style:{padding:"12px",marginBottom:9,borderRadius:9,background:C.bg,border:"1px solid "+(item.safety==="safe"?C.safeBorder:C.warningBorder)}},
-            e("div",{style:{display:"flex",alignItems:"center",gap:7,marginBottom:5}},
-              e("span",{style:{display:"inline-flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:"50%",background:C.accent+"22",color:C.accent,fontSize:11,fontWeight:800}},"#"+item.rank),
-              e("span",{style:{fontWeight:700,fontSize:13,color:C.text}},item.name),
-              Badge({color:item.safety==="safe"?C.safe:C.warning,children:item.safety.toUpperCase()})
-            ),
-            e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.6,marginBottom:6}},item.desc),
-            e("div",{style:{fontSize:10,fontWeight:600,color:C.textMuted,textTransform:"uppercase",letterSpacing:0.5,marginBottom:3}},"Protocols"),
-            e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.7}},item.protos),
-            e("div",{style:{fontSize:10,color:C.textMuted,marginTop:5}},"Freq: "+item.freq)
+    case 1: // Workouts
+      content = e("div", null,
+        e(Section, {
+          title: "Push A — Strength",
+          icon: "💪",
+          accent: "#38bdf8",
+          isOpen: !!openSections["Push A — Strength"],
+          onToggle: () => toggleSection("Push A — Strength")
+        },
+          e(ExRow, {name: "Barbell Floor Press", sets: 4, reps: "5-6", safety: "safe", isExpanded: !!expandedExercises["Barbell Floor Press"], onToggle: () => toggleExercise("Barbell Floor Press")}),
+          e(ExRow, {name: "Seated DB OH Press", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Seated DB OH Press"], onToggle: () => toggleExercise("Seated DB OH Press")}),
+          e(ExRow, {name: "Incline DB Press + Lat Raises", sets: 3, reps: "8-10 / 12-15", safety: "safe", isExpanded: !!expandedExercises["Incline DB Press + Lat Raises"], onToggle: () => toggleExercise("Incline DB Press + Lat Raises")}),
+          e(ExRow, {name: "Lying Skull Crushers", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Lying Skull Crushers"], onToggle: () => toggleExercise("Lying Skull Crushers")}),
+          e(ExRow, {name: "McGill Curl-Up", sets: 3, reps: "10 (5s hold)", safety: "safe", isExpanded: !!expandedExercises["McGill Curl-Up"], onToggle: () => toggleExercise("McGill Curl-Up")})
+        ),
+        e(Section, {
+          title: "Push B — Volume",
+          icon: "💪",
+          accent: "#38bdf8",
+          isOpen: !!openSections["Push B — Volume"],
+          onToggle: () => toggleSection("Push B — Volume")
+        },
+          e(ExRow, {name: "DB Floor Press", sets: 4, reps: "8-10", safety: "safe", isExpanded: !!expandedExercises["DB Floor Press"], onToggle: () => toggleExercise("DB Floor Press")}),
+          e(ExRow, {name: "Landmine Press (1-arm, seated)", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Landmine Press (1-arm, seated)"], onToggle: () => toggleExercise("Landmine Press (1-arm, seated)")}),
+          e(ExRow, {name: "Cable Chest Fly", sets: 3, reps: "12-15", safety: "safe", isExpanded: !!expandedExercises["Cable Chest Fly"], onToggle: () => toggleExercise("Cable Chest Fly")}),
+          e(ExRow, {name: "OH Triceps Extension", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["OH Triceps Extension"], onToggle: () => toggleExercise("OH Triceps Extension")}),
+          phase >= 1 && e(ExRow, {name: "Mechanical Drop Set", sets: 1, reps: "8+8+8", phase: "3-6", safety: "safe", isExpanded: !!expandedExercises["Mechanical Drop Set"], onToggle: () => toggleExercise("Mechanical Drop Set")}),
+          e(ExRow, {name: "Side Plank", sets: 3, reps: "30s/side", safety: "safe", isExpanded: !!expandedExercises["Side Plank"], onToggle: () => toggleExercise("Side Plank")})
+        ),
+        e(Section, {
+          title: "Pull A — Strength",
+          icon: "🔗",
+          accent: "#a78bfa",
+          isOpen: !!openSections["Pull A — Strength"],
+          onToggle: () => toggleSection("Pull A — Strength")
+        },
+          e(ExRow, {name: "Lat Pulldown (Wide)", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Lat Pulldown (Wide)"], onToggle: () => toggleExercise("Lat Pulldown (Wide)")}),
+          e(ExRow, {name: "Chest-Supported DB Row", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Chest-Supported DB Row"], onToggle: () => toggleExercise("Chest-Supported DB Row")}),
+          e(ExRow, {name: "Seated Cable Row", sets: 3, reps: "10-12", safety: "caution", notes: "No forward lean.", isExpanded: !!expandedExercises["Seated Cable Row"], onToggle: () => toggleExercise("Seated Cable Row")}),
+          e(ExRow, {name: "Seated Face Pulls", sets: 3, reps: "15-20", safety: "safe", isExpanded: !!expandedExercises["Seated Face Pulls"], onToggle: () => toggleExercise("Seated Face Pulls")}),
+          e(ExRow, {name: "Preacher Curls", sets: 3, reps: "8-10", safety: "safe", isExpanded: !!expandedExercises["Preacher Curls"], onToggle: () => toggleExercise("Preacher Curls")}),
+          e(ExRow, {name: "Pallof Press", sets: 3, reps: "10/side", safety: "safe", isExpanded: !!expandedExercises["Pallof Press"], onToggle: () => toggleExercise("Pallof Press")})
+        ),
+        e(Section, {
+          title: "Pull B — Volume",
+          icon: "🔗",
+          accent: "#a78bfa",
+          isOpen: !!openSections["Pull B — Volume"],
+          onToggle: () => toggleSection("Pull B — Volume")
+        },
+          e(ExRow, {name: "Neutral Grip Pulldown", sets: 4, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Neutral Grip Pulldown"], onToggle: () => toggleExercise("Neutral Grip Pulldown")}),
+          e(ExRow, {name: "One-Arm Cable Row", sets: 3, reps: "10-12", safety: "caution", isExpanded: !!expandedExercises["One-Arm Cable Row"], onToggle: () => toggleExercise("One-Arm Cable Row")}),
+          e(ExRow, {name: "Reverse Fly", sets: 3, reps: "12-15", safety: "safe", isExpanded: !!expandedExercises["Reverse Fly"], onToggle: () => toggleExercise("Reverse Fly")}),
+          e(ExRow, {name: "Hammer Curls", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Hammer Curls"], onToggle: () => toggleExercise("Hammer Curls")}),
+          e(ExRow, {name: "Incline DB Curl", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Incline DB Curl"], onToggle: () => toggleExercise("Incline DB Curl")}),
+          e(ExRow, {name: "Bird-Dog", sets: 3, reps: "8/side", safety: "safe", isExpanded: !!expandedExercises["Bird-Dog"], onToggle: () => toggleExercise("Bird-Dog")})
+        ),
+        e(Section, {
+          title: "Legs A — Right Leg (Cross-Ed)",
+          icon: "🦵",
+          accent: "#10b981",
+          isOpen: !!openSections["Legs A — Right Leg (Cross-Ed)"],
+          onToggle: () => toggleSection("Legs A — Right Leg (Cross-Ed)")
+        },
+          e(Callout, {type: "warning", children: "Capped at <90° hip flexion for FAI/Labral protection."}),
+          e(ExRow, {name: "SL Leg Press (Right)", sets: 4, reps: phase === 0 ? 12 : 6, safety: "caution", notes: "Foot HIGH on plate.", isExpanded: !!expandedExercises["SL Leg Press (Right)"], onToggle: () => toggleExercise("SL Leg Press (Right)")}),
+          e(ExRow, {name: "SL Glute Bridge (Right)", sets: 4, reps: 12, safety: "safe", isExpanded: !!expandedExercises["SL Glute Bridge (Right)"], onToggle: () => toggleExercise("SL Glute Bridge (Right)")}),
+          e(ExRow, {name: "Prone Ham Curl (Right)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["Prone Ham Curl (Right)"], onToggle: () => toggleExercise("Prone Ham Curl (Right)")}),
+          e(ExRow, {name: "Isometric Quad Sets (Left)", sets: 3, reps: "15x5s", safety: "safe", isExpanded: !!expandedExercises["Isometric Quad Sets (Left)"], onToggle: () => toggleExercise("Isometric Quad Sets (Left)")}),
+          e(ExRow, {name: "Ankle Pumps (Left)", sets: 3, reps: 20, safety: "safe", isExpanded: !!expandedExercises["Ankle Pumps (Left)"], onToggle: () => toggleExercise("Ankle Pumps (Left)")}),
+          e(ExRow, {name: "Dead Bug (R leg only)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["Dead Bug (R leg only)"], onToggle: () => toggleExercise("Dead Bug (R leg only)")}),
+          e("div", {style: {marginTop: 10, paddingTop: 10, borderTop: "1px solid " + C.border}},
+            e(ExRow, {removed: true, name: "Pistol Squats", notes: "Dangerous for labrum."}),
+            e(ExRow, {removed: true, name: "Bulgarian Split Squat", notes: "Exceeds 90° flexion."})
           )
         ),
-        e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
-          e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed Cardio"),
-          e(ExRow, {removed:true,name:"Single-Leg Rowing",notes:"4.6× BW spinal load. Both hips to 100–120° flexion. 95% of rowers show lumbar MRI abnormalities."}),
-          e(ExRow, {removed:true,name:"Swimming / Pool Running",notes:"Physician-prohibited for this injury."})
+        e(Section, {
+          title: "Legs B — Right Posterior Chain",
+          icon: "🦵",
+          accent: "#10b981",
+          isOpen: !!openSections["Legs B — Right Posterior Chain"],
+          onToggle: () => toggleSection("Legs B — Right Posterior Chain")
+        },
+          e(ExRow, {name: "Low-Box Step-Up (Right)", sets: 3, reps: 10, safety: "caution", notes: "Box BELOW knee.", isExpanded: !!expandedExercises["Low-Box Step-Up (Right)"], onToggle: () => toggleExercise("Low-Box Step-Up (Right)")}),
+          e(ExRow, {name: "SL Hip Thrust (Right)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["SL Hip Thrust (Right)"], onToggle: () => toggleExercise("SL Hip Thrust (Right)")}),
+          e(ExRow, {name: "Nordic Ham Curl", sets: 3, reps: 6, safety: "safe", isExpanded: !!expandedExercises["Nordic Ham Curl"], onToggle: () => toggleExercise("Nordic Ham Curl")}),
+          e(ExRow, {name: "Standing Calf Raise (R)", sets: 4, reps: 15, safety: "safe", isExpanded: !!expandedExercises["Standing Calf Raise (R)"], onToggle: () => toggleExercise("Standing Calf Raise (R)")}),
+          e(ExRow, {name: "Stir the Pot", sets: 3, reps: 8, safety: "safe", isExpanded: !!expandedExercises["Stir the Pot"], onToggle: () => toggleExercise("Stir the Pot")}),
+          e("div", {style: {marginTop: 10, paddingTop: 10, borderTop: "1px solid " + C.border}},
+            e(ExRow, {removed: true, name: "Seated Ham Curl", notes: "Compresses tendinopathy."})
+          )
+        ),
+        e(Section, {
+          title: "Recovery (Sunday)",
+          icon: "🧘",
+          isOpen: !!openSections["Recovery (Sunday)"],
+          onToggle: () => toggleSection("Recovery (Sunday)")
+        },
+          e(ExRow, {name: "Arm Ergometer", reps: "20 min", safety: "safe", isExpanded: !!expandedExercises["Arm Ergometer"], onToggle: () => toggleExercise("Arm Ergometer")}),
+          e(ExRow, {name: "Upper Body Stretching", reps: "10 min", safety: "caution", notes: "NO hamstring stretching.", isExpanded: !!expandedExercises["Upper Body Stretching"], onToggle: () => toggleExercise("Upper Body Stretching")}),
+          e(ExRow, {name: "T-Spine Mobility", reps: "5 min", safety: "safe", isExpanded: !!expandedExercises["T-Spine Mobility"], onToggle: () => toggleExercise("T-Spine Mobility")})
         )
-      ]}),
-      Section({title:"Weekly Cardio Schedule",icon:"📆",children:
-        EqTable({rows:[
-          ["Mon (post-Push A)","Arm bike 25min Z2","Battle ropes 4 rounds"],
-          ["Wed (post-Legs A)","Battle ropes Tabata 8rds","Arm bike intervals"],
-          ["Fri (post-Pull B)","Arm bike 8×30s intervals","Battle ropes 6 rounds"],
-          ["Sat (optional)","SkiErg 15min light","Arm bike 30min steady"],
-          ["Sunday","Arm bike 20min easy","Rest or light arm bike"]
-        ]})
-      })
-    );
-  }
+      );
+      break;
 
-  if(tab===3){
-    const coreExs=[
-      {name:"McGill Curl-Up",how:"Hands under lumbar curve. One knee bent. Lift head+shoulders 2–3in. Hold 5–8s.",target:"Rectus abdominis",gym:"Floor mat",home:"Floor mat"},
-      {name:"Side Plank",how:"On elbow+knee (or feet). Stack hips. Hold 15–30s.",target:"Obliques, QL",gym:"Floor mat",home:"Floor mat"},
-      {name:"Bird-Dog",how:"Quadruped. Opposite arm + RIGHT leg. Hold 5–8s. Left leg stays down.",target:"Multifidus, erectors",gym:"Floor mat",home:"Floor mat"},
-      {name:"Pallof Press",how:"Seated or tall-kneel (R knee). Band/cable at chest. Press out, hold 3s.",target:"Anti-rotation",gym:"Cable machine",home:"Band + door anchor"},
-      {name:"Dead Bug (R leg)",how:"Supine. L foot planted. R leg at 90°. Lower R leg + L arm. Press LB into mat.",target:"Deep core, TVA",gym:"Floor mat",home:"Floor mat"},
-      {name:"Stir the Pot",how:"Forearms on stability ball in plank. Small circles. Spine rigid.",target:"Anti-rotation/ext",gym:"Stability ball",home:"Stability ball"},
-      {name:"Suitcase Hold",how:"Heavy DB right hand. Resist lateral flexion. Seated or standing on R leg.",target:"Obliques (anti-lat flex)",gym:"Heavy DB",home:"Heavy DB/KB"},
-      {name:"Partial L-Sit",how:"Parallettes. Lift hips — legs rest on bench to reduce iliopsoas demand.",target:"Core, shoulders",gym:"Parallettes/dip bars",home:"Parallettes/chairs"}
-    ];
-    const removedCore=[
-      {n:"Russian Twists",r:"Flexion + rotation = disc herniation mechanism ('herniation-maker')"},
-      {n:"V-Sits / Sit-Ups",r:"3,300N compression + iliopsoas loads stress fracture"},
-      {n:"Hanging Leg Raises",r:"Maximal iliopsoas activation. Stresses femoral neck."},
-      {n:"Bicycle Crunches",r:"Flexion + rotation + bilateral hip flexor activation"},
-      {n:"Seated Rainbows",r:"Rotational slam forces lumbar rotation under momentum"},
-      {n:"Active SLR (Left)",r:"Locked-knee lever = massive hip flexor force across fracture"},
-      {n:"Full L-Sit",r:"Intense bilateral hip flexor isometric. Use partial version."}
-    ];
-    content=e(Fragment,null,
-      Section({title:"Core Safety Rules",icon:"🛡️",open:true,children:[
-        Callout({type:"danger",children:"ZERO spinal flexion under load. L4-L5 DDD: sit-ups = 3,300N compression (NIOSH injury threshold). V-sits and Russian twists strictly contraindicated."}),
-        Callout({type:"danger",children:"ZERO active hip flexion on left side. Iliopsoas = 57–70% of femoral neck strain. Any crunch/leg raise/V-sit firing left hip flexor loads the stress fracture."})
-      ]}),
-      Section({title:"Safe Core Exercises",icon:"✅",open:true,children:coreExs.map((ex_item,i)=>
-        e("div",{key:i,style:{padding:"10px",marginBottom:7,borderRadius:8,background:C.bg,borderLeft:"3px solid "+C.safe}},
-          e("div",{style:{fontWeight:700,fontSize:13,color:C.text,marginBottom:3}},ex_item.name),
-          e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.6,marginBottom:4}},ex_item.how),
-          e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",fontSize:10}},
-            Badge({color:C.safe,children:ex_item.target})
-          ),
-          e("div",{style:{display:"flex",gap:10,marginTop:5,fontSize:10,color:C.textMuted}},
-            e("span",null,"🏋️ "+ex_item.gym),
-            e("span",null,"🏠 "+ex_item.home)
+    case 2: // Cardio
+      content = e("div", null,
+        e(Section, {
+          title: "Cardio Priority Ranking",
+          icon: "❤️",
+          isOpen: !!openSections["Cardio Priority Ranking"],
+          onToggle: () => toggleSection("Cardio Priority Ranking")
+        },
+          e(Callout, {type: "info", children: "Ranked by safety. Arm bike is gold standard."}),
+          [{rank:1, name:"Arm Bike (UBE)", safety:"safe", desc:"Zero hip involvement. AAPM&R recommended."}, {rank:2, name:"Seated Battle Ropes", safety:"safe", desc:"Core dominant. No hip flexors."}, {rank:3, name:"Seated SkiErg", safety:"caution", desc:"Light only. Minimize trunk flexion."}].map((c, i) =>
+            e("div", {key: "cardio-" + i, style: {padding: 12, marginBottom: 9, borderRadius: 9, background: C.card, border: "1px solid " + (c.safety === "safe" ? C.safeBorder : C.warningBorder)}},
+              e("div", {style: {display: "flex", alignItems: "center", gap: 7, marginBottom: 5}},
+                e("span", {style: {display: "inline-flex", alignItems: "center", justifyContext: "center", width: 22, height: 22, borderRadius: 11, background: C.accent + "22", color: C.accent, fontSize: 11, fontWeight: 800, textAlign: "center"}}, "#" + c.rank),
+                e("span", {style: {fontWeight: 700, fontSize: 13, color: C.text}}, c.name),
+                e(Badge, {color: c.safety === "safe" ? C.safe : C.warning, children: c.safety.toUpperCase()})
+              ),
+              e("div", {style: {fontSize: 11, color: C.textDim}}, c.desc)
+            )
+          )
+        ),
+        e(Section, {
+          title: "Weekly Cardio Schedule",
+          icon: "📆",
+          isOpen: !!openSections["Weekly Cardio Schedule"],
+          onToggle: () => toggleSection("Weekly Cardio Schedule")
+        },
+          e(EqTable, {rows: [["Mon", "Arm Bike 25m", "Steady"], ["Wed", "Battle Ropes", "Tabata"], ["Fri", "Arm Bike", "Intervals"], ["Sat", "SkiErg 15m", "Light"], ["Sun", "Arm Bike", "Easy"]]})
+        )
+      );
+      break;
+
+    case 3: // Core
+      content = e("div", null,
+        e(Section, {
+          title: "Core Safety Rules",
+          icon: "🛡️",
+          isOpen: !!openSections["Core Safety Rules"],
+          onToggle: () => toggleSection("Core Safety Rules")
+        },
+          e(Callout, {type: "danger", children: "ZERO spinal flexion under load. NO sit-ups."}),
+          e(Callout, {type: "danger", children: "ZERO active left hip flexion. Protects fracture."})
+        ),
+        e(Section, {
+          title: "Safe Core Exercises",
+          icon: "✅",
+          isOpen: !!openSections["Safe Core Exercises"],
+          onToggle: () => toggleSection("Safe Core Exercises")
+        },
+          [{name:"McGill Curl-Up", target:"Abs"}, {name:"Side Plank", target:"Obliques"}, {name:"Bird-Dog", target:"Back"}, {name:"Pallof Press", target:"Core"}, {name:"Dead Bug (R leg)", target:"Deep Core"}, {name:"Stir the Pot", target:"Stability"}].map((c, i) =>
+            e("div", {key: "core-" + i, style: {padding: 10, marginBottom: 7, borderRadius: 8, background: C.card, borderLeft: "3px solid " + C.safe}},
+              e("div", {style: {fontWeight: 700, fontSize: 13, color: C.text}}, c.name),
+              e(Badge, {color: C.safe, children: c.target})
+            )
+          )
+        ),
+        e(Section, {
+          title: "Removed Core",
+          icon: "🚫",
+          isOpen: !!openSections["Removed Core"],
+          onToggle: () => toggleSection("Removed Core")
+        },
+          [{n:"Russian Twists", r:"Disc danger."}, {n:"Sit-Ups", r:"Spine load."}, {n:"Leg Raises", r:"Fracture danger."}].map((rem, i) =>
+            e(ExRow, {key: "remc-" + i, removed: true, name: rem.n, notes: rem.r})
           )
         )
-      )}),
-      Section({title:"Removed Core Exercises",icon:"🚫",children:removedCore.map((ex_item,i)=>
-        e(ExRow, {key:i,removed:true,name:ex_item.n,notes:ex_item.r})
-      )})
-    );
-  }
+      );
+      break;
 
-  if(tab===4){
-    content=e(Fragment,null,
-      Section({title:"Cardio Alternatives",icon:"❤️",open:true,children:[
-        EqTable({rows:[
-          ["Primary Cardio","Arm bike (UBE)","Seated battle ropes"],
-          ["Secondary","Seated battle ropes","Arm bike (Stamina InStride)"],
-          ["Tertiary (caution)","Seated SkiErg (mod)","Band speed punching (seated)"]
-        ]}),
-        Callout({type:"info",children:"If gym lacks arm bike, ask front desk — most Crunch/Amped have one in PT area. Concept2 BikeErg with arm attachment also works."})
-      ]}),
-      Section({title:"Push/Pull Alternatives",icon:"💪",children:EqTable({rows:[
-        ["Floor Press","Barbell + plates","Heavy dumbbells + mat"],
-        ["OH Press","Seated DB press","Band press (anchored overhead)"],
-        ["Lat Pulldown","Cable machine","Band pulldowns / pull-up bar"],
-        ["Chest-Sup Row","Incline bench + DBs","Supine band row"],
-        ["Cable Row","Cable machine","Band row (seated, around post)"],
-        ["Face Pulls","Cable rope","Band at face height"],
-        ["Pallof Press","Cable machine","Band + doorframe anchor"]
-      ]})}),
-      Section({title:"Leg Alternatives",icon:"🦵",children:EqTable({rows:[
-        ["SL Leg Press","Leg press machine","Wall sit (R leg) + vest"],
-        ["Step-Ups","Plyo box + DBs","Stair + backpack weight"],
-        ["Glute Bridge","Bench + DB/barbell","Couch + heavy backpack"],
-        ["Hip Thrust","Bench + barbell","Couch + heavy DB"],
-        ["Prone Ham Curl","Prone curl machine","Slider friction curl"],
-        ["Nordic Curl","GHD / partner","Couch anchor / partner"],
-        ["Calf Raise","Standing calf machine","Step edge + dumbbell"]
-      ]})}),
-      Section({title:"Gym Bag Essentials",icon:"🎒",children:e("div",{style:{fontSize:12,color:C.textDim,lineHeight:1.8}},
-        ["Thick exercise mat — floor press, dead bugs, bird-dogs","Resistance bands (medium + heavy) — Pallof press, face pulls","Wedge cushion — keep hips >90° on seated exercises","Parallettes (optional) — partial L-sit, elevated push-ups","Notebook — track loads for progressive overload"].map((item,i)=>
-          e("p",{key:i,style:{margin:"0 0 3px"}},"• "+item)
-        )
-      )})
-    );
-  }
-
-  if(tab===5){
-    const injuries=[
-      {n:"Left Femoral Neck Stress Fracture",t:"Compression-side, medial margin",r:"Strict NWB 6+ weeks. Zero L hip flexor activation. Groin pain = STOP.",c:C.danger},
-      {n:"Bilateral Cam-Type FAI",t:"Osseous prominence, anterolateral head-neck",r:"Cap hip flexion <90° both sides. No pistol squats or deep squats.",c:C.warning},
-      {n:"Bilateral Labral Tears",t:"L: diffuse degen + tear. R: small tear",r:"Avoid end-range flexion + internal rotation. 24-hour pain rule.",c:C.warning},
-      {n:"Bilateral Hamstring Tendinosis",t:"No discrete tear. Normal musculature",r:"HSR protocol. Prone > seated curls. No aggressive stretching. Pain ≤3/10.",c:C.warning},
-      {n:"L4-L5 Degenerative Disc Disease",t:"Degenerative changes at L4-L5",r:"Zero flexion/rotation under load. McGill core only. Change positions q15min.",c:C.warning}
-    ];
-    const stops=["Groin pain — any new or increasing on left side","Hip clicking or catching — new mechanical symptoms either hip","Pain persisting >24 hours after exercise","Radiating leg pain or numbness — L4-L5 nerve involvement","Limping or antalgic gait — even on crutches","Sharp catching in hip during movement"];
-    const changes=[
-      ["Russian Twists → REMOVED","Flex+rotation = herniation for L4-L5"],
-      ["SL Rowing → REMOVED","4.6× BW spine + 100-120° hip flexion"],
-      ["SkiErg → Downgraded to tertiary","Iliopsoas + trunk flexion loads fracture"],
-      ["Arm Bike → Primary cardio","AAPM&R guideline-recommended"],
-      ["Seated Ham Curl → Prone","Seated compresses tendinopathic tendons"],
-      ["Upper Crunch → McGill Curl-Up","Standard crunch = lumbar flexion"],
-      ["V-Sit position → Upright seated","V-sit fires iliopsoas hard"],
-      ["Prone Hip Ext Both → R only","L hip ext = 2,727 microstrain"],
-      ["Train to failure → ≥80% 1RM, no failure","Load drives cross-ed, not fatigue"],
-      ["Full L-Sit → Partial (legs on bench)","Full = intense bilateral hip flexor iso"],
-      ["FeetUp solo → Spotter mandatory","Solo pike/tuck both load fracture zone"]
-    ];
-    content=e(Fragment,null,
-      Section({title:"Your 5 Concurrent Pathologies",icon:"🩻",open:true,children:injuries.map((item,i)=>
-        e("div",{key:i,style:{padding:"10px",marginBottom:7,borderRadius:8,background:C.bg,borderLeft:"3px solid "+item.c}},
-          e("div",{style:{fontWeight:700,fontSize:13,color:item.c,marginBottom:2}},item.n),
-          e("div",{style:{fontSize:10,color:C.textMuted,marginBottom:5}},item.t),
-          e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.6}},item.r)
-        )
-      )}),
-      Section({title:"Absolute Stop Signals",icon:"🚨",children:[
-        Callout({type:"danger",children:"Stop immediately and contact physician if ANY occur:"}),
-        e("div",{style:{fontSize:12,color:C.textDim,lineHeight:1.8}},stops.map((s,i)=>
-          e("p",{key:i,style:{margin:"0 0 3px"}},e("span",{style:{color:C.danger,fontWeight:600}},"• "+s))
-        ))
-      ]}),
-      Section({title:"Recovery & Nutrition",icon:"🍎",children:e("div",{style:{fontSize:12,color:C.textDim,lineHeight:1.8}},
-        e("p",{style:{margin:"0 0 6px",fontWeight:600,color:C.text}},"Bone healing:"),
-        ["Vitamin D: check levels, target ≥40 ng/mL","Calcium: 1000–1200mg/day","Protein: ≥1.6g/kg (~130g/day)","AVOID NSAIDs — may impair bone healing. Tylenol OK.","Sleep ≥7 hours — GH release critical for repair"].map((r,i)=>
-          e("p",{key:i,style:{margin:"0 0 3px"}},"• "+r)
+    case 4: // Equip
+      content = e("div", null,
+        e(Section, {
+          title: "Cardio Alternatives",
+          icon: "❤️",
+          isOpen: !!openSections["Cardio Alternatives"],
+          onToggle: () => toggleSection("Cardio Alternatives")
+        },
+          e(EqTable, {rows: [["Primary", "Arm Bike", "Seated Ropes"], ["Secondary", "Mini Arm Bike", "Punching"]]})
         ),
-        e("p",{style:{margin:"12px 0 6px",fontWeight:600,color:C.text}},"Return timeline:"),
-        ["Week 6: MD reassessment → possible toe-touch WB","Weeks 6–10: Progressive WB (+25% BW/week)","Weeks 10–14: Pain-free walking → single-leg hop test","Months 3–6: Walk/jog progression → return to sport"].map((r,i)=>
-          e("p",{key:i,style:{margin:"0 0 3px"}},"• "+r)
+        e(Section, {
+          title: "Weight Alternatives",
+          icon: "💪",
+          isOpen: !!openSections["Weight Alternatives"],
+          onToggle: () => toggleSection("Weight Alternatives")
+        },
+          e(EqTable, {rows: [["Floor Press", "Barbell", "DBs + Mat"], ["Lat Pulldown", "Cable", "Bands"], ["Leg Press", "Machine", "Wall Sit"]]})
         )
-      )}),
-      Section({title:"Corrections to Gemini Plan",icon:"📝",children:changes.map((ch,i)=>
-        e("div",{key:i,style:{padding:"9px 11px",marginBottom:5,borderRadius:8,background:C.bg,borderLeft:"3px solid "+C.accent}},
-          e("div",{style:{fontWeight:600,fontSize:12,color:C.accent}},ch[0]),
-          e("div",{style:{fontSize:10,color:C.textMuted,marginTop:2}},ch[1])
+      );
+      break;
+
+    case 5: // Safety
+      content = e("div", null,
+        e(Section, {
+          title: "Injury Status",
+          icon: "🩻",
+          isOpen: !!openSections["Injury Status"],
+          onToggle: () => toggleSection("Injury Status")
+        },
+          [{n:"Fracture", r:"Strict NWB 6+ weeks. Zero flexor fire."}, {n:"FAI/Labral", r:"Stop before 90° flexion. No clicking."}, {n:"Tendinosis", r:"HSR protocol (3s/1s/3s tempo)."}, {n:"L4-L5", r:"Zero flexion/rotation under load."}].map((inj, i) =>
+            e("div", {key: "inj-" + i, style: {padding: 10, marginBottom: 7, borderRadius: 8, background: C.card, borderLeft: "3px solid " + C.warning}},
+              e("div", {style: {fontWeight: 700, fontSize: 13, color: C.warning}}, inj.n),
+              e("div", {style: {fontSize: 11, marginTop: 3, color: C.textDim}}, inj.r)
+            )
+          )
+        ),
+        e(Section, {
+          title: "Absolute Stop Signals",
+          icon: "🚨",
+          isOpen: !!openSections["Absolute Stop Signals"],
+          onToggle: () => toggleSection("Absolute Stop Signals")
+        },
+          e(Callout, {type: "danger", children: "Stop and contact MD if:"}),
+          ["Groin pain", "Hip clicking/catching", "Pain >24h after workout", "Radiating leg pain"].map((s, i) =>
+            e("p", {key: "s-" + i, style: {fontSize: 12, color: C.textDim}}, "• " + s)
+          )
         )
-      )})
-    );
+      );
+      break;
   }
 
-  return e("div",{style:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',system-ui,sans-serif",maxWidth:520,margin:"0 auto",padding:"0 10px 40px"}},
-    e("div",{style:{padding:"20px 0 6px",textAlign:"center"}},
-      e("div",{style:{fontSize:10,fontWeight:700,letterSpacing:2,color:C.accent,textTransform:"uppercase",marginBottom:4}},"Non-Weight-Bearing Protocol"),
-      e("h1",{style:{fontSize:20,fontWeight:800,margin:"0 0 3px",color:C.white,letterSpacing:-0.5}},"MRI-Adjusted PPL Program"),
-      e("div",{style:{fontSize:11,color:C.textMuted}},"6-Week Push / Pull / Legs • Left Hip NWB")
+  return e("div", {style: {maxWidth: 500, margin: "0 auto", padding: "0 10px 40px", minHeight: "100vh", background: C.bg}},
+    e("div", {style: {padding: "30px 0 20px", textAlign: "center"}},
+      e("h1", {style: {fontSize: 24, fontWeight: 800, letterSpacing: "-0.5px", color: C.white}}, "NWB Workout Plan"),
+      e("div", {style: {fontSize: 12, color: C.textMuted, marginTop: 5}}, "MRI-Adjusted PPL • Left Hip NWB")
     ),
-    e("div",{style:{display:"flex",gap:7,justifyContent:"center",padding:"10px 0",marginBottom:6}},
-      [{l:"Safe",c:C.safe},{l:"Caution",c:C.warning},{l:"Removed",c:C.danger}].map((s,i)=>
-        e("div",{key:i,style:{display:"flex",alignItems:"center",gap:3,fontSize:10}},
-          e("div",{style:{width:7,height:7,borderRadius:2,background:s.c}}),
-          e("span",{style:{color:C.textMuted}},s.l)
-        )
-      )
+    e("div", {style: {display: "flex", gap: 5, marginBottom: 15}},
+      PHASES.map((p, i) => e("div", {
+        key: i,
+        onClick: () => setPhase(i),
+        style: {
+          flex: 1,
+          padding: 10,
+          borderRadius: 8,
+          background: phase === i ? p.color + "22" : C.card,
+          border: "1px solid " + (phase === i ? p.color : C.border),
+          textAlign: "center",
+          cursor: "pointer"
+        }
+      },
+        e("div", {style: {fontSize: 10, fontWeight: 700, color: p.color}}, "WK " + p.weeks),
+        e("div", {style: {fontSize: 10, color: phase === i ? C.text : C.textMuted}}, p.name)
+      ))
     ),
-    phaseBar,
-    tabBar,
+    e("div", {style: {display: "flex", gap: 2, marginBottom: 20, overflowX: "auto", paddingBottom: 5}},
+      tabs.map((t, i) => e("button", {
+        key: t,
+        onClick: () => setTab(i),
+        style: {
+          flex: 1,
+          minWidth: 75,
+          padding: "10px 5px",
+          background: tab === i ? C.accent + "22" : "none",
+          border: "1px solid " + (tab === i ? C.accent : C.border),
+          color: tab === i ? C.accent : C.textMuted,
+          borderRadius: 8,
+          fontSize: 11,
+          fontWeight: 600,
+          cursor: "pointer",
+          fontFamily: "inherit"
+        }
+      }, t))
+    ),
     content,
-    e("div",{style:{marginTop:20,padding:"14px",borderRadius:10,background:C.dangerBg,border:"1px solid "+C.dangerBorder,textAlign:"center",fontSize:11,color:C.danger,lineHeight:1.6}},
-      e("strong",null,"Medical Disclaimer")," — This plan is for informational purposes only. Confirm all exercises with your orthopedic surgeon or PT. Groin pain = absolute stop signal."
-    ),
-    e("div",{style:{textAlign:"center",padding:"14px 0",fontSize:10,color:C.textMuted}},"Based on MRI 3/11/2026 • Generated 3/21/2026")
+    e("div", {
+      style: {
+        marginTop: 30,
+        padding: 15,
+        borderRadius: 10,
+        background: C.dangerBg,
+        border: "1px solid " + C.dangerBorder,
+        fontSize: 11,
+        textAlign: "center",
+        color: C.danger
+      }
+    },
+      e("b", null, "Medical Disclaimer:"), " Confirm all exercises with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop."
+    )
   );
 }
 
-ReactDOM.render(e(App),document.getElementById("root"));
-  </script>
-
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(function(){});
-  }
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(e(App));
   </script>
 </body>
 </html>
