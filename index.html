@@ -69,7 +69,8 @@ function Section({title,icon,children,open:defOpen,accent}){
   );
 }
 
-function ExRow({name,sets,reps,notes,safety,removed,replacement,phase}){
+function ExRow({name,sets,reps,notes,safety,removed,replacement,phase,detail}){
+  const [expanded,setExpanded]=useState(false);
   const sc=safety==="caution"?C.warning:safety==="danger"?C.danger:C.safe;
   if(removed){
     return e("div",{style:{padding:"9px 11px",marginBottom:5,borderRadius:8,background:C.dangerBg,border:"1px solid "+C.dangerBorder,opacity:0.8}},
@@ -81,18 +82,278 @@ function ExRow({name,sets,reps,notes,safety,removed,replacement,phase}){
       replacement&&e("div",{style:{fontSize:11,color:C.safe,marginTop:3}},"✓ Replaced: "+replacement)
     );
   }
-  return e("div",{style:{padding:"9px 11px",marginBottom:5,borderRadius:8,background:C.bg,borderLeft:"3px solid "+sc}},
-    e("div",{style:{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap",marginBottom:3}},
-      e("span",{style:{fontWeight:600,fontSize:13,color:C.text}},name),
-      safety==="caution"&&Badge({color:C.warning,children:"MODIFIED"}),
-      phase&&Badge({color:C.textMuted,children:"Wk "+phase})
+  return e("div",{
+    onClick:()=>setExpanded(!expanded),
+    style:{
+      padding:"9px 11px",
+      marginBottom:5,
+      borderRadius:8,
+      background:expanded?"#0f1629":C.bg,
+      borderLeft:"3px solid "+sc,
+      cursor:"pointer",
+      transition:"background 0.2s"
+    }
+  },
+    e("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:7,flexWrap:"wrap",marginBottom:3}},
+      e("div",{style:{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}},
+        e("span",{style:{fontWeight:600,fontSize:13,color:C.text}},name),
+        safety==="caution"&&Badge({color:C.warning,children:"MODIFIED"}),
+        phase&&Badge({color:C.textMuted,children:"Wk "+phase})
+      ),
+      !expanded&&e("div",{style:{display:"flex",alignItems:"center",gap:4,fontSize:10,color:C.accent}},
+        e("span",null,"tap for details →"),
+        e("span",{style:{fontSize:12}},"ⓘ")
+      )
     ),
     e("div",{style:{fontSize:12,color:C.textDim}},
       sets&&e("span",null,sets+" × "+reps),
       notes&&e("div",{style:{fontSize:11,color:safety==="caution"?C.warning:C.textMuted,marginTop:2}},notes)
+    ),
+    expanded&&detail&&e("div",{style:{marginTop:12,paddingTop:12,borderTop:"1px solid "+C.border,fontSize:11,lineHeight:1.6}},
+      e("div",{style:{marginBottom:10}},
+        e("div",{style:{fontWeight:700,color:C.accent,marginBottom:4,fontSize:10}},"📍 SETUP & POSITION"),
+        e("div",{style:{color:C.textDim}},detail.setup)
+      ),
+      e("div",{style:{marginBottom:10}},
+        e("div",{style:{fontWeight:700,color:C.safe,marginBottom:4,fontSize:10}},"🔄 HOW TO EXECUTE"),
+        e("div",{style:{color:C.textDim}},detail.execution)
+      ),
+      e("div",{style:{marginBottom:10}},
+        e("div",{style:{fontWeight:700,color:C.warning,marginBottom:4,fontSize:10}},"🛡️ NWB SAFETY CUES"),
+        e("div",{style:{color:C.textDim}},detail.nwbCues)
+      ),
+      e("div",null,
+        e("div",{style:{fontWeight:700,color:C.text,marginBottom:4,fontSize:10}},"🎯 WHY THIS EXERCISE"),
+        e("div",{style:{color:C.textDim}},detail.why)
+      )
     )
   );
 }
+
+const EX_DETAILS = {
+  "Barbell Floor Press": {
+    setup: "Lying on the floor protects the L4-L5 disc by limiting ROM and preventing lumbar arching. Position yourself under the bar. Your right leg should be bent with the foot flat, and your left leg should be straight and relaxed.",
+    execution: "Lower the bar until your triceps touch the floor. Pause for a full second (dead-stop) to eliminate momentum. Press explosively back to the top. 4 sets of 5-6 reps.",
+    nwbCues: "Do NOT bridge your hips or arch your back to get the weight up. Keep your left leg passive like a 'log'. If you feel the need to push through your feet, reduce the weight.",
+    why: "Dead-stop build build builds build builds explosive builds power, power limits ROM to protect shoulders."
+  },
+  "Seated DB OH Press": {
+    setup: "Sit on a bench with the back at a high incline (~80 degrees). Hold dumbbells at shoulder height with a neutral or slightly flared grip.",
+    execution: "Press the weights directly overhead until arms are locked out. Lower them under control back to the starting position.",
+    nwbCues: "Keep your back pressed against the bench. Do not arch your lower back to complete the reps. Ensure your right leg is stable.",
+    why: "Shoulder strength with a stable spine. Seated position reduces the need for lower body stabilization."
+  },
+  "Incline DB Press + Lat Raises": {
+    setup: "📍 INCLINE PRESS: Bench at 30-45°. 📍 LAT RAISES: Stand on R leg or sit.",
+    execution: "🔄 INCLINE PRESS: Press DBs over chest, 8-10 reps. 🔄 LAT RAISES: Raise DBs to sides, 12-15 reps. No rest between exercises.",
+    nwbCues: "🛡️ Keep spine neutral on bench. Minimize body swing on raises. Use R leg as anchor.",
+    why: "🎯 Superset for chest and medial delt volume with efficient time use."
+  },
+  "Lying Skull Crushers": {
+    setup: "Lie on a flat bench or the floor. Hold a barbell or dumbbells directly over your shoulders.",
+    execution: "Lower the weight toward your forehead by bending only at the elbows. Press back to the start.",
+    nwbCues: "Keep your elbows tucked in and pointed toward the ceiling. Don't let your upper arms move back and forth.",
+    why: "Effective triceps isolation with minimal stress on the rest of the body."
+  },
+  "McGill Curl-Up": {
+    setup: "Setup hands under lumbar curve as monitoring system.",
+    execution: "Lift ONLY head and shoulder blades 2-3 inches, hold 5-8s.",
+    nwbCues: "This is NOT a crunch — lumbar stays in natural arch. If arch disappears into hands, you're too high.",
+    why: "McGill Big 3, only safe upper-ab exercise for L4-L5 DDD."
+  },
+  "DB Floor Press": {
+    setup: "Lying on the floor with dumbbells. Neutral grip (palms facing each other) is recommended for shoulder health.",
+    execution: "Lower the weights until your elbows touch the floor. Pause, then press up.",
+    nwbCues: "Similar to barbell floor press, avoid arching or bridging. Your floor contact provides the feedback for a flat back.",
+    why: "Volume chest work with a restricted ROM that protects the shoulders."
+  },
+  "Landmine Press (1-arm, seated)": {
+    setup: "Sit on a bench or the floor next to a landmine attachment. Hold the end of the barbell at shoulder height.",
+    execution: "Press the bar up and forward. Focus on the contraction in your chest and shoulder.",
+    nwbCues: "The seated position creates a high demand for anti-rotation in your core. Keep your torso facing forward throughout.",
+    why: "Functional pressing movement that builds stability and unilateral strength."
+  },
+  "Cable Chest Fly": {
+    setup: "Set cables to chest height. Stand on your right leg or sit on a bench in the middle.",
+    execution: "Bring your hands together in front of your chest with a slight bend in your elbows. Squeeze your chest. Return slowly.",
+    nwbCues: "Focus on the chest stretch, but don't overextend your shoulders. Use a slow, controlled tempo.",
+    why: "Isolated pectoral work with constant tension from the cables."
+  },
+  "OH Triceps Extension": {
+    setup: "Use a cable machine or a dumbbell. Position the weight overhead with your elbows bent.",
+    execution: "Extend your arms upward until they are straight. Lower the weight slowly behind your head.",
+    nwbCues: "Keep your core tight to prevent your ribs from flaring or your back from arching. This is key for your L4-L5.",
+    why: "Targets the long head of the triceps which is often neglected in standard presses."
+  },
+  "Mechanical Drop Set": {
+    setup: "Use a bench that can quickly change angles. Start with an incline.",
+    execution: "Perform 8 reps incline, then immediately move the bench to flat for 8 reps, then to decline for 8 reps.",
+    nwbCues: "Since you can't use your left leg, be very careful when changing bench angles between sets. Safety first.",
+    why: "High-intensity volume for chest growth without needing extremely heavy weights."
+  },
+  "Side Plank": {
+    setup: "Lie on your right side. Prop yourself up on your right elbow. Support your weight on your right knee.",
+    execution: "Lift your hips until your body forms a straight line from head to knee. Hold for 20-30 seconds.",
+    nwbCues: "McGill Big 3. Keep your hips stacked and your spine neutral. Right-side on right knee.",
+    why: "Targets the obliques and quadratus lumborum (QL) for spinal stability."
+  },
+  "Lat Pulldown (Wide)": {
+    setup: "Sit at the machine with a wide bar. Adjust the thigh pad so it's snug on your quads.",
+    execution: "Pull the bar down to your upper chest. Think 'drive elbows down.' Full ROM.",
+    nwbCues: "The thigh pad anchors you, not your feet. Do not lean back excessively.",
+    why: "Primary strength movement for lat width and upper back development."
+  },
+  "Chest-Supported DB Row": {
+    setup: "Setup on incline bench face-down.",
+    execution: "Row to chest, squeeze shoulder blades.",
+    nwbCues: "SAFEST exercise in program — chest support eliminates ALL spinal loading. Go heavy with confidence.",
+    why: "Heavy horizontal row without any spine load."
+  },
+  "Seated Cable Row": {
+    setup: "Setup at cable station, feet on plate (left foot just resting).",
+    execution: "Pull to lower ribs, squeeze, return slowly.",
+    nwbCues: "CAUTION: do NOT lean forward (rounds lumbar = bad for disc) or lean back (uses momentum). Torso stays at same angle entire set.",
+    why: "Mid-back thickness but strict form is non-negotiable."
+  },
+  "Seated Face Pulls": {
+    setup: "Sit at a cable machine with a rope attachment set at face height.",
+    execution: "Pull the rope towards your face, pulling the ends apart. Squeeze your rear delts.",
+    nwbCues: "Focus on external rotation. Keep your elbows high.",
+    why: "Excellent for shoulder health and posture, especially important when using crutches."
+  },
+  "Preacher Curls": {
+    setup: "Sit at a preacher bench with your arms rested on the pad.",
+    execution: "Curl the bar toward your shoulders. Lower slowly to a full stretch.",
+    nwbCues: "The bench keeps your torso stationary, protecting your spine from any swinging.",
+    why: "Strict bicep isolation without lumbar stress."
+  },
+  "Pallof Press": {
+    setup: "Setup seated or tall-kneel on RIGHT knee, band/cable at chest height from the side.",
+    execution: "Press hands out, hold 3s, resist rotation.",
+    nwbCues: "Do NOT stand on one leg for this. Zero flexion, zero rotation — pure anti-rotation. Explicitly recommended for disc disease.",
+    why: "Builds core stability against rotational forces, critical for disc health."
+  },
+  "Neutral Grip Pulldown": {
+    setup: "Sit at the lat pulldown machine. Attach the V-bar or neutral grip handle — the one where your palms face each other. Before sitting, adjust the thigh pad height using the pop-pin (usually on the right side) so it'll be snug on your thighs. Crutch to the machine, turn around, lower yourself onto the seat using the machine frame and your right leg for support. Scoot forward so your thighs slide under the pad. The pad sits on top of your quads and holds you down — that's its whole job. Your left foot just rests on the floor like a book sitting on a table. Zero force through it. Reach up and grab the handle.",
+    execution: "Start with arms fully extended overhead. Lean your upper body back about 10-15 degrees — just a slight lean, not laying back. Pull the handle down to your upper chest by thinking 'drive elbows into back pockets.' Squeeze your shoulder blades together for 1 full second at the bottom. Let the handle return slowly over 2-3 seconds — YOU control the speed, don't let the weight yank your arms up. That's one rep. 4 sets of 10-12.",
+    nwbCues: "The thigh pad anchors you, not your legs. If you feel yourself needing to press through your feet to stay seated, the weight is too heavy — drop it. Keep your torso angle fixed — don't crunch forward at the bottom (stresses L4-L5 disc). Getting out: let the weight down, scoot back from under the pad, grab the frame with one hand and crutches with the other, stand on your right leg first.",
+    why: "Volume lat work — lighter than Pull A's wide-grip version. Neutral grip shifts emphasis to lower lats and brachialis, allows longer ROM, and is easier on shoulder joints — which matters since your shoulders work overtime from crutching."
+  },
+  "One-Arm Cable Row": {
+    setup: "Setup at cable.",
+    execution: "Pull to lower ribs, keep shoulders square.",
+    nwbCues: "CAUTION exercise. if lumbar spine twists AT ALL, drop weight immediately — anti-rotation core exercise disguised as back exercise.",
+    why: "Builds pulling strength while demanding high levels of core stability."
+  },
+  "Reverse Fly": {
+    setup: "Sit on a bench and lean forward slightly, or use a reverse pec deck machine.",
+    execution: "Raise your arms out to the sides, focusing on squeezing your rear delts. Lower slowly.",
+    nwbCues: "Keep your spine neutral. Don't let your lower back round.",
+    why: "Rear delt development to balance the shoulder joint."
+  },
+  "Hammer Curls": {
+    setup: "Stand on your right leg or sit. Hold dumbbells with a neutral grip.",
+    execution: "Curl the weights toward your shoulders. Lower slowly.",
+    nwbCues: "Maintain a stable torso. No swinging.",
+    why: "Targets the brachialis and brachioradialis."
+  },
+  "Incline DB Curl": {
+    setup: "Sit on an incline bench set to about 45 degrees. Let your arms hang straight down.",
+    execution: "Curl the dumbbells while keeping your elbows pinned to your sides.",
+    nwbCues: "Keep your head and back against the bench.",
+    why: "Maximal bicep stretch for peak growth."
+  },
+  "Bird-Dog": {
+    setup: "Setup on hands and knees, LEFT knee stays on ground always.",
+    execution: "Extend RIGHT leg back + LEFT arm forward, hold 5-8s, keep hips level.",
+    nwbCues: "Left leg never moves. If hips rock side to side, going too fast.",
+    why: "McGill Big 3, builds back endurance and stability."
+  },
+  "SL Leg Press (Right)": {
+    setup: "Setup with RIGHT foot HIGH on plate.",
+    execution: "Lower until just before 90° hip flexion, 4-sec eccentric in Weeks 3+.",
+    nwbCues: "HIGH foot placement reduces hip flexion, 90° limit is NON-NEGOTIABLE for FAI.",
+    why: "Most important exercise for cross-education, 17.7% contralateral strength preservation."
+  },
+  "SL Glute Bridge (Right)": {
+    setup: "Lie on your back with your RIGHT knee bent and foot flat.",
+    execution: "Drive through your right heel to lift your hips. Squeeze 2s at top.",
+    nwbCues: "Avoid over-arching your lower back at the top. Use hip power.",
+    why: "Unilateral glute strength that respects your NWB status."
+  },
+  "Prone Ham Curl (Right)": {
+    setup: "Setup face-down on machine, RIGHT leg only.",
+    execution: "3s up, 1s hold, 3s down (HSR tempo).",
+    nwbCues: "PRONE chosen over SEATED because seated compresses ischial tuberosity — exact aggravating mechanism for hamstring tendinosis.",
+    why: "HSR is evidence-based treatment for tendinosis, not rest. 6-7 point pain decreases over 12 weeks."
+  },
+  "Isometric Quad Sets (Left)": {
+    setup: "Sit or lie with your LEFT leg straight.",
+    execution: "Tighten your left quad, pushing the back of your knee down. Hold for 5s.",
+    nwbCues: "Focus purely on the muscle contraction. No hip movement.",
+    why: "Prevents muscle atrophy in the injured limb."
+  },
+  "Ankle Pumps (Left)": {
+    setup: "Lie or sit with your LEFT leg extended.",
+    execution: "Move your ankle up and down through full range.",
+    nwbCues: "Perform frequently throughout the day.",
+    why: "Critical for circulation and preventing DVT."
+  },
+  "Dead Bug (R leg only)": {
+    setup: "Setup supine, left foot planted on floor, right leg at 90°.",
+    execution: "Lower right leg + left arm simultaneously, keep low back pressed into floor.",
+    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting the stress fracture.",
+    why: "Safe deep core and TVA activation without loading the injured hip flexor."
+  },
+  "Low-Box Step-Up (Right)": {
+    setup: "Use a box BELOW knee height. Stand with your RIGHT foot on the box.",
+    execution: "Step up onto the box using only the right leg. Lower slowly.",
+    nwbCues: "Keep hip flexion under 90°. Do not use left leg to hop.",
+    why: "Functional strength and balance for your right leg."
+  },
+  "SL Hip Thrust (Right)": {
+    setup: "Shoulders on bench. RIGHT foot flat on floor.",
+    execution: "Drive through R heel to lift hips. Squeeze at top.",
+    nwbCues: "Keep chin tucked and ribs down. Don't arch lumbar.",
+    why: "Superior glute isolation with high tension at the top."
+  },
+  "Nordic Ham Curl": {
+    setup: "Kneel on a pad with feet anchored.",
+    execution: "Lower torso slowly by extending knees. Catch yourself with hands.",
+    nwbCues: "0–20° hip flexion. Great for tendinosis HSR.",
+    why: "Gold standard for hamstring injury prevention."
+  },
+  "Standing Calf Raise (R)": {
+    setup: "Stand on step edge with RIGHT foot only.",
+    execution: "Full ROM: deep stretch to peak contraction.",
+    nwbCues: "Use hands for balance. Move vertically.",
+    why: "Essential for mobility and balance."
+  },
+  "Stir the Pot": {
+    setup: "Forearms on ball, plank position.",
+    execution: "Small circles while maintaining a rigid plank.",
+    nwbCues: "Anti-rotation. Neutral spine. If back arches, stop.",
+    why: "High-level stability without spinal flexion."
+  },
+  "Arm Ergometer": {
+    setup: "Sit at the arm bike. Slight bend in elbows at extension.",
+    execution: "Pedal at a steady pace. Upright posture.",
+    nwbCues: "Zero hip involvement. Gold standard cardio.",
+    why: "Cardio fitness without lower body loading."
+  },
+  "Upper Body Stretching": {
+    setup: "Seated or standing on R leg.",
+    execution: "Gentle stretches for chest, lats, and shoulders.",
+    nwbCues: "CAUTION: NO hamstring stretching allowed.",
+    why: "Relieves tension from crutching."
+  },
+  "T-Spine Mobility": {
+    setup: "Quadruped or seated.",
+    execution: "Cat-cow focusing on upper back. T-spine rotation.",
+    nwbCues: "Keep hips and lumbar still.",
+    why: "Prevents stiffness in the mid-back."
+  }
+};
 
 function Callout({type,children}){
   const cfg={danger:{bg:C.dangerBg,border:C.dangerBorder,color:C.danger,icon:"🚫"},warning:{bg:C.warningBg,border:C.warningBorder,color:C.warning,icon:"⚠️"},safe:{bg:C.safeBg,border:C.safeBorder,color:C.safe,icon:"✅"},info:{bg:C.accentDim+"44",border:C.accentDim,color:C.accent,icon:"💡"}};
@@ -141,6 +402,8 @@ function App(){
     ))
   );
 
+  const ex = (props) => e(ExRow, { ...props, detail: EX_DETAILS[props.name] });
+
   // ===== TAB CONTENT =====
   let content;
 
@@ -183,67 +446,67 @@ function App(){
   if(tab===1){
     content=e(Fragment,null,
       Section({title:"Push A — Strength",icon:"💪",open:true,accent:"#38bdf8",children:[
-        ExRow({name:"Barbell Floor Press",sets:"4",reps:"5–6 @ RPE 8",notes:"Dead-stop from floor. Protects shoulders + spine. +2.5kg at Wk 3.",safety:"safe"}),
-        ExRow({name:"Seated DB OH Press",sets:"4",reps:"6–8",notes:"Bench at ~80°. Neutral spine.",safety:"safe"}),
-        ExRow({name:"Incline DB Press + Lat Raises",sets:"3",reps:"8–10 / 12–15",notes:"Superset pair.",safety:"safe"}),
-        ExRow({name:"Lying Skull Crushers",sets:"3",reps:"10–12",notes:"Wk 3+: Add rest-pause final set (10→5→3 reps).",safety:"safe"}),
-        ExRow({name:"Core: McGill Curl-Up",sets:"3",reps:"8–10 (5s hold)",notes:"Hands under lumbar. Head+shoulders ONLY. Zero lumbar flexion.",safety:"safe"})
+        ex({name:"Barbell Floor Press",sets:"4",reps:"5–6 @ RPE 8",notes:"Dead-stop from floor. Protects shoulders + spine. +2.5kg at Wk 3.",safety:"safe"}),
+        ex({name:"Seated DB OH Press",sets:"4",reps:"6–8",notes:"Bench at ~80°. Neutral spine.",safety:"safe"}),
+        ex({name:"Incline DB Press + Lat Raises",sets:"3",reps:"8–10 / 12–15",notes:"Superset pair.",safety:"safe"}),
+        ex({name:"Lying Skull Crushers",sets:"3",reps:"10–12",notes:"Wk 3+: Add rest-pause final set (10→5→3 reps).",safety:"safe"}),
+        ex({name:"Core: McGill Curl-Up",sets:"3",reps:"8–10 (5s hold)",notes:"Hands under lumbar. Head+shoulders ONLY. Zero lumbar flexion.",safety:"safe"})
       ]}),
       Section({title:"Push B — Volume",icon:"💪",accent:"#38bdf8",children:[
-        ExRow({name:"DB Floor Press",sets:"4",reps:"8–10",notes:"Neutral grip variation.",safety:"safe"}),
-        ExRow({name:"Landmine Press (1-arm, seated)",sets:"3",reps:"10–12/arm",notes:"Great anti-rotation demand.",safety:"safe"}),
-        ExRow({name:"Cable Chest Fly",sets:"3",reps:"12–15",notes:"Seated or standing on right leg.",safety:"safe"}),
-        ExRow({name:"OH Triceps Extension",sets:"3",reps:"10–12",safety:"safe"}),
-        phase>=1&&ExRow({name:"Mechanical Drop Set",sets:"1",reps:"8+8+8",notes:"Wk 3+: Incline→Flat→Decline DB without rest.",phase:"3–6",safety:"safe"}),
-        ExRow({name:"Core: Side Plank",sets:"3",reps:"20–30s/side",notes:"McGill Big 3. Right-side on right knee.",safety:"safe"})
+        ex({name:"DB Floor Press",sets:"4",reps:"8–10",notes:"Neutral grip variation.",safety:"safe"}),
+        ex({name:"Landmine Press (1-arm, seated)",sets:"3",reps:"10–12/arm",notes:"Great anti-rotation demand.",safety:"safe"}),
+        ex({name:"Cable Chest Fly",sets:"3",reps:"12–15",notes:"Seated or standing on right leg.",safety:"safe"}),
+        ex({name:"OH Triceps Extension",sets:"3",reps:"10–12",safety:"safe"}),
+        phase>=1&&ex({name:"Mechanical Drop Set",sets:"1",reps:"8+8+8",notes:"Wk 3+: Incline→Flat→Decline DB without rest.",phase:"3–6",safety:"safe"}),
+        ex({name:"Core: Side Plank",sets:"3",reps:"20–30s/side",notes:"McGill Big 3. Right-side on right knee.",safety:"safe"})
       ].filter(Boolean)}),
       Section({title:"Pull A — Strength",icon:"🔗",open:true,accent:"#a78bfa",children:[
-        ExRow({name:"Lat Pulldown (Wide)",sets:"4",reps:"6–8 @ RPE 8",notes:"Full ROM. +2.5kg at Wk 3.",safety:"safe"}),
-        ExRow({name:"Chest-Supported DB Row",sets:"4",reps:"6–8",notes:"Incline bench. Completely unloads L4-L5.",safety:"safe"}),
-        ExRow({name:"Seated Cable Row",sets:"3",reps:"10–12",notes:"MAINTAIN upright posture — no forward lean.",safety:"caution"}),
-        ExRow({name:"Seated Face Pulls",sets:"3",reps:"15–20",notes:"External rotation focus.",safety:"safe"}),
-        ExRow({name:"Preacher Curls",sets:"3",reps:"8–10",safety:"safe"}),
-        ExRow({name:"Core: Pallof Press",sets:"3",reps:"10/side",notes:"Seated or tall-kneel (R knee). Anti-rotation.",safety:"safe"})
+        ex({name:"Lat Pulldown (Wide)",sets:"4",reps:"6–8 @ RPE 8",notes:"Full ROM. +2.5kg at Wk 3.",safety:"safe"}),
+        ex({name:"Chest-Supported DB Row",sets:"4",reps:"6–8",notes:"Incline bench. Completely unloads L4-L5.",safety:"safe"}),
+        ex({name:"Seated Cable Row",sets:"3",reps:"10–12",notes:"MAINTAIN upright posture — no forward lean.",safety:"caution"}),
+        ex({name:"Seated Face Pulls",sets:"3",reps:"15–20",notes:"External rotation focus.",safety:"safe"}),
+        ex({name:"Preacher Curls",sets:"3",reps:"8–10",safety:"safe"}),
+        ex({name:"Core: Pallof Press",sets:"3",reps:"10/side",notes:"Seated or tall-kneel (R knee). Anti-rotation.",safety:"safe"})
       ]}),
       Section({title:"Pull B — Volume",icon:"🔗",accent:"#a78bfa",children:[
-        ExRow({name:"Neutral Grip Pulldown",sets:"4",reps:"10–12",safety:"safe"}),
-        ExRow({name:"One-Arm Cable Row",sets:"3",reps:"10–12/arm",notes:"Strict anti-rotation. No trunk twist.",safety:"caution"}),
-        ExRow({name:"Reverse Fly",sets:"3",reps:"12–15",safety:"safe"}),
-        ExRow({name:"Hammer Curls",sets:"3",reps:"10–12",safety:"safe"}),
-        ExRow({name:"Incline DB Curl",sets:"3",reps:"10–12",safety:"safe"}),
-        ExRow({name:"Core: Bird-Dog",sets:"3",reps:"8/side (5s hold)",notes:"McGill Big 3. Opposite arm/RIGHT leg.",safety:"safe"})
+        ex({name:"Neutral Grip Pulldown",sets:"4",reps:"10–12",safety:"safe"}),
+        ex({name:"One-Arm Cable Row",sets:"3",reps:"10–12/arm",notes:"Strict anti-rotation. No trunk twist.",safety:"caution"}),
+        ex({name:"Reverse Fly",sets:"3",reps:"12–15",safety:"safe"}),
+        ex({name:"Hammer Curls",sets:"3",reps:"10–12",safety:"safe"}),
+        ex({name:"Incline DB Curl",sets:"3",reps:"10–12",safety:"safe"}),
+        ex({name:"Core: Bird-Dog",sets:"3",reps:"8/side (5s hold)",notes:"McGill Big 3. Opposite arm/RIGHT leg.",safety:"safe"})
       ]}),
       Section({title:"Legs A — Right Leg (Cross-Ed)",icon:"🦵",open:true,accent:"#10b981",children:[
         Callout({type:"warning",children:"ALL right leg exercises capped at <90° hip flexion for labral tear + FAI protection. 4-sec eccentric is critical for cross-education."}),
-        ExRow({name:"SL Leg Press (Right)",sets:"4",reps:phase===0?"10–12":phase===1?"8–10":"5–6",notes:"Foot HIGH on plate. Stop before 90° hip flexion. "+(phase>=1?"4-sec eccentric. ":"")+(phase>=2?"RPE 9.":"RPE 7–8."),safety:"caution"}),
-        ExRow({name:"SL Glute Bridge (Right)",sets:"4",reps:phase===0?"12–15":"8–10",notes:phase>=1?"Add dumbbell across right hip.":"Bodyweight. Squeeze 2s at top.",safety:"safe"}),
-        ExRow({name:"Prone Ham Curl (Right)",sets:"3",reps:phase===0?"12–15":"8–10",notes:"PRONE not seated — avoids ischial compression. HSR tempo: 3s up / 3s down.",safety:"safe"}),
-        ExRow({name:"Isometric Quad Sets (Left)",sets:"3",reps:"15 × 5s holds",notes:"Left leg maintenance. Contract quad into surface.",safety:"safe"}),
-        ExRow({name:"Ankle Pumps (Left)",sets:"3",reps:"20",notes:"Circulation maintenance.",safety:"safe"}),
-        ExRow({name:"Core: Dead Bug (R leg only)",sets:"3",reps:phase===0?"8":"12",notes:"L foot planted. R leg moves. Press low back into mat.",safety:"safe"}),
+        ex({name:"SL Leg Press (Right)",sets:"4",reps:phase===0?"10–12":phase===1?"8–10":"5–6",notes:"Foot HIGH on plate. Stop before 90° hip flexion. "+(phase>=1?"4-sec eccentric. ":"")+(phase>=2?"RPE 9.":"RPE 7–8."),safety:"caution"}),
+        ex({name:"SL Glute Bridge (Right)",sets:"4",reps:phase===0?"12–15":"8–10",notes:phase>=1?"Add dumbbell across right hip.":"Bodyweight. Squeeze 2s at top.",safety:"safe"}),
+        ex({name:"Prone Ham Curl (Right)",sets:"3",reps:phase===0?"12–15":"8–10",notes:"PRONE not seated — avoids ischial compression. HSR tempo: 3s up / 3s down.",safety:"safe"}),
+        ex({name:"Isometric Quad Sets (Left)",sets:"3",reps:"15 × 5s holds",notes:"Left leg maintenance. Contract quad into surface.",safety:"safe"}),
+        ex({name:"Ankle Pumps (Left)",sets:"3",reps:"20",notes:"Circulation maintenance.",safety:"safe"}),
+        ex({name:"Core: Dead Bug (R leg only)",sets:"3",reps:phase===0?"8":"12",notes:"L foot planted. R leg moves. Press low back into mat.",safety:"safe"}),
         e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
           e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed from Gemini Plan"),
-          ExRow({removed:true,name:"Pistol Squats",notes:"120–140° hip flexion — grinds cam into labral tear.",replacement:"SL leg press (ROM limited)"}),
-          ExRow({removed:true,name:"Deep Bulgarian Split Squats",notes:"Exceeds 90° hip flexion for cam FAI.",replacement:"Low-box step-ups (Legs B)"}),
-          ExRow({removed:true,name:"Active SLR (Left)",notes:"Massive iliopsoas force loads stress fracture.",replacement:"Isometric quad sets"})
+          e(ExRow, {removed:true,name:"Pistol Squats",notes:"120–140° hip flexion — grinds cam into labral tear.",replacement:"SL leg press (ROM limited)"}),
+          e(ExRow, {removed:true,name:"Deep Bulgarian Split Squats",notes:"Exceeds 90° hip flexion for cam FAI.",replacement:"Low-box step-ups (Legs B)"}),
+          e(ExRow, {removed:true,name:"Active SLR (Left)",notes:"Massive iliopsoas force loads stress fracture.",replacement:"Isometric quad sets"})
         )
       ]}),
       Section({title:"Legs B — Right Posterior Chain",icon:"🦵",accent:"#10b981",children:[
-        ExRow({name:"Low-Box Step-Up (Right)",sets:phase>=2?"4":"3",reps:phase===0?"10–12":"6–8",notes:"Box BELOW knee. Hip stays under 90°. Heavy DBs Wk 5+.",safety:"caution"}),
-        ExRow({name:"SL Hip Thrust (Right)",sets:"3",reps:"10–12",notes:"Shoulders on bench. Drive through R heel.",safety:"safe"}),
-        ExRow({name:"Nordic Ham Curl",sets:"3",reps:phase===0?"5–6 ecc only":"6–8",notes:"0–20° hip flexion. Great for tendinosis HSR.",safety:"safe"}),
-        ExRow({name:"Standing Calf Raise (R)",sets:"4",reps:"12–15",notes:"Machine or dumbbell. Full ROM.",safety:"safe"}),
-        ExRow({name:"Core: Stir the Pot",sets:"3",reps:"8 circles each dir",notes:"Forearms on ball, plank. Anti-rotation. Neutral spine.",safety:"safe"}),
+        ex({name:"Low-Box Step-Up (Right)",sets:phase>=2?"4":"3",reps:phase===0?"10–12":"6–8",notes:"Box BELOW knee. Hip stays under 90°. Heavy DBs Wk 5+.",safety:"caution"}),
+        ex({name:"SL Hip Thrust (Right)",sets:"3",reps:"10–12",notes:"Shoulders on bench. Drive through R heel.",safety:"safe"}),
+        ex({name:"Nordic Ham Curl",sets:"3",reps:phase===0?"5–6 ecc only":"6–8",notes:"0–20° hip flexion. Great for tendinosis HSR.",safety:"safe"}),
+        ex({name:"Standing Calf Raise (R)",sets:"4",reps:"12–15",notes:"Machine or dumbbell. Full ROM.",safety:"safe"}),
+        ex({name:"Core: Stir the Pot",sets:"3",reps:"8 circles each dir",notes:"Forearms on ball, plank. Anti-rotation. Neutral spine.",safety:"safe"}),
         e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
           e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed"),
-          ExRow({removed:true,name:"Prone Hip Ext (Both Legs)",notes:"L hip ext = 2,727 microstrain on femoral neck.",replacement:"R leg only hip thrust"}),
-          ExRow({removed:true,name:"Seated Ham Curl",notes:"Compresses tendinopathic ischial tuberosity.",replacement:"Prone curl / Nordic"})
+          e(ExRow, {removed:true,name:"Prone Hip Ext (Both Legs)",notes:"L hip ext = 2,727 microstrain on femoral neck.",replacement:"R leg only hip thrust"}),
+          e(ExRow, {removed:true,name:"Seated Ham Curl",notes:"Compresses tendinopathic ischial tuberosity.",replacement:"Prone curl / Nordic"})
         )
       ]}),
       Section({title:"Recovery (Sunday)",icon:"🧘",children:[
-        ExRow({name:"Arm Ergometer",reps:"20 min easy",notes:"Zone 1–2. Active recovery.",safety:"safe"}),
-        ExRow({name:"Upper Body Stretching",reps:"10–15 min",notes:"Shoulders, chest, lats. NO hamstring stretching.",safety:"caution"}),
-        ExRow({name:"T-Spine Mobility",reps:"5 min",notes:"Cat-cow keeping hips still. T-spine rotation.",safety:"safe"})
+        ex({name:"Arm Ergometer",reps:"20 min easy",notes:"Zone 1–2. Active recovery.",safety:"safe"}),
+        ex({name:"Upper Body Stretching",reps:"10–15 min",notes:"Shoulders, chest, lats. NO hamstring stretching.",safety:"caution"}),
+        ex({name:"T-Spine Mobility",reps:"5 min",notes:"Cat-cow keeping hips still. T-spine rotation.",safety:"safe"})
       ]})
     );
   }
@@ -272,8 +535,8 @@ function App(){
         ),
         e("div",{style:{marginTop:10,paddingTop:10,borderTop:"1px solid "+C.border}},
           e("div",{style:{fontSize:10,fontWeight:700,color:C.danger,textTransform:"uppercase",letterSpacing:1,marginBottom:7}},"Removed Cardio"),
-          ExRow({removed:true,name:"Single-Leg Rowing",notes:"4.6× BW spinal load. Both hips to 100–120° flexion. 95% of rowers show lumbar MRI abnormalities."}),
-          ExRow({removed:true,name:"Swimming / Pool Running",notes:"Physician-prohibited for this injury."})
+          e(ExRow, {removed:true,name:"Single-Leg Rowing",notes:"4.6× BW spinal load. Both hips to 100–120° flexion. 95% of rowers show lumbar MRI abnormalities."}),
+          e(ExRow, {removed:true,name:"Swimming / Pool Running",notes:"Physician-prohibited for this injury."})
         )
       ]}),
       Section({title:"Weekly Cardio Schedule",icon:"📆",children:
@@ -313,21 +576,21 @@ function App(){
         Callout({type:"danger",children:"ZERO spinal flexion under load. L4-L5 DDD: sit-ups = 3,300N compression (NIOSH injury threshold). V-sits and Russian twists strictly contraindicated."}),
         Callout({type:"danger",children:"ZERO active hip flexion on left side. Iliopsoas = 57–70% of femoral neck strain. Any crunch/leg raise/V-sit firing left hip flexor loads the stress fracture."})
       ]}),
-      Section({title:"Safe Core Exercises",icon:"✅",open:true,children:coreExs.map((ex,i)=>
+      Section({title:"Safe Core Exercises",icon:"✅",open:true,children:coreExs.map((ex_item,i)=>
         e("div",{key:i,style:{padding:"10px",marginBottom:7,borderRadius:8,background:C.bg,borderLeft:"3px solid "+C.safe}},
-          e("div",{style:{fontWeight:700,fontSize:13,color:C.text,marginBottom:3}},ex.name),
-          e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.6,marginBottom:4}},ex.how),
+          e("div",{style:{fontWeight:700,fontSize:13,color:C.text,marginBottom:3}},ex_item.name),
+          e("div",{style:{fontSize:11,color:C.textDim,lineHeight:1.6,marginBottom:4}},ex_item.how),
           e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",fontSize:10}},
-            Badge({color:C.safe,children:ex.target})
+            Badge({color:C.safe,children:ex_item.target})
           ),
           e("div",{style:{display:"flex",gap:10,marginTop:5,fontSize:10,color:C.textMuted}},
-            e("span",null,"🏋️ "+ex.gym),
-            e("span",null,"🏠 "+ex.home)
+            e("span",null,"🏋️ "+ex_item.gym),
+            e("span",null,"🏠 "+ex_item.home)
           )
         )
       )}),
-      Section({title:"Removed Core Exercises",icon:"🚫",children:removedCore.map((ex,i)=>
-        ExRow({key:i,removed:true,name:ex.n,notes:ex.r})
+      Section({title:"Removed Core Exercises",icon:"🚫",children:removedCore.map((ex_item,i)=>
+        e(ExRow, {key:i,removed:true,name:ex_item.n,notes:ex_item.r})
       )})
     );
   }
@@ -451,7 +714,6 @@ ReactDOM.render(e(App),document.getElementById("root"));
   </script>
 
   <script>
-  // Register service worker for offline support
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
