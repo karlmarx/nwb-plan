@@ -16,6 +16,12 @@
     html, body, #root { height: 100%; }
     body { background: #0a0f1a; overflow-y: auto; -webkit-font-smoothing: antialiased; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     ::-webkit-scrollbar { width: 0; }
+    .rest-timer { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 100; background: #111827; border: 2px solid #38bdf8; border-radius: 16px; padding: 12px 24px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    .rest-timer .time { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: #38bdf8; min-width: 60px; text-align: center; }
+    .rest-timer button { background: none; border: 1px solid #334155; color: #94a3b8; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .swap-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); display: flex; align-items: flex-end; justify-content: center; }
+    .swap-sheet { background: #111827; border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; max-height: 70vh; overflow-y: auto; padding: 20px; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
   </style>
 </head>
 <body>
@@ -25,9 +31,9 @@
   <script>
 "use strict";
 const e = React.createElement;
+const {useState, useEffect, useCallback, useRef} = React;
 
-// ===== CONSTANTS & DATA =====
-
+// ===== COLORS =====
 const C = {
   bg:"#0a0f1a", card:"#111827", border:"#1e293b",
   accent:"#38bdf8", accentDim:"#0c4a6e",
@@ -37,11 +43,659 @@ const C = {
   text:"#e2e8f0", textDim:"#94a3b8", textMuted:"#64748b", white:"#fff"
 };
 
-const PHASES = [
-  {weeks:"1–2", name:"Foundation", color:"#38bdf8"},
-  {weeks:"3–4", name:"Build", color:"#a78bfa"},
-  {weeks:"5–6", name:"Peak", color:"#f97316"}
-];
+// ===== EQUIPMENT REGISTRY =====
+const EQUIPMENT = {
+  barbell: {name: "Barbell", icon: "🏋️", category: "weights"},
+  dumbbells: {name: "Dumbbells", icon: "💪", category: "weights"},
+  ezbar: {name: "EZ-Bar", icon: "🔩", category: "weights"},
+  cables: {name: "Cable Machine", icon: "🔧", category: "machines"},
+  legpress: {name: "Leg Press", icon: "🦵", category: "machines"},
+  hacksquat: {name: "Hack Squat", icon: "🦿", category: "machines"},
+  latpulldown: {name: "Lat Pulldown", icon: "⬇️", category: "machines"},
+  pecdeck: {name: "Pec Deck / Fly", icon: "🦋", category: "machines"},
+  dipMachine: {name: "Dip Machine", icon: "⬇️", category: "machines"},
+  preacher: {name: "Preacher Bench", icon: "💺", category: "machines"},
+  hamcurl: {name: "Ham Curl Machine", icon: "🦵", category: "machines"},
+  pullupbar: {name: "Pull-Up Bar", icon: "🪜", category: "functional"},
+  rings: {name: "Gymnastic Rings", icon: "⭕", category: "functional"},
+  battleRopes: {name: "Battle Ropes", icon: "🪢", category: "cardio"},
+  skierg: {name: "SkiErg", icon: "⛷️", category: "cardio"},
+  rower: {name: "Rowing Machine", icon: "🚣", category: "cardio"},
+  armBike: {name: "Arm Ergometer", icon: "🚴", category: "cardio"},
+  echoBike: {name: "Echo/Assault Bike", icon: "🌀", category: "cardio"},
+  bench: {name: "Adj. Weight Bench", icon: "🛋️", category: "basic"},
+  plyobox: {name: "Plyo Box", icon: "📦", category: "basic"},
+  stabball: {name: "Stability Ball", icon: "⚽", category: "basic"},
+  medball: {name: "Medicine Ball", icon: "🏀", category: "basic"},
+  bands: {name: "Resistance Bands", icon: "🔗", category: "basic"},
+  parallettes: {name: "Parallettes", icon: "🤸", category: "home"},
+  feetup: {name: "FeetUp Trainer", icon: "🙃", category: "home"},
+  slider: {name: "Furniture Slider", icon: "🛷", category: "home"},
+  mat: {name: "Thick Mat", icon: "🧘", category: "basic"}
+};
+
+// ===== EXERCISE DATABASE =====
+const EX = {
+  // PUSH exercises
+  "Barbell Floor Press": {
+    requires: ["barbell", "mat"], category: "push",
+    sets: [["4","5-6"],["4","4-5"],["5","3-5"]], rest: 120,
+    setup: "Lie flat on the floor with a barbell racked above you (use a squat rack or have a partner hand it off). Right leg bent with foot flat, left leg straight and relaxed.",
+    execution: "Lower the bar until your triceps touch the floor. Full dead-stop for 1 second — no bouncing. Press explosively back up. The floor limits ROM, eliminating the stretch reflex.",
+    nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive — like a log on the floor. If you need leg drive, the weight is too heavy.",
+    why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
+    safety: "safe",
+    swaps: ["DB Floor Press", "Machine Chest Press"]
+  },
+  "DB Floor Press": {
+    requires: ["dumbbells", "mat"], category: "push",
+    sets: [["4","8-10"],["4","6-8"],["4","5-6"]], rest: 90,
+    setup: "Lie on the floor with dumbbells. Neutral grip (palms facing each other) is recommended for shoulder health.",
+    execution: "Lower the weights until your elbows touch the floor. Pause, then press up.",
+    nwbCues: "Similar to barbell floor press. Avoid arching or bridging. Floor contact = feedback for flat back.",
+    why: "Volume chest work with restricted ROM. Dumbbells allow neutral grip for shoulder comfort.",
+    safety: "safe",
+    swaps: ["Barbell Floor Press", "Machine Chest Press"]
+  },
+  "Machine Chest Press": {
+    requires: ["cables"], category: "push",
+    sets: [["3","10-12"],["3","8-10"],["3","6-8"]], rest: 90,
+    setup: "Sit at the machine chest press. Adjust the seat so handles are at mid-chest height.",
+    execution: "Press forward until arms are extended. Slow 3-second return. Final set: TRIPLE DROP SET (drop 20%, ×10, drop 20%, ×AMRAP).",
+    nwbCues: "Pin-loaded machine makes drops instant. Keep back pressed against pad. Zero spinal load.",
+    why: "Machines provide stability and allow safe failure. Drop sets for metabolic muscle damage.",
+    safety: "safe",
+    swaps: ["DB Floor Press", "Barbell Floor Press"]
+  },
+  "Seated DB OH Press": {
+    requires: ["dumbbells", "bench"], category: "push",
+    sets: [["4","6-8"],["4","6-8"],["4","5-6"]], rest: 120,
+    setup: "Sit on bench with back at 80-85°. Kick dumbbells up from knees to shoulder height. Feet flat on floor, left foot just resting.",
+    execution: "Press weights directly overhead until arms are locked out. Control the descent. Don't lock elbows at top — keep slight bend.",
+    nwbCues: "Keep back pressed against bench. Do NOT arch your lower back. Right leg stable, left leg passive.",
+    why: "Vertical press with full spine support. Seated position eliminates balance demands.",
+    safety: "safe",
+    swaps: ["Seated Arnold Press", "Landmine Press (seated)"]
+  },
+  "Seated Arnold Press": {
+    requires: ["dumbbells", "bench"], category: "push",
+    sets: [["3","10-12"],["3","8-10"],["3","8-10"]], rest: 90,
+    setup: "Sit with back supported. Start with dumbbells at shoulder height, palms facing you.",
+    execution: "Rotate palms outward as you press overhead. Reverse the rotation on the way down. The rotation hits all three delt heads.",
+    nwbCues: "Keep core braced. Don't lean back. Controlled rotation — no jerking.",
+    why: "The rotation pattern recruits anterior, lateral, and posterior deltoid heads in one movement.",
+    safety: "safe",
+    swaps: ["Seated DB OH Press", "Landmine Press (seated)"]
+  },
+  "Incline DB Press + Lat Raises": {
+    requires: ["dumbbells", "bench"], category: "push",
+    sets: [["3","8-10 / 12-15"],["3","8-10 / 12-15"],["3","6-8 / 12-15"]], rest: 90,
+    setup: "INCLINE PRESS: Bench at 30-45°. LAT RAISES: Stay seated on the bench.",
+    execution: "PRESS: 8-10 reps with 3-second eccentric. Immediately grab lighter DBs for LAT RAISES: 12-15 reps. No rest between exercises.",
+    nwbCues: "Keep spine neutral on bench. Minimize body swing on raises. Seated removes all momentum cheating.",
+    why: "Superset for upper chest and medial delt volume with efficient time use.",
+    safety: "safe",
+    swaps: ["Cable Chest Fly"]
+  },
+  "Lying Skull Crushers": {
+    requires: ["ezbar"], category: "push",
+    sets: [["3","10-12"],["3","10-12"],["4","8-10"]], rest: 90,
+    setup: "Lie on bench or floor. Hold EZ-bar or dumbbells directly over shoulders with narrow grip.",
+    execution: "Lower toward forehead by bending ONLY at elbows. Angle arms slightly back to maintain tension. Press back to start.",
+    nwbCues: "Elbows stay tucked and pointed at ceiling. Upper arms don't move. Floor position is safest.",
+    why: "Excellent triceps isolation targeting the long head. Minimal stress on rest of body.",
+    safety: "safe",
+    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"]
+  },
+  "OH Triceps Extension": {
+    requires: ["cables"], category: "push",
+    sets: [["3","12-15"],["3","10-12"],["3","10-12"]], rest: 60,
+    setup: "Face away from cable machine. Hold rope attachment overhead with elbows bent.",
+    execution: "Extend arms upward until straight. Control the return behind your head. Keep elbows close to ears.",
+    nwbCues: "Keep core tight to prevent rib flare or back arch. Critical for L4-L5 protection.",
+    why: "Targets the long head of triceps — often neglected in standard pressing.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"]
+  },
+  "Tricep Rope Pushdown": {
+    requires: ["cables"], category: "push",
+    sets: [["2","RP: 10+5+3"],["2","RP: 10+5+3"],["2","RP: 12+6+4"]], rest: 120,
+    setup: "Stand (on R leg) or sit at cable machine. Rope attachment at high position.",
+    execution: "REST-PAUSE: Do 10 reps, rest 15 seconds, 5 more reps, rest 15 seconds, 3-5 reps to failure. One extended set = full stimulus.",
+    nwbCues: "Keep elbows pinned to sides. Torso stays upright — no leaning into it.",
+    why: "Rest-pause technique maximizes recruitment with less total volume. Time-efficient.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers", "OH Triceps Extension"]
+  },
+  "Cable Chest Fly": {
+    requires: ["cables"], category: "push",
+    sets: [["3","12-15"],["3","12-15"],["3","10-12"]], rest: 60,
+    setup: "Set cables to chest height. Sit on a bench between the cables, or lie on a flat bench.",
+    execution: "Bring hands together in front of chest with slight elbow bend. Squeeze chest hard at top. Return slowly with control.",
+    nwbCues: "Don't overextend shoulders at the stretch. Slow, controlled tempo. Lying on bench is safest position.",
+    why: "Constant cable tension throughout ROM. Isolated pectoral work.",
+    safety: "safe",
+    swaps: ["Incline DB Press + Lat Raises"]
+  },
+  "Mechanical Drop Set (Press)": {
+    requires: ["dumbbells", "bench"], category: "push",
+    sets: [["2","8+8+8"],["2","8+8+8"],["2","8+8+8"]], rest: 120,
+    setup: "Start with bench at incline (30-45°). Have same weight dumbbells ready.",
+    execution: "8 reps INCLINE → immediately flatten bench → 8 reps FLAT → immediately decline → 8 reps DECLINE. Same weight throughout — each angle change gives mechanical advantage so you can keep pressing past failure.",
+    nwbCues: "Be careful changing bench angles. Have someone help if needed. Safety first during transitions.",
+    why: "High-intensity volume for chest growth without needing extremely heavy weights. Mechanical advantage keeps you pressing past failure.",
+    safety: "safe", phase: 1,
+    swaps: ["Machine Chest Press"]
+  },
+  "Landmine Press (seated)": {
+    requires: ["barbell"], category: "push",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
+    setup: "Sit on bench or floor next to a landmine attachment (or wedge barbell in a corner). Hold end of barbell at shoulder height with one hand.",
+    execution: "Press the bar up and forward. Focus on chest and shoulder contraction. Complete all reps one side, then switch.",
+    nwbCues: "Seated position creates high anti-rotation core demand. Keep torso facing forward. This is a core exercise disguised as a press.",
+    why: "Functional unilateral pressing that builds stability. Great anti-rotation stimulus.",
+    safety: "safe",
+    swaps: ["Seated DB OH Press"]
+  },
+  "Dip Machine": {
+    requires: ["dipMachine"], category: "push",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
+    setup: "Sit in the dip machine. Grip handles at shoulder width. Feet on platform or hanging.",
+    execution: "Lower yourself by bending elbows until upper arms are parallel. Press back up. Final set: DROP SET ×2 (drop ~20% each time).",
+    nwbCues: "Machine provides stability. Keep torso upright for triceps focus, lean forward slightly for chest emphasis.",
+    why: "Compound push movement with machine stability. Drop sets for metabolic exhaustion.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers"]
+  },
+  "Pseudo Planche Push-Up": {
+    requires: ["parallettes"], category: "push",
+    sets: [["3","AMRAP"],["3","AMRAP"],["3","AMRAP"]], rest: 90,
+    setup: "Place parallettes near your waistline (fingers pointing backward or sideways). Rest your right foot on a box/bench behind you. Left leg hovers passively.",
+    execution: "Lean your body weight FORWARD over your wrists. Lower your chest toward the floor. Press back up. The forward lean makes this exponentially harder than a regular push-up.",
+    nwbCues: "Left leg just floats — zero engagement. Keep core tight and body straight. If wrists hurt, adjust parallette angle.",
+    why: "Elite calisthenics push. Builds massive shoulder and chest strength with bodyweight. Open-hip position = safe for FAI.",
+    safety: "safe",
+    swaps: ["DB Floor Press"]
+  },
+  "Parallette L-Sit": {
+    requires: ["parallettes"], category: "push",
+    sets: [["4","Max Hold"],["4","Max Hold"],["4","Max Hold"]], rest: 60,
+    setup: "Place parallettes shoulder-width apart. Sit between them and grip with palms down.",
+    execution: "Lock elbows, depress scapulae (push shoulders DOWN away from ears), lift your body off the floor. Extend legs straight out parallel to floor. Hold.",
+    nwbCues: "Left leg simply floats alongside the right. Both legs stay straight. If you can't hold the full L-sit, do a tuck hold (knees bent) instead.",
+    why: "Elite gymnastics isometric. Massive core compression + tricep/scapular strength. Completely unloads L4-L5 and hips.",
+    safety: "safe",
+    swaps: ["Pallof Press"]
+  },
+
+  // PULL exercises
+  "Lat Pulldown (Wide)": {
+    requires: ["latpulldown"], category: "pull",
+    sets: [["4","6-8"],["4","6-8"],["4","5-6"]], rest: 150,
+    setup: "Sit at machine with wide bar. Adjust thigh pad snug on quads. Grab bar outside shoulder width with overhand grip.",
+    execution: "Pull bar to upper chest — think 'drive elbows into front pockets.' Full scapular depression. Lean back no more than 15°. Control the return.",
+    nwbCues: "Thigh pad anchors you, NOT your feet. Left foot just rests on the platform. Zero force through it.",
+    why: "Primary lat width and upper back strength builder. Machine provides stability.",
+    safety: "safe",
+    swaps: ["Neutral Grip Pulldown", "Weighted Pull-Up"]
+  },
+  "Neutral Grip Pulldown": {
+    requires: ["latpulldown"], category: "pull",
+    sets: [["4","10-12"],["4","10-12"],["4","8-10"]], rest: 90,
+    setup: "Sit at lat pulldown. Attach V-bar handle. Thigh pad snug. Grab with neutral (palms facing) grip.",
+    execution: "Lean back 10°. Pull to upper chest. Squeeze shoulder blades 1 second. Return slowly with full stretch at top. REST-PAUSE on last 2 sets: 8 reps → 20s → 4 reps → 20s → 2-3 reps.",
+    nwbCues: "Thigh pad anchors you, not your legs. Left foot rests like a book on a table. Zero force through it.",
+    why: "Neutral grip shifts emphasis to lower lats and brachialis, easier on shoulder joints. Volume complement to wide grip.",
+    safety: "safe",
+    swaps: ["Lat Pulldown (Wide)", "Weighted Pull-Up"]
+  },
+  "Weighted Pull-Up": {
+    requires: ["pullupbar"], category: "pull",
+    sets: [["5","To Failure"],["5","To Failure"],["5","3-5 Weighted"]], rest: 150,
+    setup: "Hang from pull-up bar with overhand grip outside shoulder width. Use a weight belt for added load if bodyweight is too easy. Do NOT jump up — use a box or have someone help you reach the bar.",
+    execution: "From dead hang, pull your chin over the bar by driving elbows down. Control the descent. Full extension at bottom.",
+    nwbCues: "Hanging decompresses your spine (good for L4-L5). Lower body hangs completely passive — do NOT swing or kip. Step down carefully to a box, do NOT jump down.",
+    why: "King of vertical pulling. Directly trains dragon boat 'catch' phase. Decompresses spine naturally.",
+    safety: "safe",
+    swaps: ["Lat Pulldown (Wide)", "Neutral Grip Pulldown"]
+  },
+  "Finger-Assist One-Arm Pull-Up": {
+    requires: ["pullupbar"], category: "pull",
+    sets: [["4","3-5/arm"],["4","3-5/arm"],["4","2-4/arm"]], rest: 150,
+    setup: "Hang from pull-up bar with your working hand (pronated or neutral grip). Place just your INDEX FINGER of the other hand on the bar to assist.",
+    execution: "Pull your chin directly over your working hand. Use the index finger only for minimal assist. Lower slowly with control. Complete all reps one side then switch.",
+    nwbCues: "Lower body hangs completely dead — no swinging, no kipping. This decompresses your spine (great for L4-L5) with zero hip flexor engagement.",
+    why: "Elite calisthenics pull. Builds massive unilateral pulling strength. Hanging = spine decompression + zero hip flexor load. Perfect NWB exercise.",
+    safety: "safe",
+    swaps: ["Weighted Pull-Up", "Lat Pulldown (Wide)"]
+  },
+  "Chest-Supported DB Row": {
+    requires: ["dumbbells", "bench"], category: "pull",
+    sets: [["4","6-8"],["4","8-10"],["4","6-8"]], rest: 120,
+    setup: "Set incline bench to 30-45°. Lie face-down with chest on the pad. Arms hang straight down holding dumbbells.",
+    execution: "Row weights upward, pulling to lower ribcage. Squeeze shoulder blades hard at the top. Lower slowly.",
+    nwbCues: "SAFEST exercise in the program — chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively.",
+    why: "Heavy horizontal row with zero spine load. Chest support means pure back isolation. Go heavy.",
+    safety: "safe",
+    swaps: ["Seated Cable Row"]
+  },
+  "Seated Cable Row": {
+    requires: ["cables"], category: "pull",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
+    setup: "Sit at cable station. Feet on plate (left foot just resting, zero force). Grab V-bar or wide bar attachment.",
+    execution: "Initiate with scapular retraction (pinch shoulder blades), THEN drive elbows back. Pull to lower ribs. Squeeze. Return slowly.",
+    nwbCues: "CAUTION: Do NOT lean forward (rounds lumbar = bad for disc) or lean back (momentum). Torso stays at SAME angle entire set. If form breaks, stop.",
+    why: "Mid-back thickness builder. Different grips target different areas (V-bar = lats, wide = traps/rhomboids).",
+    safety: "caution",
+    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"]
+  },
+  "One-Arm Cable Row": {
+    requires: ["cables"], category: "pull",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
+    setup: "Sit facing cable machine with feet flat. Set pulley to chest height. Grab D-handle with one hand.",
+    execution: "Pull handle to lower rib cage, driving elbow straight back. Squeeze 1 second. Return slowly over 2-3 seconds. Complete all reps one side then switch.",
+    nwbCues: "CRITICAL: Do NOT twist your trunk. Your core fights the rotation — that's the training stimulus. Keep pelvis square and spine neutral. If lumbar twists AT ALL, drop weight immediately.",
+    why: "Unilateral pulling corrects imbalances and doubles as anti-rotation core training. Two exercises in one.",
+    safety: "caution",
+    swaps: ["Seated Cable Row", "Chest-Supported DB Row"]
+  },
+  "Seated Face Pulls": {
+    requires: ["cables"], category: "pull",
+    sets: [["3","15-20"],["3","15-20"],["3","15-20"]], rest: 60,
+    setup: "Sit at cable machine with rope attachment set at face height. Grab rope with overhand grip.",
+    execution: "Pull rope toward your face, pulling the ends apart at the end. Elbows HIGH, externally rotate at the end position. Squeeze rear delts.",
+    nwbCues: "Focus on external rotation at end of movement. Essential for shoulder health with this much pressing volume.",
+    why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health and paddling resilience.",
+    safety: "safe",
+    swaps: ["Reverse Fly"]
+  },
+  "Reverse Fly": {
+    requires: ["dumbbells", "bench"], category: "pull",
+    sets: [["3","12-15"],["3","15-20"],["3","12-15"]], rest: 60,
+    setup: "Lie face-down on incline bench (chest-supported) OR sit and lean forward slightly, OR use the pec deck machine in reverse.",
+    execution: "Raise arms out to sides, squeezing rear delts. Light weight, constant tension. Lower slowly.",
+    nwbCues: "Keep spine neutral. Don't round lower back. Chest-supported version is safest for L4-L5.",
+    why: "Rear delt development to balance the shoulder joint from all the pressing.",
+    safety: "safe",
+    swaps: ["Seated Face Pulls"]
+  },
+  "Preacher Curls": {
+    requires: ["preacher", "ezbar"], category: "pull",
+    sets: [["3","8-10"],["3","8-10"],["3","6-8"]], rest: 90,
+    setup: "Sit at preacher bench with arms rested on the pad. EZ-bar preferred for wrist comfort.",
+    execution: "Curl bar toward shoulders. Control the negative — 3 seconds down. Full stretch at bottom.",
+    nwbCues: "Bench keeps torso stationary, protecting spine from swinging. Zero momentum allowed.",
+    why: "Strict bicep isolation without lumbar stress. The pad prevents cheating.",
+    safety: "safe",
+    swaps: ["Hammer Curls", "Incline DB Curl"]
+  },
+  "Hammer Curls": {
+    requires: ["dumbbells"], category: "pull",
+    sets: [["3","10-12"],["3","10-12"],["4","10-12"]], rest: 60,
+    setup: "Sit on bench or stand on right leg. Hold dumbbells with neutral grip (palms facing each other).",
+    execution: "Curl weights toward shoulders keeping neutral grip throughout. Lower slowly. No body swing.",
+    nwbCues: "Maintain stable torso. If you need to swing for momentum, weight is too heavy.",
+    why: "Targets brachialis and brachioradialis for forearm and outer bicep development.",
+    safety: "safe",
+    swaps: ["Preacher Curls", "Incline DB Curl"]
+  },
+  "Incline DB Curl": {
+    requires: ["dumbbells", "bench"], category: "pull",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
+    setup: "Sit on incline bench at 45-60°. Let arms hang straight down with dumbbells.",
+    execution: "Curl dumbbells keeping elbows pinned to sides. Deep stretch at bottom. Drop set on last set: drop weight twice.",
+    nwbCues: "Keep head and back against bench. The incline creates maximum bicep stretch. Don't let elbows drift forward.",
+    why: "Maximal bicep stretch position for peak growth stimulus.",
+    safety: "safe",
+    swaps: ["Hammer Curls", "Preacher Curls"]
+  },
+  "Mechanical Drop Set (Pull)": {
+    requires: ["latpulldown"], category: "pull",
+    sets: [["2","8+8+8"],["2","8+8+8"],["2","8+8+8"]], rest: 120,
+    setup: "Start with WIDE overhand grip on lat pulldown. Same weight throughout.",
+    execution: "8 reps WIDE grip → immediately switch to NEUTRAL grip → 8 reps → immediately switch to UNDERHAND grip → 8 reps. Each grip change gives you mechanical advantage to keep pulling past failure.",
+    nwbCues: "Smooth grip transitions. Don't jerk the weight. Maintain same posture throughout.",
+    why: "Extreme lat stimulus without adding plates. Grip changes shift emphasis while maintaining intensity.",
+    safety: "safe", phase: 1,
+    swaps: ["Lat Pulldown (Wide)"]
+  },
+
+  // LEG exercises
+  "SL Leg Press (Right)": {
+    requires: ["legpress"], category: "legs",
+    sets: [["4","10-12"],["4","8-10"],["4","6-8"]], rest: 150,
+    setup: "Sit in leg press. Place RIGHT foot HIGH on the plate. Left foot off the machine entirely.",
+    execution: "Lower the sled until JUST before 90° hip flexion — then press back up. In Weeks 3+: use 4-second eccentric (lowering). Start at ~50% bilateral 1RM.",
+    nwbCues: "HIGH foot placement = less hip flexion = protects FAI/labrum. 90° limit is NON-NEGOTIABLE. Do NOT lock out knee. Left leg hangs free.",
+    why: "MOST IMPORTANT exercise for cross-education effect. Eccentric emphasis drives up to 17.7% contralateral strength preservation (Manca et al. meta-analysis).",
+    safety: "caution",
+    swaps: ["Hack Squat (Right)"]
+  },
+  "Hack Squat (Right)": {
+    requires: ["hacksquat"], category: "legs",
+    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 120,
+    setup: "Step into hack squat with RIGHT foot on platform. Left leg off to the side or hanging.",
+    execution: "Lower until just before 90° hip flexion. Press back up through the heel.",
+    nwbCues: "Same 90° hip flexion limit as leg press. Machine provides stability so you can focus on the right leg without balance concerns.",
+    why: "Squat-pattern stimulus without standing balance demands. Good complement to leg press.",
+    safety: "caution",
+    swaps: ["SL Leg Press (Right)"]
+  },
+  "SL Leg Extension (Right)": {
+    requires: ["cables"], category: "legs",
+    sets: [["4","12-15"],["4","12-15"],["4","10-12"]], rest: 90,
+    setup: "Sit in leg extension machine. Pad against RIGHT shin. Left leg off the machine.",
+    execution: "Extend knee to full lockout. 2-second SQUEEZE at top. 3-second eccentric lowering. Last set: DROP SET ×2.",
+    nwbCues: "Full lockout is safe here — it's open-chain, no hip compression. Go for the burn.",
+    why: "Quad isolation king. Drop sets force metabolic exhaustion for maximum growth stimulus.",
+    safety: "safe",
+    swaps: ["SL Leg Press (Right)"]
+  },
+  "SL Glute Bridge (Right)": {
+    requires: ["mat"], category: "legs",
+    sets: [["4","12-15"],["4","12-15"],["4","10-12"]], rest: 90,
+    setup: "Lie on back with RIGHT knee bent and foot flat. Left leg extended or bent with foot resting.",
+    execution: "Drive through right heel to lift hips. Squeeze glutes 2 seconds at top. Lower with control. Add dumbbell on hip in Weeks 3+.",
+    nwbCues: "Avoid over-arching lower back at top. Use hip power only. Left leg stays passive.",
+    why: "Unilateral glute strength with zero hip flexion demand. Safe and effective NWB exercise.",
+    safety: "safe",
+    swaps: ["SL Hip Thrust (Right)"]
+  },
+  "SL Hip Thrust (Right)": {
+    requires: ["bench"], category: "legs",
+    sets: [["3","12"],["4","10-12"],["4","8-10"]], rest: 120,
+    setup: "Shoulders on bench edge. RIGHT foot flat on floor. Left leg extended or resting.",
+    execution: "Drive through R heel to lift hips to full extension. Squeeze glutes hard at top. Chin tucked, ribs down.",
+    nwbCues: "Keep chin tucked and ribs down to prevent lumbar arching. Load with barbell or dumbbell across hips for progressive overload.",
+    why: "Superior glute isolation with peak tension at the top of the movement. Primary glute builder.",
+    safety: "safe",
+    swaps: ["SL Glute Bridge (Right)"]
+  },
+  "Prone Ham Curl (Right)": {
+    requires: ["hamcurl"], category: "legs",
+    sets: [["3","12"],["3","10-12"],["4","8-10"]], rest: 120,
+    setup: "Lie face-down on prone (lying) hamstring curl machine. RIGHT leg only. Left leg off the machine.",
+    execution: "HSR Tempo: 3 seconds up, 1 second hold, 3 seconds down. Controlled eccentric is KEY for tendinosis treatment.",
+    nwbCues: "PRONE chosen over SEATED because seated compresses the ischial tuberosity (sit bones) which aggravates hamstring tendinosis.",
+    why: "Heavy Slow Resistance (HSR) is evidence-based treatment for hamstring tendinosis. Not just maintenance — active treatment.",
+    safety: "safe",
+    swaps: ["Stab Ball Ham Curl (Right)"]
+  },
+  "Stab Ball Ham Curl (Right)": {
+    requires: ["stabball"], category: "legs",
+    sets: [["3","12-15"],["3","12-15"],["3","10-12"]], rest: 90,
+    setup: "Lie on back. Place RIGHT heel on stability ball. Left leg bent with foot resting on floor.",
+    execution: "Bridge hips up, then curl the ball toward your glutes using your right heel. Extend back out. Slow and controlled.",
+    nwbCues: "Smoother contraction than heavy RDLs — better for tendinosis. Keep hips up throughout the set.",
+    why: "Excellent hamstring-glute connection exercise. Smooth contraction respects tendinosis.",
+    safety: "safe",
+    swaps: ["Prone Ham Curl (Right)"]
+  },
+  "Low-Box Step-Up (Right)": {
+    requires: ["plyobox", "dumbbells"], category: "legs",
+    sets: [["3","10-12"],["3","10-12"],["4","6-8"]], rest: 120,
+    setup: "Use a box BELOW knee height. Place RIGHT foot on top. Hold dumbbells at sides.",
+    execution: "Push through RIGHT heel to stand on box. Let left leg dangle behind you passively. Slow, controlled descent back to floor.",
+    nwbCues: "Keep hip flexion under 90° — the low box ensures this. Do NOT hop or use left leg to push off. Pure right leg drive.",
+    why: "Functional strength and balance for right leg. Low-impact power development without plyometric shock.",
+    safety: "caution",
+    swaps: ["SL Leg Press (Right)"]
+  },
+  "Nordic Ham Curl": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","6"],["3","6"],["3","8"]], rest: 120,
+    setup: "Kneel on a thick pad with your feet anchored (under a heavy dumbbell, bench, or have someone hold them). Right knee bears the load.",
+    execution: "Slowly lower your torso forward by extending at the knees — fight gravity all the way down. Catch yourself with hands. Push off hands to return to start.",
+    nwbCues: "Only 0-20° of hip flexion throughout. Excellent for hamstring tendinosis via heavy slow resistance.",
+    why: "Gold standard for hamstring injury prevention. Eccentric strength at long muscle lengths.",
+    safety: "safe",
+    swaps: ["Prone Ham Curl (Right)"]
+  },
+  "Standing Calf Raise (R)": {
+    requires: ["plyobox"], category: "legs",
+    sets: [["4","15-20"],["4","15-20"],["4","15-20"]], rest: 60,
+    setup: "Stand on a step or platform edge with RIGHT foot only. Hold onto something for balance.",
+    execution: "Full ROM: deep stretch at bottom, peak contraction at top. Pause 1 second at top.",
+    nwbCues: "Use hands for balance only. Move vertically — no lateral shifts. All force through right foot.",
+    why: "Calf development for ankle stability and balance. Full ROM prevents tightness.",
+    safety: "safe",
+    swaps: []
+  },
+  "Isometric Quad Sets (Left)": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","15×5s"],["3","15×5s"],["3","15×5s"]], rest: 30,
+    setup: "Sit or lie with LEFT leg straight on the ground.",
+    execution: "Tighten your left quad as hard as possible, pushing the back of your knee DOWN into the floor. Hold 5 seconds. Release. Repeat.",
+    nwbCues: "Focus purely on the muscle contraction — no hip movement whatsoever. This keeps neural pathways active without loading the fracture.",
+    why: "Prevents muscle atrophy in immobilized limb by maintaining neural drive. Zero joint stress.",
+    safety: "safe",
+    swaps: []
+  },
+  "Ankle Pumps (Left)": {
+    requires: [], category: "legs",
+    sets: [["3","20+alphabet"],["3","20+alphabet"],["3","20+alphabet"]], rest: 0,
+    setup: "Lie or sit with LEFT leg extended. Can be done anywhere, anytime.",
+    execution: "Move ankle up and down through full range (20 pumps). Then trace the alphabet with your toes for ROM.",
+    nwbCues: "Perform FREQUENTLY throughout the day — not just during workouts. Critical for circulation.",
+    why: "Prevents DVT (blood clots). Maintains ankle range of motion. Do these constantly.",
+    safety: "safe",
+    swaps: []
+  },
+  "Banded Clamshells": {
+    requires: ["bands"], category: "legs",
+    sets: [["3","20/side"],["3","20/side"],["3","20/side"]], rest: 60,
+    setup: "Lie on your side with knees bent. Place resistance band just above knees. Both legs work — this is NWB safe.",
+    execution: "Open top knee like a clamshell while keeping feet together. Squeeze glute med at top. Lower slowly.",
+    nwbCues: "Both legs can do this safely — lying position is completely non-weight-bearing. Targets gluteus medius which weakens fast during NWB.",
+    why: "Gluteus medius maintenance for both legs. Prevents hip drop gait pattern when you return to walking.",
+    safety: "safe",
+    swaps: []
+  },
+
+  // CORE exercises
+  "McGill Curl-Up": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10×5s"],["3","10×5s"],["3","12×5s"]], rest: 45,
+    setup: "Lie on back. Slide hands under your lumbar curve as a monitoring system. One knee bent (RIGHT), left leg straight.",
+    execution: "Lift ONLY your head and shoulder blades 2-3 inches off the floor. Hold 5-8 seconds. Lower.",
+    nwbCues: "This is NOT a crunch — your lumbar spine stays in natural arch. If the arch disappears into your hands, you've gone too high. Stop.",
+    why: "McGill Big 3. Only safe upper-ab exercise for L4-L5 DDD. Arch preservation is key.",
+    safety: "safe",
+    swaps: []
+  },
+  "Side Plank": {
+    requires: ["mat"], category: "core",
+    sets: [["3","30s/side"],["3","30s/side"],["3","40s/side"]], rest: 45,
+    setup: "Lie on your RIGHT side. Prop up on right elbow. Support on your RIGHT KNEE (not foot).",
+    execution: "Lift hips until body forms straight line from head to knee. Hold. Breathe normally.",
+    nwbCues: "McGill Big 3. Keep hips stacked, spine neutral. Right-side on right knee. Left side: modify so left hip isn't loaded.",
+    why: "Targets obliques and quadratus lumborum for spinal stability without flexion or rotation.",
+    safety: "safe",
+    swaps: []
+  },
+  "Bird-Dog": {
+    requires: ["mat"], category: "core",
+    sets: [["3","8/side"],["3","10/side"],["3","10/side"]], rest: 45,
+    setup: "Hands and knees position. LEFT knee stays on the ground always. Spine neutral.",
+    execution: "Extend RIGHT leg straight back + LEFT arm straight forward simultaneously. Hold 5-8 seconds. Keep hips perfectly level.",
+    nwbCues: "Left leg NEVER moves from the ground. If hips rock side to side, you're going too fast. Slow and controlled.",
+    why: "McGill Big 3. Builds back endurance and anti-rotation stability in a safe quadruped position.",
+    safety: "safe",
+    swaps: []
+  },
+  "Pallof Press": {
+    requires: ["bands"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","12/side"]], rest: 60,
+    setup: "Anchor band or cable at chest height to your side. Sit in a chair or tall-kneel on RIGHT knee. Hold band with both hands at chest.",
+    execution: "Press hands straight out in front of you. Hold 3 seconds. The band tries to twist you — FIGHT IT. Return to chest. Repeat.",
+    nwbCues: "Zero spinal flexion. Zero rotation. Pure ANTI-rotation. Explicitly recommended for disc disease. Do NOT stand on one leg — sit or kneel.",
+    why: "The gold standard anti-rotation core exercise. Works entire core without any leg movement or spinal compression.",
+    safety: "safe",
+    swaps: []
+  },
+  "Dead Bug (R leg only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10"],["3","12"],["3","12"]], rest: 60,
+    setup: "Lie on back. LEFT foot planted firmly on the floor at all times. Right leg up at 90°. Arms toward ceiling.",
+    execution: "Slowly lower RIGHT leg + LEFT arm toward floor while pressing your lower back INTENSELY into the mat. Return to start.",
+    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting your stress fracture. Press low back into mat throughout.",
+    why: "Safe deep core (TVA) activation without loading the injured hip flexor. Modified specifically for your MRI findings.",
+    safety: "safe",
+    swaps: []
+  },
+  "Stir the Pot": {
+    requires: ["stabball"], category: "core",
+    sets: [["3","8/dir"],["3","8/dir"],["3","10/dir"]], rest: 60,
+    setup: "Forearms on stability ball. Body in plank position. Right foot on ground, left knee on pad if needed.",
+    execution: "Make small circles with your forearms while maintaining a perfectly rigid plank. Clockwise, then counter-clockwise.",
+    nwbCues: "Anti-rotation AND anti-extension. Keep spine neutral. If your back starts to arch, STOP immediately.",
+    why: "High-level core stability challenge without spinal flexion. One of the most demanding plank variations.",
+    safety: "safe",
+    swaps: ["Pallof Press"]
+  },
+
+  // CARDIO exercises
+  "Arm Ergometer": {
+    requires: ["armBike"], category: "cardio",
+    sets: [["1","20-30 min"],["1","25-30 min"],["1","30 min"]], rest: 0,
+    setup: "Sit at arm bike with slight bend in elbows at full extension. Adjust seat height so you're comfortable.",
+    execution: "Pedal at steady pace. Upright posture. For HIIT: alternate 30s all-out / 30s recovery for 20 minutes.",
+    nwbCues: "Zero hip involvement. Gold standard NWB cardio. AAPM&R recommended.",
+    why: "Highest safety rating for NWB cardio. Maintains VO2 max without any lower body loading.",
+    safety: "safe", tier: 1,
+    swaps: ["Seated SkiErg", "Arms-Only Echo Bike"]
+  },
+  "Seated Battle Ropes": {
+    requires: ["battleRopes"], category: "cardio",
+    sets: [["8","20s on/10s off"],["8","20s on/10s off"],["8","20s on/10s off"]], rest: 60,
+    setup: "Sit on the floor or a sturdy chair/bench facing the anchor point. Lean back slightly into a V-sit hold.",
+    execution: "ALTERNATING WAVES: Rapid up-and-down while maintaining V-sit. T-WAVES: Arms lateral, tight rapid waves. Protocol: Tabata — 20s max effort / 10s rest × 8 rounds.",
+    nwbCues: "Core dominant cardio. No hip flexors. Sit in a sturdy chair if V-sit position is uncomfortable for your hips.",
+    why: "Savage anaerobic demand. Burns 10-12 cal/min. Core works in overdrive to stabilize against rope force.",
+    safety: "safe", tier: 1,
+    swaps: ["Arm Ergometer"]
+  },
+  "Seated SkiErg": {
+    requires: ["skierg"], category: "cardio",
+    sets: [["1","20 min"],["1","25 min"],["1","30 min"]], rest: 0,
+    setup: "Pull a plyometric box or bench up to the SkiErg. Sit directly under the handles. If handles bottom out, use a higher box.",
+    execution: "Arms extended overhead. Violent downward contraction using core crunch + lat pull. Handles past hips. Protocol: 4-3-2-1 Descending Intervals (4min moderate → 3min hard → 2min very hard → 1min all-out → 2min rest → repeat reverse).",
+    nwbCues: "CAUTION: Minimize trunk flexion for L4-L5. Focus on ARM pull rather than spinal crunch. Light-to-moderate intensity if spine is sensitive.",
+    why: "Upper-body + core cardiovascular stimulus. Burns 8-12 cal/min seated. Air resistance scales infinitely with effort.",
+    safety: "caution", tier: 1,
+    swaps: ["Arm Ergometer"]
+  },
+  "Arms-Only Echo Bike": {
+    requires: ["echoBike"], category: "cardio",
+    sets: [["1","20-30 min"],["1","25-30 min"],["1","30 min"]], rest: 0,
+    setup: "Sit on the echo/assault bike. Feet on pegs (not pedals). Grab the handles.",
+    execution: "Push and pull the handles using only your arms. Fan resistance is self-regulating and unlimited.",
+    nwbCues: "Feet rest on pegs — zero leg involvement. Arms-only output reaches 8-12 cal/min for a strong athlete.",
+    why: "Self-regulating resistance. Great for intervals or steady state. No impact.",
+    safety: "safe", tier: 1,
+    swaps: ["Arm Ergometer", "Seated SkiErg"]
+  },
+  "SL Slider Row": {
+    requires: ["rower", "slider"], category: "cardio",
+    sets: [["1","10-20 × 200m"],["1","10-20 × 200m"],["1","10-20 × 200m"]], rest: 30,
+    setup: "Strap RIGHT foot into ergometer footplate. Left foot on a FURNITURE SLIDER on the floor next to the rail. Left leg glides passively.",
+    execution: "Drive explosively through RIGHT foot only. Left leg slides back frictionlessly on the slider. 200m sprints with 30s rest between. 10-20 rounds.",
+    nwbCues: "Furniture slider preferred over skateboard — won't roll away. Asymmetric drive creates massive anti-rotational core demand. Keep torso straight.",
+    why: "Combines right-leg cross-education training with intense cardio. Anti-rotational core work built in.",
+    safety: "caution", tier: 1,
+    swaps: ["Arm Ergometer"]
+  },
+
+  // RECOVERY
+  "Upper Body Stretching": {
+    requires: [], category: "recovery",
+    sets: [["1","10 min"],["1","10 min"],["1","10 min"]], rest: 0,
+    setup: "Seated or standing on R leg. Focus on chest, lats, and shoulders.",
+    execution: "Gentle stretches held 20-30 seconds. Doorway pec stretch. Lat hang. Shoulder cross-body stretch.",
+    nwbCues: "CAUTION: NO hamstring stretching allowed. NO deep hip flexion stretches. Upper body only.",
+    why: "Relieves tension from crutching. Maintains range of motion in upper body.",
+    safety: "caution",
+    swaps: []
+  },
+  "T-Spine Mobility": {
+    requires: ["mat"], category: "recovery",
+    sets: [["1","5 min"],["1","5 min"],["1","5 min"]], rest: 0,
+    setup: "Quadruped (hands and knees) or seated in a chair.",
+    execution: "Cat-cow focusing on UPPER back only. T-spine rotation: thread one arm under the other, rotate upper back, return.",
+    nwbCues: "Keep hips and lumbar spine STILL. All movement comes from thoracic spine (mid-back). This protects L4-L5.",
+    why: "Prevents stiffness in mid-back. Improves overhead pressing and pulling form.",
+    safety: "safe",
+    swaps: []
+  }
+};
+
+// ===== WORKOUT STRUCTURE =====
+const WORKOUTS = {
+  "Push A": {
+    title: "Push A — Heavy Strength", icon: "💪", color: "#38bdf8",
+    exercises: [
+      "Barbell Floor Press", "Seated DB OH Press", "Incline DB Press + Lat Raises",
+      "Lying Skull Crushers", "Pseudo Planche Push-Up", "McGill Curl-Up"
+    ],
+    removed: [
+      {name: "Standing OHP", reason: "Requires bilateral stance"},
+      {name: "Dips (freestanding)", reason: "Lower body swing risk"}
+    ]
+  },
+  "Push B": {
+    title: "Push B — Volume / Hypertrophy", icon: "💪", color: "#38bdf8",
+    exercises: [
+      "DB Floor Press", "Mechanical Drop Set (Press)", "Landmine Press (seated)",
+      "Cable Chest Fly", "Tricep Rope Pushdown", "Parallette L-Sit", "Side Plank"
+    ],
+    removed: []
+  },
+  "Pull A": {
+    title: "Pull A — Heavy Strength", icon: "🔗", color: "#a78bfa",
+    exercises: [
+      "Finger-Assist One-Arm Pull-Up", "Lat Pulldown (Wide)", "Chest-Supported DB Row",
+      "Seated Cable Row", "Seated Face Pulls", "Preacher Curls", "Pallof Press"
+    ],
+    removed: [
+      {name: "Bent-Over Row", reason: "Loads L4-L5 disc"}
+    ]
+  },
+  "Pull B": {
+    title: "Pull B — Volume / Density", icon: "🔗", color: "#a78bfa",
+    exercises: [
+      "Neutral Grip Pulldown", "Mechanical Drop Set (Pull)", "One-Arm Cable Row",
+      "Reverse Fly", "Hammer Curls", "Incline DB Curl", "Bird-Dog"
+    ],
+    removed: []
+  },
+  "Legs A": {
+    title: "Legs A — Quad/Glute (Cross-Ed)", icon: "🦵", color: "#10b981",
+    exercises: [
+      "SL Leg Press (Right)", "SL Leg Extension (Right)", "SL Glute Bridge (Right)",
+      "Banded Clamshells", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)", "Dead Bug (R leg only)"
+    ],
+    removed: [
+      {name: "Pistol Squats", reason: "Deep hip flexion damages labrum"},
+      {name: "Bulgarian Split Squat", reason: "Exceeds 90° flexion limit"}
+    ]
+  },
+  "Legs B": {
+    title: "Legs B — Posterior Chain", icon: "🦵", color: "#10b981",
+    exercises: [
+      "Low-Box Step-Up (Right)", "SL Hip Thrust (Right)", "Prone Ham Curl (Right)",
+      "Nordic Ham Curl", "Standing Calf Raise (R)", "Stir the Pot"
+    ],
+    removed: [
+      {name: "Seated Ham Curl", reason: "Compresses ischial tuberosity (tendinopathy)"},
+      {name: "Deep RDLs", reason: "Violent eccentric load on tendinosis"}
+    ]
+  },
+  "Recovery": {
+    title: "Active Recovery (Sunday)", icon: "🧘", color: "#64748b",
+    exercises: ["Arm Ergometer", "Upper Body Stretching", "T-Spine Mobility", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)"],
+    removed: []
+  }
+};
 
 const SCHED = [
   {d:"Mon", t:"Push A", i:"💪", c:"#38bdf8"},
@@ -50,498 +704,234 @@ const SCHED = [
   {d:"Thu", t:"Push B", i:"💪", c:"#38bdf8"},
   {d:"Fri", t:"Pull B", i:"🔗", c:"#a78bfa"},
   {d:"Sat", t:"Legs B", i:"🦵", c:"#10b981"},
-  {d:"Sun", t:"Rest", i:"🧘", c:"#64748b"}
+  {d:"Sun", t:"Recovery", i:"🧘", c:"#64748b"}
 ];
 
-const EX_DETAILS = {
-  "Barbell Floor Press": {
-    setup: "Lying on the floor protects the L4-L5 disc by limiting ROM and preventing lumbar arching. Position yourself under the bar. Your right leg should be bent with the foot flat, and your left leg should be straight and relaxed.",
-    execution: "Lower the bar until your triceps touch the floor. Pause for a full second (dead-stop) to eliminate momentum. Press explosively back to the top. 4 sets of 5-6 reps.",
-    nwbCues: "Do NOT bridge your hips or arch your back to get the weight up. Keep your left leg passive like a 'log'. If you feel the need to push through your feet, reduce the weight.",
-    why: "Dead-stop builds explosive power, floor limits ROM to protect shoulders."
-  },
-  "Seated DB OH Press": {
-    setup: "Sit on a bench with the back at a high incline (~80 degrees). Hold dumbbells at shoulder height with a neutral or slightly flared grip.",
-    execution: "Press the weights directly overhead until arms are locked out. Lower them under control back to the starting position.",
-    nwbCues: "Keep your back pressed against the bench. Do not arch your lower back to complete the reps. Ensure your right leg is stable.",
-    why: "Shoulder strength with a stable spine. Seated position reduces the need for lower body stabilization."
-  },
-  "Incline DB Press + Lat Raises": {
-    setup: "📍 INCLINE PRESS: Bench at 30-45°. 📍 LAT RAISES: Stand on R leg or sit.",
-    execution: "🔄 INCLINE PRESS: Press DBs over chest, 8-10 reps. 🔄 LAT RAISES: Raise DBs to sides, 12-15 reps. No rest between exercises.",
-    nwbCues: "🛡️ Keep spine neutral on bench. Minimize body swing on raises. Use R leg as anchor.",
-    why: "🎯 Superset for chest and medial delt volume with efficient time use."
-  },
-  "Lying Skull Crushers": {
-    setup: "Lie on a flat bench or the floor. Hold a barbell or dumbbells directly over your shoulders.",
-    execution: "Lower the weight toward your forehead by bending only at the elbows. Press back to the start.",
-    nwbCues: "Keep your elbows tucked in and pointed toward the ceiling. Don't let your upper arms move back and forth.",
-    why: "Effective triceps isolation with minimal stress on the rest of the body."
-  },
-  "McGill Curl-Up": {
-    setup: "Setup hands under lumbar curve as monitoring system.",
-    execution: "Lift ONLY head and shoulder blades 2-3 inches, hold 5-8s.",
-    nwbCues: "This is NOT a crunch — lumbar stays in natural arch. If arch disappears into hands, you're too high.",
-    why: "McGill Big 3, only safe upper-ab exercise for L4-L5 DDD."
-  },
-  "DB Floor Press": {
-    setup: "Lying on the floor with dumbbells. Neutral grip (palms facing each other) is recommended for shoulder health.",
-    execution: "Lower the weights until your elbows touch the floor. Pause, then press up.",
-    nwbCues: "Similar to barbell floor press, avoid arching or bridging. Your floor contact provides the feedback for a flat back.",
-    why: "Volume chest work with a restricted ROM that protects the shoulders."
-  },
-  "Landmine Press (1-arm, seated)": {
-    setup: "Sit on a bench or the floor next to a landmine attachment. Hold the end of the barbell at shoulder height.",
-    execution: "Press the bar up and forward. Focus on the contraction in your chest and shoulder.",
-    nwbCues: "The seated position creates a high demand for anti-rotation in your core. Keep your torso facing forward throughout.",
-    why: "Functional pressing movement that builds stability and unilateral strength."
-  },
-  "Cable Chest Fly": {
-    setup: "Set cables to chest height. Stand on your right leg or sit on a bench in the middle.",
-    execution: "Bring your hands together in front of your chest with a slight bend in your elbows. Squeeze your chest. Return slowly.",
-    nwbCues: "Focus on the chest stretch, but don't overextend your shoulders. Use a slow, controlled tempo.",
-    why: "Isolated pectoral work with constant tension from the cables."
-  },
-  "OH Triceps Extension": {
-    setup: "Use a cable machine or a dumbbell. Position the weight overhead with your elbows bent.",
-    execution: "Extend your arms upward until they are straight. Lower the weight slowly behind your head.",
-    nwbCues: "Keep your core tight to prevent your ribs from flaring or your back from arching. This is key for your L4-L5.",
-    why: "Targets the long head of the triceps which is often neglected in standard presses."
-  },
-  "Mechanical Drop Set": {
-    setup: "Use a bench that can quickly change angles. Start with an incline.",
-    execution: "Perform 8 reps incline, then immediately move the bench to flat for 8 reps, then to decline for 8 reps.",
-    nwbCues: "Since you can't use your left leg, be very careful when changing bench angles between sets. Safety first.",
-    why: "High-intensity volume for chest growth without needing extremely heavy weights."
-  },
-  "Side Plank": {
-    setup: "Lie on your right side. Prop yourself up on your right elbow. Support your weight on your right knee.",
-    execution: "Lift your hips until your body forms a straight line from head to knee. Hold for 20-30 seconds.",
-    nwbCues: "McGill Big 3. Keep your hips stacked and your spine neutral. Right-side on right knee.",
-    why: "Targets the obliques and quadratus lumborum (QL) for spinal stability."
-  },
-  "Lat Pulldown (Wide)": {
-    setup: "Sit at the machine with a wide bar. Adjust the thigh pad so it's snug on your quads.",
-    execution: "Pull the bar down to your upper chest. Think 'drive elbows down.' Full ROM.",
-    nwbCues: "The thigh pad anchors you, not your feet. Do not lean back excessively.",
-    why: "Primary strength movement for lat width and upper back development."
-  },
-  "Chest-Supported DB Row": {
-    setup: "Setup on incline bench face-down.",
-    execution: "Row to chest, squeeze shoulder blades.",
-    nwbCues: "SAFEST exercise in program — chest support eliminates ALL spinal loading. Go heavy with confidence.",
-    why: "Heavy horizontal row without any spine load."
-  },
-  "Seated Cable Row": {
-    setup: "Setup at cable station, feet on plate (left foot just resting).",
-    execution: "Pull to lower ribs, squeeze, return slowly.",
-    nwbCues: "CAUTION: do NOT lean forward (rounds lumbar = bad for disc) or lean back (uses momentum). Torso stays at same angle entire set.",
-    why: "Mid-back thickness but strict form is non-negotiable."
-  },
-  "Seated Face Pulls": {
-    setup: "Sit at a cable machine with a rope attachment set at face height.",
-    execution: "Pull the rope towards your face, pulling the ends apart. Squeeze your rear delts.",
-    nwbCues: "Focus on external rotation. Keep your elbows high.",
-    why: "Excellent for shoulder health and posture, especially important when using crutches."
-  },
-  "Preacher Curls": {
-    setup: "Sit at a preacher bench with your arms rested on the pad.",
-    execution: "Curl the bar toward your shoulders. Lower slowly to a full stretch.",
-    nwbCues: "The bench keeps your torso stationary, protecting your spine from any swinging.",
-    why: "Strict bicep isolation without lumbar stress."
-  },
-  "Pallof Press": {
-    setup: "Setup seated or tall-kneel on RIGHT knee, band/cable at chest height from the side.",
-    execution: "Press hands out, hold 3s, resist rotation.",
-    nwbCues: "Do NOT stand on one leg for this. Zero flexion, zero rotation — pure anti-rotation. Explicitly recommended for disc disease.",
-    why: "Builds core stability against rotational forces, critical for disc health."
-  },
-  "Neutral Grip Pulldown": {
-    setup: "Sit at the lat pulldown machine. Attach the V-bar handle. Thigh pad snug.",
-    execution: "Start overhead. Lean back 10 degrees. Pull to upper chest. Squeeze blades 1s. Return slowly.",
-    nwbCues: "Thigh pad anchors you, not your legs. Left foot rests like a book on a table. Zero force through it.",
-    why: "Volume lat work. Neutral grip shifts emphasis to lower lats and brachialis, easier on shoulder joints."
-  },
-  "One-Arm Cable Row": {
-    setup: "Setup at cable station.",
-    execution: "Pull to lower ribs, keep shoulders square.",
-    nwbCues: "CAUTION exercise. if lumbar spine twists AT ALL, drop weight immediately — anti-rotation core exercise disguised as back exercise.",
-    why: "Builds pulling strength while demanding high levels of core stability."
-  },
-  "Reverse Fly": {
-    setup: "Sit on a bench and lean forward slightly, or use a reverse pec deck machine.",
-    execution: "Raise your arms out to the sides, focusing on squeezing your rear delts. Lower slowly.",
-    nwbCues: "Keep your spine neutral. Don't let your lower back round.",
-    why: "Rear delt development to balance the shoulder joint."
-  },
-  "Hammer Curls": {
-    setup: "Stand on your right leg or sit. Hold dumbbells with a neutral grip.",
-    execution: "Curl the weights toward your shoulders. Lower slowly.",
-    nwbCues: "Maintain a stable torso. No swinging.",
-    why: "Targets the brachialis and brachioradialis."
-  },
-  "Incline DB Curl": {
-    setup: "Sit on an incline bench set to about 45 degrees. Let your arms hang straight down.",
-    execution: "Curl the dumbbells while keeping your elbows pinned to your sides.",
-    nwbCues: "Keep your head and back against the bench.",
-    why: "Maximal bicep stretch for peak growth."
-  },
-  "Bird-Dog": {
-    setup: "Setup on hands and knees, LEFT knee stays on ground always.",
-    execution: "Extend RIGHT leg back + LEFT arm forward, hold 5-8s, keep hips level.",
-    nwbCues: "Left leg never moves. If hips rock side to side, going too fast.",
-    why: "McGill Big 3, builds back endurance and stability."
-  },
-  "SL Leg Press (Right)": {
-    setup: "Setup with RIGHT foot HIGH on plate.",
-    execution: "Lower until just before 90° hip flexion, 4-sec eccentric in Weeks 3+.",
-    nwbCues: "HIGH foot placement reduces hip flexion, 90° limit is NON-NEGOTIABLE for FAI.",
-    why: "Most important exercise for cross-education, 17.7% contralateral strength preservation."
-  },
-  "SL Glute Bridge (Right)": {
-    setup: "Lie on your back with your RIGHT knee bent and foot flat.",
-    execution: "Drive through your right heel to lift your hips. Squeeze 2s at top.",
-    nwbCues: "Avoid over-arching your lower back at the top. Use hip power.",
-    why: "Unilateral glute strength that respects your NWB status."
-  },
-  "Prone Ham Curl (Right)": {
-    setup: "Setup face-down on machine, RIGHT leg only.",
-    execution: "3s up, 1s hold, 3s down (HSR tempo).",
-    nwbCues: "PRONE chosen over SEATED because seated compresses ischial tuberosity.",
-    why: "HSR is evidence-based treatment for tendinosis, not rest."
-  },
-  "Isometric Quad Sets (Left)": {
-    setup: "Sit or lie with your LEFT leg straight.",
-    execution: "Tighten your left quad, pushing the back of your knee down. Hold for 5s.",
-    nwbCues: "Focus purely on the muscle contraction. No hip movement.",
-    why: "Prevents muscle atrophy in the injured limb."
-  },
-  "Ankle Pumps (Left)": {
-    setup: "Lie or sit with your LEFT leg extended.",
-    execution: "Move your ankle up and down through full range.",
-    nwbCues: "Perform frequently throughout the day.",
-    why: "Critical for circulation and preventing DVT."
-  },
-  "Dead Bug (R leg only)": {
-    setup: "Setup supine, left foot planted on floor, right leg at 90°.",
-    execution: "Lower right leg + left arm simultaneously, keep low back pressed into floor.",
-    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely.",
-    why: "Safe deep core and TVA activation without loading the injured hip flexor."
-  },
-  "Low-Box Step-Up (Right)": {
-    setup: "Use a box BELOW knee height. Stand with your RIGHT foot on the box.",
-    execution: "Step up onto the box using only the right leg. Lower slowly.",
-    nwbCues: "Keep hip flexion under 90°. Do not use left leg to hop.",
-    why: "Functional strength and balance for your right leg."
-  },
-  "SL Hip Thrust (Right)": {
-    setup: "Shoulders on bench. RIGHT foot flat on floor.",
-    execution: "Drive through R heel to lift hips. Squeeze at top.",
-    nwbCues: "Keep chin tucked and ribs down. Don't arch lumbar.",
-    why: "Superior glute isolation with high tension at the top."
-  },
-  "Nordic Ham Curl": {
-    setup: "Kneel on a pad with feet anchored.",
-    execution: "Lower torso slowly by extending knees. Catch yourself with hands.",
-    nwbCues: "0–20° hip flexion. Great for tendinosis HSR.",
-    why: "Gold standard for hamstring injury prevention."
-  },
-  "Standing Calf Raise (R)": {
-    setup: "Stand on step edge with RIGHT foot only.",
-    execution: "Full ROM: deep stretch to peak contraction.",
-    nwbCues: "Use hands for balance. Move vertically.",
-    why: "Essential for mobility and balance."
-  },
-  "Stir the Pot": {
-    setup: "Forearms on ball, plank position.",
-    execution: "Small circles while maintaining a rigid plank.",
-    nwbCues: "Anti-rotation. Neutral spine. If back arches, stop.",
-    why: "High-level stability without spinal flexion."
-  },
-  "Arm Ergometer": {
-    setup: "Sit at the arm bike. Slight bend in elbows at extension.",
-    execution: "Pedal at a steady pace. Upright posture.",
-    nwbCues: "Zero hip involvement. Gold standard cardio.",
-    why: "Cardio fitness without lower body loading."
-  },
-  "Upper Body Stretching": {
-    setup: "Seated or standing on R leg.",
-    execution: "Gentle stretches for chest, lats, and shoulders.",
-    nwbCues: "CAUTION: NO hamstring stretching allowed.",
-    why: "Relieves tension from crutching."
-  },
-  "T-Spine Mobility": {
-    setup: "Quadruped or seated.",
-    execution: "Cat-cow focusing on upper back. T-spine rotation.",
-    nwbCues: "Keep hips and lumbar still.",
-    why: "Prevents stiffness in the mid-back."
-  }
-};
+const PHASES = [
+  {weeks:"1-2", name:"Foundation", color:"#38bdf8", desc:"Adaptation phase. Higher reps, learn safe patterns."},
+  {weeks:"3-4", name:"Build", color:"#a78bfa", desc:"Increase load. 4-sec eccentrics. Add drop sets & rest-pause."},
+  {weeks:"5-6", name:"Peak", color:"#f97316", desc:"Maximum safe output. Heavy singles. Pre-weight-bearing."}
+];
 
-// ===== STATELESS COMPONENTS =====
-
-function Badge({color, children}) {
-  return e("span", {
-    style: {
-      display: "inline-block",
-      padding: "2px 7px",
-      borderRadius: 4,
-      fontSize: 10,
-      fontWeight: 700,
-      letterSpacing: "0.5px",
-      textTransform: "uppercase",
-      background: color + "22",
-      color: color,
-      border: "1px solid " + color + "44"
-    }
-  }, children);
+// ===== HELPER: localStorage =====
+function loadState(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; }
+}
+function saveState(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
 }
 
-function Section({title, icon, children, isOpen, onToggle, accent}) {
+// ===== COMPONENTS =====
+
+function Badge({color, children}) {
+  return e("span", {style: {display:"inline-block", padding:"2px 7px", borderRadius:4, fontSize:10, fontWeight:700, letterSpacing:"0.5px", textTransform:"uppercase", background:color+"22", color:color, border:"1px solid "+color+"44"}}, children);
+}
+
+function Section({title, icon, children, isOpen, onToggle, accent, count}) {
   const ac = accent || C.accent;
-  return e("div", {
-    style: {
-      marginBottom: 10,
-      borderRadius: 10,
-      border: "1px solid " + (isOpen ? ac + "44" : C.border),
-      background: C.card,
-      overflow: "hidden"
-    }
-  },
-    e("button", {
-      onClick: onToggle,
-      style: {
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: 9,
-        padding: "13px 14px",
-        background: "none",
-        border: "none",
-        color: C.text,
-        cursor: "pointer",
-        textAlign: "left",
-        fontSize: 14,
-        fontWeight: 600,
-        fontFamily: "inherit"
-      }
-    },
-      e("span", {style: {fontSize: 17}}, icon),
-      e("span", {style: {flex: 1}}, title),
-      e("span", {
-        style: {
-          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-          transition: "transform 0.2s",
-          fontSize: 11,
-          color: C.textMuted
-        }
-      }, "▼")
+  return e("div", {style: {marginBottom:10, borderRadius:10, border:"1px solid "+(isOpen?ac+"44":C.border), background:C.card, overflow:"hidden"}},
+    e("button", {onClick:onToggle, style:{width:"100%", display:"flex", alignItems:"center", gap:9, padding:"13px 14px", background:"none", border:"none", color:C.text, cursor:"pointer", textAlign:"left", fontSize:14, fontWeight:600, fontFamily:"inherit"}},
+      e("span", {style:{fontSize:17}}, icon),
+      e("span", {style:{flex:1}}, title),
+      count != null && e("span", {style:{fontSize:11, color:C.textMuted, marginRight:8}}, count + " exercises"),
+      e("span", {style:{transform:isOpen?"rotate(180deg)":"rotate(0deg)", transition:"transform 0.2s", fontSize:11, color:C.textMuted}}, "▼")
     ),
-    isOpen && e("div", {style: {padding: "0 14px 14px", lineHeight: 1.6}}, children)
+    isOpen && e("div", {style:{padding:"0 14px 14px", lineHeight:1.6}}, children)
   );
 }
 
-function ExRow({name, sets, reps, notes, safety, removed, replacement, phase, isExpanded, onToggle}) {
-  const sc = safety === "caution" ? C.warning : safety === "danger" ? C.danger : C.safe;
-  const detail = EX_DETAILS[name];
-  
-  if (removed) {
-    return e("div", {
-      style: {
-        padding: "9px 11px",
-        marginBottom: 5,
-        borderRadius: 8,
-        background: C.dangerBg,
-        border: "1px solid " + C.dangerBorder,
-        opacity: 0.8
-      }
-    },
-      e("div", {style: {display: "flex", alignItems: "center", gap: 7, marginBottom: 3}},
-        e("span", {style: {textDecoration: "line-through", color: C.danger, fontSize: 13, fontWeight: 600}}, name),
-        e(Badge, {color: C.danger, children: "REMOVED"})
-      ),
-      e("div", {style: {fontSize: 11, color: C.danger}}, "⚠ " + notes),
-      replacement && e("div", {style: {fontSize: 11, color: C.safe, marginTop: 3}}, "✓ Replaced: " + replacement)
-    );
-  }
+function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, unavailable, equipment}) {
+  if (!ex) return null;
+  const sc = ex.safety === "caution" ? C.warning : ex.safety === "danger" ? C.danger : C.safe;
+  const s = ex.sets[phase] || ex.sets[0];
 
-  return e("div", {
-    onClick: onToggle,
-    style: {
-      padding: "9px 11px",
-      marginBottom: 5,
-      borderRadius: 8,
-      background: isExpanded ? "#0f1629" : C.bg,
-      borderLeft: "3px solid " + sc,
-      cursor: "pointer",
-      transition: "background 0.2s"
-    }
-  },
-    e("div", {style: {display: "flex", alignItems: "center", justifyContent: "space-between", gap: 7, flexWrap: "wrap", marginBottom: 3}},
-      e("div", {style: {display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap"}},
-        e("span", {style: {fontWeight: 600, fontSize: 13, color: C.text}}, name),
-        safety === "caution" && e(Badge, {color: C.warning, children: "MODIFIED"}),
-        phase && e(Badge, {color: C.textMuted, children: "Wk " + phase})
-      ),
-      !isExpanded && e("div", {style: {display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.accent}},
-        e("span", null, "tap for details →"),
-        e("span", {style: {fontSize: 12}}, "ⓘ")
+  return e("div", {style: {marginBottom:6, borderRadius:8, background: isExpanded?"#0f1629":C.bg, borderLeft:"3px solid "+(unavailable?C.danger:sc), opacity: unavailable?0.5:1, overflow:"hidden"}},
+    e("div", {onClick: onToggle, style:{padding:"10px 12px", cursor:"pointer"}},
+      e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", gap:7, flexWrap:"wrap"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:7, flexWrap:"wrap", flex:1}},
+          e("span", {style:{fontWeight:600, fontSize:13, color: unavailable?C.danger:C.text}}, name),
+          ex.safety === "caution" && e(Badge, {color:C.warning}, "MODIFIED"),
+          ex.phase != null && phase < ex.phase && e(Badge, {color:C.textMuted}, "Wk "+(ex.phase*2+1)+"+"),
+          unavailable && e(Badge, {color:C.danger}, "NO EQUIP")
+        ),
+        e("div", {style:{display:"flex", alignItems:"center", gap:8}},
+          !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"×"+s[1]),
+          e("span", {style:{fontSize:10, color:C.accent}}, isExpanded ? "▲" : "ⓘ")
+        )
       )
     ),
-    e("div", {style: {fontSize: 12, color: C.textDim}},
-      sets && e("span", null, sets + " × " + reps),
-      notes && e("div", {style: {fontSize: 11, color: safety === "caution" ? C.warning : C.textMuted, marginTop: 2}}, notes)
-    ),
-    isExpanded && detail && e("div", {style: {marginTop: 12, paddingTop: 12, borderTop: "1px solid " + C.border, fontSize: 11, lineHeight: 1.6}},
-      e("div", {style: {marginBottom: 10}},
-        e("div", {style: {fontWeight: 700, color: C.accent, marginBottom: 4, fontSize: 10}}, "📍 SETUP & POSITION"),
-        e("div", {style: {color: C.textDim}}, detail.setup)
+    isExpanded && e("div", {style:{padding:"0 12px 12px"}},
+      e("div", {style:{display:"flex", gap:12, marginBottom:12, padding:"8px 0", borderBottom:"1px solid "+C.border}},
+        e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Sets × Reps"), e("div", {style:{fontSize:14, fontWeight:700, color:C.accent}}, s[0]+" × "+s[1])),
+        ex.rest > 0 && e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Rest"), e("div", {style:{fontSize:14, fontWeight:700, color:C.text}}, ex.rest+"s"))
       ),
-      e("div", {style: {marginBottom: 10}},
-        e("div", {style: {fontWeight: 700, color: C.safe, marginBottom: 4, fontSize: 10}}, "🔄 HOW TO EXECUTE"),
-        e("div", {style: {color: C.textDim}}, detail.execution)
+      e("div", {style:{fontSize:11, lineHeight:1.7}},
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📍 SETUP & POSITION"), e("div", {style:{color:C.textDim}}, ex.setup)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why))
       ),
-      e("div", {style: {marginBottom: 10}},
-        e("div", {style: {fontWeight: 700, color: C.warning, marginBottom: 4, fontSize: 10}}, "🛡️ NWB SAFETY CUES"),
-        e("div", {style: {color: C.textDim}}, detail.nwbCues)
+      ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
+        ex.requires.map(function(eq) {
+          var eqData = EQUIPMENT[eq];
+          var has = equipment[eq] !== false;
+          return e("span", {key:eq, style:{fontSize:10, padding:"2px 6px", borderRadius:4, background:has?C.safeBg:C.dangerBg, color:has?C.safe:C.danger, border:"1px solid "+(has?C.safeBorder:C.dangerBorder)}}, (eqData?eqData.icon:"")+" "+(eqData?eqData.name:eq));
+        })
       ),
-      e("div", null,
-        e("div", {style: {fontWeight: 700, color: C.text, marginBottom: 4, fontSize: 10}}, "🎯 WHY THIS EXERCISE"),
-        e("div", {style: {color: C.textDim}}, detail.why)
-      )
+      (ex.swaps && ex.swaps.length > 0) && e("div", null,
+        e("div", {style:{fontSize:10, fontWeight:700, color:C.textMuted, marginBottom:6, textTransform:"uppercase"}}, "Swap for:"),
+        e("div", {style:{display:"flex", flexWrap:"wrap", gap:4}},
+          ex.swaps.map(function(sw) {
+            var swEx = EX[sw];
+            var swAvail = swEx && swEx.requires.every(function(r){ return equipment[r] !== false; });
+            return e("button", {key:sw, onClick:function(ev){ ev.stopPropagation(); onSwap(sw); }, style:{fontSize:11, padding:"6px 10px", borderRadius:6, background:swAvail?C.accent+"22":C.bg, color:swAvail?C.accent:C.textMuted, border:"1px solid "+(swAvail?C.accent+"44":C.border), cursor:"pointer", fontFamily:"inherit"}}, sw + (swAvail?" ✓":" ✗"));
+          })
+        )
+      ),
+      ex.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); onSwap("__timer__"+ex.rest); }, style:{marginTop:10, width:"100%", padding:"10px", borderRadius:8, background:C.accent+"22", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}, "⏱ Start "+ex.rest+"s Rest Timer")
     )
+  );
+}
+
+function RemovedRow({name, reason}) {
+  return e("div", {style:{padding:"8px 11px", marginBottom:4, borderRadius:8, background:C.dangerBg, border:"1px solid "+C.dangerBorder, opacity:0.7}},
+    e("div", {style:{display:"flex", alignItems:"center", gap:7}},
+      e("span", {style:{textDecoration:"line-through", color:C.danger, fontSize:12, fontWeight:600}}, name),
+      e(Badge, {color:C.danger}, "REMOVED")
+    ),
+    e("div", {style:{fontSize:11, color:C.danger, marginTop:2}}, "⚠ "+reason)
   );
 }
 
 function Callout({type, children}) {
-  const cfg = {
-    danger: {bg: C.dangerBg, border: C.dangerBorder, color: C.danger, icon: "🚫"},
-    warning: {bg: C.warningBg, border: C.warningBorder, color: C.warning, icon: "⚠️"},
-    safe: {bg: C.safeBg, border: C.safeBorder, color: C.safe, icon: "✅"},
-    info: {bg: C.accentDim + "44", border: C.accentDim, color: C.accent, icon: "💡"}
-  };
-  const c = cfg[type] || cfg.info;
-  return e("div", {
-    style: {
-      padding: "11px 13px",
-      borderRadius: 8,
-      background: c.bg,
-      border: "1px solid " + c.border,
-      marginBottom: 10,
-      fontSize: 12,
-      lineHeight: 1.6,
-      color: c.color
-    }
-  }, c.icon + " ", children);
+  const cfg = {danger:{bg:C.dangerBg,border:C.dangerBorder,color:C.danger,icon:"🚫"}, warning:{bg:C.warningBg,border:C.warningBorder,color:C.warning,icon:"⚠️"}, safe:{bg:C.safeBg,border:C.safeBorder,color:C.safe,icon:"✅"}, info:{bg:C.accentDim+"44",border:C.accentDim,color:C.accent,icon:"💡"}};
+  const c = cfg[type]||cfg.info;
+  return e("div", {style:{padding:"11px 13px", borderRadius:8, background:c.bg, border:"1px solid "+c.border, marginBottom:10, fontSize:12, lineHeight:1.6, color:c.color}}, c.icon+" ", children);
 }
 
-function EqTable({rows}) {
-  return e("div", {style: {overflowX: "auto", marginBottom: 10}},
-    e("table", {style: {width: "100%", borderCollapse: "collapse", fontSize: 12}},
-      e("thead", null, e("tr", {style: {borderBottom: "2px solid " + C.accent + "44"}},
-        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.accent, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Exercise"),
-        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.safe, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Full Gym"),
-        e("th", {style: {padding: "7px 8px", textAlign: "left", color: C.warning, fontWeight: 700, fontSize: 10, textTransform: "uppercase"}}, "Home")
-      )),
-      e("tbody", null, rows.map((r, i) => e("tr", {key: "row-" + i, style: {borderBottom: "1px solid " + C.border}},
-        e("td", {style: {padding: "7px 8px", color: C.text, fontWeight: 500}}, r[0]),
-        e("td", {style: {padding: "7px 8px", color: C.textDim}}, r[1]),
-        e("td", {style: {padding: "7px 8px", color: C.textDim}}, r[2])
-      )))
-    )
+function RestTimer({seconds, onClose}) {
+  const [remaining, setRemaining] = useState(seconds);
+  const intervalRef = useRef(null);
+
+  useEffect(function() {
+    intervalRef.current = setInterval(function() {
+      setRemaining(function(r) {
+        if (r <= 1) { clearInterval(intervalRef.current); return 0; }
+        return r - 1;
+      });
+    }, 1000);
+    return function() { clearInterval(intervalRef.current); };
+  }, [seconds]);
+
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+
+  return e("div", {className:"rest-timer"},
+    e("div", {className:"time", style: remaining === 0 ? {color:C.safe, animation:"pulse 1s infinite"} : {}},
+      remaining === 0 ? "GO!" : (mins > 0 ? mins+":" : "") + (secs < 10 && mins > 0 ? "0" : "") + secs
+    ),
+    e("button", {onClick:onClose}, "✕ Close")
   );
 }
 
 // ===== MAIN APP =====
-
 function App() {
-  const [tab, setTab] = React.useState(0);
-  const [phase, setPhase] = React.useState(1); // Default to Build
-  const [openSections, setOpenSections] = React.useState({
-    "Weekly Overview": true,
-    "Push A — Strength": true,
-    "Pull A — Strength": true,
-    "Legs A — Right Leg (Cross-Ed)": true,
-    "Cardio Priority Ranking": true,
-    "Core Safety Rules": true,
-    "Injury Status": true
-  });
-  const [expandedExercises, setExpandedExercises] = React.useState({});
+  const [tab, setTab] = useState(0);
+  const [phase, setPhase] = useState(loadState("nwb_phase", 0));
+  const realTodayKey = SCHED[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1].t;
+  const [openSections, setOpenSections] = useState(function(){ var init = {}; init[realTodayKey] = true; return init; });
+  const [expandedEx, setExpandedEx] = useState({});
+  const [equipment, setEquipment] = useState(loadState("nwb_equipment", {}));
+  const [timer, setTimer] = useState(null);
+  const [swaps, setSwaps] = useState(loadState("nwb_swaps", {}));
+  const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const [selectedDay, setSelectedDay] = useState(realToday);
 
-  const toggleSection = (t) => setOpenSections(s => ({...s, [t]: !s[t]}));
-  const toggleExercise = (n) => setExpandedExercises(s => ({...s, [n]: !s[n]}));
+  useEffect(function(){ saveState("nwb_phase", phase); }, [phase]);
+  useEffect(function(){ saveState("nwb_equipment", equipment); }, [equipment]);
+  useEffect(function(){ saveState("nwb_swaps", swaps); }, [swaps]);
 
-  const tabs = ["Schedule", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+  const toggleSection = function(t){ setOpenSections(function(s){ var n = {}; n[t] = !s[t]; return Object.assign({}, s, n); }); };
+  const toggleEx = function(n){ setExpandedEx(function(s){ var n2 = {}; n2[n] = !s[n]; return Object.assign({}, s, n2); }); };
 
-  let content = null;
-  switch (tab) {
-    case 0: // Schedule
+  const isAvailable = function(exName) {
+    var ex = EX[exName];
+    if (!ex) return true;
+    return ex.requires.every(function(r){ return equipment[r] !== false; });
+  };
+
+  const handleSwap = function(workoutKey, origName, newName) {
+    if (newName.startsWith("__timer__")) {
+      setTimer(parseInt(newName.replace("__timer__","")));
+      return;
+    }
+    var key = workoutKey + ":" + origName;
+    setSwaps(function(s){ var n = {}; n[key] = newName; return Object.assign({}, s, n); });
+  };
+
+  const getExName = function(workoutKey, origName) {
+    var key = workoutKey + ":" + origName;
+    return swaps[key] || origName;
+  };
+
+  const resetSwap = function(workoutKey, origName) {
+    var key = workoutKey + ":" + origName;
+    setSwaps(function(s){ var n = Object.assign({}, s); delete n[key]; return n; });
+  };
+
+  const tabs = ["Today", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+
+  function renderWorkout(workoutKey) {
+    var w = WORKOUTS[workoutKey];
+    if (!w) return null;
+    return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
+      w.exercises.map(function(origName) {
+        var exName = getExName(workoutKey, origName);
+        var ex = EX[exName];
+        if (!ex) return null;
+        if (ex.phase != null && phase < ex.phase) return null;
+        var unavail = !isAvailable(exName);
+        return e("div", {key: origName},
+          exName !== origName && e("div", {style:{fontSize:10, color:C.textMuted, padding:"2px 12px", display:"flex", alignItems:"center", gap:4}},
+            e("span", null, "↻ was: " + origName),
+            e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
+          ),
+          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, unavailable:unavail, equipment:equipment})
+        );
+      }),
+      w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
+        w.removed.map(function(r){ return e(RemovedRow, {key:r.name, name:r.name, reason:r.reason}); })
+      )
+    );
+  }
+
+  var content = null;
+  switch(tab) {
+    case 0: // Today
+      var selSched = SCHED[selectedDay];
+      var selWorkout = WORKOUTS[selSched.t];
+      var isToday2 = selectedDay === realToday;
       content = e("div", null,
-        e("div", {style: {display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 14}},
-          SCHED.map((s, i) => e("div", {key: "day-" + i, style: {padding: "7px 3px", borderRadius: 7, background: C.card, border: "1px solid " + s.c + "33", textAlign: "center"}},
-            e("div", {style: {fontSize: 9, fontWeight: 700, color: C.textMuted, textTransform: "uppercase"}}, s.d),
-            e("div", {style: {fontSize: 15, margin: "3px 0"}}, s.i),
-            e("div", {style: {fontSize: 9, color: s.c, fontWeight: 600}}, s.t)
-          ))
+        e("div", {style:{textAlign:"center", marginBottom:16}},
+          e("div", {style:{fontSize:11, color:C.textMuted, textTransform:"uppercase", letterSpacing:1}}, (isToday2 ? "Today — " : "") + ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][selectedDay]),
+          e("div", {style:{fontSize:22, fontWeight:800, color:selSched.c, marginTop:4}}, selSched.i + " " + selSched.t)
         ),
-        e(Section, {
-          title: "Weekly Overview",
-          icon: "📅",
-          isOpen: !!openSections["Weekly Overview"],
-          onToggle: () => toggleSection("Weekly Overview")
-        },
-          e("div", {style: {fontSize: 12, color: C.textDim, lineHeight: 1.7}},
-            e("p", null, "6-day PPL split. Cardio 3-4×/week. Sunday = active recovery."),
-            e("div", {style: {display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7, marginTop: 10}},
-              [{l:"Push", d:"Floor press, OH press, chest, triceps"}, {l:"Pull", d:"Pulldowns, rows, biceps"}, {l:"Legs", d:"Right leg only"}, {l:"Core", d:"McGill Big 3 every session"}].map((info, i) =>
-                e("div", {key: "ov-" + i, style: {padding: "9px", borderRadius: 7, background: C.bg, border: "1px solid " + C.border}},
-                  e("div", {style: {fontSize: 11, fontWeight: 700, color: C.accent}}, info.l),
-                  e("div", {style: {fontSize: 10, color: C.textMuted, marginTop: 2}}, info.d)
-                )
-              )
-            )
-          )
+        e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:16}},
+          SCHED.map(function(s, i) {
+            var isSel = i === selectedDay;
+            var isReal = i === realToday;
+            return e("div", {key:"day-"+i, onClick:function(){ setSelectedDay(i); if(!openSections[s.t]) toggleSection(s.t); }, style:{padding:"7px 3px", borderRadius:7, background: isSel ? s.c+"22" : C.card, border:"1px solid "+(isSel ? s.c : isReal ? s.c+"44" : C.border+"66"), textAlign:"center", cursor:"pointer"}},
+              e("div", {style:{fontSize:9, fontWeight:700, color: isSel ? s.c : C.textMuted, textTransform:"uppercase"}}, isReal ? "• "+s.d : s.d),
+              e("div", {style:{fontSize:14, margin:"2px 0"}}, s.i),
+              e("div", {style:{fontSize:8, color: isSel ? C.text : C.textMuted, fontWeight:600}}, s.t)
+            );
+          })
         ),
-        e(Section, {
-          title: "Phase Progression",
-          icon: "📈",
-          isOpen: !!openSections["Phase Progression"],
-          onToggle: () => toggleSection("Phase Progression")
-        },
-          PHASES.map((p, i) =>
-            e("div", {
-              key: "prog-" + i,
-              onClick: () => setPhase(i),
-              style: {
-                padding: "11px",
-                marginBottom: 7,
-                borderRadius: 8,
-                background: phase === i ? p.color + "11" : C.bg,
-                border: "1px solid " + (phase === i ? p.color + "44" : C.border),
-                cursor: "pointer"
-              }
-            },
-              e("div", {style: {fontWeight: 700, color: p.color, fontSize: 13}}, "Weeks " + p.weeks + ": " + p.name),
-              e("div", {style: {fontSize: 11, color: C.textMuted, marginTop: 3}},
-                i === 0 ? "Lower load, high reps (10-15). Adaptation phase." :
-                i === 1 ? "Increase load (80% 1RM). 4-sec eccentrics on legs." :
-                "Peak intensity. Prepare for WB transition."
-              )
-            )
-          )
-        ),
-        e(Section, {
-          title: "Cross-Education Protocol",
-          icon: "🧠",
-          isOpen: !!openSections["Cross-Education Protocol"],
-          onToggle: () => toggleSection("Cross-Education Protocol")
-        },
-          e(Callout, {type: "info", children: "Meta-analyses confirm ~16% contralateral strength preservation. Load (≥80% 1RM) + Eccentric emphasis (~17.7% transfer)."}),
-          e("div", {style: {fontSize: 12, color: C.textDim, lineHeight: 1.7}},
-            e("p", {style: {margin: "0 0 6px", fontWeight: 600, color: C.text}}, "Right leg training rules:"),
-            ["Intensity: ≥80% 1RM (Wks 3+)", "Tempo: 4-second eccentric", "Rest: 2+ minutes", "ROM: <90° hip flexion (FAI protection)"].map((rule, i) =>
-              e("p", {key: "rule-" + i}, "• " + rule)
-            )
+        selWorkout && renderWorkout(selSched.t),
+        e(Section, {title:"Cross-Education Protocol", icon:"🧠", isOpen:!!openSections["cross-ed"], onToggle:function(){ toggleSection("cross-ed"); }},
+          e(Callout, {type:"info"}, "Manca et al. meta-analysis: 11.9% strength gains in untrained limb. Eccentric-focused work → 17.7% crossover."),
+          e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+            ["Intensity: ≥80% 1RM (Weeks 3+)", "Tempo: 4-second eccentric on leg exercises", "Rest: 2+ minutes between heavy sets", "ROM: <90° hip flexion (FAI protection)", "Mental focus on injured limb during right-leg training"].map(function(r,i){ return e("p", {key:"r-"+i}, "• "+r); })
           )
         )
       );
@@ -549,285 +939,162 @@ function App() {
 
     case 1: // Workouts
       content = e("div", null,
-        e(Section, {
-          title: "Push A — Strength",
-          icon: "💪",
-          accent: "#38bdf8",
-          isOpen: !!openSections["Push A — Strength"],
-          onToggle: () => toggleSection("Push A — Strength")
-        },
-          e(ExRow, {name: "Barbell Floor Press", sets: 4, reps: "5-6", safety: "safe", isExpanded: !!expandedExercises["Barbell Floor Press"], onToggle: () => toggleExercise("Barbell Floor Press")}),
-          e(ExRow, {name: "Seated DB OH Press", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Seated DB OH Press"], onToggle: () => toggleExercise("Seated DB OH Press")}),
-          e(ExRow, {name: "Incline DB Press + Lat Raises", sets: 3, reps: "8-10 / 12-15", safety: "safe", isExpanded: !!expandedExercises["Incline DB Press + Lat Raises"], onToggle: () => toggleExercise("Incline DB Press + Lat Raises")}),
-          e(ExRow, {name: "Lying Skull Crushers", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Lying Skull Crushers"], onToggle: () => toggleExercise("Lying Skull Crushers")}),
-          e(ExRow, {name: "McGill Curl-Up", sets: 3, reps: "10 (5s hold)", safety: "safe", isExpanded: !!expandedExercises["McGill Curl-Up"], onToggle: () => toggleExercise("McGill Curl-Up")})
-        ),
-        e(Section, {
-          title: "Push B — Volume",
-          icon: "💪",
-          accent: "#38bdf8",
-          isOpen: !!openSections["Push B — Volume"],
-          onToggle: () => toggleSection("Push B — Volume")
-        },
-          e(ExRow, {name: "DB Floor Press", sets: 4, reps: "8-10", safety: "safe", isExpanded: !!expandedExercises["DB Floor Press"], onToggle: () => toggleExercise("DB Floor Press")}),
-          e(ExRow, {name: "Landmine Press (1-arm, seated)", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Landmine Press (1-arm, seated)"], onToggle: () => toggleExercise("Landmine Press (1-arm, seated)")}),
-          e(ExRow, {name: "Cable Chest Fly", sets: 3, reps: "12-15", safety: "safe", isExpanded: !!expandedExercises["Cable Chest Fly"], onToggle: () => toggleExercise("Cable Chest Fly")}),
-          e(ExRow, {name: "OH Triceps Extension", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["OH Triceps Extension"], onToggle: () => toggleExercise("OH Triceps Extension")}),
-          phase >= 1 && e(ExRow, {name: "Mechanical Drop Set", sets: 1, reps: "8+8+8", phase: "3-6", safety: "safe", isExpanded: !!expandedExercises["Mechanical Drop Set"], onToggle: () => toggleExercise("Mechanical Drop Set")}),
-          e(ExRow, {name: "Side Plank", sets: 3, reps: "30s/side", safety: "safe", isExpanded: !!expandedExercises["Side Plank"], onToggle: () => toggleExercise("Side Plank")})
-        ),
-        e(Section, {
-          title: "Pull A — Strength",
-          icon: "🔗",
-          accent: "#a78bfa",
-          isOpen: !!openSections["Pull A — Strength"],
-          onToggle: () => toggleSection("Pull A — Strength")
-        },
-          e(ExRow, {name: "Lat Pulldown (Wide)", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Lat Pulldown (Wide)"], onToggle: () => toggleExercise("Lat Pulldown (Wide)")}),
-          e(ExRow, {name: "Chest-Supported DB Row", sets: 4, reps: "6-8", safety: "safe", isExpanded: !!expandedExercises["Chest-Supported DB Row"], onToggle: () => toggleExercise("Chest-Supported DB Row")}),
-          e(ExRow, {name: "Seated Cable Row", sets: 3, reps: "10-12", safety: "caution", notes: "No forward lean.", isExpanded: !!expandedExercises["Seated Cable Row"], onToggle: () => toggleExercise("Seated Cable Row")}),
-          e(ExRow, {name: "Seated Face Pulls", sets: 3, reps: "15-20", safety: "safe", isExpanded: !!expandedExercises["Seated Face Pulls"], onToggle: () => toggleExercise("Seated Face Pulls")}),
-          e(ExRow, {name: "Preacher Curls", sets: 3, reps: "8-10", safety: "safe", isExpanded: !!expandedExercises["Preacher Curls"], onToggle: () => toggleExercise("Preacher Curls")}),
-          e(ExRow, {name: "Pallof Press", sets: 3, reps: "10/side", safety: "safe", isExpanded: !!expandedExercises["Pallof Press"], onToggle: () => toggleExercise("Pallof Press")})
-        ),
-        e(Section, {
-          title: "Pull B — Volume",
-          icon: "🔗",
-          accent: "#a78bfa",
-          isOpen: !!openSections["Pull B — Volume"],
-          onToggle: () => toggleSection("Pull B — Volume")
-        },
-          e(ExRow, {name: "Neutral Grip Pulldown", sets: 4, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Neutral Grip Pulldown"], onToggle: () => toggleExercise("Neutral Grip Pulldown")}),
-          e(ExRow, {name: "One-Arm Cable Row", sets: 3, reps: "10-12", safety: "caution", isExpanded: !!expandedExercises["One-Arm Cable Row"], onToggle: () => toggleExercise("One-Arm Cable Row")}),
-          e(ExRow, {name: "Reverse Fly", sets: 3, reps: "12-15", safety: "safe", isExpanded: !!expandedExercises["Reverse Fly"], onToggle: () => toggleExercise("Reverse Fly")}),
-          e(ExRow, {name: "Hammer Curls", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Hammer Curls"], onToggle: () => toggleExercise("Hammer Curls")}),
-          e(ExRow, {name: "Incline DB Curl", sets: 3, reps: "10-12", safety: "safe", isExpanded: !!expandedExercises["Incline DB Curl"], onToggle: () => toggleExercise("Incline DB Curl")}),
-          e(ExRow, {name: "Bird-Dog", sets: 3, reps: "8/side", safety: "safe", isExpanded: !!expandedExercises["Bird-Dog"], onToggle: () => toggleExercise("Bird-Dog")})
-        ),
-        e(Section, {
-          title: "Legs A — Right Leg (Cross-Ed)",
-          icon: "🦵",
-          accent: "#10b981",
-          isOpen: !!openSections["Legs A — Right Leg (Cross-Ed)"],
-          onToggle: () => toggleSection("Legs A — Right Leg (Cross-Ed)")
-        },
-          e(Callout, {type: "warning", children: "Capped at <90° hip flexion for FAI/Labral protection."}),
-          e(ExRow, {name: "SL Leg Press (Right)", sets: 4, reps: phase === 0 ? 12 : 6, safety: "caution", notes: "Foot HIGH on plate.", isExpanded: !!expandedExercises["SL Leg Press (Right)"], onToggle: () => toggleExercise("SL Leg Press (Right)")}),
-          e(ExRow, {name: "SL Glute Bridge (Right)", sets: 4, reps: 12, safety: "safe", isExpanded: !!expandedExercises["SL Glute Bridge (Right)"], onToggle: () => toggleExercise("SL Glute Bridge (Right)")}),
-          e(ExRow, {name: "Prone Ham Curl (Right)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["Prone Ham Curl (Right)"], onToggle: () => toggleExercise("Prone Ham Curl (Right)")}),
-          e(ExRow, {name: "Isometric Quad Sets (Left)", sets: 3, reps: "15x5s", safety: "safe", isExpanded: !!expandedExercises["Isometric Quad Sets (Left)"], onToggle: () => toggleExercise("Isometric Quad Sets (Left)")}),
-          e(ExRow, {name: "Ankle Pumps (Left)", sets: 3, reps: 20, safety: "safe", isExpanded: !!expandedExercises["Ankle Pumps (Left)"], onToggle: () => toggleExercise("Ankle Pumps (Left)")}),
-          e(ExRow, {name: "Dead Bug (R leg only)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["Dead Bug (R leg only)"], onToggle: () => toggleExercise("Dead Bug (R leg only)")}),
-          e("div", {style: {marginTop: 10, paddingTop: 10, borderTop: "1px solid " + C.border}},
-            e(ExRow, {removed: true, name: "Pistol Squats", notes: "Dangerous for labrum."}),
-            e(ExRow, {removed: true, name: "Bulgarian Split Squat", notes: "Exceeds 90° flexion."})
-          )
-        ),
-        e(Section, {
-          title: "Legs B — Right Posterior Chain",
-          icon: "🦵",
-          accent: "#10b981",
-          isOpen: !!openSections["Legs B — Right Posterior Chain"],
-          onToggle: () => toggleSection("Legs B — Right Posterior Chain")
-        },
-          e(ExRow, {name: "Low-Box Step-Up (Right)", sets: 3, reps: 10, safety: "caution", notes: "Box BELOW knee.", isExpanded: !!expandedExercises["Low-Box Step-Up (Right)"], onToggle: () => toggleExercise("Low-Box Step-Up (Right)")}),
-          e(ExRow, {name: "SL Hip Thrust (Right)", sets: 3, reps: 12, safety: "safe", isExpanded: !!expandedExercises["SL Hip Thrust (Right)"], onToggle: () => toggleExercise("SL Hip Thrust (Right)")}),
-          e(ExRow, {name: "Nordic Ham Curl", sets: 3, reps: 6, safety: "safe", isExpanded: !!expandedExercises["Nordic Ham Curl"], onToggle: () => toggleExercise("Nordic Ham Curl")}),
-          e(ExRow, {name: "Standing Calf Raise (R)", sets: 4, reps: 15, safety: "safe", isExpanded: !!expandedExercises["Standing Calf Raise (R)"], onToggle: () => toggleExercise("Standing Calf Raise (R)")}),
-          e(ExRow, {name: "Stir the Pot", sets: 3, reps: 8, safety: "safe", isExpanded: !!expandedExercises["Stir the Pot"], onToggle: () => toggleExercise("Stir the Pot")}),
-          e("div", {style: {marginTop: 10, paddingTop: 10, borderTop: "1px solid " + C.border}},
-            e(ExRow, {removed: true, name: "Seated Ham Curl", notes: "Compresses tendinopathy."})
-          )
-        ),
-        e(Section, {
-          title: "Recovery (Sunday)",
-          icon: "🧘",
-          isOpen: !!openSections["Recovery (Sunday)"],
-          onToggle: () => toggleSection("Recovery (Sunday)")
-        },
-          e(ExRow, {name: "Arm Ergometer", reps: "20 min", safety: "safe", isExpanded: !!expandedExercises["Arm Ergometer"], onToggle: () => toggleExercise("Arm Ergometer")}),
-          e(ExRow, {name: "Upper Body Stretching", reps: "10 min", safety: "caution", notes: "NO hamstring stretching.", isExpanded: !!expandedExercises["Upper Body Stretching"], onToggle: () => toggleExercise("Upper Body Stretching")}),
-          e(ExRow, {name: "T-Spine Mobility", reps: "5 min", safety: "safe", isExpanded: !!expandedExercises["T-Spine Mobility"], onToggle: () => toggleExercise("T-Spine Mobility")})
-        )
+        ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B", "Recovery"].map(function(k) {
+          return e("div", {key:k}, renderWorkout(k));
+        })
       );
       break;
 
     case 2: // Cardio
+      var cardioExercises = Object.keys(EX).filter(function(k){ return EX[k].category === "cardio"; });
+      var tier1 = cardioExercises.filter(function(k){ return EX[k].tier === 1; });
       content = e("div", null,
-        e(Section, {
-          title: "Cardio Priority Ranking",
-          icon: "❤️",
-          isOpen: !!openSections["Cardio Priority Ranking"],
-          onToggle: () => toggleSection("Cardio Priority Ranking")
-        },
-          e(Callout, {type: "info", children: "Ranked by safety. Arm bike is gold standard."}),
-          [{rank:1, name:"Arm Bike (UBE)", safety:"safe", desc:"Zero hip involvement. AAPM&R recommended."}, {rank:2, name:"Seated Battle Ropes", safety:"safe", desc:"Core dominant. No hip flexors."}, {rank:3, name:"Seated SkiErg", safety:"caution", desc:"Light only. Minimize trunk flexion."}].map((c, i) =>
-            e("div", {key: "cardio-" + i, style: {padding: 12, marginBottom: 9, borderRadius: 9, background: C.card, border: "1px solid " + (c.safety === "safe" ? C.safeBorder : C.warningBorder)}},
-              e("div", {style: {display: "flex", alignItems: "center", gap: 7, marginBottom: 5}},
-                e("span", {style: {display: "inline-flex", alignItems: "center", justifyContext: "center", width: 22, height: 22, borderRadius: 11, background: C.accent + "22", color: C.accent, fontSize: 11, fontWeight: 800, textAlign: "center"}}, "#" + c.rank),
-                e("span", {style: {fontWeight: 700, fontSize: 13, color: C.text}}, c.name),
-                e(Badge, {color: c.safety === "safe" ? C.safe : C.warning, children: c.safety.toUpperCase()})
-              ),
-              e("div", {style: {fontSize: 11, color: C.textDim}}, c.desc)
-            )
-          )
+        e(Callout, {type:"warning"}, "VO2 max drops ~15% in just 2 weeks of inactivity. Aggressive upper-body cardio is non-negotiable."),
+        e(Section, {title:"Tier 1 — Highest Output", icon:"🔥", isOpen:!!openSections["cardio-t1"], onToggle:function(){ toggleSection("cardio-t1"); }},
+          tier1.map(function(k) {
+            return e(ExRow, {key:k, name:k, ex:EX[k], phase:phase, isExpanded:!!expandedEx[k], onToggle:function(){ toggleEx(k); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, unavailable:!isAvailable(k), equipment:equipment});
+          })
         ),
-        e(Section, {
-          title: "Weekly Cardio Schedule",
-          icon: "📆",
-          isOpen: !!openSections["Weekly Cardio Schedule"],
-          onToggle: () => toggleSection("Weekly Cardio Schedule")
-        },
-          e(EqTable, {rows: [["Mon", "Arm Bike 25m", "Steady"], ["Wed", "Battle Ropes", "Tabata"], ["Fri", "Arm Bike", "Intervals"], ["Sat", "SkiErg 15m", "Light"], ["Sun", "Arm Bike", "Easy"]]})
+        e(Section, {title:"Weekly Cardio Schedule", icon:"📆", isOpen:!!openSections["cardio-sched"], onToggle:function(){ toggleSection("cardio-sched"); }},
+          e("div", {style:{overflowX:"auto"}},
+            e("table", {style:{width:"100%", borderCollapse:"collapse", fontSize:11}},
+              e("thead", null, e("tr", {style:{borderBottom:"2px solid "+C.accent+"44"}},
+                ["Day","AM","PM","~Cal"].map(function(h){ return e("th", {key:h, style:{padding:"6px", textAlign:"left", color:C.accent, fontSize:10, fontWeight:700}}, h); })
+              )),
+              e("tbody", null,
+                [["Mon","—","SkiErg HIIT 25m","~300"],["Tue","Arm Ergo 30m","Battle Ropes 15m","~400"],["Wed","SkiErg Intervals","—","~350"],["Thu","Boxing 20m","SkiErg Steady 25m","~450"],["Fri","Arm Ergo HIIT","Ropes Tabata","~400"],["Sat","SkiErg Long 40m","Boxing 15m","~500"],["Sun","Light Arm Ergo 20m","—","~100"]].map(function(row,i) {
+                  return e("tr", {key:"cr-"+i, style:{borderBottom:"1px solid "+C.border}},
+                    row.map(function(cell,j){ return e("td", {key:"cc-"+j, style:{padding:"6px", color:j===0?C.text:C.textDim, fontWeight:j===0?600:400}}, cell); })
+                  );
+                })
+              )
+            )
+          ),
+          e("div", {style:{marginTop:10, fontSize:11, color:C.textMuted}}, "Estimated weekly total: ~2,500 cal from cardio alone")
+        ),
+        e(Section, {title:"Cardio Protocols", icon:"📋", isOpen:!!openSections["cardio-proto"], onToggle:function(){ toggleSection("cardio-proto"); }},
+          e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+            e("p", {style:{fontWeight:700, color:C.accent, marginBottom:4}}, "SkiErg 4-3-2-1 Descending Intervals (20 min)"),
+            e("p", null, "4 min moderate → 3 min hard → 2 min very hard → 1 min ALL OUT → 2 min rest → repeat in reverse (1-2-3-4)"),
+            e("p", {style:{fontWeight:700, color:C.accent, marginTop:12, marginBottom:4}}, "Battle Ropes Tabata (12 min)"),
+            e("p", null, "3 rounds of classic Tabata: 20s max effort alternating waves / 10s rest × 8 = 4 min. 1 min rest between rounds."),
+            e("p", {style:{fontWeight:700, color:C.accent, marginTop:12, marginBottom:4}}, "Slider Row HIIT"),
+            e("p", null, "10-20 rounds of 200m sprints. 30s rest between. Right leg drives, left leg glides on furniture slider.")
+          )
         )
       );
       break;
 
     case 3: // Core
       content = e("div", null,
-        e(Section, {
-          title: "Core Safety Rules",
-          icon: "🛡️",
-          isOpen: !!openSections["Core Safety Rules"],
-          onToggle: () => toggleSection("Core Safety Rules")
-        },
-          e(Callout, {type: "danger", children: "ZERO spinal flexion under load. NO sit-ups."}),
-          e(Callout, {type: "danger", children: "ZERO active left hip flexion. Protects fracture."})
+        e(Callout, {type:"danger"}, "ZERO spinal flexion under load. NO sit-ups, NO Russian twists under load, NO leg raises."),
+        e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture."),
+        e(Section, {title:"MRI-Safe Core Exercises", icon:"✅", isOpen:!!openSections["safe-core"], onToggle:function(){ toggleSection("safe-core"); }},
+          ["McGill Curl-Up","Side Plank","Bird-Dog","Pallof Press","Dead Bug (R leg only)","Stir the Pot","Parallette L-Sit"].map(function(name) {
+            var ex = EX[name];
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, unavailable:false, equipment:equipment});
+          })
         ),
-        e(Section, {
-          title: "Safe Core Exercises",
-          icon: "✅",
-          isOpen: !!openSections["Safe Core Exercises"],
-          onToggle: () => toggleSection("Safe Core Exercises")
-        },
-          [{name:"McGill Curl-Up", target:"Abs"}, {name:"Side Plank", target:"Obliques"}, {name:"Bird-Dog", target:"Back"}, {name:"Pallof Press", target:"Core"}, {name:"Dead Bug (R leg)", target:"Deep Core"}, {name:"Stir the Pot", target:"Stability"}].map((c, i) =>
-            e("div", {key: "core-" + i, style: {padding: 10, marginBottom: 7, borderRadius: 8, background: C.card, borderLeft: "3px solid " + C.safe}},
-              e("div", {style: {fontWeight: 700, fontSize: 13, color: C.text}}, c.name),
-              e(Badge, {color: C.safe, children: c.target})
-            )
-          )
-        ),
-        e(Section, {
-          title: "Removed Core",
-          icon: "🚫",
-          isOpen: !!openSections["Removed Core"],
-          onToggle: () => toggleSection("Removed Core")
-        },
-          [{n:"Russian Twists", r:"Disc danger."}, {n:"Sit-Ups", r:"Spine load."}, {n:"Leg Raises", r:"Fracture danger."}].map((rem, i) =>
-            e(ExRow, {key: "remc-" + i, removed: true, name: rem.n, notes: rem.r})
-          )
+        e(Section, {title:"Why These Are Dangerous", icon:"🚫", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
+          e(RemovedRow, {name:"Active Straight Leg Raises", reason:"Hip flexor contraction compresses femoral neck stress fracture AND shears against labral tear. NEVER do these."}),
+          e(RemovedRow, {name:"Russian Twists (weighted)", reason:"Spinal rotation under load compresses L4-L5 degenerative discs."}),
+          e(RemovedRow, {name:"Sit-Ups / Crunches (full)", reason:"Spinal flexion under load. Use McGill Curl-Up instead."}),
+          e(RemovedRow, {name:"Hanging Leg Raises", reason:"Deep hip flexion + massive hip flexor force = fracture + labral danger."}),
+          e(RemovedRow, {name:"Cable Crunches", reason:"Spinal flexion under heavy load. L4-L5 contraindicated."}),
+          e(RemovedRow, {name:"V-Ups / Tuck-Ups", reason:"Combines spinal flexion + deep hip flexion. Double danger."})
         )
       );
       break;
 
-    case 4: // Equip
+    case 4: // Equipment
+      var categories = {weights:"Weights", machines:"Machines", functional:"Functional", cardio:"Cardio Equipment", basic:"Basic Gear", home:"Home Equipment"};
       content = e("div", null,
-        e(Section, {
-          title: "Cardio Alternatives",
-          icon: "❤️",
-          isOpen: !!openSections["Cardio Alternatives"],
-          onToggle: () => toggleSection("Cardio Alternatives")
-        },
-          e(EqTable, {rows: [["Primary", "Arm Bike", "Seated Ropes"], ["Secondary", "Mini Arm Bike", "Punching"]]})
-        ),
-        e(Section, {
-          title: "Weight Alternatives",
-          icon: "💪",
-          isOpen: !!openSections["Weight Alternatives"],
-          onToggle: () => toggleSection("Weight Alternatives")
-        },
-          e(EqTable, {rows: [["Floor Press", "Barbell", "DBs + Mat"], ["Lat Pulldown", "Cable", "Bands"], ["Leg Press", "Machine", "Wall Sit"]]})
+        e(Callout, {type:"info"}, "Toggle equipment ON/OFF. Exercises that need unavailable equipment will show alternatives."),
+        Object.keys(categories).map(function(cat) {
+          var items = Object.keys(EQUIPMENT).filter(function(k){ return EQUIPMENT[k].category === cat; });
+          return e(Section, {key:cat, title:categories[cat], icon:"🏋️", isOpen:!!openSections["eq-"+cat], onToggle:function(){ toggleSection("eq-"+cat); }},
+            items.map(function(eqKey) {
+              var eq = EQUIPMENT[eqKey];
+              var isOn = equipment[eqKey] !== false;
+              return e("div", {key:eqKey, onClick:function(){ setEquipment(function(prev){ var n = Object.assign({}, prev); n[eqKey] = !isOn; return n; }); }, style:{display:"flex", alignItems:"center", gap:10, padding:"10px 8px", borderRadius:8, background:isOn?C.safeBg:C.bg, border:"1px solid "+(isOn?C.safeBorder:C.border), marginBottom:4, cursor:"pointer"}},
+                e("div", {style:{width:36, height:20, borderRadius:10, background:isOn?C.safe:C.textMuted+"44", position:"relative", transition:"background 0.2s"}},
+                  e("div", {style:{width:16, height:16, borderRadius:8, background:C.white, position:"absolute", top:2, left:isOn?18:2, transition:"left 0.2s"}})
+                ),
+                e("span", {style:{fontSize:15}}, eq.icon),
+                e("span", {style:{fontSize:13, fontWeight:500, color:isOn?C.text:C.textMuted}}, eq.name)
+              );
+            })
+          );
+        }),
+        e(Section, {title:"Gym Bag Essentials", icon:"🎒", isOpen:!!openSections["gym-bag"], onToggle:function(){ toggleSection("gym-bag"); }},
+          [{n:"Furniture Slider", d:"Mandatory for single-leg rowing intervals. Gyms don't have these."}, {n:"Thick Exercise Mat", d:"For floor presses and seated battle rope intervals."}, {n:"Light Resistance Band", d:"For Pallof presses and Thrower's Ten prehab if no cables."}, {n:"Parallettes (optional)", d:"For L-sits. Can use hex dumbbells at gym instead."}].map(function(item, i) {
+            return e("div", {key:"bag-"+i, style:{padding:10, marginBottom:5, borderRadius:8, background:C.bg, borderLeft:"3px solid "+C.accent}},
+              e("div", {style:{fontWeight:700, fontSize:12, color:C.accent}}, item.n),
+              e("div", {style:{fontSize:11, color:C.textDim, marginTop:2}}, item.d)
+            );
+          })
         )
       );
       break;
 
     case 5: // Safety
       content = e("div", null,
-        e(Section, {
-          title: "Injury Status",
-          icon: "🩻",
-          isOpen: !!openSections["Injury Status"],
-          onToggle: () => toggleSection("Injury Status")
-        },
-          [{n:"Fracture", r:"Strict NWB 6+ weeks. Zero flexor fire."}, {n:"FAI/Labral", r:"Stop before 90° flexion. No clicking."}, {n:"Tendinosis", r:"HSR protocol (3s/1s/3s tempo)."}, {n:"L4-L5", r:"Zero flexion/rotation under load."}].map((inj, i) =>
-            e("div", {key: "inj-" + i, style: {padding: 10, marginBottom: 7, borderRadius: 8, background: C.card, borderLeft: "3px solid " + C.warning}},
-              e("div", {style: {fontWeight: 700, fontSize: 13, color: C.warning}}, inj.n),
-              e("div", {style: {fontSize: 11, marginTop: 3, color: C.textDim}}, inj.r)
-            )
+        e(Section, {title:"Injury Status (MRI 3/11/2026)", icon:"🩻", isOpen:!!openSections["injuries"], onToggle:function(){ toggleSection("injuries"); }},
+          [{n:"L Hip Stress Fracture", c:C.danger, r:"Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side."}, {n:"Bilateral FAI + Labral Tears", c:C.warning, r:"Cam-type impingement both hips. Anterosuperior labral tear. Stop ALL exercises before 90° hip flexion."}, {n:"Bilateral Hamstring Tendinosis", c:C.warning, r:"No discrete tear. HSR protocol (3s/1s/3s tempo). Prone > seated for curls."}, {n:"L4-L5 DDD", c:C.warning, r:"Degenerative disc disease. Zero spinal flexion or rotation under load. Anti-extension/anti-rotation core only."}, {n:"R Hip Labral Tear (mild)", c:C.textMuted, r:"Small anterosuperior tear. Minimize deep flexion. Monitor for clicking."}].map(function(inj, i) {
+            return e("div", {key:"inj-"+i, style:{padding:12, marginBottom:7, borderRadius:8, background:C.card, borderLeft:"3px solid "+inj.c}},
+              e("div", {style:{fontWeight:700, fontSize:13, color:inj.c}}, inj.n),
+              e("div", {style:{fontSize:11, marginTop:4, color:C.textDim, lineHeight:1.6}}, inj.r)
+            );
+          })
+        ),
+        e(Section, {title:"Absolute Stop Signals", icon:"🚨", isOpen:!!openSections["stop-signals"], onToggle:function(){ toggleSection("stop-signals"); }},
+          e(Callout, {type:"danger"}, "Stop exercise and contact your MD immediately if:"),
+          ["Groin pain (any side)", "Hip clicking or catching sensation", "Pain lasting >24 hours after workout", "Radiating leg pain or numbness", "Sharp pain during any exercise", "Swelling in hip or thigh area"].map(function(s,i){ return e("p", {key:"s-"+i, style:{fontSize:12, color:C.textDim, padding:"3px 0"}}, "🔴 "+s); })
+        ),
+        e(Section, {title:"Nutrition During NWB", icon:"🍗", isOpen:!!openSections["nutrition"], onToggle:function(){ toggleSection("nutrition"); }},
+          e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+            e("p", {style:{fontWeight:700, color:C.warning, marginBottom:6}}, "Do NOT cut calories. Healing demands energy."),
+            e("p", null, "• Calories: 2,800-3,200 kcal/day (25-30 kcal/kg)"),
+            e("p", null, "• Protein: 130-205g/day (1.6-2.5 g/kg)"),
+            e("p", null, "• Timing: 25-35g protein every 3-4 hours (including before bed)"),
+            e("p", null, "• Leucine-rich sources (whey, dairy, meat) — immobilized muscles develop 'anabolic resistance' requiring stronger protein signal")
           )
         ),
-        e(Section, {
-          title: "Absolute Stop Signals",
-          icon: "🚨",
-          isOpen: !!openSections["Absolute Stop Signals"],
-          onToggle: () => toggleSection("Absolute Stop Signals")
-        },
-          e(Callout, {type: "danger", children: "Stop and contact MD if:"}),
-          ["Groin pain", "Hip clicking/catching", "Pain >24h after workout", "Radiating leg pain"].map((s, i) =>
-            e("p", {key: "s-" + i, style: {fontSize: 12, color: C.textDim}}, "• " + s)
+        e(Section, {title:"Progressive Overload Rules", icon:"📈", isOpen:!!openSections["overload"], onToggle:function(){ toggleSection("overload"); }},
+          e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+            [{t:"Load Progression", d:"Add 2.5kg when all reps/sets hit target RPE across 2 sessions. Single-leg: 5% increments."}, {t:"Volume Accumulation", d:"Add 1 set/exercise/week over 3-week wave (3×10 → 4×10 → 5×10), then deload."}, {t:"Tempo Manipulation", d:"4-second eccentric on any exercise. Increases TUT by 60-100%."}, {t:"Rest-Pause Sets", d:"8 reps → rack 15s → 3-4 more → rack 15s → 2-3 more. Comparable hypertrophy in less time."}, {t:"Mechanical Advantage Drop Sets", d:"Cycle harder→easier variations (incline→flat→decline press). Max stimulus from limited exercises."}, {t:"Density Training", d:"Cut 15 seconds off rest every 2 weeks. Same work in less time = progressive overload."}].map(function(rule,i) {
+              return e("div", {key:"ol-"+i, style:{marginBottom:8}}, e("span", {style:{fontWeight:700, color:C.accent}}, rule.t+": "), rule.d);
+            })
           )
         )
       );
       break;
   }
 
-  return e("div", {style: {maxWidth: 500, margin: "0 auto", padding: "0 10px 40px", minHeight: "100vh", background: C.bg}},
-    e("div", {style: {padding: "30px 0 20px", textAlign: "center"}},
-      e("h1", {style: {fontSize: 24, fontWeight: 800, letterSpacing: "-0.5px", color: C.white}}, "NWB Workout Plan"),
-      e("div", {style: {fontSize: 12, color: C.textMuted, marginTop: 5}}, "MRI-Adjusted PPL • Left Hip NWB")
+  return e("div", {style:{maxWidth:500, margin:"0 auto", padding:"0 10px 80px", minHeight:"100vh", background:C.bg}},
+    e("div", {style:{padding:"24px 0 16px", textAlign:"center"}},
+      e("h1", {style:{fontSize:22, fontWeight:800, letterSpacing:"-0.5px", color:C.white}}, "NWB Workout Plan"),
+      e("div", {style:{fontSize:11, color:C.textMuted, marginTop:4}}, "MRI-Adjusted PPL • Left Hip NWB • 6 Weeks")
     ),
-    e("div", {style: {display: "flex", gap: 5, marginBottom: 15}},
-      PHASES.map((p, i) => e("div", {
-        key: i,
-        onClick: () => setPhase(i),
-        style: {
-          flex: 1,
-          padding: 10,
-          borderRadius: 8,
-          background: phase === i ? p.color + "22" : C.card,
-          border: "1px solid " + (phase === i ? p.color : C.border),
-          textAlign: "center",
-          cursor: "pointer"
-        }
-      },
-        e("div", {style: {fontSize: 10, fontWeight: 700, color: p.color}}, "WK " + p.weeks),
-        e("div", {style: {fontSize: 10, color: phase === i ? C.text : C.textMuted}}, p.name)
-      ))
+    e("div", {style:{display:"flex", gap:4, marginBottom:12}},
+      PHASES.map(function(p, i) {
+        return e("div", {key:i, onClick:function(){ setPhase(i); }, style:{flex:1, padding:"8px 4px", borderRadius:8, background:phase===i?p.color+"22":C.card, border:"2px solid "+(phase===i?p.color:C.border), textAlign:"center", cursor:"pointer", transition:"all 0.2s"}},
+          e("div", {style:{fontSize:10, fontWeight:800, color:p.color}}, "WK "+p.weeks),
+          e("div", {style:{fontSize:9, color:phase===i?C.text:C.textMuted, marginTop:2}}, p.name)
+        );
+      })
     ),
-    e("div", {style: {display: "flex", gap: 2, marginBottom: 20, overflowX: "auto", paddingBottom: 5}},
-      tabs.map((t, i) => e("button", {
-        key: t,
-        onClick: () => setTab(i),
-        style: {
-          flex: 1,
-          minWidth: 75,
-          padding: "10px 5px",
-          background: tab === i ? C.accent + "22" : "none",
-          border: "1px solid " + (tab === i ? C.accent : C.border),
-          color: tab === i ? C.accent : C.textMuted,
-          borderRadius: 8,
-          fontSize: 11,
-          fontWeight: 600,
-          cursor: "pointer",
-          fontFamily: "inherit"
-        }
-      }, t))
+    e("div", {style:{display:"flex", gap:2, marginBottom:16, overflowX:"auto", paddingBottom:4}},
+      tabs.map(function(t, i) {
+        var isTodayTab = i === 0;
+        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.border), color:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
+      })
     ),
     content,
-    e("div", {
-      style: {
-        marginTop: 30,
-        padding: 15,
-        borderRadius: 10,
-        background: C.dangerBg,
-        border: "1px solid " + C.dangerBorder,
-        fontSize: 11,
-        textAlign: "center",
-        color: C.danger
-      }
-    },
-      e("b", null, "Medical Disclaimer:"), " Confirm all exercises with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop."
-    )
+    e("div", {style:{marginTop:20, padding:12, borderRadius:10, background:C.dangerBg, border:"1px solid "+C.dangerBorder, fontSize:11, textAlign:"center", color:C.danger}},
+      e("b", null, "Medical Disclaimer: "), "Confirm all exercises with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop."
+    ),
+    timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }})
   );
 }
 
