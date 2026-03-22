@@ -85,7 +85,8 @@ const EX = {
     nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive — like a log on the floor. If you need leg drive, the weight is too heavy.",
     why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
     safety: "safe",
-    swaps: ["DB Floor Press", "Machine Chest Press"]
+    swaps: ["DB Floor Press", "Machine Chest Press"],
+    visual: "      O===+===O      (Barbell)\n      |       |\n  o__/|\\_    _|__   (Torso on floor)\n     / \\\n    L   R            (L straight, R bent)"
   },
   "DB Floor Press": {
     requires: ["dumbbells", "mat"], category: "push",
@@ -501,7 +502,8 @@ const EX = {
     nwbCues: "This is NOT a crunch — your lumbar spine stays in natural arch. If the arch disappears into your hands, you've gone too high. Stop.",
     why: "McGill Big 3. Only safe upper-ab exercise for L4-L5 DDD. Arch preservation is key.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "    o\n   /|\\_\n  / \\  \\\n L   R"
   },
   "Side Plank": {
     requires: ["mat"], category: "core",
@@ -521,7 +523,8 @@ const EX = {
     nwbCues: "Left leg NEVER moves from the ground. If hips rock side to side, you're going too fast. Slow and controlled.",
     why: "McGill Big 3. Builds back endurance and anti-rotation stability in a safe quadruped position.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "   __o  (Left Arm)\n  / /\\_\n |  |  \\ (Right Leg)\n ^  ^    \n K  H"
   },
   "Pallof Press": {
     requires: ["bands"], category: "core",
@@ -531,7 +534,8 @@ const EX = {
     nwbCues: "Zero spinal flexion. Zero rotation. Pure ANTI-rotation. Explicitly recommended for disc disease. Do NOT stand on one leg — sit or kneel.",
     why: "The gold standard anti-rotation core exercise. Works entire core without any leg movement or spinal compression.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "  (ANCHOR)=====[HANDS]--o\n                        |\n                        /\\\n                       K  H"
   },
   "Dead Bug (R leg only)": {
     requires: ["mat"], category: "core",
@@ -541,7 +545,8 @@ const EX = {
     nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting your stress fracture. Press low back into mat throughout.",
     why: "Safe deep core (TVA) activation without loading the injured hip flexor. Modified specifically for your MRI findings.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "    (L Arm)\n      \\\n   _o_|_/\n  |   |\n  ^   R\n  L (Foot planted)"
   },
   "Stir the Pot": {
     requires: ["stabball"], category: "core",
@@ -551,7 +556,8 @@ const EX = {
     nwbCues: "Anti-rotation AND anti-extension. Keep spine neutral. If your back starts to arch, STOP immediately.",
     why: "High-level core stability challenge without spinal flexion. One of the most demanding plank variations.",
     safety: "safe",
-    swaps: ["Pallof Press"]
+    swaps: ["Pallof Press"],
+    visual: "       o\n      /|\\____\n    (BALL)   \\\n             K/H"
   },
 
   // CARDIO exercises
@@ -632,7 +638,7 @@ const EX = {
 // ===== WORKOUT STRUCTURE =====
 const WORKOUTS = {
   "Push A": {
-    title: "Push A — Heavy Strength", icon: "💪", color: "#38bdf8",
+    title: "Push A — Heavy Strength", icon: "💪", color: "#38bdf8", hevyId: "rout_123",
     exercises: [
       "Barbell Floor Press", "Seated DB OH Press", "Incline DB Press + Lat Raises",
       "Lying Skull Crushers", "Pseudo Planche Push-Up", "McGill Curl-Up"
@@ -643,7 +649,7 @@ const WORKOUTS = {
     ]
   },
   "Push B": {
-    title: "Push B — Volume / Hypertrophy", icon: "💪", color: "#38bdf8",
+    title: "Push B — Volume / Hypertrophy", icon: "💪", color: "#38bdf8", hevyId: "rout_456",
     exercises: [
       "DB Floor Press", "Mechanical Drop Set (Press)", "Landmine Press (seated)",
       "Cable Chest Fly", "Tricep Rope Pushdown", "Parallette L-Sit", "Side Plank"
@@ -651,7 +657,7 @@ const WORKOUTS = {
     removed: []
   },
   "Pull A": {
-    title: "Pull A — Heavy Strength", icon: "🔗", color: "#a78bfa",
+    title: "Pull A — Heavy Strength", icon: "🔗", color: "#a78bfa", hevyId: "rout_789",
     exercises: [
       "Finger-Assist One-Arm Pull-Up", "Lat Pulldown (Wide)", "Chest-Supported DB Row",
       "Seated Cable Row", "Seated Face Pulls", "Preacher Curls", "Pallof Press"
@@ -661,7 +667,7 @@ const WORKOUTS = {
     ]
   },
   "Pull B": {
-    title: "Pull B — Volume / Density", icon: "🔗", color: "#a78bfa",
+    title: "Pull B — Volume / Density", icon: "🔗", color: "#a78bfa", hevyId: "rout_012",
     exercises: [
       "Neutral Grip Pulldown", "Mechanical Drop Set (Pull)", "One-Arm Cable Row",
       "Reverse Fly", "Hammer Curls", "Incline DB Curl", "Bird-Dog"
@@ -669,7 +675,7 @@ const WORKOUTS = {
     removed: []
   },
   "Legs A": {
-    title: "Legs A — Quad/Glute (Cross-Ed)", icon: "🦵", color: "#10b981",
+    title: "Legs A — Quad/Glute (Cross-Ed)", icon: "🦵", color: "#10b981", hevyId: "rout_345",
     exercises: [
       "SL Leg Press (Right)", "SL Leg Extension (Right)", "SL Glute Bridge (Right)",
       "Banded Clamshells", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)", "Dead Bug (R leg only)"
@@ -680,7 +686,7 @@ const WORKOUTS = {
     ]
   },
   "Legs B": {
-    title: "Legs B — Posterior Chain", icon: "🦵", color: "#10b981",
+    title: "Legs B — Posterior Chain", icon: "🦵", color: "#10b981", hevyId: "rout_678",
     exercises: [
       "Low-Box Step-Up (Right)", "SL Hip Thrust (Right)", "Prone Ham Curl (Right)",
       "Nordic Ham Curl", "Standing Calf Raise (R)", "Stir the Pot"
@@ -691,13 +697,13 @@ const WORKOUTS = {
     ]
   },
   "Recovery": {
-    title: "Active Recovery (Sunday)", icon: "🧘", color: "#64748b",
+    title: "Active Recovery (Sunday)", icon: "🧘", color: "#64748b", hevyId: "rout_901",
     exercises: ["Arm Ergometer", "Upper Body Stretching", "T-Spine Mobility", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)"],
     removed: []
   }
 };
 
-const SCHED = [
+const DEFAULT_SCHED = [
   {d:"Mon", t:"Push A", i:"💪", c:"#38bdf8"},
   {d:"Tue", t:"Pull A", i:"🔗", c:"#a78bfa"},
   {d:"Wed", t:"Legs A", i:"🦵", c:"#10b981"},
@@ -769,7 +775,11 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, unavailable, equi
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📍 SETUP & POSITION"), e("div", {style:{color:C.textDim}}, ex.setup)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why))
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
+        ex.visual && e("div", {style:{marginBottom:10}},
+          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "🖼️ VISUAL GUIDE"),
+          e("pre", {style:{fontFamily:"monospace", fontSize:10, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:8, borderRadius:8, color:C.textDim, border:"1px solid "+C.border}}, ex.visual)
+        )
       ),
       ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
         ex.requires.map(function(eq) {
@@ -838,7 +848,8 @@ function RestTimer({seconds, onClose}) {
 function App() {
   const [tab, setTab] = useState(0);
   const [phase, setPhase] = useState(loadState("nwb_phase", 0));
-  const realTodayKey = SCHED[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1].t;
+  const [sched, setSched] = useState(loadState("nwb_sched", DEFAULT_SCHED));
+  const realTodayKey = sched[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1].t;
   const [openSections, setOpenSections] = useState(function(){ var init = {}; init[realTodayKey] = true; return init; });
   const [expandedEx, setExpandedEx] = useState({});
   const [equipment, setEquipment] = useState(loadState("nwb_equipment", {}));
@@ -850,6 +861,7 @@ function App() {
   useEffect(function(){ saveState("nwb_phase", phase); }, [phase]);
   useEffect(function(){ saveState("nwb_equipment", equipment); }, [equipment]);
   useEffect(function(){ saveState("nwb_swaps", swaps); }, [swaps]);
+  useEffect(function(){ saveState("nwb_sched", sched); }, [sched]);
 
   const toggleSection = function(t){ setOpenSections(function(s){ var n = {}; n[t] = !s[t]; return Object.assign({}, s, n); }); };
   const toggleEx = function(n){ setExpandedEx(function(s){ var n2 = {}; n2[n] = !s[n]; return Object.assign({}, s, n2); }); };
@@ -879,12 +891,15 @@ function App() {
     setSwaps(function(s){ var n = Object.assign({}, s); delete n[key]; return n; });
   };
 
-  const tabs = ["Today", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+  const tabs = ["Today", "Schedule", "Workouts", "Cardio", "Core", "Equip", "Safety"];
 
   function renderWorkout(workoutKey) {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
+      w.hevyId && e("div", {style:{marginBottom:12}},
+        e("a", {href:"https://hevy.com/routine/"+w.hevyId, target:"_blank", style:{display:"block", width:"100%", padding:"10px", borderRadius:8, background:"#38bdf8", color:"#0a0f1a", textAlign:"center", fontWeight:700, textDecoration:"none", fontSize:14}}, "🚀 Start in HEVY")
+      ),
       w.exercises.map(function(origName) {
         var exName = getExName(workoutKey, origName);
         var ex = EX[exName];
@@ -908,7 +923,7 @@ function App() {
   var content = null;
   switch(tab) {
     case 0: // Today
-      var selSched = SCHED[selectedDay];
+      var selSched = sched[selectedDay];
       var selWorkout = WORKOUTS[selSched.t];
       var isToday2 = selectedDay === realToday;
       content = e("div", null,
@@ -917,7 +932,7 @@ function App() {
           e("div", {style:{fontSize:22, fontWeight:800, color:selSched.c, marginTop:4}}, selSched.i + " " + selSched.t)
         ),
         e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:16}},
-          SCHED.map(function(s, i) {
+          sched.map(function(s, i) {
             var isSel = i === selectedDay;
             var isReal = i === realToday;
             return e("div", {key:"day-"+i, onClick:function(){ setSelectedDay(i); if(!openSections[s.t]) toggleSection(s.t); }, style:{padding:"7px 3px", borderRadius:7, background: isSel ? s.c+"22" : C.card, border:"1px solid "+(isSel ? s.c : isReal ? s.c+"44" : C.border+"66"), textAlign:"center", cursor:"pointer"}},
@@ -937,7 +952,33 @@ function App() {
       );
       break;
 
-    case 1: // Workouts
+    case 1: // Schedule
+      content = e("div", null,
+        e(Callout, {type:"info"}, "Customize your weekly workout schedule. Changes are saved automatically."),
+        sched.map(function(s, i) {
+          return e("div", {key:i, style:{display:"flex", alignItems:"center", gap:10, marginBottom:8, padding:"10px", background:C.card, borderRadius:8, border:"1px solid "+C.border}},
+            e("div", {style:{width:40, fontWeight:700, fontSize:13, color:C.textDim}}, s.d),
+            e("select", {
+              value: s.t,
+              onChange: function(ev) {
+                var newT = ev.target.value;
+                var w = WORKOUTS[newT];
+                var newSched = sched.slice();
+                newSched[i] = {d:s.d, t:newT, i:w.icon, c:w.color};
+                setSched(newSched);
+              },
+              style: {flex:1, padding:"8px", borderRadius:6, background:C.bg, color:C.text, border:"1px solid "+C.border, fontFamily:"inherit", fontSize:14}
+            },
+              Object.keys(WORKOUTS).map(function(wk) {
+                return e("option", {key:wk, value:wk}, WORKOUTS[wk].icon + " " + wk);
+              })
+            )
+          );
+        })
+      );
+      break;
+
+    case 2: // Workouts
       content = e("div", null,
         ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B", "Recovery"].map(function(k) {
           return e("div", {key:k}, renderWorkout(k));
@@ -945,7 +986,7 @@ function App() {
       );
       break;
 
-    case 2: // Cardio
+    case 3: // Cardio
       var cardioExercises = Object.keys(EX).filter(function(k){ return EX[k].category === "cardio"; });
       var tier1 = cardioExercises.filter(function(k){ return EX[k].tier === 1; });
       content = e("div", null,
@@ -985,7 +1026,7 @@ function App() {
       );
       break;
 
-    case 3: // Core
+    case 4: // Core
       content = e("div", null,
         e(Callout, {type:"danger"}, "ZERO spinal flexion under load. NO sit-ups, NO Russian twists under load, NO leg raises."),
         e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture."),
@@ -1006,7 +1047,7 @@ function App() {
       );
       break;
 
-    case 4: // Equipment
+    case 5: // Equipment
       var categories = {weights:"Weights", machines:"Machines", functional:"Functional", cardio:"Cardio Equipment", basic:"Basic Gear", home:"Home Equipment"};
       content = e("div", null,
         e(Callout, {type:"info"}, "Toggle equipment ON/OFF. Exercises that need unavailable equipment will show alternatives."),
@@ -1037,7 +1078,7 @@ function App() {
       );
       break;
 
-    case 5: // Safety
+    case 6: // Safety
       content = e("div", null,
         e(Section, {title:"Injury Status (MRI 3/11/2026)", icon:"🩻", isOpen:!!openSections["injuries"], onToggle:function(){ toggleSection("injuries"); }},
           [{n:"L Hip Stress Fracture", c:C.danger, r:"Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side."}, {n:"Bilateral FAI + Labral Tears", c:C.warning, r:"Cam-type impingement both hips. Anterosuperior labral tear. Stop ALL exercises before 90° hip flexion."}, {n:"Bilateral Hamstring Tendinosis", c:C.warning, r:"No discrete tear. HSR protocol (3s/1s/3s tempo). Prone > seated for curls."}, {n:"L4-L5 DDD", c:C.warning, r:"Degenerative disc disease. Zero spinal flexion or rotation under load. Anti-extension/anti-rotation core only."}, {n:"R Hip Labral Tear (mild)", c:C.textMuted, r:"Small anterosuperior tear. Minimize deep flexion. Monitor for clicking."}].map(function(inj, i) {
@@ -1087,7 +1128,7 @@ function App() {
     e("div", {style:{display:"flex", gap:2, marginBottom:16, overflowX:"auto", paddingBottom:4}},
       tabs.map(function(t, i) {
         var isTodayTab = i === 0;
-        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.border), color:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
+        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?sched[selectedDay].c:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?sched[selectedDay].c:C.accent):C.border), color:tab===i?(isTodayTab?sched[selectedDay].c:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
       })
     ),
     content,
