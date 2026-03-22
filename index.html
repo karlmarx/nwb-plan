@@ -96,7 +96,8 @@ const EX = {
     nwbCues: "Similar to barbell floor press. Avoid arching or bridging. Floor contact = feedback for flat back.",
     why: "Volume chest work with restricted ROM. Dumbbells allow neutral grip for shoulder comfort.",
     safety: "safe",
-    swaps: ["Barbell Floor Press", "Machine Chest Press"]
+    swaps: ["Barbell Floor Press", "Machine Chest Press"],
+    visual: "      [=]  [=]\n       |    |\n       \\----/\n        (__)\n=================="
   },
   "Machine Chest Press": {
     requires: ["cables"], category: "push",
@@ -106,7 +107,8 @@ const EX = {
     nwbCues: "Pin-loaded machine makes drops instant. Keep back pressed against pad. Zero spinal load.",
     why: "Machines provide stability and allow safe failure. Drop sets for metabolic muscle damage.",
     safety: "safe",
-    swaps: ["DB Floor Press", "Barbell Floor Press"]
+    swaps: ["DB Floor Press", "Barbell Floor Press"],
+    visual: "   |    (o)\n   |   /|  \\===]\n   |===| \\\n   |   |  \\\n  _|_ _|_ _|_"
   },
   "Seated DB OH Press": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -116,7 +118,8 @@ const EX = {
     nwbCues: "Keep back pressed against bench. Do NOT arch your lower back. Right leg stable, left leg passive.",
     why: "Vertical press with full spine support. Seated position eliminates balance demands.",
     safety: "safe",
-    swaps: ["Seated Arnold Press", "Landmine Press (seated)"]
+    swaps: ["Seated Arnold Press", "Landmine Press (seated)"],
+    visual: "   [=]      [=]\n    |        |\n    \\  (oo)  /\n     \\--||--/\n       /  \\\n     _/__\\__"
   },
   "Seated Arnold Press": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -126,7 +129,8 @@ const EX = {
     nwbCues: "Keep core braced. Don't lean back. Controlled rotation — no jerking.",
     why: "The rotation pattern recruits anterior, lateral, and posterior deltoid heads in one movement.",
     safety: "safe",
-    swaps: ["Seated DB OH Press", "Landmine Press (seated)"]
+    swaps: ["Seated DB OH Press", "Landmine Press (seated)"],
+    visual: "   Start      Finish\n              [=]  [=]\n                \\  /\n   (oo)         (oo)\n  [=]||[=]     / || \\\n   /  \\        /  \\"
   },
   "Incline DB Press + Lat Raises": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -146,7 +150,8 @@ const EX = {
     nwbCues: "Elbows stay tucked and pointed at ceiling. Upper arms don't move. Floor position is safest.",
     why: "Excellent triceps isolation targeting the long head. Minimal stress on rest of body.",
     safety: "safe",
-    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"]
+    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"],
+    visual: "      ==[ ]\n     /\n  O-< \n /| |\n[___|___]"
   },
   "OH Triceps Extension": {
     requires: ["cables"], category: "push",
@@ -156,7 +161,8 @@ const EX = {
     nwbCues: "Keep core tight to prevent rib flare or back arch. Critical for L4-L5 protection.",
     why: "Targets the long head of triceps — often neglected in standard pressing.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"]
+    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"],
+    visual: "   |\n   |--o\n   | /\n   O \n  /|\\\\ \n / | \\\\\n  / \\\\ "
   },
   "Tricep Rope Pushdown": {
     requires: ["cables"], category: "push",
@@ -166,7 +172,8 @@ const EX = {
     nwbCues: "Keep elbows pinned to sides. Torso stays upright — no leaning into it.",
     why: "Rest-pause technique maximizes recruitment with less total volume. Time-efficient.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers", "OH Triceps Extension"]
+    swaps: ["Lying Skull Crushers", "OH Triceps Extension"],
+    visual: "   |\n   |\n   o\n  /| \n O | \n/ \\\\| \n  / \\\\ "
   },
   "Cable Chest Fly": {
     requires: ["cables"], category: "push",
@@ -176,7 +183,8 @@ const EX = {
     nwbCues: "Don't overextend shoulders at the stretch. Slow, controlled tempo. Lying on bench is safest position.",
     why: "Constant cable tension throughout ROM. Isolated pectoral work.",
     safety: "safe",
-    swaps: ["Incline DB Press + Lat Raises"]
+    swaps: ["Incline DB Press + Lat Raises"],
+    visual: "o       o\n \\\\     /\n  \\\\ O /\n   \\\\|/\n    |\n   / \\\\"
   },
   "Mechanical Drop Set (Press)": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -206,7 +214,8 @@ const EX = {
     nwbCues: "Machine provides stability. Keep torso upright for triceps focus, lean forward slightly for chest emphasis.",
     why: "Compound push movement with machine stability. Drop sets for metabolic exhaustion.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers"]
+    swaps: ["Lying Skull Crushers"],
+    visual: " |     |\n O-___-O\n | | | |\n |_|_|_|\n   | |\n  [_|_]"
   },
   "Pseudo Planche Push-Up": {
     requires: ["parallettes"], category: "push",
@@ -278,7 +287,8 @@ const EX = {
     nwbCues: "SAFEST exercise in the program — chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively.",
     why: "Heavy horizontal row with zero spine load. Chest support means pure back isolation. Go heavy.",
     safety: "safe",
-    swaps: ["Seated Cable Row"]
+    swaps: ["Seated Cable Row"],
+    visual: "      O\n    / | \\_[]\n   /  |\n======|======== (Bench)"
   },
   "Seated Cable Row": {
     requires: ["cables"], category: "pull",
@@ -288,17 +298,8 @@ const EX = {
     nwbCues: "CAUTION: Do NOT lean forward (rounds lumbar = bad for disc) or lean back (momentum). Torso stays at SAME angle entire set. If form breaks, stop.",
     why: "Mid-back thickness builder. Different grips target different areas (V-bar = lats, wide = traps/rhomboids).",
     safety: "caution",
-    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"]
-  },
-  "One-Arm Cable Row": {
-    requires: ["cables"], category: "pull",
-    sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
-    setup: "Sit facing cable machine with feet flat. Set pulley to chest height. Grab D-handle with one hand.",
-    execution: "Pull handle to lower rib cage, driving elbow straight back. Squeeze 1 second. Return slowly over 2-3 seconds. Complete all reps one side then switch.",
-    nwbCues: "CRITICAL: Do NOT twist your trunk. Your core fights the rotation — that's the training stimulus. Keep pelvis square and spine neutral. If lumbar twists AT ALL, drop weight immediately.",
-    why: "Unilateral pulling corrects imbalances and doubles as anti-rotation core training. Two exercises in one.",
-    safety: "caution",
-    swaps: ["Seated Cable Row", "Chest-Supported DB Row"]
+    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"],
+    visual: "| (Pulley)\n|   \\\n|    \\ _ []\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)"
   },
   "Seated Face Pulls": {
     requires: ["cables"], category: "pull",
@@ -308,7 +309,8 @@ const EX = {
     nwbCues: "Focus on external rotation at end of movement. Essential for shoulder health with this much pressing volume.",
     why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health and paddling resilience.",
     safety: "safe",
-    swaps: ["Reverse Fly"]
+    swaps: ["Reverse Fly"],
+    visual: "| (Pulley)\n|------_ []\n|     /\n|   O\n|  /|\\\n| +-+-+ (Seat)"
   },
   "Reverse Fly": {
     requires: ["dumbbells", "bench"], category: "pull",
@@ -328,7 +330,8 @@ const EX = {
     nwbCues: "Bench keeps torso stationary, protecting spine from swinging. Zero momentum allowed.",
     why: "Strict bicep isolation without lumbar stress. The pad prevents cheating.",
     safety: "safe",
-    swaps: ["Hammer Curls", "Incline DB Curl"]
+    swaps: ["Hammer Curls", "Incline DB Curl"],
+    visual: "     O\n   / | \\\n []\\ | /[]\n   +-+-+ (Seat)\n     |"
   },
   "Hammer Curls": {
     requires: ["dumbbells"], category: "pull",
