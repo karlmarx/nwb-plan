@@ -889,13 +889,30 @@ function App() {
     return match ? match[1] : input.trim();
   }
 
+  var [hevyEditing, setHevyEditing] = useState(null);
+
   function renderWorkout(workoutKey) {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
     var hevyId = parseHevyId(hevyIds[workoutKey]);
+    var isEditingHevy = hevyEditing === workoutKey;
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
-      hevyId ? e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", textAlign:"center", padding:"10px", marginBottom:10, borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:700, textDecoration:"none", cursor:"pointer"}}, "📱 Log in HEVY") :
-        e("button", {onClick:function(ev){ ev.stopPropagation(); setTab(4); if(!openSections["hevy-setup"]) toggleSection("hevy-setup"); }, style:{display:"block", width:"100%", textAlign:"center", padding:"8px", marginBottom:10, borderRadius:8, background:"none", border:"1px dashed "+C.border, color:C.textMuted, fontSize:11, cursor:"pointer", fontFamily:"inherit"}}, "Set up HEVY link →"),
+      hevyId && !isEditingHevy ? e("div", {style:{display:"flex", gap:6, marginBottom:10}},
+        e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{flex:1, display:"block", textAlign:"center", padding:"8px", borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:600, textDecoration:"none"}}, "Open in HEVY"),
+        e("button", {onClick:function(ev){ ev.stopPropagation(); setHevyEditing(workoutKey); }, style:{padding:"8px 10px", borderRadius:8, background:"none", border:"1px solid "+C.border, color:C.textMuted, fontSize:11, cursor:"pointer", fontFamily:"inherit"}}, "✏️")
+      ) :
+      isEditingHevy ? e("div", {style:{marginBottom:10, padding:10, borderRadius:8, background:C.bg, border:"1px solid #a78bfa44"}},
+        e("div", {style:{fontSize:11, color:C.textDim, marginBottom:6}}, "Paste HEVY routine URL or ID:"),
+        e("div", {style:{display:"flex", gap:6}},
+          e("input", {type:"text", autoFocus:true, value:hevyIds[workoutKey]||"", placeholder:"hevy.com/routine/... or ID", onClick:function(ev){ ev.stopPropagation(); }, onChange:function(ev){ var v=ev.target.value; setHevyIds(function(p){ var n=Object.assign({},p); n[workoutKey]=v; return n; }); }, style:{flex:1, padding:"8px 10px", borderRadius:6, background:C.cardBg, border:"1px solid "+C.border, color:C.text, fontSize:12, fontFamily:"monospace", outline:"none"}}),
+          e("button", {onClick:function(ev){ ev.stopPropagation(); setHevyEditing(null); }, style:{padding:"8px 12px", borderRadius:6, background:"#a78bfa", border:"none", color:"#fff", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "Done")
+        ),
+        hevyId && e("div", {style:{marginTop:6, display:"flex", justifyContent:"space-between", alignItems:"center"}},
+          e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{fontSize:10, color:"#a78bfa", textDecoration:"none"}}, "Test link →"),
+          e("button", {onClick:function(ev){ ev.stopPropagation(); setHevyIds(function(p){ var n=Object.assign({},p); delete n[workoutKey]; return n; }); setHevyEditing(null); }, style:{fontSize:10, color:C.danger||"#f87171", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit"}}, "Remove")
+        )
+      ) :
+      e("button", {onClick:function(ev){ ev.stopPropagation(); setHevyEditing(workoutKey); }, style:{display:"flex", alignItems:"center", justifyContent:"center", gap:4, width:"100%", padding:"6px", marginBottom:8, borderRadius:6, background:"none", border:"1px dashed "+C.border, color:C.textMuted, fontSize:10, cursor:"pointer", fontFamily:"inherit", opacity:0.6}}, "📱 Link HEVY routine"),
       w.exercises.map(function(origName) {
         var exName = getExName(workoutKey, origName);
         var ex = EX[exName];
@@ -1019,23 +1036,7 @@ function App() {
 
     case 4: // Equipment
       var categories = {weights:"Weights", machines:"Machines", functional:"Functional", cardio:"Cardio Equipment", basic:"Basic Gear", home:"Home Equipment"};
-      var hevyWorkouts = ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B", "Recovery"];
-      var inputStyle = {width:"100%", padding:"8px 12px", borderRadius:8, background:C.bg, border:"1px solid "+C.border, color:C.text, fontSize:12, fontFamily:"monospace", outline:"none"};
       content = e("div", null,
-        e(Section, {title:"HEVY Integration", icon:"📱", accent:"#a78bfa", isOpen:!!openSections["hevy-setup"], onToggle:function(){ toggleSection("hevy-setup"); }},
-          e("div", {style:{fontSize:11, color:C.textDim, marginBottom:10, lineHeight:1.6}}, "Paste your HEVY routine ID or full URL for each workout. A \"Log in HEVY\" button will appear at the top of each workout."),
-          hevyWorkouts.map(function(wk) {
-            var val = hevyIds[wk] || "";
-            var parsed = parseHevyId(val);
-            return e("div", {key:"hevy-"+wk, style:{marginBottom:8}},
-              e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4}},
-                e("span", {style:{fontSize:12, fontWeight:600, color:C.text}}, wk),
-                parsed && e("a", {href:"https://hevy.com/routine/"+parsed, target:"_blank", rel:"noopener", style:{fontSize:10, color:"#a78bfa", textDecoration:"none"}}, "Test →")
-              ),
-              e("input", {type:"text", value:val, placeholder:"Routine ID or hevy.com/routine/... URL", onChange:function(ev){ var v = ev.target.value; setHevyIds(function(prev){ var n = Object.assign({}, prev); n[wk] = v; return n; }); }, style:inputStyle})
-            );
-          })
-        ),
         e(Callout, {type:"info"}, "Toggle equipment ON/OFF. Exercises that need unavailable equipment will show alternatives."),
         Object.keys(categories).map(function(cat) {
           var items = Object.keys(EQUIPMENT).filter(function(k){ return EQUIPMENT[k].category === cat; });
