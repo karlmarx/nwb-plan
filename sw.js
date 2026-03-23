@@ -1,4 +1,4 @@
-const CACHE = 'nwb-plan-v1';
+const CACHE = 'nwb-plan-v2';
 const URLS = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
