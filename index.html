@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#0a0f1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NWB PPL">
+  <meta name="apple-mobile-web-app-title" content="FFF">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icon-192.png">
-  <title>NWB Workout Plan</title>
+  <title>Femur Fracture Fitness</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body, #root { height: 100%; }
@@ -1315,9 +1315,9 @@ function App() {
   }
 
   return e("div", {style:{maxWidth:500, margin:"0 auto", padding:"0 10px 80px", minHeight:"100vh", background:C.bg}},
-    e("div", {style:{padding:"24px 0 12px", textAlign:"center"}},
-      e("h1", {style:{fontSize:22, fontWeight:800, letterSpacing:"-0.5px", color:C.white}}, "NWB Workout Plan"),
-      e("div", {style:{fontSize:11, color:C.textMuted, marginTop:4}}, "MRI-Adjusted PPL • Left Hip NWB • 6 Weeks")
+    e("div", {style:{padding:"24px 0 16px", textAlign:"center"}},
+      e("h1", {style:{fontSize:22, fontWeight:800, letterSpacing:"-0.5px", color:C.white}}, "Femur Fracture Fitness"),
+      e("div", {style:{fontSize:11, color:C.textMuted, marginTop:4}}, "Six-Week Program Designed for Non-Weight-Bearing Left Leg Recovery from a Compression-Side Femoral Neck Stress Fracture")
     ),
     e(ProgressClock, null),
     e("div", {style:{display:"flex", gap:4, marginBottom:12}},
@@ -1338,6 +1338,9 @@ function App() {
     content,
     e("div", {style:{marginTop:20, padding:12, borderRadius:10, background:C.dangerBg, border:"1px solid "+C.dangerBorder, fontSize:11, textAlign:"center", color:C.danger}},
       e("b", null, "Medical Disclaimer: "), "Confirm all exercises with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop."
+    ),
+    e("div", {style:{marginTop:12, textAlign:"center", fontSize:10, color:C.textMuted}},
+      "Built with Claude \u00d7 Gemini | Source on ", e("a", {href:"https://github.com/karlmarx/nwb-plan", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted, textDecoration:"underline"}}, "GitHub")
     ),
     timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }})
   );
