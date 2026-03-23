@@ -870,10 +870,17 @@ function ProgressClock() {
   const [now, setNow] = useState(function(){ return new Date(); });
   const [countdown, setCountdown] = useState(false);
   const [flash, setFlash] = useState(false);
+  const [minimized, setMinimized] = useState(false);
 
   useEffect(function() {
     var id = setInterval(function(){ setNow(new Date()); }, 1000);
     return function(){ clearInterval(id); };
+  }, []);
+
+  useEffect(function() {
+    function onScroll() { if (window.scrollY > 20) setMinimized(true); }
+    window.addEventListener("scroll", onScroll, {passive: true});
+    return function(){ window.removeEventListener("scroll", onScroll); };
   }, []);
 
   var elapsed = now - PROG_START;
@@ -900,6 +907,7 @@ function ProgressClock() {
   var clr = progress < 0.33 ? C.safe : progress < 0.66 ? C.accent : C.warning;
 
   function handleClick() {
+    if (minimized) { setMinimized(false); return; }
     setCountdown(function(v){ return !v; });
     setFlash(true);
     setTimeout(function(){ setFlash(false); }, 300);
@@ -909,6 +917,26 @@ function ProgressClock() {
   var numStyle = {fontSize:28, fontWeight:800, fontVariantNumeric:"tabular-nums", color:clr, lineHeight:1, letterSpacing:"-1px"};
   var lblStyle = {fontSize:8, fontWeight:700, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1.5px"};
   var sepStyle = {fontSize:24, fontWeight:300, color:clr+"66", alignSelf:"flex-start", marginTop:4, lineHeight:1};
+  var pctDisplay = countdown ? (100 - pct)+"% remaining" : pct+"% complete";
+
+  if (minimized) {
+    return e("div", {
+      onClick: handleClick,
+      style: {
+        cursor:"pointer", marginBottom:12,
+        borderRadius:10, padding:"6px 12px",
+        background:"#111827", border:"1px solid "+clr+"33",
+        display:"flex", alignItems:"center", justifyContent:"space-between"
+      }
+    },
+      e("span", {style:{fontSize:10, fontWeight:700, color:clr}}, "W"+weekNum+"·D"+totalDayNum),
+      e("span", {style:{fontSize:10, color:C.textMuted, fontVariantNumeric:"tabular-nums"}},
+        t.d > 0 ? t.d+"d "+pad(t.h)+"h "+pad(t.m)+"m" : pad(t.h)+":"+pad(t.m)+":"+pad(t.s),
+        " · "+pctDisplay+" "+(countdown ? "↓" : "↑")
+      ),
+      e("span", {style:{fontSize:9, color:C.textMuted}}, "tap to expand")
+    );
+  }
 
   return e("div", {
     onClick: handleClick,
@@ -983,7 +1011,7 @@ function ProgressClock() {
     e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", padding:"6px 14px 9px"}},
       e("span", {style:{fontSize:9, color:C.textMuted}}),
       e("span", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1px"}},
-        pct+"% complete · tap to toggle"
+        pctDisplay+" · tap to toggle"
       ),
       e("span", {style:{fontSize:9, color:C.textMuted}})
     )
