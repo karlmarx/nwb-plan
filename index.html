@@ -1485,9 +1485,7 @@ function App() {
         )
       ),
       e("a", {href:"https://hevy.com/user/karl__marx", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted}, title:"Hevy"},
-        e("svg", {width:16, height:16, viewBox:"0 0 24 24", fill:"currentColor"},
-          e("path", {d:"M6.5 2C4.015 2 2 4.015 2 6.5S4.015 11 6.5 11c1.33 0 2.524-.58 3.346-1.5L12 12.5l2.154-3C15.976 10.42 17.17 11 18.5 11 20.985 11 23 8.985 23 6.5S20.985 2 18.5 2 14 4.015 14 6.5c0 .538.1 1.052.275 1.53L12 11l-2.275-2.97C9.9 7.552 10 7.038 10 6.5 10 4.015 7.985 2 5.5 2h1z"})
-        )
+        e("span", {style:{fontSize:16, lineHeight:1}}, "💪")
       )
     ),
     timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }}),
