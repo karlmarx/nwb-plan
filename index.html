@@ -838,13 +838,18 @@ function RestTimer({seconds, onClose}) {
 function App() {
   const [tab, setTab] = useState(0);
   const [phase, setPhase] = useState(loadState("nwb_phase", 0));
-  const realTodayKey = SCHED[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1].t;
-  const [openSections, setOpenSections] = useState(function(){ var init = {}; init[realTodayKey] = true; return init; });
+  const [openSections, setOpenSections] = useState(function(){
+    var sd = loadState("nwb_startDay", 0);
+    var rt = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+    var rotIdx = (rt - sd + 7) % 7;
+    var init = {}; init[SCHED[rotIdx].t] = true; return init;
+  });
   const [expandedEx, setExpandedEx] = useState({});
   const [equipment, setEquipment] = useState(loadState("nwb_equipment", {}));
   const [timer, setTimer] = useState(null);
   const [swaps, setSwaps] = useState(loadState("nwb_swaps", {}));
   const [hevyIds, setHevyIds] = useState(loadState("nwb_hevy", {}));
+  const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
 
@@ -852,6 +857,12 @@ function App() {
   useEffect(function(){ saveState("nwb_equipment", equipment); }, [equipment]);
   useEffect(function(){ saveState("nwb_swaps", swaps); }, [swaps]);
   useEffect(function(){ saveState("nwb_hevy", hevyIds); }, [hevyIds]);
+  useEffect(function(){ saveState("nwb_startDay", startDay); }, [startDay]);
+
+  const getWorkoutForDay = function(dayIdx) {
+    var rotationIdx = (dayIdx - startDay + 7) % 7;
+    return SCHED[rotationIdx];
+  };
 
   const toggleSection = function(t){ setOpenSections(function(s){ var n = {}; n[t] = !s[t]; return Object.assign({}, s, n); }); };
   const toggleEx = function(n){ setExpandedEx(function(s){ var n2 = {}; n2[n] = !s[n]; return Object.assign({}, s, n2); }); };
@@ -936,22 +947,25 @@ function App() {
   var content = null;
   switch(tab) {
     case 0: // Today
-      var selSched = SCHED[selectedDay];
+      var dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+      var dayAbbr = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+      var selSched = getWorkoutForDay(selectedDay);
       var selWorkout = WORKOUTS[selSched.t];
       var isToday2 = selectedDay === realToday;
       content = e("div", null,
         e("div", {style:{textAlign:"center", marginBottom:16}},
-          e("div", {style:{fontSize:11, color:C.textMuted, textTransform:"uppercase", letterSpacing:1}}, (isToday2 ? "Today — " : "") + ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][selectedDay]),
+          e("div", {style:{fontSize:11, color:C.textMuted, textTransform:"uppercase", letterSpacing:1}}, (isToday2 ? "Today — " : "") + dayNames[selectedDay]),
           e("div", {style:{fontSize:22, fontWeight:800, color:selSched.c, marginTop:4}}, selSched.i + " " + selSched.t)
         ),
         e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:16}},
-          SCHED.map(function(s, i) {
+          dayAbbr.map(function(d, i) {
+            var dayWorkout = getWorkoutForDay(i);
             var isSel = i === selectedDay;
             var isReal = i === realToday;
-            return e("div", {key:"day-"+i, onClick:function(){ setSelectedDay(i); if(!openSections[s.t]) toggleSection(s.t); }, style:{padding:"7px 3px", borderRadius:7, background: isSel ? s.c+"22" : C.card, border:"1px solid "+(isSel ? s.c : isReal ? s.c+"44" : C.border+"66"), textAlign:"center", cursor:"pointer"}},
-              e("div", {style:{fontSize:9, fontWeight:700, color: isSel ? s.c : C.textMuted, textTransform:"uppercase"}}, isReal ? "• "+s.d : s.d),
-              e("div", {style:{fontSize:14, margin:"2px 0"}}, s.i),
-              e("div", {style:{fontSize:8, color: isSel ? C.text : C.textMuted, fontWeight:600}}, s.t)
+            return e("div", {key:"day-"+i, onClick:function(){ setSelectedDay(i); if(!openSections[dayWorkout.t]) toggleSection(dayWorkout.t); }, style:{padding:"7px 3px", borderRadius:7, background: isSel ? dayWorkout.c+"22" : C.card, border:"1px solid "+(isSel ? dayWorkout.c : isReal ? dayWorkout.c+"44" : C.border+"66"), textAlign:"center", cursor:"pointer"}},
+              e("div", {style:{fontSize:9, fontWeight:700, color: isSel ? dayWorkout.c : C.textMuted, textTransform:"uppercase"}}, isReal ? "• "+d : d),
+              e("div", {style:{fontSize:14, margin:"2px 0"}}, dayWorkout.i),
+              e("div", {style:{fontSize:8, color: isSel ? C.text : C.textMuted, fontWeight:600}}, dayWorkout.t)
             );
           })
         ),
@@ -1036,7 +1050,24 @@ function App() {
 
     case 4: // Equipment
       var categories = {weights:"Weights", machines:"Machines", functional:"Functional", cardio:"Cardio Equipment", basic:"Basic Gear", home:"Home Equipment"};
+      var startDayNames = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
       content = e("div", null,
+        e(Section, {title:"Week Start Day", icon:"📅", isOpen:!!openSections["week-start"], onToggle:function(){ toggleSection("week-start"); }},
+          e("div", {style:{fontSize:11, color:C.textDim, marginBottom:10}}, "Shift the PPL rotation to start on a different day. Push A always begins on your chosen start day."),
+          e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4}},
+            startDayNames.map(function(d, i) {
+              var isCurrent = i === startDay;
+              return e("button", {key:"sd-"+i, onClick:function(){ setStartDay(i); }, style:{padding:"10px 2px", borderRadius:8, background:isCurrent?C.accent+"22":C.bg, border:"1px solid "+(isCurrent?C.accent:C.border), color:isCurrent?C.accent:C.textMuted, fontSize:11, fontWeight:isCurrent?700:500, cursor:"pointer", fontFamily:"inherit"}}, d);
+            })
+          ),
+          startDay !== 0 && e("div", {style:{marginTop:10, fontSize:11, color:C.textDim, lineHeight:1.6}},
+            e("div", {style:{fontWeight:600, color:C.accent, marginBottom:4}}, "Current rotation:"),
+            startDayNames.map(function(d, i) {
+              var workout = getWorkoutForDay(i);
+              return e("span", {key:"rot-"+i, style:{display:"inline-block", marginRight:6, marginBottom:2}}, d + "=" + workout.t + (i < 6 ? " →" : ""));
+            })
+          )
+        ),
         e(Callout, {type:"info"}, "Toggle equipment ON/OFF. Exercises that need unavailable equipment will show alternatives."),
         Object.keys(categories).map(function(cat) {
           var items = Object.keys(EQUIPMENT).filter(function(k){ return EQUIPMENT[k].category === cat; });
@@ -1115,7 +1146,8 @@ function App() {
     e("div", {style:{display:"flex", gap:2, marginBottom:16, overflowX:"auto", paddingBottom:4}},
       tabs.map(function(t, i) {
         var isTodayTab = i === 0;
-        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.border), color:tab===i?(isTodayTab?SCHED[selectedDay].c:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
+        var todayColor = getWorkoutForDay(selectedDay).c;
+        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?todayColor:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?todayColor:C.accent):C.border), color:tab===i?(isTodayTab?todayColor:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
       })
     ),
     content,
