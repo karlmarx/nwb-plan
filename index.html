@@ -22,6 +22,9 @@
     .swap-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); display: flex; align-items: flex-end; justify-content: center; }
     .swap-sheet { background: #111827; border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; max-height: 70vh; overflow-y: auto; padding: 20px; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .diagram-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .diagram-sheet { background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 16px; width: 100%; max-width: 760px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .diagram-sheet::-webkit-scrollbar { width: 0; }
   </style>
 </head>
 <body>
@@ -225,7 +228,8 @@ const EX = {
     nwbCues: "Left leg just floats — zero engagement. Keep core tight and body straight. If wrists hurt, adjust parallette angle.",
     why: "Elite calisthenics push. Builds massive shoulder and chest strength with bodyweight. Open-hip position = safe for FAI.",
     safety: "safe",
-    swaps: ["DB Floor Press"]
+    swaps: ["DB Floor Press"],
+    diagram: "planche"
   },
   "Parallette L-Sit": {
     requires: ["parallettes"], category: "push",
@@ -762,7 +766,137 @@ function Section({title, icon, children, isOpen, onToggle, accent, count}) {
   );
 }
 
-function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, unavailable, equipment}) {
+// ===== EXERCISE DIAGRAMS =====
+function PlancheDiagram({onClose}) {
+  var activeNote = null;
+  // Stateless — callout highlighting not needed in modal context
+
+  var callouts = [
+    {key:"leftleg", title:"\u2713 Left Leg", color:"#4ade80", bg:"#0d1f14", border:"#4ade80", text:"Hangs passively alongside the right leg near the box. Not resting on the box, not pushing, not tensing. Just floating. Your left hip flexors stay completely silent."},
+    {key:"lean", title:"\u2197 The Forward Lean", color:"#60a5fa", bg:"#0d1525", border:"#60a5fa", text:"Your shoulders travel well forward of your hands. This shifts your center of gravity over and past the parallettes, making your anterior delts and chest carry enormous load just to stay still."},
+    {key:"hip", title:"\u25CE Hip Position", color:"#a78bfa", bg:"#130d1f", border:"#a78bfa", text:"Your hip sits at roughly neutral extension \u2014 not flexed, not compressed. The joint is just connecting your torso to your leg. No FAI impingement zone."},
+    {key:"sag", title:"\u26A0 Don\u2019t Let Hips Sag", color:"#facc15", bg:"#1a1700", border:"#facc15", text:"If your core goes slack, your hips will pike or sag. Keep your glute and core braced so the body stays in one rigid plank line from head to right foot."}
+  ];
+
+  var steps = [
+    {n:1, parts:["Place parallettes on the floor near your ", e("strong",{style:{color:"#f0ede6"}},"waist level"), " \u2014 much further back than a normal push-up. Kneel to get into position."]},
+    {n:2, parts:["Right foot goes on the box behind you. ", e("strong",{style:{color:"#facc15"}},"Left leg hangs alongside it"), " \u2014 same height roughly, just not bearing weight or touching anything."]},
+    {n:3, parts:["Lean your whole body ", e("strong",{style:{color:"#60a5fa"}},"forward over your wrists"), ". You should feel immediate shoulder tension just holding this position. That\u2019s correct."]},
+    {n:4, parts:[e("strong",{style:{color:"#f0ede6"}},"Lower your chest"), " toward the floor, maintaining the forward lean. Do not let your hips drift backward as you descend."]},
+    {n:5, parts:[e("strong",{style:{color:"#f0ede6"}},"Press back up"), " to start. AMRAP \u2014 if your lean is aggressive, 3\u20135 reps is genuinely hard. Stop if form breaks."]}
+  ];
+
+  return e("div", {style:{padding:"24px 16px 32px", color:"#f0ede6", fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"}},
+    // Close button
+    e("div", {style:{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16}},
+      e("div", null,
+        e("div", {style:{fontSize:"clamp(1.1rem,3.5vw,1.5rem)", fontWeight:800, letterSpacing:"-0.02em"}}, "Pseudo Planche Push-Up"),
+        e("div", {style:{fontSize:10, color:"#666", letterSpacing:"0.15em", textTransform:"uppercase", marginTop:2}}, "Side-view mechanics + NWB position")
+      ),
+      e("button", {onClick:onClose, style:{background:"#222", border:"1px solid #444", color:"#aaa", borderRadius:8, padding:"6px 12px", fontSize:12, cursor:"pointer", fontFamily:"inherit", flexShrink:0}}, "\u2715 Close")
+    ),
+
+    // SVG Diagram
+    e("div", {style:{width:"100%", background:"#161616", border:"1px solid #2a2a2a", borderRadius:12, padding:"20px 12px 12px", marginBottom:16}},
+      e("div", {style:{fontSize:10, letterSpacing:"0.18em", textTransform:"uppercase", color:"#555", marginBottom:8}}, "Side View \u2014 Top Position (Arms Extended)"),
+      e("svg", {viewBox:"0 0 760 320", width:"100%", xmlns:"http://www.w3.org/2000/svg", style:{fontFamily:"-apple-system, monospace"}},
+        // Floor
+        e("line", {x1:30, y1:285, x2:730, y2:285, stroke:"#333", strokeWidth:1.5}),
+        // Box
+        e("rect", {x:555, y:225, width:100, height:60, rx:4, fill:"#1e1e1e", stroke:"#444", strokeWidth:1.5}),
+        e("text", {x:605, y:262, textAnchor:"middle", fontSize:11, fill:"#555"}, "box"),
+        // Body rigid line hint
+        e("line", {x1:282, y1:93, x2:542, y2:253, stroke:"#f0ede6", strokeWidth:0.6, strokeDasharray:"7,5", opacity:0.12}),
+        e("text", {x:375, y:148, fontSize:10, fill:"#444", transform:"rotate(17,375,148)"}, "body rigid / straight"),
+        // Vertical reference
+        e("line", {x1:308, y1:70, x2:308, y2:210, stroke:"#2a2a2a", strokeWidth:1, strokeDasharray:"4,4"}),
+        // Torso
+        e("line", {x1:308, y1:112, x2:418, y2:172, stroke:"#f0ede6", strokeWidth:5, strokeLinecap:"round"}),
+        // Head
+        e("circle", {cx:283, cy:95, r:17, fill:"none", stroke:"#f0ede6", strokeWidth:3}),
+        // Neck
+        e("line", {x1:293, y1:110, x2:308, y2:112, stroke:"#f0ede6", strokeWidth:3}),
+        // Right arm
+        e("line", {x1:308, y1:112, x2:328, y2:172, stroke:"#f0ede6", strokeWidth:4, strokeLinecap:"round"}),
+        e("line", {x1:328, y1:172, x2:353, y2:222, stroke:"#f0ede6", strokeWidth:4, strokeLinecap:"round"}),
+        // Left arm (behind, dashed)
+        e("line", {x1:316, y1:117, x2:336, y2:177, stroke:"#aaa", strokeWidth:3, strokeLinecap:"round", strokeDasharray:"5,3"}),
+        e("line", {x1:336, y1:177, x2:361, y2:225, stroke:"#aaa", strokeWidth:3, strokeLinecap:"round", strokeDasharray:"5,3"}),
+        // Parallettes
+        e("rect", {x:338, y:218, width:36, height:9, rx:3, fill:"#4ade80", opacity:0.9}),
+        e("line", {x1:340, y1:227, x2:340, y2:245, stroke:"#4ade80", strokeWidth:2.5}),
+        e("line", {x1:372, y1:227, x2:372, y2:245, stroke:"#4ade80", strokeWidth:2.5}),
+        e("line", {x1:340, y1:245, x2:372, y2:245, stroke:"#4ade80", strokeWidth:2}),
+        // Right leg
+        e("line", {x1:418, y1:172, x2:478, y2:225, stroke:"#f0ede6", strokeWidth:5, strokeLinecap:"round"}),
+        e("line", {x1:478, y1:225, x2:555, y2:225, stroke:"#f0ede6", strokeWidth:5, strokeLinecap:"round"}),
+        // Right foot on box
+        e("rect", {x:548, y:219, width:20, height:8, rx:2, fill:"#f0ede6"}),
+        // Left leg (hovering, dashed yellow)
+        e("line", {x1:418, y1:172, x2:470, y2:238, stroke:"#facc15", strokeWidth:4, strokeLinecap:"round", strokeDasharray:"6,4"}),
+        e("line", {x1:470, y1:238, x2:540, y2:253, stroke:"#facc15", strokeWidth:4, strokeLinecap:"round", strokeDasharray:"6,4"}),
+        // Left foot hover ellipse
+        e("ellipse", {cx:548, cy:257, rx:11, ry:5, fill:"none", stroke:"#facc15", strokeWidth:2, strokeDasharray:"4,3"}),
+        // Gap line
+        e("line", {x1:548, y1:262, x2:548, y2:225, stroke:"#facc15", strokeWidth:1, strokeDasharray:"2,3", opacity:0.4}),
+        e("text", {x:524, y:275, fontSize:10, fill:"#facc15"}, "hovers"),
+        // Annotations: hands near waist
+        e("line", {x1:356, y1:214, x2:298, y2:194, stroke:"#4ade80", strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:160, y:184, fontSize:11, fill:"#4ade80"}, "hands near"),
+        e("text", {x:163, y:196, fontSize:11, fill:"#4ade80"}, "waist / hips"),
+        e("text", {x:155, y:208, fontSize:10, fill:"#555"}, "(not under shoulders)"),
+        // Shoulder annotation
+        e("circle", {cx:308, cy:112, r:5, fill:"#60a5fa", opacity:0.8}),
+        e("line", {x1:302, y1:104, x2:250, y2:78, stroke:"#60a5fa", strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:165, y:74, fontSize:11, fill:"#60a5fa"}, "shoulder"),
+        e("text", {x:152, y:86, fontSize:10, fill:"#555"}, "forward of hands"),
+        // Hip annotation
+        e("circle", {cx:418, cy:172, r:5, fill:"#a78bfa", opacity:0.9}),
+        e("line", {x1:423, y1:165, x2:468, y2:138, stroke:"#a78bfa", strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:472, y:134, fontSize:11, fill:"#a78bfa"}, "hip \u2014 neutral"),
+        e("text", {x:472, y:146, fontSize:10, fill:"#555"}, "not flexed / not loaded"),
+        // Right foot annotation
+        e("line", {x1:568, y1:218, x2:618, y2:188, stroke:"#f0ede6", strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:622, y:184, fontSize:11, fill:"#f0ede6"}, "right foot"),
+        e("text", {x:622, y:196, fontSize:10, fill:"#555"}, "on box \u2014 stability"),
+        // Left foot annotation
+        e("line", {x1:558, y1:257, x2:625, y2:248, stroke:"#facc15", strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:628, y:244, fontSize:11, fill:"#facc15"}, "left foot"),
+        e("text", {x:628, y:256, fontSize:10, fill:"#555"}, "floats \u2014 zero"),
+        e("text", {x:628, y:268, fontSize:10, fill:"#555"}, "weight / push")
+      )
+    ),
+
+    // Callout cards
+    e("div", {style:{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:10, marginBottom:16}},
+      callouts.map(function(c) {
+        return e("div", {key:c.key, style:{background:c.bg, border:"1px solid #2a2a2a", borderLeft:"3px solid "+c.border, borderRadius:8, padding:"12px 14px"}},
+          e("div", {style:{fontSize:12, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", color:c.color, marginBottom:5}}, c.title),
+          e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, c.text)
+        );
+      })
+    ),
+
+    // Movement sequence
+    e("div", {style:{background:"#161616", border:"1px solid #2a2a2a", borderRadius:12, padding:"16px 14px"}},
+      e("div", {style:{fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"#555", marginBottom:12}}, "Movement Sequence"),
+      e("div", {style:{display:"flex", flexDirection:"column", gap:10}},
+        steps.map(function(s) {
+          return e("div", {key:s.n, style:{display:"flex", gap:12, alignItems:"flex-start"}},
+            e("div", {style:{width:22, height:22, borderRadius:"50%", background:"#222", border:"1px solid #444", fontSize:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#777", marginTop:1}}, s.n),
+            e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, s.parts)
+          );
+        })
+      )
+    )
+  );
+}
+
+var DIAGRAMS = {
+  planche: PlancheDiagram
+};
+
+function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment}) {
   if (!ex) return null;
   const sc = ex.safety === "caution" ? C.warning : ex.safety === "danger" ? C.danger : C.safe;
   const s = ex.sets[phase] || ex.sets[0];
@@ -792,7 +926,10 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, unavailable, equi
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
-        ex.visual && e("div", {style:{marginBottom:10}},
+        ex.diagram && DIAGRAMS[ex.diagram] && e("div", {style:{marginBottom:10}},
+          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "📐 View Movement Diagram")
+        ),
+        ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
           e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
           e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
         )
@@ -1031,6 +1168,7 @@ function App() {
   const [expandedEx, setExpandedEx] = useState({});
   const [equipment, setEquipment] = useState(loadState("nwb_equipment", {}));
   const [timer, setTimer] = useState(null);
+  const [diagramOpen, setDiagramOpen] = useState(null);
   const [swaps, setSwaps] = useState(loadState("nwb_swaps", {}));
   const [hevyIds, setHevyIds] = useState(loadState("nwb_hevy", {}));
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
@@ -1120,7 +1258,7 @@ function App() {
             e("span", null, "↻ was: " + origName),
             e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
           ),
-          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, unavailable:unavail, equipment:equipment})
+          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment})
         );
       }),
       w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
@@ -1179,7 +1317,7 @@ function App() {
         e(Callout, {type:"warning"}, "VO2 max drops ~15% in just 2 weeks of inactivity. Aggressive upper-body cardio is non-negotiable."),
         e(Section, {title:"Tier 1 — Highest Output", icon:"🔥", isOpen:!!openSections["cardio-t1"], onToggle:function(){ toggleSection("cardio-t1"); }},
           tier1.map(function(k) {
-            return e(ExRow, {key:k, name:k, ex:EX[k], phase:phase, isExpanded:!!expandedEx[k], onToggle:function(){ toggleEx(k); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, unavailable:!isAvailable(k), equipment:equipment});
+            return e(ExRow, {key:k, name:k, ex:EX[k], phase:phase, isExpanded:!!expandedEx[k], onToggle:function(){ toggleEx(k); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(k), equipment:equipment});
           })
         ),
         e(Section, {title:"Weekly Cardio Schedule", icon:"📆", isOpen:!!openSections["cardio-sched"], onToggle:function(){ toggleSection("cardio-sched"); }},
@@ -1219,7 +1357,7 @@ function App() {
         e(Section, {title:"MRI-Safe Core Exercises", icon:"✅", isOpen:!!openSections["safe-core"], onToggle:function(){ toggleSection("safe-core"); }},
           ["McGill Curl-Up","Side Plank","Bird-Dog","Pallof Press","Dead Bug (R leg only)","Stir the Pot","Parallette L-Sit"].map(function(name) {
             var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, unavailable:false, equipment:equipment});
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:false, equipment:equipment});
           })
         ),
         e(Section, {title:"Why These Are Dangerous", icon:"🚫", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
@@ -1359,7 +1497,12 @@ function App() {
         )
       )
     ),
-    timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }})
+    timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }}),
+    diagramOpen && DIAGRAMS[diagramOpen] && e("div", {className:"diagram-modal", onClick:function(ev){ if(ev.target === ev.currentTarget) setDiagramOpen(null); }},
+      e("div", {className:"diagram-sheet"},
+        e(DIAGRAMS[diagramOpen], {onClose:function(){ setDiagramOpen(null); }})
+      )
+    )
   );
 }
 
