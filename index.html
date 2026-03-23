@@ -12,18 +12,19 @@
   <link rel="apple-touch-icon" href="/icon-192.png">
   <title>Femur Fracture Fitness</title>
   <style>
+    :root { --bg:#0a0f1a; --card:#111827; --text:#e2e8f0; --accent:#38bdf8; --border:#334155; --textDim:#94a3b8; --modalBg:rgba(0,0,0,0.7); --diagramModalBg:rgba(0,0,0,0.85); --diagramSheet:#0e0e0e; --diagramBorder:#2a2a2a; --shadow:rgba(0,0,0,0.5); }
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body, #root { height: 100%; }
-    body { background: #0a0f1a; overflow-y: auto; -webkit-font-smoothing: antialiased; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); overflow-y: auto; -webkit-font-smoothing: antialiased; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     ::-webkit-scrollbar { width: 0; }
-    .rest-timer { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 100; background: #111827; border: 2px solid #38bdf8; border-radius: 16px; padding: 12px 24px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-    .rest-timer .time { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: #38bdf8; min-width: 60px; text-align: center; }
-    .rest-timer button { background: none; border: 1px solid #334155; color: #94a3b8; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .swap-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); display: flex; align-items: flex-end; justify-content: center; }
-    .swap-sheet { background: #111827; border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; max-height: 70vh; overflow-y: auto; padding: 20px; }
+    .rest-timer { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 100; background: var(--card); border: 2px solid var(--accent); border-radius: 16px; padding: 12px 24px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px var(--shadow); }
+    .rest-timer .time { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); min-width: 60px; text-align: center; }
+    .rest-timer button { background: none; border: 1px solid var(--border); color: var(--textDim); border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .swap-modal { position: fixed; inset: 0; z-index: 200; background: var(--modalBg); display: flex; align-items: flex-end; justify-content: center; }
+    .swap-sheet { background: var(--card); border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; max-height: 70vh; overflow-y: auto; padding: 20px; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .diagram-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 12px; }
-    .diagram-sheet { background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 16px; width: 100%; max-width: 760px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .diagram-modal { position: fixed; inset: 0; z-index: 300; background: var(--diagramModalBg); display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .diagram-sheet { background: var(--diagramSheet); border: 1px solid var(--diagramBorder); border-radius: 16px; width: 100%; max-width: 760px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .diagram-sheet::-webkit-scrollbar { width: 0; }
   </style>
 </head>
@@ -37,14 +38,33 @@ const e = React.createElement;
 const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== COLORS =====
-const C = {
+const DARK = {
   bg:"#0a0f1a", card:"#111827", border:"#1e293b",
   accent:"#38bdf8", accentDim:"#0c4a6e",
   danger:"#ef4444", dangerBg:"#450a0a", dangerBorder:"#7f1d1d",
   warning:"#f59e0b", warningBg:"#451a03", warningBorder:"#78350f",
   safe:"#10b981", safeBg:"#022c22", safeBorder:"#064e3b",
-  text:"#e2e8f0", textDim:"#94a3b8", textMuted:"#64748b", white:"#fff"
+  text:"#e2e8f0", textDim:"#94a3b8", textMuted:"#64748b", white:"#fff",
+  expandedRow:"#0f1629", diagramBtn:"#161616",
+  clockGrad:"linear-gradient(135deg, #111827 0%, #0d1424 100%)",
+  modalBg:"rgba(0,0,0,0.7)", diagramModalBg:"rgba(0,0,0,0.85)",
+  diagramSheet:"#0e0e0e", diagramBorder:"#2a2a2a",
+  shadow:"rgba(0,0,0,0.5)", timerBorder:"#334155"
 };
+const LIGHT = {
+  bg:"#f8fafc", card:"#ffffff", border:"#e2e8f0",
+  accent:"#0284c7", accentDim:"#bae6fd",
+  danger:"#dc2626", dangerBg:"#fef2f2", dangerBorder:"#fecaca",
+  warning:"#d97706", warningBg:"#fffbeb", warningBorder:"#fde68a",
+  safe:"#059669", safeBg:"#ecfdf5", safeBorder:"#a7f3d0",
+  text:"#1e293b", textDim:"#475569", textMuted:"#94a3b8", white:"#0f172a",
+  expandedRow:"#f1f5f9", diagramBtn:"#e2e8f0",
+  clockGrad:"linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)",
+  modalBg:"rgba(0,0,0,0.4)", diagramModalBg:"rgba(0,0,0,0.5)",
+  diagramSheet:"#ffffff", diagramBorder:"#e2e8f0",
+  shadow:"rgba(0,0,0,0.1)", timerBorder:"#cbd5e1"
+};
+let C = (function(){ try { var v = JSON.parse(localStorage.getItem("nwb_dark")); return v === false ? LIGHT : DARK; } catch(e) { return DARK; } })();
 
 // ===== EQUIPMENT REGISTRY =====
 const EQUIPMENT = {
@@ -901,7 +921,7 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
   const sc = ex.safety === "caution" ? C.warning : ex.safety === "danger" ? C.danger : C.safe;
   const s = ex.sets[phase] || ex.sets[0];
 
-  return e("div", {style: {marginBottom:6, borderRadius:8, background: isExpanded?"#0f1629":C.bg, borderLeft:"3px solid "+(unavailable?C.danger:sc), opacity: unavailable?0.5:1, overflow:"hidden"}},
+  return e("div", {style: {marginBottom:6, borderRadius:8, background: isExpanded?C.expandedRow:C.bg, borderLeft:"3px solid "+(unavailable?C.danger:sc), opacity: unavailable?0.5:1, overflow:"hidden"}},
     e("div", {onClick: onToggle, style:{padding:"10px 12px", cursor:"pointer"}},
       e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", gap:7, flexWrap:"wrap"}},
         e("div", {style:{display:"flex", alignItems:"center", gap:7, flexWrap:"wrap", flex:1}},
@@ -927,11 +947,11 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
         ex.diagram && DIAGRAMS[ex.diagram] && e("div", {style:{marginBottom:10}},
-          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "📐 View Movement Diagram")
+          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:C.diagramBtn, border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "📐 View Movement Diagram")
         ),
         ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
           e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
-          e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
+          e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:C.bg, padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
         )
       ),
       ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
@@ -1062,7 +1082,7 @@ function ProgressClock() {
       style: {
         cursor:"pointer", marginBottom:12,
         borderRadius:10, padding:"6px 12px",
-        background:"#111827", border:"1px solid "+clr+"33",
+        background:C.card, border:"1px solid "+clr+"33",
         display:"flex", alignItems:"center", justifyContent:"space-between"
       }
     },
@@ -1080,7 +1100,7 @@ function ProgressClock() {
     style: {
       cursor:"pointer", marginBottom:16,
       borderRadius:14,
-      background: flash ? clr+"18" : "linear-gradient(135deg, #111827 0%, #0d1424 100%)",
+      background: flash ? clr+"18" : C.clockGrad,
       border:"1px solid "+clr+"55",
       boxShadow:"0 0 24px "+clr+"18, inset 0 1px 0 "+clr+"22",
       transition:"background 0.25s, box-shadow 0.25s",
@@ -1174,6 +1194,28 @@ function App() {
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
+  const [dark, setDark] = useState(loadState("nwb_dark", true));
+
+  // Update global C and CSS variables when theme changes
+  useEffect(function(){
+    C = dark ? DARK : LIGHT;
+    saveState("nwb_dark", dark);
+    var r = document.documentElement.style;
+    r.setProperty("--bg", C.bg);
+    r.setProperty("--card", C.card);
+    r.setProperty("--text", C.text);
+    r.setProperty("--accent", C.accent);
+    r.setProperty("--border", C.timerBorder);
+    r.setProperty("--textDim", C.textDim);
+    r.setProperty("--modalBg", C.modalBg);
+    r.setProperty("--diagramModalBg", C.diagramModalBg);
+    r.setProperty("--diagramSheet", C.diagramSheet);
+    r.setProperty("--diagramBorder", C.diagramBorder);
+    r.setProperty("--shadow", C.shadow);
+    document.body.style.background = C.bg;
+    document.body.style.color = C.text;
+    document.querySelector('meta[name="theme-color"]').content = C.bg;
+  }, [dark]);
 
   useEffect(function(){ saveState("nwb_phase", phase); }, [phase]);
   useEffect(function(){ saveState("nwb_equipment", equipment); }, [equipment]);
@@ -1454,7 +1496,8 @@ function App() {
   }
 
   return e("div", {style:{maxWidth:500, margin:"0 auto", padding:"0 10px 80px", minHeight:"100vh", background:C.bg}},
-    e("div", {style:{padding:"24px 0 16px", textAlign:"center"}},
+    e("div", {style:{padding:"24px 0 16px", textAlign:"center", position:"relative"}},
+      e("button", {onClick:function(){ setDark(!dark); }, style:{position:"absolute", right:0, top:24, background:"none", border:"1px solid "+C.border, borderRadius:8, padding:"6px 8px", cursor:"pointer", color:C.textMuted, fontSize:16, lineHeight:1}, title:dark?"Switch to light mode":"Switch to dark mode"}, dark?"\u2600\uFE0F":"\uD83C\uDF19"),
       e("h1", {style:{fontSize:22, fontWeight:800, letterSpacing:"-0.5px", color:C.white}}, "Femur Fracture Fitness"),
       e("div", {style:{fontSize:11, color:C.textMuted, marginTop:4}}, "NWB-Adjusted PPL \u2022 Left Femur Stress Fracture \u2022 6 Weeks")
     ),
