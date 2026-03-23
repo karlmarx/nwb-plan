@@ -85,7 +85,8 @@ const EX = {
     nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive — like a log on the floor. If you need leg drive, the weight is too heavy.",
     why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
     safety: "safe",
-    swaps: ["DB Floor Press", "Machine Chest Press"]
+    swaps: ["DB Floor Press", "Machine Chest Press"],
+    visual: "      O===+===O      (Barbell)\n      |       |\n  o__/|\\_    _|__   (Torso on floor)\n     / \\\n    L   R            (L straight, R bent)"
   },
   "DB Floor Press": {
     requires: ["dumbbells", "mat"], category: "push",
@@ -95,7 +96,8 @@ const EX = {
     nwbCues: "Similar to barbell floor press. Avoid arching or bridging. Floor contact = feedback for flat back.",
     why: "Volume chest work with restricted ROM. Dumbbells allow neutral grip for shoulder comfort.",
     safety: "safe",
-    swaps: ["Barbell Floor Press", "Machine Chest Press"]
+    swaps: ["Barbell Floor Press", "Machine Chest Press"],
+    visual: "      [=]  [=]\n       |    |\n       \\----/\n        (__)\n=================="
   },
   "Machine Chest Press": {
     requires: ["cables"], category: "push",
@@ -105,7 +107,8 @@ const EX = {
     nwbCues: "Pin-loaded machine makes drops instant. Keep back pressed against pad. Zero spinal load.",
     why: "Machines provide stability and allow safe failure. Drop sets for metabolic muscle damage.",
     safety: "safe",
-    swaps: ["DB Floor Press", "Barbell Floor Press"]
+    swaps: ["DB Floor Press", "Barbell Floor Press"],
+    visual: "   |    (o)\n   |   /|  \\===]\n   |===| \\\n   |   |  \\\n  _|_ _|_ _|_"
   },
   "Seated DB OH Press": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -115,7 +118,8 @@ const EX = {
     nwbCues: "Keep back pressed against bench. Do NOT arch your lower back. Right leg stable, left leg passive.",
     why: "Vertical press with full spine support. Seated position eliminates balance demands.",
     safety: "safe",
-    swaps: ["Seated Arnold Press", "Landmine Press (seated)"]
+    swaps: ["Seated Arnold Press", "Landmine Press (seated)"],
+    visual: "   [=]      [=]\n    |        |\n    \\  (oo)  /\n     \\--||--/\n       /  \\\n     _/__\\__"
   },
   "Seated Arnold Press": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -125,7 +129,8 @@ const EX = {
     nwbCues: "Keep core braced. Don't lean back. Controlled rotation — no jerking.",
     why: "The rotation pattern recruits anterior, lateral, and posterior deltoid heads in one movement.",
     safety: "safe",
-    swaps: ["Seated DB OH Press", "Landmine Press (seated)"]
+    swaps: ["Seated DB OH Press", "Landmine Press (seated)"],
+    visual: "   Start      Finish\n              [=]  [=]\n                \\  /\n   (oo)         (oo)\n  [=]||[=]     / || \\\n   /  \\        /  \\"
   },
   "Incline DB Press + Lat Raises": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -145,7 +150,8 @@ const EX = {
     nwbCues: "Elbows stay tucked and pointed at ceiling. Upper arms don't move. Floor position is safest.",
     why: "Excellent triceps isolation targeting the long head. Minimal stress on rest of body.",
     safety: "safe",
-    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"]
+    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"],
+    visual: "      ==[ ]\n     /\n  O-< \n /| |\n[___|___]"
   },
   "OH Triceps Extension": {
     requires: ["cables"], category: "push",
@@ -155,7 +161,8 @@ const EX = {
     nwbCues: "Keep core tight to prevent rib flare or back arch. Critical for L4-L5 protection.",
     why: "Targets the long head of triceps — often neglected in standard pressing.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"]
+    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"],
+    visual: "   |\n   |--o\n   | /\n   O \n  /|\\\\ \n / | \\\\\n  / \\\\ "
   },
   "Tricep Rope Pushdown": {
     requires: ["cables"], category: "push",
@@ -165,7 +172,8 @@ const EX = {
     nwbCues: "Keep elbows pinned to sides. Torso stays upright — no leaning into it.",
     why: "Rest-pause technique maximizes recruitment with less total volume. Time-efficient.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers", "OH Triceps Extension"]
+    swaps: ["Lying Skull Crushers", "OH Triceps Extension"],
+    visual: "   |\n   |\n   o\n  /| \n O | \n/ \\\\| \n  / \\\\ "
   },
   "Cable Chest Fly": {
     requires: ["cables"], category: "push",
@@ -175,7 +183,8 @@ const EX = {
     nwbCues: "Don't overextend shoulders at the stretch. Slow, controlled tempo. Lying on bench is safest position.",
     why: "Constant cable tension throughout ROM. Isolated pectoral work.",
     safety: "safe",
-    swaps: ["Incline DB Press + Lat Raises"]
+    swaps: ["Incline DB Press + Lat Raises"],
+    visual: "o       o\n \\\\     /\n  \\\\ O /\n   \\\\|/\n    |\n   / \\\\"
   },
   "Mechanical Drop Set (Press)": {
     requires: ["dumbbells", "bench"], category: "push",
@@ -205,7 +214,8 @@ const EX = {
     nwbCues: "Machine provides stability. Keep torso upright for triceps focus, lean forward slightly for chest emphasis.",
     why: "Compound push movement with machine stability. Drop sets for metabolic exhaustion.",
     safety: "safe",
-    swaps: ["Lying Skull Crushers"]
+    swaps: ["Lying Skull Crushers"],
+    visual: " |     |\n O-___-O\n | | | |\n |_|_|_|\n   | |\n  [_|_]"
   },
   "Pseudo Planche Push-Up": {
     requires: ["parallettes"], category: "push",
@@ -277,7 +287,8 @@ const EX = {
     nwbCues: "SAFEST exercise in the program — chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively.",
     why: "Heavy horizontal row with zero spine load. Chest support means pure back isolation. Go heavy.",
     safety: "safe",
-    swaps: ["Seated Cable Row"]
+    swaps: ["Seated Cable Row"],
+    visual: "      O\n    / | \\_[]\n   /  |\n======|======== (Bench)"
   },
   "Seated Cable Row": {
     requires: ["cables"], category: "pull",
@@ -287,7 +298,8 @@ const EX = {
     nwbCues: "CAUTION: Do NOT lean forward (rounds lumbar = bad for disc) or lean back (momentum). Torso stays at SAME angle entire set. If form breaks, stop.",
     why: "Mid-back thickness builder. Different grips target different areas (V-bar = lats, wide = traps/rhomboids).",
     safety: "caution",
-    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"]
+    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"],
+    visual: "| (Pulley)\n|   \\\n|    \\ _ []\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)"
   },
   "One-Arm Cable Row": {
     requires: ["cables"], category: "pull",
@@ -297,7 +309,8 @@ const EX = {
     nwbCues: "CRITICAL: Do NOT twist your trunk. Your core fights the rotation — that's the training stimulus. Keep pelvis square and spine neutral. If lumbar twists AT ALL, drop weight immediately.",
     why: "Unilateral pulling corrects imbalances and doubles as anti-rotation core training. Two exercises in one.",
     safety: "caution",
-    swaps: ["Seated Cable Row", "Chest-Supported DB Row"]
+    swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
+    visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)"
   },
   "Seated Face Pulls": {
     requires: ["cables"], category: "pull",
@@ -307,7 +320,8 @@ const EX = {
     nwbCues: "Focus on external rotation at end of movement. Essential for shoulder health with this much pressing volume.",
     why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health and paddling resilience.",
     safety: "safe",
-    swaps: ["Reverse Fly"]
+    swaps: ["Reverse Fly"],
+    visual: "| (Pulley)\n|------_ []\n|     /\n|   O\n|  /|\\\n| +-+-+ (Seat)"
   },
   "Reverse Fly": {
     requires: ["dumbbells", "bench"], category: "pull",
@@ -327,7 +341,8 @@ const EX = {
     nwbCues: "Bench keeps torso stationary, protecting spine from swinging. Zero momentum allowed.",
     why: "Strict bicep isolation without lumbar stress. The pad prevents cheating.",
     safety: "safe",
-    swaps: ["Hammer Curls", "Incline DB Curl"]
+    swaps: ["Hammer Curls", "Incline DB Curl"],
+    visual: "     O\n   / | \\\n []\\ | /[]\n   +-+-+ (Seat)\n     |"
   },
   "Hammer Curls": {
     requires: ["dumbbells"], category: "pull",
@@ -369,7 +384,8 @@ const EX = {
     nwbCues: "HIGH foot placement = less hip flexion = protects FAI/labrum. 90° limit is NON-NEGOTIABLE. Do NOT lock out knee. Left leg hangs free.",
     why: "MOST IMPORTANT exercise for cross-education effect. Eccentric emphasis drives up to 17.7% contralateral strength preservation (Manca et al. meta-analysis).",
     safety: "caution",
-    swaps: ["Hack Squat (Right)"]
+    swaps: ["Hack Squat (Right)"],
+    visual: "     [=======]\n        /   \n     R /    \n    __/\n   |   \\\n   |  L \\"
   },
   "Hack Squat (Right)": {
     requires: ["hacksquat"], category: "legs",
@@ -389,7 +405,8 @@ const EX = {
     nwbCues: "Full lockout is safe here — it's open-chain, no hip compression. Go for the burn.",
     why: "Quad isolation king. Drop sets force metabolic exhaustion for maximum growth stimulus.",
     safety: "safe",
-    swaps: ["SL Leg Press (Right)"]
+    swaps: ["SL Leg Press (Right)"],
+    visual: "      O\n     /|\\_   __R(Pad)\n      |   \\/\n     / \\   \\\n    L   (Seat)"
   },
   "SL Glute Bridge (Right)": {
     requires: ["mat"], category: "legs",
@@ -501,7 +518,8 @@ const EX = {
     nwbCues: "This is NOT a crunch — your lumbar spine stays in natural arch. If the arch disappears into your hands, you've gone too high. Stop.",
     why: "McGill Big 3. Only safe upper-ab exercise for L4-L5 DDD. Arch preservation is key.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "    o\n   /|\\_\n  / \\  \\\n L   R"
   },
   "Side Plank": {
     requires: ["mat"], category: "core",
@@ -521,7 +539,8 @@ const EX = {
     nwbCues: "Left leg NEVER moves from the ground. If hips rock side to side, you're going too fast. Slow and controlled.",
     why: "McGill Big 3. Builds back endurance and anti-rotation stability in a safe quadruped position.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "   __o  (Left Arm)\n  / /\\_\n |  |  \\ (Right Leg)\n ^  ^    \n K  H"
   },
   "Pallof Press": {
     requires: ["bands"], category: "core",
@@ -531,7 +550,8 @@ const EX = {
     nwbCues: "Zero spinal flexion. Zero rotation. Pure ANTI-rotation. Explicitly recommended for disc disease. Do NOT stand on one leg — sit or kneel.",
     why: "The gold standard anti-rotation core exercise. Works entire core without any leg movement or spinal compression.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "  (ANCHOR)=====[HANDS]--o\n                        |\n                        /\\\n                       K  H"
   },
   "Dead Bug (R leg only)": {
     requires: ["mat"], category: "core",
@@ -541,7 +561,8 @@ const EX = {
     nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting your stress fracture. Press low back into mat throughout.",
     why: "Safe deep core (TVA) activation without loading the injured hip flexor. Modified specifically for your MRI findings.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    visual: "    (L Arm)\n      \\\n   _o_|_/\n  |   |\n  ^   R\n  L (Foot planted)"
   },
   "Stir the Pot": {
     requires: ["stabball"], category: "core",
@@ -551,7 +572,8 @@ const EX = {
     nwbCues: "Anti-rotation AND anti-extension. Keep spine neutral. If your back starts to arch, STOP immediately.",
     why: "High-level core stability challenge without spinal flexion. One of the most demanding plank variations.",
     safety: "safe",
-    swaps: ["Pallof Press"]
+    swaps: ["Pallof Press"],
+    visual: "       o\n      /|\\____\n    (BALL)   \\\n             K/H"
   },
 
   // CARDIO exercises
@@ -769,7 +791,11 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, unavailable, equi
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📍 SETUP & POSITION"), e("div", {style:{color:C.textDim}}, ex.setup)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
         e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why))
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
+        ex.visual && e("div", {style:{marginBottom:10}},
+          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
+          e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
+        )
       ),
       ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
         ex.requires.map(function(eq) {
