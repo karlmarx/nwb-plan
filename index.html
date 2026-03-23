@@ -1077,6 +1077,7 @@ function App() {
   };
 
   const tabs = ["Today", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+  const tabTips = ["Today's scheduled workout", "All push/pull/legs exercises", "NWB cardio options", "Core & ab routines", "Toggle available equipment", "Injury cues & safety rules"];
 
   function parseHevyId(input) {
     if (!input) return "";
@@ -1332,7 +1333,7 @@ function App() {
       tabs.map(function(t, i) {
         var isTodayTab = i === 0;
         var todayColor = getWorkoutForDay(selectedDay).c;
-        return e("button", {key:t, onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?todayColor:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?todayColor:C.accent):C.border), color:tab===i?(isTodayTab?todayColor:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
+        return e("button", {key:t, title:tabTips[i], onClick:function(){ setTab(i); }, style:{flex:1, minWidth:60, padding:"10px 4px", background:tab===i?(isTodayTab?todayColor:C.accent)+"22":"none", border:"1px solid "+(tab===i?(isTodayTab?todayColor:C.accent):C.border), color:tab===i?(isTodayTab?todayColor:C.accent):C.textMuted, borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, t);
       })
     ),
     content,
