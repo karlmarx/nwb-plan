@@ -655,7 +655,7 @@ const EX = {
 const WORKOUTS = {
   "Push A": {
     title: "Push A — Heavy Strength", icon: "💪", color: "#38bdf8",
-    hevy: "https://hevy.com/routine/09b6239f-0eac-4a0d-9c44-7076d789f943",
+    hevy: "https://hevy.com/routine/T2lMXhz4NFS",
     exercises: [
       "Barbell Floor Press", "Seated DB OH Press", "Incline DB Press + Lat Raises",
       "Lying Skull Crushers", "Pseudo Planche Push-Up", "McGill Curl-Up"
@@ -667,7 +667,7 @@ const WORKOUTS = {
   },
   "Push B": {
     title: "Push B — Volume / Hypertrophy", icon: "💪", color: "#38bdf8",
-    hevy: "https://hevy.com/routine/d926a000-5eb0-47dc-9e88-f9d2ffb0afae",
+    hevy: "https://hevy.com/routine/j0XrGQzMyF1",
     exercises: [
       "DB Floor Press", "Mechanical Drop Set (Press)", "Landmine Press (seated)",
       "Cable Chest Fly", "Tricep Rope Pushdown", "Parallette L-Sit", "Side Plank"
@@ -676,7 +676,7 @@ const WORKOUTS = {
   },
   "Pull A": {
     title: "Pull A — Heavy Strength", icon: "🔗", color: "#a78bfa",
-    hevy: "https://hevy.com/routine/f6ad71a1-344d-49bd-9b12-44ab6e94d283",
+    hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
       "Finger-Assist One-Arm Pull-Up", "Lat Pulldown (Wide)", "Chest-Supported DB Row",
       "Seated Cable Row", "Seated Face Pulls", "Preacher Curls", "Pallof Press"
@@ -687,7 +687,7 @@ const WORKOUTS = {
   },
   "Pull B": {
     title: "Pull B — Volume / Density", icon: "🔗", color: "#a78bfa",
-    hevy: "https://hevy.com/routine/2fc65afa-8b93-49fa-bae2-2d8b65f6a16b",
+    hevy: "https://hevy.com/routine/J1rggKx4PIk",
     exercises: [
       "Neutral Grip Pulldown", "Mechanical Drop Set (Pull)", "One-Arm Cable Row",
       "Reverse Fly", "Hammer Curls", "Incline DB Curl", "Bird-Dog"
@@ -696,7 +696,7 @@ const WORKOUTS = {
   },
   "Legs A": {
     title: "Legs A — Quad/Glute (Cross-Ed)", icon: "🦵", color: "#10b981",
-    hevy: "https://hevy.com/routine/c2cd785b-23cd-48c2-8c83-f87a3cf1787b",
+    hevy: "https://hevy.com/routine/FKCWOPCUE4H",
     exercises: [
       "SL Leg Press (Right)", "SL Leg Extension (Right)", "SL Glute Bridge (Right)",
       "Banded Clamshells", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)", "Dead Bug (R leg only)"
@@ -708,7 +708,7 @@ const WORKOUTS = {
   },
   "Legs B": {
     title: "Legs B — Posterior Chain", icon: "🦵", color: "#10b981",
-    hevy: "https://hevy.com/routine/5014074d-63f9-41dc-8bac-933ff4443880",
+    hevy: "https://hevy.com/routine/s5QsLGXsVAy",
     exercises: [
       "Low-Box Step-Up (Right)", "SL Hip Thrust (Right)", "Prone Ham Curl (Right)",
       "Nordic Ham Curl", "Standing Calf Raise (R)", "Stir the Pot"
@@ -1039,12 +1039,12 @@ function App() {
   const [timer, setTimer] = useState(null);
   const [swaps, setSwaps] = useState(loadState("nwb_swaps", {}));
   const HEVY_DEFAULTS = {
-    "Push A": "https://hevy.com/routine/09b6239f-0eac-4a0d-9c44-7076d789f943",
-    "Push B": "https://hevy.com/routine/d926a000-5eb0-47dc-9e88-f9d2ffb0afae",
-    "Pull A": "https://hevy.com/routine/f6ad71a1-344d-49bd-9b12-44ab6e94d283",
-    "Pull B": "https://hevy.com/routine/2fc65afa-8b93-49fa-bae2-2d8b65f6a16b",
-    "Legs A": "https://hevy.com/routine/c2cd785b-23cd-48c2-8c83-f87a3cf1787b",
-    "Legs B": "https://hevy.com/routine/5014074d-63f9-41dc-8bac-933ff4443880"
+    "Push A": "https://hevy.com/routine/T2lMXhz4NFS",
+    "Push B": "https://hevy.com/routine/j0XrGQzMyF1",
+    "Pull A": "https://hevy.com/routine/c91UqmMdwz7",
+    "Pull B": "https://hevy.com/routine/J1rggKx4PIk",
+    "Legs A": "https://hevy.com/routine/FKCWOPCUE4H",
+    "Legs B": "https://hevy.com/routine/s5QsLGXsVAy"
   };
   const [hevyIds, setHevyIds] = useState(Object.assign({}, HEVY_DEFAULTS, loadState("nwb_hevy", {})));
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
