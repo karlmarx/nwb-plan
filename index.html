@@ -1308,6 +1308,15 @@ function App() {
           e(Callout, {type:"danger"}, "Stop exercise and contact your MD immediately if:"),
           ["Groin pain (any side)", "Hip clicking or catching sensation", "Pain lasting >24 hours after workout", "Radiating leg pain or numbness", "Sharp pain during any exercise", "Swelling in hip or thigh area"].map(function(s,i){ return e("p", {key:"s-"+i, style:{fontSize:12, color:C.textDim, padding:"3px 0"}}, "🔴 "+s); })
         ),
+        e(Section, {title:"About", icon:"ℹ️", isOpen:!!openSections["about"], onToggle:function(){ toggleSection("about"); }},
+          e("div", {style:{fontSize:13, color:C.textDim, lineHeight:1.8}},
+            "This app was built by me, for me — to keep track of what I can actually do at the gym while recovering from a compression-side fracture of my left femur and a hip labrum tear.",
+            e("br", null), e("br", null),
+            "Instead of juggling fitness apps, Google searches, and YouTube videos to figure out which exercises are safe, I wanted one place that knows my injuries, shows me the right movements, and gets out of the way.",
+            e("br", null), e("br", null),
+            e("span", {style:{color:C.textMuted, fontSize:11}}, "nwbfit.vercel.app")
+          )
+        ),
         e(Section, {title:"Nutrition During NWB", icon:"🍗", isOpen:!!openSections["nutrition"], onToggle:function(){ toggleSection("nutrition"); }},
           e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
             e("p", {style:{fontWeight:700, color:C.warning, marginBottom:6}}, "Do NOT cut calories. Healing demands energy."),
