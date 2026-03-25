@@ -25,6 +25,19 @@
     .diagram-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 12px; }
     .diagram-sheet { background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 16px; width: 100%; max-width: 760px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .diagram-sheet::-webkit-scrollbar { width: 0; }
+    /* Glute Bridge animation */
+    @keyframes gluteBridge { 0%,17.5% { --bp:0 } 17.5%,42.5% { --bp:1 } 42.5%,65% { --bp:1 } 65%,90% { --bp:0 } 90%,100% { --bp:0 } }
+    @keyframes bridgeUp { 0%,17.5% { transform: translateY(0); } 42.5%,65% { transform: translateY(-38px); } 90%,100% { transform: translateY(0); } }
+    @keyframes bridgeUpSmall { 0%,17.5% { transform: translateY(0); } 42.5%,65% { transform: translateY(-22px); } 90%,100% { transform: translateY(0); } }
+    @keyframes fadeInMid { 0%,17% { opacity:0 } 25%,42% { opacity:1 } 50% { opacity:0 } 100% { opacity:0 } }
+    @keyframes fadeInTop { 0%,42% { opacity:0 } 50%,65% { opacity:1 } 72% { opacity:0 } 100% { opacity:0 } }
+    /* Clamshell animation */
+    @keyframes clamOpen { 0%,16.7% { transform: rotate(0deg); } 43.3%,63.3% { transform: rotate(-45deg); } 90%,100% { transform: rotate(0deg); } }
+    @keyframes clamFadeOpen { 0%,30% { opacity:0 } 43%,63% { opacity:1 } 75% { opacity:0 } 100% { opacity:0 } }
+    @media (prefers-reduced-motion: reduce) {
+      .anim-bridge, .anim-clam { animation: none !important; }
+      .anim-bridge *, .anim-clam * { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -415,12 +428,13 @@ const EX = {
   "SL Glute Bridge (Right)": {
     requires: ["mat"], category: "legs",
     sets: [["4","12-15"],["4","12-15"],["4","10-12"]], rest: 90,
-    setup: "Lie on back with RIGHT knee bent and foot flat. Left leg extended or bent with foot resting.",
-    execution: "Drive through right heel to lift hips. Squeeze glutes 2 seconds at top. Lower with control. Add dumbbell on hip in Weeks 3+.",
-    nwbCues: "Avoid over-arching lower back at top. Use hip power only. Left leg stays passive.",
+    setup: "Lie on back with RIGHT knee bent and foot flat. LEFT leg: bend knee ~90° and lift foot off the floor. Let the shin hang like dead weight — do NOT rest foot on the ground, this causes hip flexor engagement on the injured side. Arms flat at sides.",
+    execution: "Before each rep, exhale and consciously let the entire left side go slack. Drive through right heel to lift hips until torso forms a straight line from shoulders to right knee. Squeeze glutes hard for 2 seconds at top. Lower with control. If you catch the left side tensing mid-rep, reset rather than pushing through. Add dumbbell on hip in Weeks 3+.",
+    nwbCues: "If you feel tension in your LEFT hip flexor, your left foot is probably planted or you're bracing. Lift the foot and let it hang. Avoid over-arching lower back at top — if you feel it in your lower back, drop hips slightly. Use hip power only. Left leg stays completely passive.",
     why: "Unilateral glute strength with zero hip flexion demand. Safe and effective NWB exercise.",
     safety: "safe",
-    swaps: ["SL Hip Thrust (Right)"]
+    swaps: ["SL Hip Thrust (Right)"],
+    diagram: "gluteBridge"
   },
   "SL Hip Thrust (Right)": {
     requires: ["bench"], category: "legs",
@@ -505,12 +519,13 @@ const EX = {
   "Banded Clamshells": {
     requires: ["bands"], category: "legs",
     sets: [["3","20/side"],["3","20/side"],["3","20/side"]], rest: 60,
-    setup: "Lie on your side with knees bent. Place resistance band just above knees. Both legs work — this is NWB safe.",
-    execution: "Open top knee like a clamshell while keeping feet together. Squeeze glute med at top. Lower slowly.",
-    nwbCues: "Both legs can do this safely — lying position is completely non-weight-bearing. Targets gluteus medius which weakens fast during NWB.",
-    why: "Gluteus medius maintenance for both legs. Prevents hip drop gait pattern when you return to walking.",
+    setup: "Lie on your side with hips stacked vertically — imagine your hip bones are balanced directly on top of each other. A wall behind your back can help you stay honest. Place resistance band just ABOVE the knees, never on the kneecap. Both legs work — this is NWB safe. When lying on your LEFT (injured) side: place a pillow under the left hip if pressure is uncomfortable.",
+    execution: "Open the top knee upward like a clamshell while keeping feet glued together — they are the hinge point. Keep hip bones stacked vertically throughout. If your top hip rolls backward, you're cheating the rep and loading the low back instead of the glute med. Reduce range of motion until you can keep the stack. Squeeze glute med at top. Lower with control. Tempo: 1s open, brief hold, 1s close. No snapping.",
+    nwbCues: "Both legs can do this safely — lying position is completely non-weight-bearing. Targets gluteus medius which weakens fast during NWB. If band slides down mid-set, stop and reposition — shearing force on the joint. If any groin pain — STOP immediately. If you feel hip flexor engagement instead of glute med, reset your hip stacking and reduce range of motion.",
+    why: "Gluteus medius maintenance for both legs. Prevents hip drop gait pattern when you return to walking. The burn should be deep in the side of the glute.",
     safety: "safe",
-    swaps: []
+    swaps: [],
+    diagram: "clamshells"
   },
 
   // CORE exercises
@@ -898,8 +913,345 @@ function PlancheDiagram({onClose}) {
   );
 }
 
+// ===== SL GLUTE BRIDGE DIAGRAM =====
+function GluteBridgeDiagram({onClose}) {
+  var paused = useRef(false);
+  var _p = useState(false); var isPaused = _p[0]; var setIsPaused = _p[1];
+  var dur = "4s";
+
+  var callouts = [
+    {key:"right", title:"Right Leg (Working)", color:"#48c78e", bg:"#0d1f14", border:"#48c78e", text:"Drive through the RIGHT heel to lift hips. Foot stays flat, knee tracks over toes. This leg does 100% of the work."},
+    {key:"left", title:"Left Leg (NWB · Passive)", color:"#465060", bg:"#0d1119", border:"#465060", text:"Bend knee ~90° and lift foot off the floor. Let the shin hang like dead weight. Do NOT rest foot on the ground — this causes hip flexor engagement on the injured side."},
+    {key:"squeeze", title:"Squeeze at Top", color:"#dc5046", bg:"#1a0d0c", border:"#dc5046", text:"Hold the bridge for 2 full seconds at the top. Consciously squeeze glutes. If you feel it in your lower back, you're over-arching — drop hips slightly."},
+    {key:"breath", title:"Breathing", color:"#daa53c", bg:"#1a1500", border:"#daa53c", text:"Exhale on the drive up. Before each rep, exhale and consciously let the entire left side go slack. If you catch it tensing mid-rep, reset."}
+  ];
+
+  var steps = [
+    {n:1, parts:["Lie on your back on a mat. ", e("strong",{key:"s1",style:{color:"#48c78e"}},"RIGHT knee bent"), ", foot flat on the floor. Arms at sides, palms down."]},
+    {n:2, parts:["Bend your LEFT knee ~90° and ", e("strong",{key:"s2",style:{color:"#465060"}},"lift your left foot off the floor"), ". Let the shin hang straight down like dead weight. Do NOT rest it anywhere."]},
+    {n:3, parts:["Drive through your ", e("strong",{key:"s3",style:{color:"#daa53c"}},"right heel"), " to lift hips until your torso forms a straight line from shoulders to right knee."]},
+    {n:4, parts:[e("strong",{key:"s4",style:{color:"#dc5046"}},"Squeeze glutes hard"), " at the top for 2 seconds. Don't over-arch — ribs stay down."]},
+    {n:5, parts:["Lower with control (~2 seconds down). Brief pause at bottom. Repeat for all reps."]}
+  ];
+
+  function togglePause(ev) { ev.stopPropagation(); setIsPaused(!isPaused); }
+
+  // Animation style helper
+  var anim = function(name, extraStyle) {
+    var s = {animationName:name, animationDuration:dur, animationTimingFunction:"ease-in-out", animationIterationCount:"infinite"};
+    if (isPaused) s.animationPlayState = "paused";
+    return Object.assign(s, extraStyle || {});
+  };
+
+  // Colors
+  var green = "#48c78e";
+  var grey = "#465060";
+  var teal = "#4ecdc4";
+  var orange = "#daa53c";
+  var red = "#dc5046";
+  var bg = "#0d141e";
+  var dimText = "#788c9e";
+
+  return e("div", {style:{padding:"24px 16px 32px", color:"#dce4eb", fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"}},
+    // Header
+    e("div", {style:{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16}},
+      e("div", null,
+        e("div", {style:{fontSize:"clamp(1.1rem,3.5vw,1.5rem)", fontWeight:800, letterSpacing:"-0.02em"}}, "SL Glute Bridge (Right)"),
+        e("div", {style:{fontSize:10, color:"#666", letterSpacing:"0.15em", textTransform:"uppercase", marginTop:2}}, "Unilateral \u00b7 NWB Safe")
+      ),
+      e("button", {onClick:onClose, style:{background:"#222", border:"1px solid #444", color:"#aaa", borderRadius:8, padding:"6px 12px", fontSize:12, cursor:"pointer", fontFamily:"inherit", flexShrink:0}}, "\u2715 Close")
+    ),
+
+    // SVG Animation
+    e("div", {onClick:togglePause, style:{width:"100%", background:bg, border:"1px solid #23374b", borderRadius:12, padding:"16px 12px 8px", marginBottom:16, cursor:"pointer", position:"relative"}},
+      e("div", {style:{fontSize:10, letterSpacing:"0.18em", textTransform:"uppercase", color:"#555", marginBottom:8}}, "Side View \u2014 Animated \u00b7 Tap to " + (isPaused ? "play" : "pause")),
+      e("svg", {viewBox:"0 0 640 280", width:"100%", xmlns:"http://www.w3.org/2000/svg", className:"anim-bridge", style:{fontFamily:"-apple-system, monospace", display:"block"}},
+
+        // Floor / mat
+        e("rect", {x:40, y:228, width:560, height:4, rx:2, fill:"#1a2636"}),
+        e("text", {x:320, y:250, textAnchor:"middle", fontSize:9, fill:"#333"}, "MAT"),
+
+        // === STATIC PARTS (upper back, head, arms stay on ground) ===
+        // Head
+        e("circle", {cx:108, cy:200, r:18, fill:"none", stroke:teal, strokeWidth:4}),
+        // Upper back on ground
+        e("line", {x1:126, y1:206, x2:220, y2:216, stroke:teal, strokeWidth:6, strokeLinecap:"round"}),
+        // Left arm (on ground)
+        e("line", {x1:150, y1:210, x2:130, y2:226, stroke:teal, strokeWidth:4, strokeLinecap:"round", opacity:0.5}),
+        // Right arm (on ground)
+        e("line", {x1:190, y1:214, x2:175, y2:228, stroke:teal, strokeWidth:4, strokeLinecap:"round", opacity:0.5}),
+
+        // === ANIMATED HIP GROUP (torso from mid-back to hip, lifts up) ===
+        e("g", {style:anim("bridgeUp")},
+          // Lower torso / hip area
+          e("line", {x1:220, y1:216, x2:310, y2:210, stroke:teal, strokeWidth:6, strokeLinecap:"round"}),
+
+          // Hip joint dot
+          e("circle", {cx:310, cy:210, r:4, fill:teal}),
+
+          // RIGHT leg — thigh (hip to knee)
+          e("line", {x1:310, y1:210, x2:410, y2:175, stroke:green, strokeWidth:7, strokeLinecap:"round"}),
+          // RIGHT leg — shin (knee down to foot on ground)
+          // Knee position animated up, but foot stays planted
+          // We animate the thigh up; the shin connects knee to fixed foot
+          e("line", {x1:410, y1:175, x2:430, y2:228, stroke:green, strokeWidth:7, strokeLinecap:"round"}),
+
+          // RIGHT foot (planted)
+          e("rect", {x:420, y:224, width:24, height:6, rx:3, fill:green}),
+
+          // LEFT leg — thigh (hip to knee, passive, rides with hip)
+          e("line", {x1:310, y1:210, x2:370, y2:180, stroke:grey, strokeWidth:5, strokeLinecap:"round", strokeDasharray:"8,4"}),
+          // LEFT leg — shin hanging down like dead weight
+          e("line", {x1:370, y1:180, x2:372, y2:225, stroke:grey, strokeWidth:5, strokeLinecap:"round", strokeDasharray:"8,4"}),
+          // LEFT foot (hovering)
+          e("ellipse", {cx:373, cy:228, rx:8, ry:3, fill:"none", stroke:grey, strokeWidth:1.5, strokeDasharray:"3,2"}),
+
+          // "R" label near right knee
+          e("text", {x:415, y:168, fontSize:14, fontWeight:800, fill:green}, "R"),
+          // "L" label near left foot
+          e("text", {x:383, y:233, fontSize:12, fontWeight:700, fill:grey}, "L"),
+          // "DEAD WEIGHT" label
+          e("text", {x:385, y:195, fontSize:9, fontWeight:700, fill:grey, letterSpacing:"0.08em"}, "DEAD"),
+          e("text", {x:381, y:206, fontSize:9, fontWeight:700, fill:grey, letterSpacing:"0.08em"}, "WEIGHT")
+        ),
+
+        // === ANIMATED LABELS (fade in/out with phases) ===
+        // "DRIVE" arrow — fades in during rise
+        e("g", {style:anim("fadeInMid")},
+          e("text", {x:270, y:175, fontSize:12, fontWeight:800, fill:teal, letterSpacing:"0.1em"}, "DRIVE"),
+          e("line", {x1:285, y1:178, x2:285, y2:196, stroke:teal, strokeWidth:2, markerEnd:"url(#arrowUp)"}),
+          // Arrow marker
+          e("defs", null,
+            e("marker", {id:"arrowUp", viewBox:"0 0 10 10", refX:5, refY:10, markerWidth:6, markerHeight:6, orient:"auto"},
+              e("path", {d:"M0,10 L5,0 L10,10", fill:"none", stroke:teal, strokeWidth:2})
+            )
+          )
+        ),
+
+        // "SQUEEZE 2s" — fades in at top hold
+        e("g", {style:anim("fadeInTop")},
+          e("text", {x:238, y:155, fontSize:11, fontWeight:800, fill:red, letterSpacing:"0.08em"}, "SQUEEZE 2s")
+        ),
+
+        // "HEEL DRIVE" below right foot — fades in during rise
+        e("g", {style:anim("fadeInMid")},
+          e("text", {x:405, y:260, fontSize:10, fontWeight:700, fill:orange, letterSpacing:"0.06em", textAnchor:"middle"}, "HEEL DRIVE"),
+          e("line", {x1:432, y1:232, x2:432, y2:244, stroke:orange, strokeWidth:1.5, strokeDasharray:"2,2"})
+        )
+      ),
+
+      // Legend bar
+      e("div", {style:{display:"flex", gap:24, justifyContent:"center", padding:"10px 0 4px"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:6}},
+          e("div", {style:{width:8, height:8, borderRadius:"50%", background:green}}),
+          e("span", {style:{fontSize:10, fontWeight:700, color:green, letterSpacing:"0.05em"}}, "RIGHT (WORKING)")
+        ),
+        e("div", {style:{display:"flex", alignItems:"center", gap:6}},
+          e("div", {style:{width:8, height:8, borderRadius:"50%", background:grey}}),
+          e("span", {style:{fontSize:10, fontWeight:700, color:grey, letterSpacing:"0.05em"}}, "LEFT (NWB \u00b7 HOVERING)")
+        )
+      )
+    ),
+
+    // Callout cards
+    e("div", {style:{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:10, marginBottom:16}},
+      callouts.map(function(c) {
+        return e("div", {key:c.key, style:{background:c.bg, border:"1px solid #2a2a2a", borderLeft:"3px solid "+c.border, borderRadius:8, padding:"12px 14px"}},
+          e("div", {style:{fontSize:12, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", color:c.color, marginBottom:5}}, c.title),
+          e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, c.text)
+        );
+      })
+    ),
+
+    // Movement sequence
+    e("div", {style:{background:"#161616", border:"1px solid #2a2a2a", borderRadius:12, padding:"16px 14px"}},
+      e("div", {style:{fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"#555", marginBottom:12}}, "Movement Sequence"),
+      e("div", {style:{display:"flex", flexDirection:"column", gap:10}},
+        steps.map(function(s) {
+          return e("div", {key:s.n, style:{display:"flex", gap:12, alignItems:"flex-start"}},
+            e("div", {style:{width:22, height:22, borderRadius:"50%", background:"#222", border:"1px solid #444", fontSize:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#777", marginTop:1}}, s.n),
+            e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, s.parts)
+          );
+        })
+      )
+    )
+  );
+}
+
+// ===== BANDED CLAMSHELLS DIAGRAM =====
+function ClamshellDiagram({onClose}) {
+  var _p = useState(false); var isPaused = _p[0]; var setIsPaused = _p[1];
+  var dur = "3s";
+
+  var callouts = [
+    {key:"stack", title:"\u2713 Hips Stacked", color:"#48c78e", bg:"#0d1f14", border:"#48c78e", text:"Hip bones balanced directly on top of each other. If the top hip rolls backward, you're cheating the rep and loading the low back instead of the glute med. A wall behind your back can help you stay honest."},
+    {key:"band", title:"Band Placement", color:"#daa53c", bg:"#1a1500", border:"#daa53c", text:"Band goes just ABOVE the knees, never on the kneecap. If it slides down mid-set, stop and reposition — shearing force on the joint."},
+    {key:"feet", title:"Feet Together", color:"#4ecdc4", bg:"#0d1a1e", border:"#4ecdc4", text:"Feet stay glued together throughout the movement — they are the hinge point. If feet separate, you're using hip flexors instead of glute med."},
+    {key:"target", title:"Target: Glute Med", color:"#48c78e", bg:"#0d1f14", border:"#48c78e", text:"The burn should be deep in the side of the glute. If you feel hip flexor engagement instead, reset your hip stacking and reduce range of motion."}
+  ];
+
+  var steps = [
+    {n:1, parts:["Lie on your side with ", e("strong",{key:"c1",style:{color:"#dce4eb"}},"hips and knees bent ~45\u00b0"), ". Bottom arm under head for support."]},
+    {n:2, parts:["Place resistance band ", e("strong",{key:"c2",style:{color:"#daa53c"}},"just above both knees"), ". Not on the kneecap."]},
+    {n:3, parts:["Keep feet glued together. ", e("strong",{key:"c3",style:{color:"#4ecdc4"}},"Open top knee upward"), " like a clamshell. Control the movement."]},
+    {n:4, parts:[e("strong",{key:"c4",style:{color:"#48c78e"}},"Squeeze glute med"), " at the top. Brief hold. Lower with control (~1s)."]},
+    {n:5, parts:["Tempo: 1s open, brief hold, 1s close. ", e("strong",{key:"c5",style:{color:"#dc5046"}},"No snapping"), ". 20 reps per side."]}
+  ];
+
+  function togglePause(ev) { ev.stopPropagation(); setIsPaused(!isPaused); }
+
+  var anim = function(name, extraStyle) {
+    var s = {animationName:name, animationDuration:dur, animationTimingFunction:"ease-in-out", animationIterationCount:"infinite"};
+    if (isPaused) s.animationPlayState = "paused";
+    return Object.assign(s, extraStyle || {});
+  };
+
+  var green = "#48c78e";
+  var grey = "#465060";
+  var teal = "#4ecdc4";
+  var orange = "#daa53c";
+  var bg = "#0d141e";
+  var dimText = "#788c9e";
+  var body = "#4ecdc4";
+
+  return e("div", {style:{padding:"24px 16px 32px", color:"#dce4eb", fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"}},
+    // Header
+    e("div", {style:{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16}},
+      e("div", null,
+        e("div", {style:{fontSize:"clamp(1.1rem,3.5vw,1.5rem)", fontWeight:800, letterSpacing:"-0.02em"}}, "Banded Clamshells"),
+        e("div", {style:{fontSize:10, color:"#666", letterSpacing:"0.15em", textTransform:"uppercase", marginTop:2}}, "Bilateral \u00b7 NWB Safe \u00b7 Glute Med")
+      ),
+      e("button", {onClick:onClose, style:{background:"#222", border:"1px solid #444", color:"#aaa", borderRadius:8, padding:"6px 12px", fontSize:12, cursor:"pointer", fontFamily:"inherit", flexShrink:0}}, "\u2715 Close")
+    ),
+
+    // SVG Animation
+    e("div", {onClick:togglePause, style:{width:"100%", background:bg, border:"1px solid #23374b", borderRadius:12, padding:"16px 12px 8px", marginBottom:16, cursor:"pointer", position:"relative"}},
+      e("div", {style:{fontSize:10, letterSpacing:"0.18em", textTransform:"uppercase", color:"#555", marginBottom:8}}, "Front View \u2014 Animated \u00b7 Tap to " + (isPaused ? "play" : "pause")),
+      e("svg", {viewBox:"0 0 640 300", width:"100%", xmlns:"http://www.w3.org/2000/svg", className:"anim-clam", style:{fontFamily:"-apple-system, monospace", display:"block"}},
+
+        // Floor
+        e("rect", {x:40, y:260, width:560, height:3, rx:1.5, fill:"#1a2636"}),
+
+        // === BODY (side-lying, viewed from front) ===
+        // Head (bottom, resting on arm)
+        e("circle", {cx:160, cy:170, r:18, fill:"none", stroke:body, strokeWidth:4}),
+        // Bottom arm (under head)
+        e("line", {x1:160, y1:188, x2:140, y2:220, stroke:body, strokeWidth:4, strokeLinecap:"round", opacity:0.5}),
+        e("line", {x1:140, y1:220, x2:160, y2:258, stroke:body, strokeWidth:4, strokeLinecap:"round", opacity:0.5}),
+        // Torso (side-lying)
+        e("line", {x1:178, y1:175, x2:310, y2:195, stroke:body, strokeWidth:7, strokeLinecap:"round"}),
+        // Top arm (hand on floor for stability)
+        e("line", {x1:240, y1:185, x2:260, y2:220, stroke:body, strokeWidth:4, strokeLinecap:"round", opacity:0.6}),
+        e("line", {x1:260, y1:220, x2:270, y2:258, stroke:body, strokeWidth:4, strokeLinecap:"round", opacity:0.6}),
+
+        // Hip joint
+        e("circle", {cx:310, cy:195, r:5, fill:body}),
+
+        // === BOTTOM LEG (static, on floor) ===
+        // Thigh
+        e("line", {x1:310, y1:195, x2:410, y2:225, stroke:body, strokeWidth:6, strokeLinecap:"round"}),
+        // Shin (bent)
+        e("line", {x1:410, y1:225, x2:460, y2:258, stroke:body, strokeWidth:6, strokeLinecap:"round"}),
+        // Foot
+        e("ellipse", {cx:465, cy:258, rx:10, ry:4, fill:body}),
+
+        // === TOP LEG (animated — rotates open from hip) ===
+        e("g", {style:Object.assign({transformOrigin:"310px 195px"}, anim("clamOpen"))},
+          // Thigh
+          e("line", {x1:310, y1:195, x2:410, y2:220, stroke:green, strokeWidth:7, strokeLinecap:"round"}),
+          // Shin (bent, matches bottom leg angle)
+          e("line", {x1:410, y1:220, x2:458, y2:252, stroke:green, strokeWidth:6, strokeLinecap:"round"}),
+          // Foot (stays near bottom foot)
+          e("ellipse", {cx:463, cy:252, rx:10, ry:4, fill:green}),
+
+          // Band (between knees — short strip)
+          e("rect", {x:395, y:216, width:22, height:8, rx:3, fill:orange, opacity:0.9}),
+
+          // Knee marker
+          e("circle", {cx:410, cy:220, r:4, fill:green})
+        ),
+
+        // Band on bottom knee too
+        e("rect", {x:397, y:222, width:20, height:7, rx:3, fill:orange, opacity:0.6}),
+
+        // === HIP STACKING LINE (vertical dotted) ===
+        e("line", {x1:310, y1:140, x2:310, y2:210, stroke:green, strokeWidth:1.5, strokeDasharray:"4,4"}),
+        e("text", {x:310, y:133, textAnchor:"middle", fontSize:12, fontWeight:800, fill:green}, "\u2713"),
+        e("text", {x:310, y:122, textAnchor:"middle", fontSize:9, fontWeight:700, fill:dimText, letterSpacing:"0.1em"}, "HIPS STACKED"),
+
+        // "FEET TOGETHER" label
+        e("text", {x:475, y:275, fontSize:9, fontWeight:700, fill:teal, letterSpacing:"0.06em"}, "FEET TOGETHER"),
+
+        // "BAND ABOVE KNEES" label
+        e("line", {x1:430, y1:218, x2:480, y2:200, stroke:dimText, strokeWidth:1, strokeDasharray:"3,3"}),
+        e("text", {x:484, y:198, fontSize:9, fill:dimText, letterSpacing:"0.06em"}, "BAND ABOVE"),
+        e("text", {x:484, y:209, fontSize:9, fill:dimText, letterSpacing:"0.06em"}, "KNEES"),
+
+        // "GLUTE MED" target — fades in during open phase
+        e("g", {style:anim("clamFadeOpen")},
+          e("circle", {cx:325, cy:185, r:6, fill:"none", stroke:green, strokeWidth:2}),
+          e("circle", {cx:325, cy:185, r:2, fill:green}),
+          e("line", {x1:331, y1:181, x2:370, y2:160, stroke:green, strokeWidth:1, strokeDasharray:"3,3"}),
+          e("text", {x:374, y:157, fontSize:11, fontWeight:800, fill:green, letterSpacing:"0.06em"}, "GLUTE MED"),
+          e("text", {x:374, y:169, fontSize:9, fill:dimText}, "feel the burn here")
+        )
+      ),
+
+      // Legend bar
+      e("div", {style:{display:"flex", gap:24, justifyContent:"center", padding:"10px 0 4px"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:6}},
+          e("div", {style:{width:8, height:8, borderRadius:"50%", background:orange}}),
+          e("span", {style:{fontSize:10, fontWeight:700, color:orange, letterSpacing:"0.05em"}}, "RESISTANCE BAND")
+        ),
+        e("div", {style:{display:"flex", alignItems:"center", gap:6}},
+          e("div", {style:{width:8, height:8, borderRadius:"50%", background:green}}),
+          e("span", {style:{fontSize:10, fontWeight:700, color:green, letterSpacing:"0.05em"}}, "TARGET: GLUTE MED")
+        )
+      )
+    ),
+
+    // NWB Safety Note
+    e("div", {style:{background:"#1a0d0c", border:"1px solid #7f1d1d", borderRadius:8, padding:"12px 14px", marginBottom:16}},
+      e("div", {style:{fontSize:12, fontWeight:700, color:"#dc5046", marginBottom:6}}, "\u26A0 NWB Safety Notes"),
+      e("div", {style:{fontSize:11, lineHeight:1.7, color:"#bbb"}},
+        e("div", {style:{marginBottom:4}}, "\u2022 When lying on your LEFT (injured) side: place a pillow under the left hip if pressure is uncomfortable"),
+        e("div", {style:{marginBottom:4}}, "\u2022 If any groin pain \u2014 STOP immediately"),
+        e("div", {style:{marginBottom:4}}, "\u2022 If you feel hip flexor engagement instead of glute med, reset your hip stacking and reduce range of motion"),
+        e("div", null, "\u2022 Tempo: 1s open, brief hold, 1s close. No snapping. The burn should be deep in the side of the glute.")
+      )
+    ),
+
+    // Callout cards
+    e("div", {style:{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:10, marginBottom:16}},
+      callouts.map(function(c) {
+        return e("div", {key:c.key, style:{background:c.bg, border:"1px solid #2a2a2a", borderLeft:"3px solid "+c.border, borderRadius:8, padding:"12px 14px"}},
+          e("div", {style:{fontSize:12, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", color:c.color, marginBottom:5}}, c.title),
+          e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, c.text)
+        );
+      })
+    ),
+
+    // Movement sequence
+    e("div", {style:{background:"#161616", border:"1px solid #2a2a2a", borderRadius:12, padding:"16px 14px"}},
+      e("div", {style:{fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"#555", marginBottom:12}}, "Movement Sequence"),
+      e("div", {style:{display:"flex", flexDirection:"column", gap:10}},
+        steps.map(function(s) {
+          return e("div", {key:s.n, style:{display:"flex", gap:12, alignItems:"flex-start"}},
+            e("div", {style:{width:22, height:22, borderRadius:"50%", background:"#222", border:"1px solid #444", fontSize:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#777", marginTop:1}}, s.n),
+            e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, s.parts)
+          );
+        })
+      )
+    )
+  );
+}
+
+// Add more exercise diagram functions here...
+
 var DIAGRAMS = {
-  planche: PlancheDiagram
+  planche: PlancheDiagram,
+  gluteBridge: GluteBridgeDiagram,
+  clamshells: ClamshellDiagram
 };
 
 function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment}) {
