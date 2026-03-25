@@ -1492,7 +1492,8 @@ function App() {
       ),
       e("a", {href:"https://hevy.com/user/karl__marx", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted}, title:"Hevy"},
         e("span", {style:{fontSize:16, lineHeight:1}}, "💪")
-      )
+      ),
+      e("a", {href:"https://nwb-yoga.vercel.app", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted, fontSize:12, textDecoration:"none"}, title:"NWB Yoga"}, "🧘 Yoga")
     ),
     timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }}),
     diagramOpen && DIAGRAMS[diagramOpen] && e("div", {className:"diagram-modal", onClick:function(ev){ if(ev.target === ev.currentTarget) setDiagramOpen(null); }},
