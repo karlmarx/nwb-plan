@@ -1239,7 +1239,7 @@ function App() {
   function renderWorkout(workoutKey) {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
-    var hevyId = parseHevyId(hevyIds[workoutKey]);
+    var hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
       hevyId ? e("div", {style:{marginBottom:10}},
         e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", textAlign:"center", padding:"8px", borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:600, textDecoration:"none"}}, "Open in HEVY")
