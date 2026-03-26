@@ -37,7 +37,7 @@ const e = React.createElement;
 const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== COLORS =====
-const C = {
+const DARK = {
   bg:"#0a0f1a", card:"#111827", border:"#1e293b",
   accent:"#38bdf8", accentDim:"#0c4a6e",
   danger:"#ef4444", dangerBg:"#450a0a", dangerBorder:"#7f1d1d",
@@ -45,6 +45,15 @@ const C = {
   safe:"#10b981", safeBg:"#022c22", safeBorder:"#064e3b",
   text:"#e2e8f0", textDim:"#94a3b8", textMuted:"#64748b", white:"#fff"
 };
+const LIGHT = {
+  bg:"#f8fafc", card:"#ffffff", border:"#e2e8f0",
+  accent:"#0284c7", accentDim:"#bae6fd",
+  danger:"#dc2626", dangerBg:"#fef2f2", dangerBorder:"#fecaca",
+  warning:"#d97706", warningBg:"#fffbeb", warningBorder:"#fde68a",
+  safe:"#059669", safeBg:"#ecfdf5", safeBorder:"#a7f3d0",
+  text:"#1e293b", textDim:"#475569", textMuted:"#94a3b8", white:"#0f172a"
+};
+var C = DARK;
 
 // ===== EQUIPMENT REGISTRY =====
 const EQUIPMENT = {
@@ -937,7 +946,7 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
         ),
         ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
           e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
-          e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
+          e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:C.bg, padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
         )
       ),
       ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
@@ -1068,7 +1077,7 @@ function ProgressClock() {
       style: {
         cursor:"pointer", marginBottom:12,
         borderRadius:10, padding:"6px 12px",
-        background:"#111827", border:"1px solid "+clr+"33",
+        background:C.card, border:"1px solid "+clr+"33",
         display:"flex", alignItems:"center", justifyContent:"space-between"
       }
     },
@@ -1086,7 +1095,7 @@ function ProgressClock() {
     style: {
       cursor:"pointer", marginBottom:16,
       borderRadius:14,
-      background: flash ? clr+"18" : "linear-gradient(135deg, #111827 0%, #0d1424 100%)",
+      background: flash ? clr+"18" : "linear-gradient(135deg, "+C.card+" 0%, "+C.bg+" 100%)",
       border:"1px solid "+clr+"55",
       boxShadow:"0 0 24px "+clr+"18, inset 0 1px 0 "+clr+"22",
       transition:"background 0.25s, box-shadow 0.25s",
@@ -1162,7 +1171,35 @@ function ProgressClock() {
 }
 
 // ===== MAIN APP =====
+function ThemeToggle({dark, onToggle}) {
+  return e("button", {onClick:onToggle, title:dark?"Switch to light mode":"Switch to dark mode", style:{background:"none", border:"1px solid "+C.border, borderRadius:8, padding:"6px 10px", cursor:"pointer", fontSize:16, lineHeight:1, color:C.text}}, dark ? "\u2600\uFE0F" : "\uD83C\uDF19");
+}
+
 function App() {
+  const [dark, setDark] = useState(loadState("nwb_theme", true));
+  C = dark ? DARK : LIGHT;
+
+  useEffect(function() {
+    saveState("nwb_theme", dark);
+    document.body.style.background = C.bg;
+    document.body.style.color = C.text;
+    document.querySelector('meta[name="theme-color"]').content = C.bg;
+    // Update CSS custom styles for modals
+    var sheet = document.querySelector("style");
+    var rules = sheet.sheet.cssRules;
+    for (var i = 0; i < rules.length; i++) {
+      var r = rules[i];
+      if (r.selectorText === "body") { r.style.background = C.bg; r.style.color = C.text; }
+      if (r.selectorText === ".rest-timer") { r.style.background = C.card; r.style.borderColor = C.accent; }
+      if (r.selectorText === ".rest-timer .time") { r.style.color = C.accent; }
+      if (r.selectorText === ".rest-timer button") { r.style.borderColor = C.border; r.style.color = C.textDim; }
+      if (r.selectorText === ".swap-modal") { r.style.background = dark ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.4)"; }
+      if (r.selectorText === ".swap-sheet") { r.style.background = C.card; }
+      if (r.selectorText === ".diagram-modal") { r.style.background = dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.5)"; }
+      if (r.selectorText === ".diagram-sheet") { r.style.background = dark ? "#0e0e0e" : "#ffffff"; r.style.borderColor = C.border; }
+    }
+  }, [dark]);
+
   const [tab, setTab] = useState(0);
   const [phase, setPhase] = useState(loadState("nwb_phase", 0));
   const [openSections, setOpenSections] = useState(function(){
@@ -1460,7 +1497,8 @@ function App() {
   }
 
   return e("div", {style:{maxWidth:500, margin:"0 auto", padding:"0 10px 80px", minHeight:"100vh", background:C.bg}},
-    e("div", {style:{padding:"24px 0 16px", textAlign:"center"}},
+    e("div", {style:{padding:"24px 0 16px", textAlign:"center", position:"relative"}},
+      e("div", {style:{position:"absolute", right:0, top:24}}, e(ThemeToggle, {dark:dark, onToggle:function(){ setDark(!dark); }})),
       e("h1", {style:{fontSize:22, fontWeight:800, letterSpacing:"-0.5px", color:C.white}}, "Femur Fracture Fitness"),
       e("div", {style:{fontSize:11, color:C.textMuted, marginTop:4}}, "NWB-Adjusted PPL \u2022 Left Femur Stress Fracture \u2022 6 Weeks")
     ),
