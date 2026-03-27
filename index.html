@@ -161,7 +161,7 @@ const EX = {
     sets: [["3","12-15"],["3","10-12"],["3","10-12"]], rest: 60,
     setup: "Face away from cable machine. Hold rope attachment overhead with elbows bent.",
     execution: "Extend arms upward until straight. Control the return behind your head. Keep elbows close to ears.",
-    nwbCues: "Keep core tight to prevent rib flare or back arch. Critical for L4-L5 protection.",
+    nwbCues: "Keep core tight to prevent rib flare or back arch.",
     why: "Targets the long head of triceps — often neglected in standard pressing.",
     safety: "safe",
     swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"],
@@ -202,12 +202,14 @@ const EX = {
   "Landmine Press (seated)": {
     requires: ["barbell", "bench"], category: "push",
     sets: [["3","10-12"],["3","10-12"],["3","8-10"]], rest: 90,
-    setup: "Sit on a BENCH (not the floor — floor sitting causes posterior pelvic tilt that loads L4-L5). Position the bench next to a landmine attachment or barbell wedged in a corner. Right foot flat on floor for stability. Left leg rests passively on the bench or hangs off the side — zero engagement. Hold end of barbell at shoulder height with one hand.",
-    execution: "PRESSING WITH RIGHT ARM: Press up and forward. Anti-rotation demand is on the left obliques — this is safe. PRESSING WITH LEFT ARM: Press up and forward. ⚠️ Anti-rotation demand shifts to the RIGHT obliques, but the LEFT ILIOPSOAS may recruit to stabilize the left hip. Use 15-20% LIGHTER weight on this side. Complete all reps one side, then switch.",
-    nwbCues: "⚠️ STOP IMMEDIATELY if you feel any pull or pinch in the LEFT HIP CREASE — this means the left iliopsoas is firing to stabilize against rotation, which generates 57-70% of femoral neck strain. Go lighter on left-arm pressing where left hip would stabilize. Exhale before each press to reflexively quiet the iliopsoas. Keep torso facing forward.",
-    why: "Functional unilateral pressing that builds stability. Great anti-rotation stimulus. Bench setup protects L4-L5 from posterior pelvic tilt.",
+    tempo: "4-4-0",
+    setup: "Sit on bench or floor next to a landmine attachment (or wedge barbell in a corner). Hold end of barbell at shoulder height with one hand.",
+    execution: "Press the bar up and forward \u2014 4-count press, 4-count lower. Focus on NOT rotating your torso. The unilateral load tries to twist you; your core fights it.",
+    nwbCues: "CAUTION: Anti-rotation demand can recruit left iliopsoas as a stabilizer. Go lighter than ego wants. Stop immediately if you feel hip crease pinch or left hip tightening.",
+    why: "Functional unilateral pressing that doubles as elite anti-rotation core work at slow tempo.",
     safety: "caution",
-    swaps: ["Seated DB OH Press"]
+    swaps: ["Seated DB OH Press"],
+    amp: ["BASE: Light weight, 4-4 tempo.", "AMP 1: Moderate weight + 3-second hold at top of press.", "AMP 2: Moderate weight + 3-second hold + alternate pressing (left hand, right hand, no rest). Anti-rotation overload."]
   },
   "Dip Machine": {
     requires: ["dipMachine"], category: "push",
@@ -234,12 +236,12 @@ const EX = {
   "Parallette L-Sit": {
     requires: ["parallettes"], category: "push",
     sets: [["4","Max Hold"],["4","Max Hold"],["4","Max Hold"]], rest: 60,
-    setup: "Place parallettes shoulder-width apart. Sit between them and grip with palms down. ⚠️ USE SUPPORT HOLD MODIFICATION: legs hang STRAIGHT DOWN, not extended forward.",
-    execution: "SUPPORT HOLD (required modification): Lock elbows, depress scapulae (push shoulders DOWN away from ears), lift your body off the floor. Legs hang STRAIGHT DOWN — do NOT extend them forward. Hold. This trains the same scapular depression and tricep strength without hip flexor activation.",
-    nwbCues: "⚠️ DANGER: A full L-sit (legs horizontal) requires MAXIMAL bilateral iliopsoas activation to hold both legs against gravity. The iliopsoas generates 57-70% of femoral neck strain — this directly loads the fracture site. A tuck hold is WORSE (deeper hip flexion past 90°, violates FAI limit). USE SUPPORT HOLD ONLY (legs hanging down). If you want additional core challenge, add a slight knee raise with the RIGHT leg only.",
-    why: "Support hold: elite gymnastics isometric for scapular depression + tricep strength. Modified from L-sit to eliminate dangerous bilateral hip flexor activation.",
+    setup: "Place parallettes shoulder-width apart. Sit between them and grip with palms down. Use SUPPORT HOLD: legs hang straight down, not extended forward.",
+    execution: "Lock elbows, depress scapulae (push shoulders DOWN away from ears), lift your body off the floor. Legs hang straight down. Hold. For extra core challenge, add a slight knee raise with the RIGHT leg only.",
+    nwbCues: "Full L-sit requires maximal bilateral iliopsoas activation — directly loads the fracture site. Support Hold only (legs hanging down). Tuck hold is also contraindicated (deep hip flexion past 90\u00b0).",
+    why: "Elite gymnastics isometric for scapular depression + tricep strength. Support Hold modification eliminates hip flexor activation.",
     safety: "caution",
-    swaps: ["Pallof Press"]
+    swaps: ["Pallof Press (Seated)"]
   },
 
   // PULL exercises
@@ -268,7 +270,7 @@ const EX = {
     sets: [["5","To Failure"],["5","To Failure"],["5","3-5 Weighted"]], rest: 150,
     setup: "Hang from pull-up bar with overhand grip outside shoulder width. Use a weight belt for added load if bodyweight is too easy. ⚠️ GETTING UP: Use a tall box — step up with RIGHT foot only, grip bar, then step off. Do NOT jump up. Left leg hangs passive.",
     execution: "From dead hang, pull your chin over the bar by driving elbows down. Control the descent. Full extension at bottom.",
-    nwbCues: "Hanging decompresses your spine (good for L4-L5). Lower body hangs completely passive — do NOT swing or kip. ⚠️ GETTING DOWN: Step RIGHT foot back onto the box. Do NOT jump or drop down. Left leg never touches the box/ground with force.",
+    nwbCues: "Lower body hangs completely passive — do NOT swing or kip. Step down carefully to a box, do NOT jump down.",
     why: "King of vertical pulling. Directly trains dragon boat 'catch' phase. Decompresses spine naturally.",
     safety: "safe",
     swaps: ["Lat Pulldown (Wide)", "Neutral Grip Pulldown"]
@@ -278,7 +280,7 @@ const EX = {
     sets: [["4","3-5/arm"],["4","3-5/arm"],["4","2-4/arm"]], rest: 150,
     setup: "Hang from pull-up bar with your working hand (pronated or neutral grip). Place just your INDEX FINGER of the other hand on the bar to assist.",
     execution: "Pull your chin directly over your working hand. Use the index finger only for minimal assist. Lower slowly with control. Complete all reps one side then switch.",
-    nwbCues: "Lower body hangs completely dead — no swinging, no kipping. This decompresses your spine (great for L4-L5) with zero hip flexor engagement.",
+    nwbCues: "Lower body hangs completely dead — no swinging, no kipping. Zero hip flexor engagement.",
     why: "Elite calisthenics pull. Builds massive unilateral pulling strength. Hanging = spine decompression + zero hip flexor load. Perfect NWB exercise.",
     safety: "safe",
     swaps: ["Weighted Pull-Up", "Lat Pulldown (Wide)"]
@@ -332,7 +334,7 @@ const EX = {
     sets: [["3","12-15"],["3","15-20"],["3","12-15"]], rest: 60,
     setup: "Lie face-down on incline bench (chest-supported) OR sit and lean forward slightly, OR use the pec deck machine in reverse.",
     execution: "Raise arms out to sides, squeezing rear delts. Light weight, constant tension. Lower slowly.",
-    nwbCues: "Keep spine neutral. Don't round lower back. Chest-supported version is safest for L4-L5.",
+    nwbCues: "Keep spine neutral. Don't round lower back. Chest-supported version keeps form honest.",
     why: "Rear delt development to balance the shoulder joint from all the pressing.",
     safety: "safe",
     swaps: ["Seated Face Pulls"]
@@ -436,9 +438,9 @@ const EX = {
     requires: ["hamcurl"], category: "legs",
     sets: [["3","12"],["3","10-12"],["4","8-10"]], rest: 120,
     setup: "Lie face-down on prone (lying) hamstring curl machine. RIGHT leg only. Left leg off the machine.",
-    execution: "HSR Tempo: 3 seconds up, 1 second hold, 3 seconds down. Controlled eccentric is KEY for tendinosis treatment.",
-    nwbCues: "PRONE chosen over SEATED because seated compresses the ischial tuberosity (sit bones) which aggravates hamstring tendinosis.",
-    why: "Heavy Slow Resistance (HSR) is evidence-based treatment for hamstring tendinosis. Not just maintenance — active treatment.",
+    execution: "3 seconds up, 1 second hold, 3 seconds down. Controlled eccentric for maximum muscle activation.",
+    nwbCues: "Prone position is preferred — no hip flexion involved. Left leg stays off the machine.",
+    why: "Slow eccentric loading builds hamstring strength at long muscle lengths. Prone keeps it NWB-simple.",
     safety: "safe",
     swaps: ["Stab Ball Ham Curl (Right)"]
   },
@@ -447,8 +449,8 @@ const EX = {
     sets: [["3","12-15"],["3","12-15"],["3","10-12"]], rest: 90,
     setup: "Lie on back. Place RIGHT heel on stability ball. Left leg bent with foot resting on floor.",
     execution: "Bridge hips up, then curl the ball toward your glutes using your right heel. Extend back out. Slow and controlled.",
-    nwbCues: "Smoother contraction than heavy RDLs — better for tendinosis. Keep hips up throughout the set.",
-    why: "Excellent hamstring-glute connection exercise. Smooth contraction respects tendinosis.",
+    nwbCues: "Smoother contraction than heavy RDLs. Keep hips up throughout the set.",
+    why: "Excellent hamstring-glute connection exercise. Smooth contraction, zero spinal load.",
     safety: "safe",
     swaps: ["Prone Ham Curl (Right)"]
   },
@@ -465,10 +467,10 @@ const EX = {
   "Nordic Ham Curl": {
     requires: ["mat"], category: "legs",
     sets: [["3","6"],["3","6"],["3","8"]], rest: 120,
-    setup: "Kneel on a thick pad with feet anchored (under a heavy dumbbell, bench, or have someone hold them). RIGHT knee bears ALL the load and does ALL the work. Left knee rests on the pad beside the right for balance only — zero force through it. Place extra padding under the left knee for comfort.",
-    execution: "Slowly lower your torso forward by extending at the knees — fight gravity all the way down using RIGHT hamstring only. Catch yourself with hands. Push off hands to return to start. Left leg is passive dead weight throughout.",
-    nwbCues: "Only 0-20° of hip flexion throughout — well within FAI limits. Left knee is on the pad for positioning only, NOT pushing or bracing. If you feel any left hip engagement, shift more weight to the right side. Exhale before lowering.",
-    why: "Gold standard for hamstring injury prevention. Eccentric strength at long muscle lengths. HSR protocol for tendinosis treatment.",
+    setup: "Kneel on a thick pad with your feet anchored (under a heavy dumbbell, bench, or have someone hold them). Right knee bears the load.",
+    execution: "Slowly lower your torso forward by extending at the knees — fight gravity all the way down. Catch yourself with hands. Push off hands to return to start.",
+    nwbCues: "Only 0-20° of hip flexion throughout. Minimal hip involvement.",
+    why: "Gold standard for hamstring injury prevention. Eccentric strength at long muscle lengths.",
     safety: "safe",
     swaps: ["Prone Ham Curl (Right)"]
   },
@@ -513,71 +515,242 @@ const EX = {
     swaps: []
   },
 
-  // CORE exercises
-  "McGill Curl-Up": {
+  // CORE exercises — Block 1: Anti-Extension
+  "Forearm Plank Saw": {
     requires: ["mat"], category: "core",
-    sets: [["3","10×5s"],["3","10×5s"],["3","12×5s"]], rest: 45,
-    setup: "Lie on back. Slide hands under your lumbar curve as a monitoring system. One knee bent (RIGHT), left leg straight.",
-    execution: "Lift ONLY your head and shoulder blades 2-3 inches off the floor. Hold 5-8 seconds. Lower.",
-    nwbCues: "This is NOT a crunch — your lumbar spine stays in natural arch. If the arch disappears into your hands, you've gone too high. Stop.",
-    why: "McGill Big 3. Only safe upper-ab exercise for L4-L5 DDD. Arch preservation is key.",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "4-4-0",
+    setup: "Forearm plank. RIGHT knee or foot as base (choose per amp level). Left leg extended behind, resting passively on mat.",
+    execution: "Rock forward past elbows, then backward \u2014 slow, controlled, 4-count each direction. Maintain rigid plank line. Never rest at either end \u2014 continuous tension.",
+    nwbCues: "Left leg is dead weight on the mat. If you feel your left hip flexor trying to stabilize, widen your right foot base. Exhale to brace.",
+    why: "Anti-extension under dynamic load. Time-based sets force sustained tension.",
+    safety: "safe",
+    swaps: ["Wheelbarrow Hold"],
+    amp: ["BASE: Right knee down. Slow rocks, small range.", "AMP 1: Right foot base. Full range forward/back.", "AMP 2: Right foot base + 10lb plate on upper back. Full range, 4-count tempo. Expect failure around 30-35s initially."]
+  },
+  "Plank Knee Tuck (R only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "4-4-5",
+    setup: "Forearm plank on right knee. Left leg extended behind on mat, completely passive.",
+    execution: "Draw RIGHT knee toward right elbow \u2014 4-count in, 5-second HOLD at peak contraction, 4-count return. Never touch knee to ground between reps. Continuous tension.",
+    nwbCues: "Only the RIGHT knee moves. Left leg stays dead on the mat the entire time. If left hip flexor engages, stop and reset position.",
+    why: "Unilateral flexion under anti-extension load. Your obliques and right hip flexor do all the work while your core fights extension.",
+    safety: "safe",
+    swaps: ["Slow Mountain Climber (R)"],
+    amp: ["BASE: Right knee on pad, small range to elbow.", "AMP 1: Right foot base, full range knee-to-elbow.", "AMP 2: Right foot base + band around right foot for resistance. 5-second hold at peak. Expect failure around 35-40s."]
+  },
+  "Wheelbarrow Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","30s"],["3","45s"],["4","45s"]], rest: 30,
+    tempo: "isometric",
+    setup: "High plank, hands on floor. Shift weight FORWARD until shoulders are well past wrists \u2014 like the start of a planche lean. Right knee or foot base.",
+    execution: "Hold. Fight the urge to sag or pike. Breathe. The further forward you shift, the harder it gets. Find your failure point and live there.",
+    nwbCues: "Left leg rests on mat behind you. This is pure anti-extension \u2014 your core fights gravity trying to hyperextend your spine. Zero hip flexor demand.",
+    why: "Isometric anti-extension at extreme lever arm. Longer hold = harder.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: ["BASE: Right knee down, moderate forward shift.", "AMP 1: Right foot base, aggressive forward shift past wrists.", "AMP 2: Right foot base, max forward shift + 4-count slow weight shifts side to side. Expect failure around 25-30s."]
+  },
+  "Spiderman Plank (R only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["3","60s"]], rest: 30,
+    tempo: "4-4-3",
+    setup: "Forearm plank on right foot. Left leg extended behind on mat.",
+    execution: "Bring RIGHT knee to RIGHT elbow OUTSIDE the body \u2014 4-count out, 3-second hold, 4-count return. Hip opens laterally. Obliques fire hard.",
+    nwbCues: "Right side only. Left leg stays completely dead. Great for right hip mobility + oblique activation simultaneously.",
+    why: "Oblique-dominant plank variation with hip mobility on the good side.",
+    safety: "safe",
+    swaps: ["Plank Knee Tuck (R only)"],
+    amp: ["BASE: Right knee base, small range.", "AMP 1: Right foot base, full range knee-to-elbow.", "AMP 2: Right foot base + 3-second hold at peak + band around right foot. Expect failure around 35-40s."]
+  },
+  "Slow Mountain Climber (R)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["3","60s"]], rest: 30,
+    tempo: "4-4-0",
+    setup: "High plank, hands on floor or parallettes. Right foot as base. Left leg extended on mat.",
+    execution: "Draw RIGHT knee toward chest \u2014 4-count in, 4-count out. No momentum. Never touch foot to ground between reps. Continuous tension on the core.",
+    nwbCues: "LEFT LEG STAYS COMPLETELY STILL. It rests on the mat and does not move. Only the right knee travels. If your left hip twitches, pause and exhale to reset.",
+    why: "Slow mountain climber \u2014 removes all momentum. At 4-4 tempo, 45 seconds is only ~5 reps.",
+    safety: "safe",
+    swaps: ["Plank Knee Tuck (R only)"],
+    amp: ["BASE: Right knee base to start, climb to right foot as strength builds.", "AMP 1: Right foot base + band around right foot.", "AMP 2: Right foot base + band + 3-second hold at peak flexion. Expect failure around 30-35s (~4 reps)."]
+  },
+  "Dead Bug (R Leg Only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "4-4-3",
+    setup: "Lie on back. LEFT foot PLANTED on floor at all times \u2014 it never moves. Right leg up at 90\u00b0. Arms toward ceiling.",
+    execution: "Slowly lower RIGHT leg + LEFT arm toward floor \u2014 4-count down, 3-second hold 1 inch off floor, 4-count return. Press lower back INTO the mat throughout. Never let it arch.",
+    nwbCues: "Left foot stays planted \u2014 this eliminates left iliopsoas entirely. The low back press is everything: if your back arches off the mat, you've gone too far.",
+    why: "Safe deep core (TVA + rectus) activation without loading the injured hip flexor. The 3-second hold at bottom maximizes tension.",
+    safety: "safe",
+    swaps: ["Hollow Body Hold"],
+    amp: ["BASE: Bodyweight only, right leg extends to 45\u00b0.", "AMP 1: Band around right foot + 5lb weight in left hand. Full extension.", "AMP 2: Band + weight + single-arm overhead hold (left arm only, contralateral to right leg) + 4-4-5 tempo. Expect failure around 35-40s (~3 reps)."]
+  },
+  "Hollow Body Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","30s"],["3","45s"],["4","45s"]], rest: 30,
+    tempo: "isometric",
+    setup: "Lie on back. Right leg extended straight, hovering 6 inches off floor. LEFT leg bent with foot on floor (passive \u2014 do NOT extend it). Arms overhead.",
+    execution: "Hold. Press lower back flat into mat. Think about pulling ribs toward pelvis. Breathe steadily.",
+    nwbCues: "Left leg stays bent with foot on floor. Bilateral hollow body would fire left iliopsoas to hold left leg up \u2014 not safe. This asymmetric version isolates the right side + core.",
+    why: "Gymnastics-grade anti-extension isometric. The asymmetric position is actually harder because your core fights rotation too.",
+    safety: "safe",
+    swaps: ["Dead Bug (R Leg Only)"],
+    amp: ["BASE: Arms by ears, right leg at 45\u00b0.", "AMP 1: Arms overhead holding 5-10lb plate. Right leg lower (harder).", "AMP 2: Plate overhead + slow right-leg flutter (6-inch range, 4-count up/down). Left leg stays bent and still. Expect failure around 25-30s."]
+  },
+  "Body Saw (Sliders)": {
+    requires: ["slider", "mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["3","60s"]], rest: 30,
+    tempo: "4-4-0",
+    setup: "Forearms on sliders (or towels on hard floor). Right knee or foot base. Left leg extended behind on mat.",
+    execution: "Push forearms forward, extending body long \u2014 4-count forward, 4-count pull back. The longer you extend, the harder the anti-extension demand. Never fully return to easy position.",
+    nwbCues: "Left leg passive on mat. At full extension your core is fighting extreme anti-extension force. Exhale hard to brace. If back arches, shorten range.",
+    why: "One of the hardest plank variations. The slider removes friction so your core does all the stabilization work.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: ["BASE: Right knee base, small range.", "AMP 1: Right foot base, full range extension.", "AMP 2: Right foot base, full range + 3-second hold at max extension. Expect failure around 30-35s."]
+  },
+
+  // CORE exercises — Block 2: Anti-Rotation
+  "Pallof Press (Seated)": {
+    requires: ["bands", "bench"], category: "core",
+    sets: [["3","45s/side"],["3","60s/side"],["4","60s/side"]], rest: 30,
+    tempo: "4-4-3",
+    setup: "Sit on bench, feet flat (right foot active, left foot resting). Band anchored at chest height to your side. Hold band at chest with both hands.",
+    execution: "Press hands straight out \u2014 4-count press, 3-second HOLD at full extension, 4-count return. The band tries to rotate you. FIGHT IT. Do not let your torso turn even 1 degree.",
+    nwbCues: "Seated = zero femoral load. The anti-rotation demand is all core. If you feel left hip crease engaging to stabilize, go lighter. Both sides: right-side anchor works left obliques, left-side anchor works right obliques.",
+    why: "Gold standard anti-rotation. Seated version is perfect for NWB. Slow tempo with hold increases difficulty.",
+    safety: "safe",
+    swaps: ["Pallof Overhead Reach"],
+    amp: ["BASE: Light band, press to chest distance.", "AMP 1: Medium band + 3-second hold at extension.", "AMP 2: Heavy band + overhead reach from extended position (press out, then reach UP while extended \u2014 anti-rotation + anti-extension combined). Hold 3 seconds overhead. Expect failure around 35-40s/side."]
+  },
+  "Pallof Overhead Reach": {
+    requires: ["bands", "bench"], category: "core",
+    sets: [["3","45s/side"],["3","60s/side"],["3","60s/side"]], rest: 30,
+    tempo: "4-4-3",
+    setup: "Same seated Pallof position. Band anchored at side, hands at chest.",
+    execution: "Press out to full extension, then slowly raise hands OVERHEAD \u2014 4-count up, 3-second hold overhead, 4-count down to chest level, 4-count return to chest. The overhead position combines anti-rotation with anti-extension.",
+    nwbCues: "This one recruits more core than standard Pallof because the overhead lever arm is enormous. Go lighter than you think. Seated = NWB safe.",
+    why: "Pallof progression. The overhead reach doubles the anti-movement demand. If the band feels easy, go heavier.",
+    safety: "safe",
+    swaps: ["Pallof Press (Seated)"],
+    amp: ["BASE: Light band, partial overhead reach.", "AMP 1: Medium band, full overhead reach + 3-second hold.", "AMP 2: Heavy band, full overhead reach + 5-second hold + eyes closed. Expect failure around 30-35s/side."]
+  },
+  "Bird-Dog (Prone Bench)": {
+    requires: ["bench"], category: "core",
+    sets: [["3","8/side"],["3","10/side"],["4","10/side"]], rest: 45,
+    tempo: "4-4-5",
+    setup: "Lie face-down on a bench, torso supported. Hips at bench edge so legs hang free. Hold bench with one hand. DEFAULT: prone bench modification \u2014 NOT quadruped. Quadruped version loads left femoral neck at ~90\u00b0 hip flexion.",
+    execution: "Extend RIGHT leg straight back (hip extension via glutes) + LEFT arm straight forward \u2014 4-count up, 5-second HOLD at top, 4-count lower. Keep hips level. Alternate sides: LEFT leg stays passive/hanging when it's not the working leg.",
+    nwbCues: "Prone bench eliminates femoral neck loading. Left leg HANGS freely when not working. When extending left arm, the anti-rotation demand is high \u2014 fight the urge to rotate. Standard quadruped bird-dog needs PT clearance (left knee at 90\u00b0 hip flexion = FAI limit).",
+    why: "McGill Big 3 exercise made NWB-safe. Prone bench version is actually harder because you fight gravity without the ground's help.",
+    safety: "safe",
+    swaps: ["Pallof Press (Seated)"],
+    amp: ["BASE: Bodyweight, partial range.", "AMP 1: Ankle weight on right leg + 3-5lb dumbbell in left hand.", "AMP 2: Ankle weight + dumbbell + 4-4-5 tempo (5-second hold at top). Each rep takes 13+ seconds. Expect failure around rep 6-8."]
+  },
+
+  // CORE exercises — Block 3: Anti-Lateral-Flexion
+  "Side Plank (R Side Down)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "isometric / 4-4 dips",
+    setup: "RIGHT side down, right elbow under shoulder. RIGHT KNEE (base) or RIGHT FOOT (amp). Left leg stacked on top or resting on floor in front.",
+    execution: "Lift hips until body forms straight line. HOLD. At AMP 2: add 4-count hip dips \u2014 lower hip toward floor, drive back up. Never touch floor. Continuous tension.",
+    nwbCues: "Right femur takes the load here \u2014 which is safe (it's the uninjured side). Left leg rests passively on top or on floor. This is the GOOD side where we can load normally.",
+    why: "McGill Big 3. Right side down directly loads right obliques and QL. The gold standard anti-lateral-flexion exercise.",
     safety: "safe",
     swaps: [],
-    visual: "    o\n   /|\\_\n  / \\  \\\n L   R"
+    amp: ["BASE: Right knee down, isometric hold.", "AMP 1: Right FOOT base, isometric hold + top arm reaches to ceiling.", "AMP 2: Right foot + top arm holding 5-10lb weight overhead + 4-count hip dips. Expect failure around 30-40s."],
+    diagram: "sideplank"
   },
-  "Side Plank": {
-    requires: ["mat"], category: "core",
-    sets: [["3","30s/side"],["3","30s/side"],["3","40s/side"]], rest: 45,
-    setup: "RIGHT OBLIQUES (right-side-down): Lie on your RIGHT side. Prop up on right elbow. Support on your RIGHT KNEE (not foot). Left leg stacks on top passively. LEFT OBLIQUES (also right-side-down): Same right-side-down position, but add a LEFT ARM OVERHEAD REACH toward the ceiling/wall, lengthening the left side. This biases the left obliques through anti-lateral-flexion.",
-    execution: "RIGHT OBLIQUES: Lift hips until body forms straight line from head to right knee. Hold. Breathe normally. LEFT OBLIQUES: From the same right-side-down position, reach left arm overhead and slightly behind you while holding the plank. You will feel the left obliques fire to stabilize. Hold.",
-    nwbCues: "⚠️ NEVER lie on your LEFT side — this loads the left femoral neck through the left hip/femur, directly stressing the fracture site. BOTH sides are trained from the RIGHT-SIDE-DOWN position. Right obliques work as the primary stabilizer; left obliques are targeted via the overhead reach variation. Exhale before lifting hips to quiet the iliopsoas.",
-    why: "McGill Big 3. Targets obliques and quadratus lumborum for spinal stability without flexion or rotation. Modified to protect left femoral neck stress fracture.",
-    safety: "caution",
-    swaps: []
-  },
-  "Bird-Dog": {
-    requires: ["mat"], category: "core",
-    sets: [["3","8/side"],["3","10/side"],["3","10/side"]], rest: 45,
-    setup: "PREFERRED (Prone Bench): Lie face-down on a flat bench with your hips at the edge, arms hanging down or gripping the bench sides. This avoids quadruped position entirely. QUADRUPED (PT clearance required): Hands and knees on a thick mat. Left knee bears partial weight at ~90° hip flexion — this is at the FAI limit and loads the femoral neck.",
-    execution: "PRONE BENCH: From face-down, extend RIGHT leg straight back to hip height + raise LEFT arm straight forward. Hold 5-8 seconds. Lower and repeat. Alternate: extend LEFT leg (passively, no force) + RIGHT arm. QUADRUPED: Extend RIGHT leg straight back + LEFT arm forward. Hold 5-8 seconds. Left knee stays planted. Keep hips perfectly level.",
-    nwbCues: "⚠️ QUADRUPED WARNING: Hands-and-knees puts left hip at ~90° flexion (FAI limit) and loads the left femoral neck through the left knee. Use the PRONE BENCH version unless your PT has explicitly cleared quadruped. On the bench: left leg extends passively under gravity — zero hip flexor activation. Exhale before each rep to quiet the iliopsoas.",
-    why: "McGill Big 3. Builds back endurance and anti-rotation stability. Prone bench modification eliminates femoral neck loading and FAI risk from quadruped position.",
-    safety: "caution",
-    swaps: [],
-    visual: "  PRONE BENCH VERSION:\n  (L Arm) o___[BENCH]___o (R Leg)\n              ||"
-  },
-  "Pallof Press": {
-    requires: ["bands"], category: "core",
-    sets: [["3","10/side"],["3","10/side"],["3","12/side"]], rest: 60,
-    setup: "Anchor band or cable at chest height to your side. Sit in a sturdy chair or on a bench (preferred over kneeling — avoids loading left knee). Hold band with both hands at chest. Right foot flat on floor, left foot resting.",
-    execution: "Press hands straight out in front of you. Hold 3 seconds. The band tries to twist you — FIGHT IT. Return to chest. Repeat. BAND ON RIGHT SIDE: Left obliques resist rotation — safe. BAND ON LEFT SIDE: Right obliques resist, but left iliopsoas may co-activate. Go lighter and stop if hip crease pinches.",
-    nwbCues: "Zero spinal flexion. Zero rotation. Pure ANTI-rotation. Explicitly recommended for disc disease. SEATED POSITION PREFERRED — tall-kneeling on right knee loads left knee as passive support (avoid). Exhale before pressing out.",
-    why: "The gold standard anti-rotation core exercise. Works entire core without any leg movement or spinal compression.",
+  "Side Plank (L Oblique Bias \u2014 R Side Down)": {
+    requires: ["mat", "bands"], category: "core",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "4-4-3",
+    setup: "Stay RIGHT side down (we CANNOT load the left femur by going left-side-down). This variation biases LEFT obliques through overhead reach and rotation.",
+    execution: "From right-side-down side plank: reach TOP (left) arm overhead toward the floor beyond your head \u2014 4-count reach, 3-second hold at max stretch, 4-count return. Your left obliques work eccentrically to control the reach and concentrically to pull back.",
+    nwbCues: "LEFT femur stays completely unloaded. Right side bears all the weight. The left oblique bias comes from the overhead reach and gravity pulling your top arm. You can also add a Pallof rotation hold from this position.",
+    why: "Solves the 'can't do left side plank' problem. Right-side-down position with left-arm overhead reach creates massive left oblique demand without loading left femur.",
     safety: "safe",
-    swaps: [],
-    visual: "  (ANCHOR)=====[HANDS]--o\n                        |\n                        /\\\n                       K  H"
+    swaps: ["Pallof Press (Seated)"],
+    amp: ["BASE: Right knee down, left arm reach overhead (no weight).", "AMP 1: Right foot base, left arm holding 3-5lb weight, slow reach.", "AMP 2: Right foot base, weight overhead reach + Pallof band in top hand for added anti-rotation. Expect failure around 35-40s."],
+    diagram: "sideplank"
   },
-  "Dead Bug (R leg only)": {
-    requires: ["mat"], category: "core",
-    sets: [["3","10"],["3","12"],["3","12"]], rest: 60,
-    setup: "Lie on back. LEFT foot planted firmly on the floor at all times. Right leg up at 90°. Arms toward ceiling.",
-    execution: "Slowly lower RIGHT leg + LEFT arm toward floor while pressing your lower back INTENSELY into the mat. Return to start.",
-    nwbCues: "Left foot stays planted — this eliminates left iliopsoas activation entirely, protecting your stress fracture. Press low back into mat throughout.",
-    why: "Safe deep core (TVA) activation without loading the injured hip flexor. Modified specifically for your MRI findings.",
+  "Suitcase Hold (Seated)": {
+    requires: ["dumbbells", "bench"], category: "core",
+    sets: [["3","45s/side"],["3","60s/side"],["3","60s/side"]], rest: 30,
+    tempo: "isometric",
+    setup: "Sit on bench, spine tall. Hold one dumbbell at your side in one hand, arm straight. Gravity pulls you toward the weight \u2014 fight it.",
+    execution: "HOLD. Sit perfectly straight. Do not lean toward or away from the weight. Breathe. Switch sides. Your obliques and QL fire isometrically to prevent lateral flexion.",
+    nwbCues: "Seated = zero femoral load. Pure anti-lateral-flexion. If you feel any hip crease tension, go lighter.",
+    why: "Simple but effective. Isometric anti-lateral-flexion under load. Scale weight up as 60 seconds gets easy.",
     safety: "safe",
-    swaps: [],
-    visual: "    (L Arm)\n      \\\n   _o_|_/\n  |   |\n  ^   R\n  L (Foot planted)"
+    swaps: ["Side Plank (R Side Down)"],
+    amp: ["BASE: 15-20lb, 45 seconds.", "AMP 1: 25-30lb, 60 seconds.", "AMP 2: 30-40lb, 60 seconds + slow overhead press (5 reps) while holding the suitcase weight in the other hand. Expect failure around 40-50s/side."]
+  },
+
+  // CORE exercises — Block 4: Rotation + Integrated
+  "Russian Twist (Seated Bench)": {
+    requires: ["bench", "dumbbells"], category: "core",
+    sets: [["3","45s"],["3","60s"],["3","60s"]], rest: 30,
+    tempo: "4-4-0",
+    setup: "Sit on bench, feet off the ground or right foot lightly anchoring. Left leg hangs passively or rests on bench. Lean back slightly to engage core. Hold weight at chest.",
+    execution: "Rotate torso LEFT, then RIGHT \u2014 4-count each direction. Full rotation through thoracic spine. DO NOT rush. The slow tempo removes all momentum and forces your obliques to control the entire movement.",
+    nwbCues: "Left leg stays passive \u2014 does not rotate with you. Only your torso and arms move. If left hip crease pinches during rotation, reduce lean-back angle.",
+    why: "Classic rotation exercise, now unlocked. At 4-count tempo, this is nothing like fast momentum-driven Russian twists. Your obliques will feel every degree of rotation.",
+    safety: "safe",
+    swaps: ["Cable Woodchop (Seated)"],
+    amp: ["BASE: 5-10lb weight, moderate lean.", "AMP 1: 10-15lb, deeper lean + feet fully off floor.", "AMP 2: 15-20lb + feet off floor + 3-second hold at each end of rotation. Expect failure around 35-45s."]
+  },
+  "Cable Woodchop (Seated)": {
+    requires: ["cables", "bench"], category: "core",
+    sets: [["3","10/side"],["3","12/side"],["4","12/side"]], rest: 45,
+    tempo: "4-4-0",
+    setup: "Sit on bench sideways to cable machine. Cable at high position (high-to-low chop) or low position (low-to-high chop). Both hands on handle. Right foot can anchor, left leg passive.",
+    execution: "Pull cable diagonally across body with ROTATION \u2014 4-count chop, 4-count return. Control every inch. The weight should be challenging but not so heavy that you lurch.",
+    nwbCues: "Seated = NWB safe. Rotation happens through thoracic spine. If left hip engages to stabilize, go lighter or widen your base.",
+    why: "Loaded rotation with eccentric control. The 4-count return is where the real work happens \u2014 your obliques decelerate the load.",
+    safety: "safe",
+    swaps: ["Russian Twist (Seated Bench)"],
+    amp: ["BASE: Light weight, high-to-low only.", "AMP 1: Moderate weight, both high-to-low and low-to-high.", "AMP 2: Moderate weight + 3-second hold at end of chop + slow return. Continuous tension \u2014 don't let the stack touch between reps. Expect failure around rep 8-10/side."]
+  },
+  "Bicycle Crunch (R Leg Only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["3","60s"]], rest: 30,
+    tempo: "4-4-0",
+    setup: "Lie on back, hands behind head. LEFT FOOT STAYS PLANTED on floor \u2014 it never moves. Right leg up at 90\u00b0.",
+    execution: "Bring RIGHT knee toward LEFT elbow while rotating torso \u2014 4-count in, 4-count extend right leg out. Controlled rotation through the trunk. The left foot stays planted and the left leg stays still.",
+    nwbCues: "Left foot PLANTED = left iliopsoas stays silent. Only the right leg cycles. The rotation comes from your thoracic spine and obliques, not from hip flexor momentum.",
+    why: "Combines spinal rotation with anti-extension. At slow tempo, dramatically harder than fast bicycle crunches. Rotation is now allowed \u2014 use it.",
+    safety: "safe",
+    swaps: ["Russian Twist (Seated Bench)"],
+    amp: ["BASE: Bodyweight, right leg extends to 45\u00b0 only.", "AMP 1: Right leg full extension (nearly straight) + 3-second hold at peak rotation.", "AMP 2: Ankle weight on right leg + full extension + 3-second hold. Expect failure around 35-40s."]
   },
   "Stir the Pot": {
-    requires: ["stabball", "bench"], category: "core",
-    sets: [["3","8/dir"],["3","8/dir"],["3","10/dir"]], rest: 60,
-    setup: "Place stability ball on a bench or elevated surface. Rest forearms on ball. Right foot on ground behind you, right knee slightly bent. Left leg hangs completely passive — do NOT rest left knee on the ground (this loads the left femoral neck and puts left hip near 90° flexion).",
-    execution: "Make small circles with your forearms while maintaining a perfectly rigid plank. Clockwise, then counter-clockwise. All weight through right foot and forearms.",
-    nwbCues: "⚠️ Do NOT put left knee on pad/ground — this creates quadruped-like loading through the left femoral neck. Left leg simply dangles or rests passively on a low support behind you. Anti-rotation AND anti-extension. Keep spine neutral. If your back arches, STOP. Exhale before initiating circles.",
-    why: "High-level core stability challenge without spinal flexion. One of the most demanding plank variations.",
-    safety: "caution",
-    swaps: ["Pallof Press"],
-    visual: "       o\n      /|\\____\n    (BALL)   \\\n             R foot"
+    requires: ["stabball"], category: "core",
+    sets: [["3","30s/dir"],["3","45s/dir"],["3","45s/dir"]], rest: 30,
+    tempo: "slow continuous",
+    setup: "Forearms on stability ball. Right foot or knee on ground. Left leg extended behind on mat, passive.",
+    execution: "Make slow circles with your forearms \u2014 clockwise, then counter-clockwise. The ball creates instability that demands constant anti-rotation AND anti-extension. Make the circles as large as you can control.",
+    nwbCues: "Left leg rests on mat. If it starts to tense or stabilize, reposition. Anti-rotation + anti-extension + anti-lateral-flexion all at once \u2014 the ultimate integrated core challenge.",
+    why: "One of the most demanding plank variations. The ball instability forces constant anti-rotation + anti-extension + anti-lateral-flexion.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: ["BASE: Right knee base, small circles.", "AMP 1: Right foot base, medium circles.", "AMP 2: Right foot base, large circles + 3-second hold at the 12, 3, 6, 9 o'clock positions. Expect failure around 25-30s/direction."]
+  },
+  "McGill Curl-Up": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45s"],["3","60s"],["4","60s"]], rest: 30,
+    tempo: "4-0-5",
+    setup: "Lie on back. Hands under lumbar curve as a monitoring system. RIGHT knee bent, left leg straight on floor.",
+    execution: "Lift ONLY head and shoulder blades 2-3 inches off floor \u2014 4-count up, 5-second HOLD, lower. Your lumbar spine stays in its natural arch throughout. If the arch disappears into your hands, you went too high.",
+    nwbCues: "Left leg stays straight and passive on the floor. This is NOT a crunch \u2014 the range of motion is tiny. The hold at the top is where the work happens.",
+    why: "McGill Big 3. The only safe upper-ab exercise that preserves spinal curves. 5-second holds increase difficulty significantly.",
+    safety: "safe",
+    swaps: ["Hollow Body Hold"],
+    amp: ["BASE: Bodyweight, 3-second hold.", "AMP 1: Arms crossed holding 5lb plate on chest, 5-second hold.", "AMP 2: Arms extended toward ceiling holding plate, 5-second hold. Expect failure around 35-45s."]
   },
 
   // CARDIO exercises
@@ -606,9 +779,9 @@ const EX = {
     sets: [["1","20 min"],["1","25 min"],["1","30 min"]], rest: 0,
     setup: "Pull a plyometric box or bench up to the SkiErg. Sit directly under the handles. If handles bottom out, use a higher box.",
     execution: "Arms extended overhead. Violent downward contraction using core crunch + lat pull. Handles past hips. Protocol: 4-3-2-1 Descending Intervals (4min moderate → 3min hard → 2min very hard → 1min all-out → 2min rest → repeat reverse).",
-    nwbCues: "⚠️ CAUTION: Minimize trunk flexion for L4-L5 — focus on ARM pull rather than spinal crunch. Do NOT lean forward past upright. Light-to-moderate intensity if spine is sensitive. Right foot on floor for stability, left foot rests passively.",
+    nwbCues: "Focus on ARM pull rather than spinal crunch. Keep hips stable in the seat.",
     why: "Upper-body + core cardiovascular stimulus. Burns 8-12 cal/min seated. Air resistance scales infinitely with effort.",
-    safety: "caution", tier: 1,
+    safety: "safe", tier: 1,
     swaps: ["Arm Ergometer"]
   },
   "Arms-Only Echo Bike": {
@@ -646,9 +819,9 @@ const EX = {
   "T-Spine Mobility": {
     requires: ["mat"], category: "recovery",
     sets: [["1","5 min"],["1","5 min"],["1","5 min"]], rest: 0,
-    setup: "Sit in a sturdy chair or on a bench (NOT quadruped — hands-and-knees loads the left femoral neck and puts left hip at ~90° flexion). Sit tall with feet flat (right foot bearing weight, left foot resting).",
-    execution: "SEATED CAT-COW: Round and extend UPPER back only — lumbar stays neutral. T-SPINE ROTATION: Cross arms over chest, rotate upper back left, then right. Move slowly. OPEN BOOK: If lying down, lie on RIGHT side with knees stacked, open left arm toward ceiling rotating through mid-back.",
-    nwbCues: "⚠️ Avoid quadruped (hands-and-knees) position — loads left femoral neck. All movement comes from thoracic spine (mid-back). Keep hips and lumbar spine STILL. This protects L4-L5.",
+    setup: "Quadruped (hands and knees) or seated in a chair.",
+    execution: "Cat-cow focusing on UPPER back only. T-spine rotation: thread one arm under the other, rotate upper back, return.",
+    nwbCues: "Keep hips and lumbar spine still. All movement comes from thoracic spine (mid-back).",
     why: "Prevents stiffness in mid-back. Improves overhead pressing and pulling form.",
     safety: "safe",
     swaps: []
@@ -674,7 +847,7 @@ const WORKOUTS = {
     hevy: "https://hevy.com/routine/j0XrGQzMyF1",
     exercises: [
       "DB Floor Press", "Mechanical Drop Set (Press)", "Landmine Press (seated)",
-      "Cable Chest Fly", "Tricep Rope Pushdown", "Parallette L-Sit", "Side Plank"
+      "Cable Chest Fly", "Tricep Rope Pushdown", "Parallette L-Sit", "Side Plank (R Side Down)"
     ],
     removed: []
   },
@@ -683,10 +856,10 @@ const WORKOUTS = {
     hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
       "Finger-Assist One-Arm Pull-Up", "Lat Pulldown (Wide)", "Chest-Supported DB Row",
-      "Seated Cable Row", "Seated Face Pulls", "Preacher Curls", "Pallof Press"
+      "Seated Cable Row", "Seated Face Pulls", "Preacher Curls", "Pallof Press (Seated)"
     ],
     removed: [
-      {name: "Bent-Over Row", reason: "Loads L4-L5 disc"}
+      {name: "Bent-Over Row", reason: "Unsupported spinal position — use chest-supported rows instead"}
     ]
   },
   "Pull B": {
@@ -694,7 +867,7 @@ const WORKOUTS = {
     hevy: "https://hevy.com/routine/J1rggKx4PIk",
     exercises: [
       "Neutral Grip Pulldown", "Mechanical Drop Set (Pull)", "One-Arm Cable Row",
-      "Reverse Fly", "Hammer Curls", "Incline DB Curl", "Bird-Dog"
+      "Reverse Fly", "Hammer Curls", "Incline DB Curl", "Bird-Dog (Prone Bench)"
     ],
     removed: []
   },
@@ -703,7 +876,7 @@ const WORKOUTS = {
     hevy: "https://hevy.com/routine/FKCWOPCUE4H",
     exercises: [
       "SL Leg Press (Right)", "SL Leg Extension (Right)", "SL Glute Bridge (Right)",
-      "Banded Clamshells", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)", "Dead Bug (R leg only)"
+      "Banded Clamshells", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)", "Dead Bug (R Leg Only)"
     ],
     removed: [
       {name: "Pistol Squats", reason: "Deep hip flexion damages labrum"},
@@ -727,6 +900,16 @@ const WORKOUTS = {
     exercises: ["Arm Ergometer", "Upper Body Stretching", "T-Spine Mobility", "Isometric Quad Sets (Left)", "Ankle Pumps (Left)"],
     removed: []
   }
+};
+
+// ===== CORE FINISHER RECOMMENDATIONS =====
+const CORE_FINISHERS = {
+  "Push A": ["Forearm Plank Saw", "Pallof Press (Seated)"],
+  "Push B": ["Dead Bug (R Leg Only)", "Bird-Dog (Prone Bench)"],
+  "Pull A": ["Side Plank (R Side Down)", "Russian Twist (Seated Bench)"],
+  "Pull B": ["Suitcase Hold (Seated)", "McGill Curl-Up"],
+  "Legs A": ["Hollow Body Hold", "Side Plank (L Oblique Bias \u2014 R Side Down)"],
+  "Legs B": ["Wheelbarrow Hold", "Bicycle Crunch (R Leg Only)"]
 };
 
 const SCHED = [
@@ -898,8 +1081,124 @@ function PlancheDiagram({onClose}) {
   );
 }
 
+function SidePlankDiagram({onClose}) {
+  var callouts = [
+    {key:"rside", title:"\u2713 Right Side Down", color:"#2ecc71", bg:"#0d1f14", border:"#2ecc71", text:"ALL weight goes through your right elbow + right knee (BASE) or right foot (AMP). Right femur is uninjured \u2014 load it freely. Your right obliques and QL do the heavy lifting."},
+    {key:"lleg", title:"\u26A0 Left Leg", color:"#c0392b", bg:"#1f0d0d", border:"#c0392b", text:"Rests passively on top or in front on the floor. Dead weight. NEVER go left-side-down \u2014 that loads the left femoral neck directly through the elbow-hip-knee chain."},
+    {key:"loblique", title:"\u2197 Left Oblique Bias", color:"#a78bfa", bg:"#130d1f", border:"#a78bfa", text:"Stay right-side-down but reach LEFT arm overhead toward the floor beyond your head. Gravity pulls your top arm down \u2014 left obliques work eccentrically to control it. Solves the 'can\u2019t train left obliques' problem."},
+    {key:"amp", title:"\uD83D\uDD25 Amplification", color:"#facc15", bg:"#1a1700", border:"#facc15", text:"BASE: Right knee down, isometric hold. AMP 1: Right foot, arm to ceiling. AMP 2: Right foot + weight overhead + 4-count hip dips."}
+  ];
+
+  return e("div", {style:{padding:"24px 16px 32px", color:"#f0ede6", fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"}},
+    e("div", {style:{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16}},
+      e("div", null,
+        e("div", {style:{fontSize:"clamp(1.1rem,3.5vw,1.5rem)", fontWeight:800, letterSpacing:"-0.02em"}}, "Side Plank \u2014 Leg Configuration"),
+        e("div", {style:{fontSize:10, color:"#666", letterSpacing:"0.15em", textTransform:"uppercase", marginTop:2}}, "Why right-side-down only + left oblique bias trick")
+      ),
+      e("button", {onClick:onClose, style:{background:"#222", border:"1px solid #444", color:"#aaa", borderRadius:8, padding:"6px 12px", fontSize:12, cursor:"pointer", fontFamily:"inherit", flexShrink:0}}, "\u2715 Close")
+    ),
+
+    // RIGHT SIDE DOWN diagram
+    e("div", {style:{width:"100%", background:"#161616", border:"1px solid #2a2a2a", borderRadius:12, padding:"20px 12px 12px", marginBottom:12}},
+      e("div", {style:{fontSize:10, letterSpacing:"0.18em", textTransform:"uppercase", color:"#555", marginBottom:8}}, "Right Side Down \u2014 Safe Position"),
+      e("svg", {viewBox:"0 0 760 240", width:"100%", xmlns:"http://www.w3.org/2000/svg", style:{fontFamily:"-apple-system, monospace"}},
+        // Floor
+        e("line", {x1:30, y1:210, x2:730, y2:210, stroke:"#333", strokeWidth:1.5}),
+        e("text", {x:738, y:214, fontSize:10, fill:"#555"}, "floor"),
+        // Body rigid line hint
+        e("line", {x1:155, y1:185, x2:380, y2:120, stroke:"#f0ede6", strokeWidth:0.6, strokeDasharray:"7,5", opacity:0.12}),
+        // Head
+        e("circle", {cx:130, cy:170, r:14, fill:"none", stroke:"#2ecc71", strokeWidth:3}),
+        // R elbow on ground
+        e("circle", {cx:165, cy:198, r:7, fill:"#2ecc71"}),
+        e("line", {x1:165, y1:198, x2:148, y2:178, stroke:"#2ecc71", strokeWidth:4, strokeLinecap:"round"}),
+        // Torso
+        e("line", {x1:168, y1:194, x2:360, y2:120, stroke:"#2ecc71", strokeWidth:5, strokeLinecap:"round"}),
+        // Hip joint
+        e("circle", {cx:360, cy:120, r:5, fill:"#2ecc71"}),
+        // R leg — knee bent (BASE, solid)
+        e("line", {x1:360, y1:120, x2:420, y2:170, stroke:"#2ecc71", strokeWidth:5, strokeLinecap:"round"}),
+        e("line", {x1:420, y1:170, x2:500, y2:208, stroke:"#2ecc71", strokeWidth:5, strokeLinecap:"round"}),
+        e("circle", {cx:420, cy:170, r:4, fill:"#2ecc71"}),
+        // R leg — foot extended (AMP, dashed)
+        e("line", {x1:360, y1:120, x2:560, y2:208, stroke:"#2ecc71", strokeWidth:3.5, strokeLinecap:"round", strokeDasharray:"8,6", opacity:0.5}),
+        e("circle", {cx:560, cy:208, r:3, fill:"#2ecc71", opacity:0.5}),
+        e("text", {x:568, y:200, fontSize:10, fill:"#2ecc71", opacity:0.7}, "R foot (AMP)"),
+        // L leg — stacked on top (red, passive)
+        e("line", {x1:360, y1:120, x2:520, y2:92, stroke:"#c0392b", strokeWidth:4, strokeLinecap:"round"}),
+        e("circle", {cx:520, cy:92, r:3, fill:"#c0392b"}),
+        // L oblique bias — overhead reach (purple, dashed)
+        e("line", {x1:168, y1:194, x2:105, y2:140, stroke:"#a78bfa", strokeWidth:3, strokeLinecap:"round", strokeDasharray:"6,4"}),
+        e("line", {x1:105, y1:140, x2:60, y2:90, stroke:"#a78bfa", strokeWidth:3, strokeLinecap:"round", strokeDasharray:"6,4"}),
+        e("circle", {cx:60, cy:90, r:3, fill:"#a78bfa"}),
+        // Annotations
+        e("text", {x:165, y:228, textAnchor:"middle", fontSize:10, fill:"#2ecc71", fontWeight:"bold"}, "R elbow"),
+        e("text", {x:445, y:228, textAnchor:"middle", fontSize:10, fill:"#2ecc71", fontWeight:"bold"}, "R knee (BASE)"),
+        e("text", {x:535, y:78, fill:"#c0392b", fontSize:10, fontWeight:"bold"}, "L leg stacked"),
+        e("text", {x:535, y:90, fill:"#c0392b", fontSize:9}, "dead weight, zero load"),
+        e("text", {x:40, y:80, fill:"#a78bfa", fontSize:9, textAnchor:"middle"}, "L arm overhead"),
+        e("text", {x:40, y:92, fill:"#a78bfa", fontSize:9, textAnchor:"middle"}, "(oblique bias)"),
+        // Load path arrow
+        e("text", {x:85, y:228, fill:"#888", fontSize:9}, "ALL weight \u2192"),
+        e("text", {x:85, y:239, fill:"#2ecc71", fontSize:9, fontWeight:"bold"}, "R elbow + R knee/foot"),
+        // Safe badge
+        e("text", {x:680, y:120, fill:"#2ecc71", fontSize:24}, "\u2713"),
+        e("text", {x:668, y:142, fill:"#2ecc71", fontSize:10, fontWeight:"bold"}, "SAFE")
+      )
+    ),
+
+    // LEFT SIDE DOWN — NEVER diagram
+    e("div", {style:{width:"100%", background:"#161616", border:"1px solid #c0392b22", borderRadius:12, padding:"20px 12px 12px", marginBottom:16}},
+      e("div", {style:{fontSize:10, letterSpacing:"0.18em", textTransform:"uppercase", color:"#c0392b", marginBottom:8}}, "Left Side Down \u2014 \u26D4 Never Do This"),
+      e("svg", {viewBox:"0 0 760 200", width:"100%", xmlns:"http://www.w3.org/2000/svg", style:{fontFamily:"-apple-system, monospace"}},
+        // Floor
+        e("line", {x1:30, y1:175, x2:730, y2:175, stroke:"#333", strokeWidth:1.5}),
+        // Head
+        e("circle", {cx:130, cy:135, r:14, fill:"none", stroke:"#c0392b", strokeWidth:3, opacity:0.4}),
+        // L elbow on ground (BAD)
+        e("circle", {cx:165, cy:163, r:7, fill:"#c0392b", opacity:0.5}),
+        e("line", {x1:165, y1:163, x2:148, y2:143, stroke:"#c0392b", strokeWidth:4, strokeLinecap:"round", opacity:0.4}),
+        // Torso
+        e("line", {x1:168, y1:159, x2:360, y2:85, stroke:"#c0392b", strokeWidth:5, strokeLinecap:"round", opacity:0.4}),
+        // Hip
+        e("circle", {cx:360, cy:85, r:5, fill:"#c0392b", opacity:0.4}),
+        // L leg on ground
+        e("line", {x1:360, y1:85, x2:420, y2:135, stroke:"#c0392b", strokeWidth:5, strokeLinecap:"round", opacity:0.4}),
+        e("line", {x1:420, y1:135, x2:500, y2:173, stroke:"#c0392b", strokeWidth:5, strokeLinecap:"round", opacity:0.4}),
+        // Danger zone circle
+        e("circle", {cx:400, cy:115, r:22, fill:"none", stroke:"#c0392b", strokeWidth:2, strokeDasharray:"4,3"}),
+        e("text", {x:430, y:108, fill:"#c0392b", fontSize:9, fontWeight:"bold"}, "LOADS LEFT"),
+        e("text", {x:430, y:120, fill:"#c0392b", fontSize:9, fontWeight:"bold"}, "FEMORAL NECK"),
+        // Big X
+        e("text", {x:672, y:90, fill:"#c0392b", fontSize:36, fontWeight:"bold"}, "\u2717"),
+        // Labels
+        e("text", {x:165, y:192, textAnchor:"middle", fontSize:10, fill:"#c0392b", fontWeight:"bold"}, "L elbow"),
+        e("text", {x:460, y:192, textAnchor:"middle", fontSize:10, fill:"#c0392b", fontWeight:"bold"}, "L knee on ground = fracture load")
+      )
+    ),
+
+    // Callout cards
+    e("div", {style:{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap:10, marginBottom:16}},
+      callouts.map(function(c) {
+        return e("div", {key:c.key, style:{background:c.bg, border:"1px solid #2a2a2a", borderLeft:"3px solid "+c.border, borderRadius:8, padding:"12px 14px"}},
+          e("div", {style:{fontSize:12, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", color:c.color, marginBottom:5}}, c.title),
+          e("div", {style:{fontSize:11, lineHeight:1.65, color:"#bbb"}}, c.text)
+        );
+      })
+    ),
+
+    // Legend
+    e("div", {style:{display:"flex", gap:20, justifyContent:"center", fontSize:11, color:"#777"}},
+      e("div", {style:{display:"flex", alignItems:"center", gap:6}}, e("div", {style:{width:12, height:12, borderRadius:2, background:"#2ecc71"}}), "Right side (bears weight)"),
+      e("div", {style:{display:"flex", alignItems:"center", gap:6}}, e("div", {style:{width:12, height:12, borderRadius:2, background:"#c0392b"}}), "Left side (zero load)"),
+      e("div", {style:{display:"flex", alignItems:"center", gap:6}}, e("div", {style:{width:12, height:12, borderRadius:2, background:"#a78bfa"}}), "Oblique bias reach")
+    )
+  );
+}
+
 var DIAGRAMS = {
-  planche: PlancheDiagram
+  planche: PlancheDiagram,
+  sideplank: SidePlankDiagram
 };
 
 function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment}) {
@@ -938,6 +1237,18 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
         ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
           e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
           e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
+        ),
+        ex.tempo && e("div", {style:{display:"flex", gap:8, marginBottom:10}},
+          e("span", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase", fontWeight:700}}, "TEMPO"),
+          e("span", {style:{fontSize:12, color:C.accent, fontWeight:600, fontFamily:"monospace"}}, ex.tempo)
+        ),
+        ex.amp && e("div", {style:{marginBottom:10}},
+          e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase", fontWeight:700, marginBottom:6}}, "\uD83D\uDD25 AMPLIFICATION TIERS"),
+          ex.amp.map(function(level, i) {
+            var colors = [C.safe, C.warning, C.danger];
+            var labels = ["BASE", "AMP 1", "AMP 2"];
+            return e("div", {key:"amp-"+i, style:{padding:"6px 8px", marginBottom:3, borderRadius:6, background:colors[i]+"11", borderLeft:"3px solid "+colors[i]+"66", fontSize:11, color:C.textDim, lineHeight:1.5}}, level);
+          })
         )
       ),
       ex.requires.length > 0 && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
@@ -1244,6 +1555,22 @@ function App() {
       hevyId ? e("div", {style:{marginBottom:10}},
         e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", textAlign:"center", padding:"8px", borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:600, textDecoration:"none"}}, "Open in HEVY")
       ) : null,
+      workoutKey === "Recovery" && e("a", {href:"https://nwb-yoga.vercel.app", target:"_blank", rel:"noopener noreferrer", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", marginBottom:12, padding:"10px 14px", borderRadius:8, background:"#1e293b", border:"1px solid #334155", textDecoration:"none"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:10}},
+          e("svg", {width:28, height:28, viewBox:"0 0 24 24", fill:"#F5F0EB"},
+            e("circle", {cx:"12", cy:"4.5", r:"2.5"}),
+            e("path", {d:"M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z", opacity:"0.6"}),
+            e("path", {d:"M10.5 7.5h3v4.5h-3z"}),
+            e("path", {d:"M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z"}),
+            e("path", {d:"M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z"})
+          ),
+          e("div", null,
+            e("div", {style:{fontSize:13, fontWeight:600, color:"#F5F0EB"}}, "NWB Yoga \u2014 Companion App"),
+            e("div", {style:{fontSize:11, color:C.textDim, marginTop:2}}, "3 guided tiers \u00b7 14 animated poses \u00b7 built-in timer")
+          ),
+          e("span", {style:{marginLeft:"auto", color:"#64748b", fontSize:12}}, "\u2192")
+        )
+      ),
       w.exercises.map(function(origName) {
         var exName = getExName(workoutKey, origName);
         var ex = EX[exName];
@@ -1260,6 +1587,14 @@ function App() {
       }),
       w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
         w.removed.map(function(r){ return e(RemovedRow, {key:r.name, name:r.name, reason:r.reason}); })
+      ),
+      CORE_FINISHERS[workoutKey] && e("div", {style:{marginTop:12, paddingTop:10, borderTop:"1px dashed #334155", background:"#0d131f", borderRadius:8, padding:10, border:"1px solid #1e293b"}},
+        e("div", {style:{fontSize:12, fontWeight:700, color:"#f59e0b", marginBottom:8, letterSpacing:0.3}}, "\uD83D\uDD25 Core Finisher \u2014 pick 1\u20132"),
+        CORE_FINISHERS[workoutKey].map(function(name) {
+          var ex = EX[name];
+          if (!ex) return null;
+          return e(ExRow, {key:"cf-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
+        })
       )
     );
   }
@@ -1293,7 +1628,7 @@ function App() {
         e(Section, {title:"Cross-Education Protocol", icon:"🧠", isOpen:!!openSections["cross-ed"], onToggle:function(){ toggleSection("cross-ed"); }},
           e(Callout, {type:"info"}, "Manca et al. meta-analysis: 11.9% strength gains in untrained limb. Eccentric-focused work → 17.7% crossover."),
           e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
-            ["Intensity: ≥80% 1RM (Weeks 3+)", "Tempo: 4-second eccentric on leg exercises", "Rest: 2+ minutes between heavy sets", "ROM: <90° hip flexion (FAI protection)", "Mental focus on injured limb during right-leg training"].map(function(r,i){ return e("p", {key:"r-"+i}, "• "+r); })
+            ["Intensity: ≥80% 1RM (Weeks 3+)", "Tempo: 4-second eccentric on leg exercises", "Rest: 2+ minutes between heavy sets", "ROM: <90° hip flexion (protects left hip)", "Mental focus on injured limb during right-leg training"].map(function(r,i){ return e("p", {key:"r-"+i}, "• "+r); })
           )
         )
       );
@@ -1343,27 +1678,43 @@ function App() {
             e("p", {style:{fontWeight:700, color:C.accent, marginTop:12, marginBottom:4}}, "Slider Row HIIT"),
             e("p", null, "10-20 rounds of 200m sprints. 30s rest between. Right leg drives, left leg glides on furniture slider.")
           )
-        )
+        ),
       );
       break;
 
     case 3: // Core
       content = e("div", null,
-        e(Callout, {type:"danger"}, "ZERO spinal flexion under load. NO sit-ups, NO Russian twists under load, NO leg raises."),
-        e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture."),
-        e(Section, {title:"MRI-Safe Core Exercises", icon:"✅", isOpen:!!openSections["safe-core"], onToggle:function(){ toggleSection("safe-core"); }},
-          ["McGill Curl-Up","Side Plank","Bird-Dog","Pallof Press","Dead Bug (R leg only)","Stir the Pot","Parallette L-Sit"].map(function(name) {
+        e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture. Left leg passive in ALL exercises."),
+        e(Callout, {type:"info"}, "Slow tempo protocol: 4-count movements, time-based sets, continuous tension. BASE \u2192 AMP 1 \u2192 AMP 2. Target muscle failure in the final 10-15 seconds of each set. If you finish the set comfortably, move up an amp level."),
+        e(Section, {title:"Block 1: Anti-Extension", icon:"\uD83D\uDC80", isOpen:!!openSections["core-antiext"], onToggle:function(){ toggleSection("core-antiext"); }, count:8, accent:C.danger},
+          ["Forearm Plank Saw","Plank Knee Tuck (R only)","Wheelbarrow Hold","Spiderman Plank (R only)","Slow Mountain Climber (R)","Dead Bug (R Leg Only)","Hollow Body Hold","Body Saw (Sliders)"].map(function(name) {
             var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:false, equipment:equipment});
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
           })
         ),
-        e(Section, {title:"Why These Are Dangerous", icon:"🚫", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
-          e(RemovedRow, {name:"Active Straight Leg Raises", reason:"Hip flexor contraction compresses femoral neck stress fracture AND shears against labral tear. NEVER do these."}),
-          e(RemovedRow, {name:"Russian Twists (weighted)", reason:"Spinal rotation under load compresses L4-L5 degenerative discs."}),
-          e(RemovedRow, {name:"Sit-Ups / Crunches (full)", reason:"Spinal flexion under load. Use McGill Curl-Up instead."}),
-          e(RemovedRow, {name:"Hanging Leg Raises", reason:"Deep hip flexion + massive hip flexor force = fracture + labral danger."}),
-          e(RemovedRow, {name:"Cable Crunches", reason:"Spinal flexion under heavy load. L4-L5 contraindicated."}),
-          e(RemovedRow, {name:"V-Ups / Tuck-Ups", reason:"Combines spinal flexion + deep hip flexion. Double danger."})
+        e(Section, {title:"Block 2: Anti-Rotation", icon:"\uD83D\uDD04", isOpen:!!openSections["core-antirot"], onToggle:function(){ toggleSection("core-antirot"); }, count:3, accent:C.accent},
+          ["Pallof Press (Seated)","Pallof Overhead Reach","Bird-Dog (Prone Bench)"].map(function(name) {
+            var ex = EX[name];
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
+          })
+        ),
+        e(Section, {title:"Block 3: Anti-Lateral-Flexion", icon:"\u2194\uFE0F", isOpen:!!openSections["core-antilat"], onToggle:function(){ toggleSection("core-antilat"); }, count:3, accent:C.warning},
+          ["Side Plank (R Side Down)","Side Plank (L Oblique Bias \u2014 R Side Down)","Suitcase Hold (Seated)"].map(function(name) {
+            var ex = EX[name];
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
+          })
+        ),
+        e(Section, {title:"Block 4: Rotation + Integrated", icon:"\uD83C\uDF00", isOpen:!!openSections["core-rotation"], onToggle:function(){ toggleSection("core-rotation"); }, count:5, accent:"#a78bfa"},
+          ["Russian Twist (Seated Bench)","Cable Woodchop (Seated)","Bicycle Crunch (R Leg Only)","Stir the Pot","McGill Curl-Up"].map(function(name) {
+            var ex = EX[name];
+            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
+          })
+        ),
+        e(Section, {title:"Removed Exercises", icon:"\uD83D\uDEAB", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
+          e(RemovedRow, {name:"Active Straight Leg Raises", reason:"Hip flexor contraction compresses femoral neck stress fracture. NEVER do these."}),
+          e(RemovedRow, {name:"Hanging Leg Raises", reason:"Deep hip flexion + massive hip flexor force = fracture danger."}),
+          e(RemovedRow, {name:"Standard Navasana / V-Ups / Tuck-Ups", reason:"Bilateral hip flexor activation. Use Modified Navasana (parallette press) instead."}),
+          e(RemovedRow, {name:"Standard Bird-Dog (quadruped)", reason:"Left knee at 90\u00b0 hip flexion approaches FAI limit + loads femoral neck. Use Prone Bench version instead. Quadruped needs PT clearance."})
         )
       );
       break;
@@ -1419,7 +1770,7 @@ function App() {
     case 5: // Safety
       content = e("div", null,
         e(Section, {title:"Injury Status (MRI 3/11/2026)", icon:"🩻", isOpen:!!openSections["injuries"], onToggle:function(){ toggleSection("injuries"); }},
-          [{n:"L Hip Stress Fracture", c:C.danger, r:"Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side."}, {n:"Bilateral FAI + Labral Tears", c:C.warning, r:"Cam-type impingement both hips. Anterosuperior labral tear. Stop ALL exercises before 90° hip flexion."}, {n:"Bilateral Hamstring Tendinosis", c:C.warning, r:"No discrete tear. HSR protocol (3s/1s/3s tempo). Prone > seated for curls."}, {n:"L4-L5 DDD", c:C.warning, r:"Degenerative disc disease. Zero spinal flexion or rotation under load. Anti-extension/anti-rotation core only."}, {n:"R Hip Labral Tear (mild)", c:C.textMuted, r:"Small anterosuperior tear. Minimize deep flexion. Monitor for clicking."}].map(function(inj, i) {
+          [{n:"L Hip Stress Fracture", c:C.danger, r:"Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side. This drives ALL exercise modifications."}, {n:"Bilateral FAI + Labral Tears", c:C.warning, r:"Cam-type impingement both hips. Anterosuperior labral tear. Keep hip flexion under 90°."}, {n:"Bilateral Hamstring Tendinosis", c:C.textMuted, r:"Minor — no discrete tear. Not restricting programming."}, {n:"L4-L5 DDD", c:C.textMuted, r:"Minor — not restricting programming. Good form is sufficient."}, {n:"R Hip Labral Tear (mild)", c:C.textMuted, r:"Minor — small anterosuperior tear. Not restricting programming."}].map(function(inj, i) {
             return e("div", {key:"inj-"+i, style:{padding:12, marginBottom:7, borderRadius:8, background:C.card, borderLeft:"3px solid "+inj.c}},
               e("div", {style:{fontWeight:700, fontSize:13, color:inj.c}}, inj.n),
               e("div", {style:{fontSize:11, marginTop:4, color:C.textDim, lineHeight:1.6}}, inj.r)
@@ -1429,6 +1780,81 @@ function App() {
         e(Section, {title:"Absolute Stop Signals", icon:"🚨", isOpen:!!openSections["stop-signals"], onToggle:function(){ toggleSection("stop-signals"); }},
           e(Callout, {type:"danger"}, "Stop exercise and contact your MD immediately if:"),
           ["Groin pain (any side)", "Hip clicking or catching sensation", "Pain lasting >24 hours after workout", "Radiating leg pain or numbness", "Sharp pain during any exercise", "Swelling in hip or thigh area"].map(function(s,i){ return e("p", {key:"s-"+i, style:{fontSize:12, color:C.textDim, padding:"3px 0"}}, "🔴 "+s); })
+        ),
+        e(Section, {title:"Pool Entry & Exit", icon:"\uD83C\uDFCA", isOpen:!!openSections["pool-entry"], onToggle:function(){ toggleSection("pool-entry"); }},
+          e(Callout, {type:"danger"}, "Left leg is a passenger at all times. Arms drive every transition. Right leg assists but never hops or impacts."),
+          e("div", {style:{padding:14, marginBottom:10, borderRadius:10, background:C.bg, border:"1px solid "+C.border}},
+            e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}},
+              e("div", {style:{fontWeight:700, fontSize:14, color:C.accent}}, "Method 1: Sun Chair at Pool Edge"),
+              e("span", {style:{fontSize:10, fontWeight:700, color:C.safe, background:C.safeBg, border:"1px solid "+C.safeBorder, borderRadius:6, padding:"2px 8px"}}, "RECOMMENDED")
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Entry"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Position heavy chair at pool edge. Sit, then lateral transfer to deck (hands press down). Controlled tricep-dip lower into the water. Right foot finds the wall, left leg hangs passively."
+              )
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Exit"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Hands on deck, right foot on wall. Straight-arm press up to seated on deck edge. Lift left leg with hands. Transfer to chair."
+              )
+            )
+          ),
+          e("div", {style:{padding:14, marginBottom:10, borderRadius:10, background:C.bg, border:"1px solid "+C.border}},
+            e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}},
+              e("div", {style:{fontWeight:700, fontSize:14, color:C.accent}}, "Method 2: Steps \u2014 Single Rail"),
+              e("span", {style:{fontSize:10, fontWeight:700, color:C.danger, background:C.dangerBg, border:"1px solid "+C.dangerBorder, borderRadius:6, padding:"2px 8px"}}, "HARDEST EXIT")
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Entry"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Both hands on curved rail. Right foot steps down one step at a time. Hands walk down the rail. Left leg trails between steps. Buoyancy helps on lower steps."
+              )
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Exit"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Reverse the entry. Last 2\u20133 steps are hardest as buoyancy drops. Near-full bodyweight pull on one rail."
+              )
+            ),
+            e("div", {style:{fontSize:11, color:C.warning, padding:"6px 10px", background:C.warningBg, border:"1px solid "+C.warningBorder, borderRadius:6}},
+              "\u26A0\uFE0F Top steps can recruit left hip flexor \u2014 stop and reset if felt. Dry hands before exit."
+            )
+          ),
+          e("div", {style:{padding:14, marginBottom:10, borderRadius:10, background:C.bg, border:"1px solid "+C.border}},
+            e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}},
+              e("div", {style:{fontWeight:700, fontSize:14, color:C.accent}}, "Method 3: Wall Press \u2014 No Props"),
+              e("span", {style:{fontSize:10, fontWeight:700, color:C.warning, background:C.warningBg, border:"1px solid "+C.warningBorder, borderRadius:6, padding:"2px 8px"}}, "ANY POOL")
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Entry"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Sit at edge (lower via right knee). Hands on deck, slow tricep-negative dip into water. Left leg hangs passively."
+              )
+            ),
+            e("div", {style:{marginBottom:8}},
+              e("div", {style:{fontWeight:700, fontSize:11, color:C.text, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.05em"}}, "Exit"),
+              e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
+                "Press up from water, rotate to seated on deck. Lift left leg with hands. Floor-to-stand via right knee."
+              )
+            )
+          ),
+          e("div", {style:{fontWeight:700, fontSize:13, color:C.text, marginTop:6, marginBottom:8}}, "Quick Reference"),
+          e("div", {style:{overflowX:"auto"}},
+            e("table", {style:{width:"100%", borderCollapse:"collapse", fontSize:11}},
+              e("thead", null, e("tr", {style:{borderBottom:"2px solid "+C.accent+"44"}},
+                ["Method","Requires","Difficulty"].map(function(h){ return e("th", {key:h, style:{padding:"6px", textAlign:"left", color:C.accent, fontSize:10, fontWeight:700}}, h); })
+              )),
+              e("tbody", null,
+                [["Sun Chair","Heavy chair at edge","Easiest"],["Steps + Rail","Pool steps with rail","Hard exit"],["Wall Press","Any pool edge","Hardest"]].map(function(row, i) {
+                  return e("tr", {key:"pe-"+i, style:{borderBottom:"1px solid "+C.border}},
+                    row.map(function(cell, j){ return e("td", {key:"pc-"+j, style:{padding:"6px", color:j===0?C.text:C.textDim, fontWeight:j===0?600:400}}, cell); })
+                  );
+                })
+              )
+            )
+          )
         ),
         e(Section, {title:"About", icon:"ℹ️", isOpen:!!openSections["about"], onToggle:function(){ toggleSection("about"); }},
           e("div", {style:{fontSize:13, color:C.textDim, lineHeight:1.8}},
@@ -1491,9 +1917,19 @@ function App() {
         )
       ),
       e("a", {href:"https://hevy.com/user/karl__marx", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted}, title:"Hevy"},
-        e("span", {style:{fontSize:16, lineHeight:1}}, "💪")
+        e("svg", {width:16, height:16, viewBox:"0 0 24 24", fill:"currentColor"},
+          e("path", {d:"M2 8h4v8H2zM18 8h4v8h-4zM6 11h12v2H6z"})
+        )
       ),
-      e("a", {href:"https://nwb-yoga.vercel.app", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted, fontSize:12, textDecoration:"none"}, title:"NWB Yoga"}, "🧘 Yoga")
+      e("a", {href:"https://nwb-yoga.vercel.app", target:"_blank", rel:"noopener noreferrer", style:{color:C.textMuted}, title:"NWB Yoga \u2014 Companion App"},
+        e("svg", {width:16, height:16, viewBox:"0 0 24 24", fill:"currentColor"},
+          e("circle", {cx:"12", cy:"4.5", r:"2.5"}),
+          e("path", {d:"M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z", opacity:"0.6"}),
+          e("path", {d:"M10.5 7.5h3v4.5h-3z"}),
+          e("path", {d:"M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z"}),
+          e("path", {d:"M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z"})
+        )
+      )
     ),
     timer && e(RestTimer, {seconds:timer, onClose:function(){ setTimer(null); }}),
     diagramOpen && DIAGRAMS[diagramOpen] && e("div", {className:"diagram-modal", onClick:function(ev){ if(ev.target === ev.currentTarget) setDiagramOpen(null); }},
