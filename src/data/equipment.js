@@ -25,5 +25,7 @@ export const EQUIPMENT = {
   parallettes: { name: 'Parallettes', icon: '🤸', category: 'home' },
   feetup: { name: 'FeetUp Trainer', icon: '🙃', category: 'home' },
   slider: { name: 'Furniture Slider', icon: '🛷', category: 'home' },
-  mat: { name: 'Thick Mat', icon: '🧘', category: 'basic' }
+  mat: { name: 'Thick Mat', icon: '🧘', category: 'basic' },
+  trx: { name: 'TRX Suspension', icon: '🪢', category: 'functional' },
+  kneepad: { name: 'Knee Pad', icon: '🛡️', category: 'basic' }
 };
