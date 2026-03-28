@@ -515,6 +515,235 @@ const EX = {
     swaps: []
   },
 
+  // LEFT LEG MAINTENANCE supplements
+  "Quad Sets": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","15 (5s hold)"],["3","15 (5s hold)"],["3","15 (5s hold)"]], rest: 30,
+    setup: "Supine, left leg straight on the floor.",
+    execution: "Press the back of your knee hard into the floor. Hold 5 seconds, release fully, repeat.",
+    nwbCues: "Zero hip flexor activation — pure quad isometric. If you feel hip crease tension, you're lifting the leg instead of pressing down.",
+    why: "Maintains quad neural drive in the immobilized limb without any joint loading.",
+    safety: "safe", swaps: []
+  },
+  "Short Arc Quads": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","12 (2s hold)"],["3","12 (2s hold)"],["3","12 (2s hold)"]], rest: 30,
+    setup: "Supine, rolled towel under left knee creating ~30° bend.",
+    execution: "Extend knee to full lockout, hold 2s, lower slowly back to the towel.",
+    nwbCues: "Hip stays completely static — no iliopsoas activation. The towel limits ROM to safe range.",
+    why: "Quad activation through limited ROM. Builds on quad sets with slightly more demand.",
+    safety: "safe", swaps: []
+  },
+  "Ankle Pumps & Circles": {
+    requires: [], category: "legs",
+    sets: [["2","20 each direction"],["2","20 each direction"],["2","20 each direction"]], rest: 0,
+    setup: "Supine or seated, left leg elevated on a pillow or bolster.",
+    execution: "Alternate between pointing and flexing the ankle (20 reps), then draw circles in both directions.",
+    nwbCues: "DVT prevention and calf maintenance. Perform frequently throughout the day, not just during workouts.",
+    why: "Prevents blood clots (DVT) and maintains ankle ROM and calf engagement during immobilization.",
+    safety: "safe", swaps: []
+  },
+  "Banded Terminal Knee Extensions": {
+    requires: ["bands"], category: "legs",
+    sets: [["3","12"],["3","12"],["3","12"]], rest: 60,
+    setup: "Seated, loop band behind left knee anchored to a post behind you. Start at ~30° knee bend.",
+    execution: "Press knee to full extension against band resistance. Squeeze quad at lockout, return slowly.",
+    nwbCues: "Pure knee extension only — no hip flexor engagement. If you feel hip crease tension, reposition the anchor point.",
+    why: "Resisted knee extension builds quad strength without hip flexor demand. Good progression from quad sets.",
+    safety: "safe", swaps: []
+  },
+  "Reclined Knee Extensions": {
+    requires: [], category: "legs",
+    sets: [["3","10 (3s ecc)"],["3","10 (3s ecc)"],["3","10 (3s ecc)"]], rest: 60,
+    setup: "Leg extension machine or ankle-banded. Recline the seat back so hip angle stays well under 90°.",
+    execution: "Extend to full lockout, then lower over 3 seconds (controlled eccentric).",
+    nwbCues: "Recline the seat to keep hip angle safe for FAI. If seat doesn't recline enough, use ankle band from a reclined bench instead.",
+    why: "Loaded quad work with controlled eccentric in an FAI-safe hip position.",
+    safety: "safe", swaps: []
+  },
+
+  // DAILY CORE SUPPLEMENTS
+  "Modified Plank": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45-60s"],["3","45-60s"],["3","45-60s"]], rest: 30,
+    setup: "Forearms on floor, RIGHT knee on floor as base. Left leg stacked passively on top of right leg.",
+    execution: "Maintain a rigid line from shoulders through right knee. Left leg is dead weight — do not engage it.",
+    nwbCues: "Zero left hip flexor activation. No weight bearing on left leg. If left hip engages, widen right knee base.",
+    why: "Anti-extension hold modified for NWB. Right knee base keeps left leg completely passive.",
+    safety: "safe", swaps: []
+  },
+  "Modified Hollow Body Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","30s"],["3","30s"],["3","30s"]], rest: 30,
+    setup: "Supine, arms extended overhead.",
+    execution: "Extend right leg 6 inches off floor, press lower back firmly into mat. Left leg stays bent with foot resting on floor.",
+    nwbCues: "Only right leg extends — left hip flexor stays completely off. If lower back lifts off mat, raise right leg higher.",
+    why: "Asymmetric hollow body targets core anti-extension while keeping left hip flexor silent.",
+    safety: "safe", swaps: []
+  },
+  "Seated Cable Crunch": {
+    requires: ["cables"], category: "core",
+    sets: [["3","15"],["3","15"],["3","15"]], rest: 60,
+    setup: "Seated on bench facing away from cable stack. Rope attachment behind head, hands at temples.",
+    execution: "Crunch down contracting abs hard, return to upright with control. Focus on rib-to-pelvis shortening.",
+    nwbCues: "Fully seated — zero hip flexor demand. All movement comes from spinal flexion, not hip flexion.",
+    why: "Direct rectus abdominis work with zero hip flexor involvement. Seated position is ideal for NWB.",
+    safety: "safe", swaps: []
+  },
+  "Pallof Press with Overhead Reach": {
+    requires: ["bands"], category: "core",
+    sets: [["3","8/side (3s hold)"],["3","8/side (3s hold)"],["3","8/side (3s hold)"]], rest: 60,
+    setup: "Seated on bench, band anchored at chest height to your side.",
+    execution: "Press band out to full extension, then raise arms overhead. Hold 3s at top. Reverse the motion back to chest.",
+    nwbCues: "Overhead reach increases lever arm dramatically — go lighter than standard Pallof. Fully seated eliminates all lower body demand.",
+    why: "Anti-rotation with an extended overhead lever arm. The overhead position multiplies the rotational force.",
+    safety: "safe", swaps: []
+  },
+  "Single-Arm Seated Cable Row": {
+    requires: ["cables"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 60,
+    setup: "Seated at cable machine, single D-handle at chest height. Feet flat, torso upright.",
+    execution: "Row with one arm while resisting trunk rotation. Drive elbow straight back, squeeze, return slowly.",
+    nwbCues: "Anti-rotation demand is the primary core stimulus. Fully seated. Keep pelvis square — zero trunk twist.",
+    why: "Unilateral rowing creates powerful anti-rotation demand as a training effect, not just a side effect.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank with Band Row": {
+    requires: ["mat", "bands"], category: "core",
+    sets: [["3","8/side"],["3","8/side"],["3","8/side"]], rest: 60,
+    setup: "Side plank on right forearm and right knee. Left leg stacked on top. Band anchored in front of you at floor level.",
+    execution: "Hold side plank steady. Row band to hip with top arm, squeezing shoulder blade. Return slowly.",
+    nwbCues: "Left leg stays passive on BOTH sides — when you switch, keep right knee/forearm as base and just rotate. Left leg is always dead weight.",
+    why: "Anti-lateral-flexion combined with horizontal rowing. Multi-planar core challenge.",
+    safety: "safe", swaps: []
+  },
+  "Seated Landmine Rotation": {
+    requires: ["barbell", "bench"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 60,
+    setup: "Seated on bench straddling it or sideways. Hold the end of a landmine barbell at chest height with both hands.",
+    execution: "Rotate torso and press bar in an arc from hip to hip. Control the weight through the full rotation.",
+    nwbCues: "Fully seated — no hip flexor demand. Rotation comes from thoracic spine only.",
+    why: "Loaded rotational power from a seated position. The barbell arc creates progressive resistance through range.",
+    safety: "safe", swaps: []
+  },
+  "High-to-Low Woodchop": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable or band anchored high above and to one side.",
+    execution: "Pull diagonally from high anchor to opposite hip with trunk rotation. Control the return over 2-3 seconds.",
+    nwbCues: "Seated — rotational force only. No hip flexor involvement. If left hip crease engages, reduce weight.",
+    why: "Diagonal pulling pattern trains obliques through full rotational range with eccentric control on return.",
+    safety: "safe", swaps: []
+  },
+  "Pallof Alphabet": {
+    requires: ["bands"], category: "core",
+    sets: [["2","A-Z/side"],["2","A-Z/side"],["2","A-Z/side"]], rest: 60,
+    setup: "Seated on bench, band anchored at chest height to your side. Both hands on band at chest.",
+    execution: "Press band out to full extension and trace the letters A through Z with your hands, maintaining arm extension throughout.",
+    nwbCues: "Extended time under tension with anti-rotation endurance. Fully seated. Go lighter than standard Pallof — this set is long.",
+    why: "Anti-rotation endurance. Tracing letters creates unpredictable force vectors that challenge stabilization constantly.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank Hip Dips": {
+    requires: ["mat"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Side plank on right forearm and right knee as base. Left leg stacked on top, passive.",
+    execution: "Lower hip toward the floor with control, then drive back up to full side plank. Never fully rest on the floor.",
+    nwbCues: "Left leg stays passive dead weight on both sides. Right side bears all load through forearm and knee.",
+    why: "Dynamic anti-lateral-flexion. Hip dips add concentric/eccentric demand to the isometric side plank.",
+    safety: "safe", swaps: []
+  },
+  "Seated Oblique Cable Crunch": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable set at head height to one side. Hold handle at temple.",
+    execution: "Lateral crunch TOWARD the cable — shorten the distance between ribs and hip on that side. Return with control.",
+    nwbCues: "Fully seated — targets obliques with zero hip flexor demand. Pure lateral spinal flexion.",
+    why: "Isolated oblique work from a fully seated NWB-safe position.",
+    safety: "safe", swaps: []
+  },
+  "Modified Hollow Body Flutter": {
+    requires: ["mat"], category: "core",
+    sets: [["3","20"],["3","20"],["3","20"]], rest: 30,
+    setup: "Supine, arms at sides or extended overhead. Left knee bent, left foot flat on floor.",
+    execution: "Flutter kick with RIGHT leg only — small range, 6-12 inches off the floor. Left leg stays bent and still.",
+    nwbCues: "Only right leg moves. Left hip flexor stays completely off. Press lower back into mat throughout.",
+    why: "Unilateral flutter adds anti-extension and anti-rotation challenge simultaneously.",
+    safety: "safe", swaps: []
+  },
+  "Modified Plank Shoulder Taps": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 30,
+    setup: "Forearm plank position, right knee down as base. Left leg stacked on top, passive.",
+    execution: "Shift weight to one forearm, tap opposite shoulder with free hand. Return forearm to floor. Alternate sides.",
+    nwbCues: "Anti-rotation under instability — resist the urge to rotate when lifting a hand. Left leg stays passive throughout.",
+    why: "Shoulder taps force anti-rotation under shifting load. Each tap removes a base of support.",
+    safety: "safe", swaps: []
+  },
+  "Pallof ISO Hold": {
+    requires: ["bands"], category: "core",
+    sets: [["3","30s/side"],["3","30s/side"],["3","30s/side"]], rest: 30,
+    setup: "Seated on bench, band anchored at chest height to your side. Both hands on band.",
+    execution: "Press band out to full arm extension and HOLD for the entire set duration. Fight rotation.",
+    nwbCues: "Sustained anti-rotation demand. Fully seated. If band feels easy at 30s, step up to heavier band.",
+    why: "Isometric anti-rotation endurance. Simple but effective — sustained tension builds stabilizer endurance.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","60s/side"],["3","60s/side"],["3","60s/side"]], rest: 30,
+    setup: "Side plank on right forearm and right knee as base. Left leg stacked on top, completely passive.",
+    execution: "Hold a rigid side plank line. Breathe steadily. Focus on keeping hips elevated and body straight.",
+    nwbCues: "Left leg is passive dead weight. All load through right forearm and right knee. Never go left-side-down.",
+    why: "Isometric anti-lateral-flexion endurance. Long holds build stabilizer capacity.",
+    safety: "safe", swaps: []
+  },
+  "Low-to-High Woodchop": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable or band anchored low and to one side.",
+    execution: "Pull diagonally from low anchor to high across body with trunk rotation. Control return over 2-3 seconds.",
+    nwbCues: "Seated — rotation only, no hip flexor. Different muscle emphasis than high-to-low variation.",
+    why: "Low-to-high diagonal pull emphasizes different oblique fiber recruitment than the high-to-low pattern.",
+    safety: "safe", swaps: []
+  },
+  "Slow Dead Bugs (Modified)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","8/side"],["3","8/side"],["3","8/side"]], rest: 30,
+    setup: "Supine, arms extended to ceiling, knees bent, both feet flat on the floor.",
+    execution: "Extend RIGHT leg and opposite (left) arm on a 4-second count. Return over 4 seconds. Left leg stays bent with foot on floor the entire time.",
+    nwbCues: "4-second tempo increases time under tension dramatically. Left hip flexor never activates \u2014 left foot stays planted.",
+    why: "Slow tempo dead bug maximizes time under tension for deep core activation. 8 reps per side = over 60 seconds of work.",
+    safety: "safe", swaps: []
+  },
+  "Weighted Crunch (Seated)": {
+    requires: ["dumbbells", "bench"], category: "core",
+    sets: [["3","15"],["3","15"],["3","12"]], rest: 60,
+    setup: "Seated on bench, hold dumbbell or plate at chest with both hands. Feet flat on floor.",
+    execution: "Crunch torso forward, driving ribs toward pelvis. Squeeze upper abs hard at bottom. Return to upright with control over 2 seconds.",
+    nwbCues: "Fully seated \u2014 zero hip flexor demand. Pure spinal flexion, no hip flexion. Go heavy.",
+    why: "Loaded upper rectus abdominis work from a safe seated position. Weight forces harder contraction.",
+    safety: "safe", swaps: []
+  },
+  "Reverse Crunch (R Leg Only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","12"],["3","12"],["3","15"]], rest: 30,
+    setup: "Supine, left foot planted on floor. Right knee bent at 90\u00b0, foot hovering off the floor.",
+    execution: "Draw right knee toward chest by curling your PELVIS off the floor. Lower slowly over 3 seconds. Left foot stays planted.",
+    nwbCues: "Only right leg moves \u2014 left hip flexor completely off. The motion is pelvic curl, not hip flexion. Press left foot into floor for stability.",
+    why: "Lower rectus abdominis isolation. The pelvic curl pattern targets the abs below the navel.",
+    safety: "safe", swaps: []
+  },
+  "Right Leg Lowers": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10"],["3","10"],["3","12"]], rest: 30,
+    setup: "Supine, arms pressed into floor at sides. Left knee bent, foot planted. Right leg vertical (90\u00b0 at hip).",
+    execution: "Lower right leg toward floor over 4 seconds. Stop before your back arches off the mat. Return to vertical over 2 seconds.",
+    nwbCues: "Press lower back into mat throughout. Only right leg moves. Left foot stays planted. If back arches, you went too far \u2014 reduce range.",
+    why: "Eccentric lower ab work. 4-second lowering phase maximizes time under tension at the hardest part of the range.",
+    safety: "safe", swaps: []
+  },
+
   // CORE exercises — Block 1: Anti-Extension
   "Forearm Plank Saw": {
     requires: ["mat"], category: "core",
@@ -912,6 +1141,225 @@ const CORE_FINISHERS = {
   "Legs B": ["Wheelbarrow Hold", "Bicycle Crunch (R Leg Only)"]
 };
 
+// ===== DAILY SUPPLEMENT SECTIONS =====
+// ===== MUSCLE GROUP TAGS =====
+const MUSCLE_TAGS = {
+  // Push
+  "Barbell Floor Press":["Chest","Triceps"],"DB Floor Press":["Chest","Triceps"],"Machine Chest Press":["Chest","Triceps"],
+  "Seated DB OH Press":["Shoulders","Triceps"],"Seated Arnold Press":["Shoulders","Triceps"],"Landmine Press (seated)":["Shoulders","Core"],
+  "Incline DB Press + Lat Raises":["Upper Chest","Side Delts"],"Cable Chest Fly":["Chest"],
+  "Lying Skull Crushers":["Triceps"],"OH Triceps Extension":["Triceps"],"Tricep Rope Pushdown":["Triceps"],
+  "Mechanical Drop Set (Press)":["Chest","Triceps"],"Dip Machine":["Chest","Triceps"],
+  "Pseudo Planche Push-Up":["Chest","Shoulders"],"Parallette L-Sit":["Triceps","Core"],
+  // Pull
+  "Lat Pulldown (Wide)":["Lats","Biceps"],"Neutral Grip Pulldown":["Lats","Biceps"],
+  "Weighted Pull-Up":["Lats","Biceps"],"Finger-Assist One-Arm Pull-Up":["Lats","Biceps"],
+  "Chest-Supported DB Row":["Upper Back","Lats"],"Seated Cable Row":["Upper Back","Lats"],
+  "One-Arm Cable Row":["Upper Back","Core"],"Mechanical Drop Set (Pull)":["Lats","Biceps"],
+  "Seated Face Pulls":["Rear Delts","Rotator Cuff"],"Reverse Fly":["Rear Delts"],
+  "Preacher Curls":["Biceps"],"Hammer Curls":["Biceps","Forearms"],"Incline DB Curl":["Biceps"],
+  // Legs
+  "SL Leg Press (Right)":["Quads","Glutes"],"Hack Squat (Right)":["Quads","Glutes"],
+  "SL Leg Extension (Right)":["Quads"],"SL Glute Bridge (Right)":["Glutes","Hamstrings"],
+  "SL Hip Thrust (Right)":["Glutes","Hamstrings"],"Prone Ham Curl (Right)":["Hamstrings"],
+  "Stab Ball Ham Curl (Right)":["Hamstrings","Glutes"],"Low-Box Step-Up (Right)":["Quads","Glutes"],
+  "Nordic Ham Curl":["Hamstrings"],"Standing Calf Raise (R)":["Calves"],
+  "Banded Clamshells":["Glute Med"],"Isometric Quad Sets (Left)":["Quads (L)"],
+  "Ankle Pumps (Left)":["Calves (L)"],
+  // Core — Block exercises
+  "Forearm Plank Saw":["Upper Abs","Lower Abs"],"Plank Knee Tuck (R only)":["Lower Abs","Obliques"],
+  "Wheelbarrow Hold":["Upper Abs","Lower Abs"],"Spiderman Plank (R only)":["Obliques","Lower Abs"],
+  "Slow Mountain Climber (R)":["Lower Abs","Obliques"],"Dead Bug (R Leg Only)":["Lower Abs","TVA"],
+  "Hollow Body Hold":["Lower Abs","Upper Abs"],"Body Saw (Sliders)":["Upper Abs","Lower Abs"],
+  "Pallof Press (Seated)":["Obliques"],"Pallof Overhead Reach":["Obliques","Upper Abs"],
+  "Bird-Dog (Prone Bench)":["Lower Back","Obliques"],
+  "Side Plank (R Side Down)":["Obliques"],"Side Plank (L Oblique Bias \u2014 R Side Down)":["Obliques"],
+  "Suitcase Hold (Seated)":["Obliques"],
+  "Russian Twist (Seated Bench)":["Obliques"],"Cable Woodchop (Seated)":["Obliques"],
+  "Bicycle Crunch (R Leg Only)":["Obliques","Upper Abs"],"Stir the Pot":["Upper Abs","Obliques"],
+  "McGill Curl-Up":["Upper Abs"],
+  // Core supplements
+  "Modified Plank":["Upper Abs","Lower Abs"],"Modified Hollow Body Hold":["Lower Abs"],
+  "Seated Cable Crunch":["Upper Abs"],"Pallof Press with Overhead Reach":["Obliques"],
+  "Single-Arm Seated Cable Row":["Obliques"],"Modified Side Plank with Band Row":["Obliques"],
+  "Seated Landmine Rotation":["Obliques"],"High-to-Low Woodchop":["Obliques"],
+  "Pallof Alphabet":["Obliques"],"Modified Side Plank Hip Dips":["Obliques"],
+  "Seated Oblique Cable Crunch":["Obliques"],"Modified Hollow Body Flutter":["Lower Abs"],
+  "Modified Plank Shoulder Taps":["Upper Abs","Obliques"],"Pallof ISO Hold":["Obliques"],
+  "Modified Side Plank Hold":["Obliques"],"Low-to-High Woodchop":["Obliques"],
+  "Slow Dead Bugs (Modified)":["Lower Abs","TVA"],
+  "Weighted Crunch (Seated)":["Upper Abs"],"Reverse Crunch (R Leg Only)":["Lower Abs"],
+  "Right Leg Lowers":["Lower Abs"],
+  // Left Leg supplements
+  "Quad Sets":["Quads (L)"],"Short Arc Quads":["Quads (L)"],
+  "Ankle Pumps & Circles":["Calves (L)"],"Banded Terminal Knee Extensions":["Quads (L)"],
+  "Reclined Knee Extensions":["Quads (L)"]
+};
+
+const SUPPLEMENT_LEFT_LEG = {
+  base: ["Quad Sets", "Short Arc Quads", "Ankle Pumps & Circles"],
+  legsExtra: ["Banded Terminal Knee Extensions", "Reclined Knee Extensions"]
+};
+
+const SUPPLEMENT_CORE = {
+  "Push A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Seated Cable Crunch", region: "Upper Abs"},
+    {name: "Modified Hollow Body Hold", region: "Lower Abs"},
+    {name: "Pallof Press with Overhead Reach", region: "Obliques"},
+    {name: "Modified Side Plank Hip Dips", region: "Obliques"}
+  ]},
+  "Push B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank", region: "Upper Abs"},
+    {name: "Reverse Crunch (R Leg Only)", region: "Lower Abs"},
+    {name: "Single-Arm Seated Cable Row", region: "Obliques"},
+    {name: "Seated Oblique Cable Crunch", region: "Obliques"}
+  ]},
+  "Pull A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Weighted Crunch (Seated)", region: "Upper Abs"},
+    {name: "Modified Hollow Body Flutter", region: "Lower Abs"},
+    {name: "Seated Landmine Rotation", region: "Obliques"},
+    {name: "Modified Side Plank with Band Row", region: "Obliques"}
+  ]},
+  "Pull B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank Shoulder Taps", region: "Upper Abs"},
+    {name: "Slow Dead Bugs (Modified)", region: "Lower Abs"},
+    {name: "High-to-Low Woodchop", region: "Obliques"},
+    {name: "Suitcase Hold (Seated)", region: "Obliques"}
+  ]},
+  "Legs A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Seated Cable Crunch", region: "Upper Abs"},
+    {name: "Right Leg Lowers", region: "Lower Abs"},
+    {name: "Pallof Alphabet", region: "Obliques"},
+    {name: "Modified Side Plank Hold", region: "Obliques"}
+  ]},
+  "Legs B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank", region: "Upper Abs"},
+    {name: "Reverse Crunch (R Leg Only)", region: "Lower Abs"},
+    {name: "Low-to-High Woodchop", region: "Obliques"},
+    {name: "Pallof ISO Hold", region: "Obliques"}
+  ]}
+};
+
+// ===== EQUIPMENT VARIANT SYSTEM =====
+const CABLE_VARIANTS = [
+  {id: "single-col", label: "Single Column"},
+  {id: "dual-pulleys", label: "Dual Pulleys"},
+  {id: "lat-machine", label: "Lat Pulldown Machine"},
+  {id: "functional", label: "Functional Trainer"}
+];
+
+const CABLE_SUPERSET = {
+  title: "Left Ankle Dorsiflexion",
+  sets: "2\u00d715",
+  instruction: "Low cable, strap around top of left foot. Pull toes toward shin against cable resistance.",
+  safety: "Tibialis anterior maintenance for gait recovery. Fully seated or reclined."
+};
+
+const GENERIC_SEATED_SUPERSET = {
+  title: "Quad Sets",
+  sets: "2\u00d710, 5s hold",
+  instruction: "Press back of left knee into seat surface. Hold 5 seconds, release, repeat.",
+  safety: "Pure isometric, zero joint stress. Can be done between any seated exercise."
+};
+
+const EQ_VARIANTS = {
+  "SL Leg Press (Right)": {
+    variants: [
+      {id: "45-sled", label: "45\u00b0 Sled (Incline)"},
+      {id: "seated", label: "Seated/Horizontal"},
+      {id: "plate-sled", label: "Plate-Loaded Sled"}
+    ],
+    variantSetup: {
+      "45-sled": "Sit in 45\u00b0 incline sled leg press. Place RIGHT foot HIGH on the plate (above center) to minimize hip flexion at the bottom. Left foot off the machine entirely. Back flat against pad, grip side handles.",
+      "seated": "Sit in seated/horizontal leg press. Place RIGHT foot centered on the press plate. Left foot off to the side. Adjust seat depth so hip flexion stays under 90\u00b0 at bottom of rep. Back against pad.",
+      "plate-sled": "Sit in plate-loaded sled press. Place RIGHT foot HIGH on the plate. Left foot off the machine. Load plates evenly if machine has bilateral loading. Grip side handles firmly."
+    },
+    superset: {
+      title: "Left Leg Extension",
+      sets: "3\u00d710, 3s eccentric",
+      instruction: "Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00d710, 5s hold) before walking to extension machine.",
+      safety: "Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas."
+    }
+  },
+  "SL Leg Extension (Right)": {
+    variants: [
+      {id: "selectorized", label: "Selectorized"},
+      {id: "plate-loaded", label: "Plate-Loaded"}
+    ],
+    variantSetup: {
+      "selectorized": "Sit in selectorized leg extension machine. Adjust back pad and shin pad for RIGHT leg. Left leg off the machine. Pin-select your weight.",
+      "plate-loaded": "Sit in plate-loaded leg extension. Adjust pads for RIGHT leg. Left leg off the machine. Load plates manually."
+    },
+    superset: {
+      title: "Left Leg Extension",
+      sets: "3\u00d712, 3s eccentric",
+      instruction: "Same machine \u2014 reduce weight to ~40-50% of right side. Stay seated, switch legs.",
+      safety: "Hip stays static and reclined, pure knee extension, zero iliopsoas."
+    },
+    variantSupersetNotes: {
+      "plate-loaded": "Plate-loaded requires manual weight change between legs \u2014 strip plates before switching."
+    }
+  },
+  "Prone Ham Curl (Right)": {
+    variants: [
+      {id: "seated", label: "Seated Machine"},
+      {id: "prone", label: "Prone/Lying"},
+      {id: "plate-loaded", label: "Plate-Loaded"}
+    ],
+    variantSetup: {
+      "seated": "Sit in seated hamstring curl machine. RIGHT leg on the pad, left leg off the machine. Adjust back pad so you\u2019re comfortably upright.",
+      "prone": "Lie face-down on prone/lying hamstring curl machine. RIGHT leg only under the pad. Left leg off to the side or resting on the machine frame.",
+      "plate-loaded": "Position on plate-loaded curl machine (seated or prone depending on type). RIGHT leg only. Load plates manually."
+    },
+    variantSuperset: {
+      "seated": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly. Stay seated, switch legs. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only. Seated position keeps hip neutral."
+      },
+      "prone": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly. Stay face down, switch legs. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only. Prone position keeps hip completely neutral."
+      },
+      "plate-loaded": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly, switch legs. Strip plates as needed. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only."
+      }
+    }
+  },
+  "Machine Chest Press": {
+    variants: [
+      {id: "selectorized", label: "Selectorized"},
+      {id: "plate-loaded", label: "Plate-Loaded"},
+      {id: "smith", label: "Smith Machine"}
+    ],
+    variantSetup: {
+      "selectorized": "Sit at selectorized chest press machine. Adjust seat height so handles align with mid-chest. Pin-select weight. Back against pad.",
+      "plate-loaded": "Sit at plate-loaded chest press machine. Adjust seat height so handles align with mid-chest. Load plates evenly on both sides.",
+      "smith": "Set up on a flat bench inside the Smith machine. Unrack the bar at chest height. Right foot flat on floor, left leg straight and relaxed."
+    },
+    superset: {
+      title: "Quad Sets",
+      sets: "2\u00d710, 5s hold",
+      instruction: "Press back of left knee into seat surface. Hold 5 seconds, release, repeat.",
+      safety: "Pure isometric, zero joint stress."
+    }
+  },
+  "Lat Pulldown (Wide)": {isCable: true, variants: CABLE_VARIANTS},
+  "Neutral Grip Pulldown": {isCable: true, variants: CABLE_VARIANTS},
+  "Seated Cable Row": {isCable: true, variants: CABLE_VARIANTS},
+  "One-Arm Cable Row": {isCable: true, variants: CABLE_VARIANTS},
+  "Cable Chest Fly": {isCable: true, variants: CABLE_VARIANTS},
+  "Tricep Rope Pushdown": {isCable: true, variants: CABLE_VARIANTS},
+  "OH Triceps Extension": {isCable: true, variants: CABLE_VARIANTS},
+  "Seated Face Pulls": {isCable: true, variants: CABLE_VARIANTS}
+};
+
 const SCHED = [
   {d:"Mon", t:"Push A", i:"💪", c:"#38bdf8"},
   {d:"Tue", t:"Pull A", i:"🔗", c:"#a78bfa"},
@@ -1201,10 +1649,14 @@ var DIAGRAMS = {
   sideplank: SidePlankDiagram
 };
 
-function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment}) {
+function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment, variantData, selectedVariant, onVariantChange, supersetInfo}) {
   if (!ex) return null;
   const sc = ex.safety === "caution" ? C.warning : ex.safety === "danger" ? C.danger : C.safe;
   const s = ex.sets[phase] || ex.sets[0];
+  var effectiveSetup = ex.setup;
+  if (variantData && variantData.variantSetup && selectedVariant && variantData.variantSetup[selectedVariant]) {
+    effectiveSetup = variantData.variantSetup[selectedVariant];
+  }
 
   return e("div", {style: {marginBottom:6, borderRadius:8, background: isExpanded?"#0f1629":C.bg, borderLeft:"3px solid "+(unavailable?C.danger:sc), opacity: unavailable?0.5:1, overflow:"hidden"}},
     e("div", {onClick: onToggle, style:{padding:"10px 12px", cursor:"pointer"}},
@@ -1213,29 +1665,36 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           e("span", {style:{fontWeight:600, fontSize:13, color: unavailable?C.danger:C.text}}, name),
           ex.safety === "caution" && e(Badge, {color:C.warning}, "MODIFIED"),
           ex.phase != null && phase < ex.phase && e(Badge, {color:C.textMuted}, "Wk "+(ex.phase*2+1)+"+"),
-          unavailable && e(Badge, {color:C.danger}, "NO EQUIP")
+          unavailable && e(Badge, {color:C.danger}, "NO EQUIP"),
+          MUSCLE_TAGS[name] && !isExpanded && MUSCLE_TAGS[name].map(function(m) { return e("span", {key:m, style:{fontSize:8, padding:"1px 4px", borderRadius:3, background:C.border, color:C.textMuted, fontWeight:600, letterSpacing:"0.3px"}}, m); })
         ),
         e("div", {style:{display:"flex", alignItems:"center", gap:8}},
-          !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"×"+s[1]),
-          e("span", {style:{fontSize:10, color:C.accent}}, isExpanded ? "▲" : "ⓘ")
+          !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"\u00d7"+s[1]),
+          e("span", {style:{fontSize:10, color:C.accent}}, isExpanded ? "\u25b2" : "\u24d8")
         )
       )
     ),
     isExpanded && e("div", {style:{padding:"0 12px 12px"}},
       e("div", {style:{display:"flex", gap:12, marginBottom:12, padding:"8px 0", borderBottom:"1px solid "+C.border}},
-        e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Sets × Reps"), e("div", {style:{fontSize:14, fontWeight:700, color:C.accent}}, s[0]+" × "+s[1])),
+        e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Sets \u00d7 Reps"), e("div", {style:{fontSize:14, fontWeight:700, color:C.accent}}, s[0]+" \u00d7 "+s[1])),
         ex.rest > 0 && e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Rest"), e("div", {style:{fontSize:14, fontWeight:700, color:C.text}}, ex.rest+"s"))
       ),
+      variantData && variantData.variants && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
+        variantData.variants.map(function(v) {
+          var isSel = v.id === selectedVariant;
+          return e("button", {key:v.id, onClick:function(ev){ ev.stopPropagation(); onVariantChange && onVariantChange(v.id); }, style:{fontSize:10, padding:"5px 10px", borderRadius:12, background:isSel?C.accent+"22":"transparent", border:"1px solid "+(isSel?C.accent:C.border), color:isSel?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:isSel?700:400, transition:"all 0.15s"}}, v.label);
+        })
+      ),
       e("div", {style:{fontSize:11, lineHeight:1.7}},
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📍 SETUP & POSITION"), e("div", {style:{color:C.textDim}}, ex.setup)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "\uD83D\uDCCD SETUP & POSITION"), e("div", {style:{color:C.textDim}}, effectiveSetup)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "\uD83D\uDD04 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "\uD83D\uDEE1\uFE0F NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "\uD83C\uDFAF WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
         ex.diagram && DIAGRAMS[ex.diagram] && e("div", {style:{marginBottom:10}},
-          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "📐 View Movement Diagram")
+          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "\uD83D\uDCD0 View Movement Diagram")
         ),
         ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
-          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
+          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "\uD83D\uDCD0 VISUAL GUIDE"),
           e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
         ),
         ex.tempo && e("div", {style:{display:"flex", gap:8, marginBottom:10}},
@@ -1246,7 +1705,6 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase", fontWeight:700, marginBottom:6}}, "\uD83D\uDD25 AMPLIFICATION TIERS"),
           ex.amp.map(function(level, i) {
             var colors = [C.safe, C.warning, C.danger];
-            var labels = ["BASE", "AMP 1", "AMP 2"];
             return e("div", {key:"amp-"+i, style:{padding:"6px 8px", marginBottom:3, borderRadius:6, background:colors[i]+"11", borderLeft:"3px solid "+colors[i]+"66", fontSize:11, color:C.textDim, lineHeight:1.5}}, level);
           })
         )
@@ -1264,11 +1722,21 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           ex.swaps.map(function(sw) {
             var swEx = EX[sw];
             var swAvail = swEx && swEx.requires.every(function(r){ return equipment[r] !== false; });
-            return e("button", {key:sw, onClick:function(ev){ ev.stopPropagation(); onSwap(sw); }, style:{fontSize:11, padding:"6px 10px", borderRadius:6, background:swAvail?C.accent+"22":C.bg, color:swAvail?C.accent:C.textMuted, border:"1px solid "+(swAvail?C.accent+"44":C.border), cursor:"pointer", fontFamily:"inherit"}}, sw + (swAvail?" ✓":" ✗"));
+            return e("button", {key:sw, onClick:function(ev){ ev.stopPropagation(); onSwap(sw); }, style:{fontSize:11, padding:"6px 10px", borderRadius:6, background:swAvail?C.accent+"22":C.bg, color:swAvail?C.accent:C.textMuted, border:"1px solid "+(swAvail?C.accent+"44":C.border), cursor:"pointer", fontFamily:"inherit"}}, sw + (swAvail?" \u2713":" \u2717"));
           })
         )
       ),
-      ex.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); onSwap("__timer__"+ex.rest); }, style:{marginTop:10, width:"100%", padding:"10px", borderRadius:8, background:C.accent+"22", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}, "⏱ Start "+ex.rest+"s Rest Timer")
+      ex.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); onSwap("__timer__"+ex.rest); }, style:{marginTop:10, width:"100%", padding:"10px", borderRadius:8, background:C.accent+"22", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+ex.rest+"s Rest Timer"),
+      supersetInfo && e("div", {style:{marginTop:12, padding:"10px 12px", borderRadius:8, background:"#14b8a611", border:"1px solid #14b8a633", borderLeft:"3px solid #14b8a6"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:6, marginBottom:6}},
+          e("span", {style:{display:"inline-block", width:20, height:20, borderRadius:4, background:"#14b8a622", border:"1px solid #14b8a644", textAlign:"center", lineHeight:"20px", fontSize:11, fontWeight:800, color:"#14b8a6"}}, "L"),
+          e("span", {style:{fontWeight:700, fontSize:12, color:"#14b8a6"}}, supersetInfo.title),
+          e("span", {style:{fontSize:11, color:C.textDim, marginLeft:4}}, supersetInfo.sets)
+        ),
+        e("div", {style:{fontSize:11, color:C.textDim, lineHeight:1.6, marginBottom:4}}, supersetInfo.instruction),
+        e("div", {style:{fontSize:10, color:"#14b8a6"}}, "\uD83D\uDEE1\uFE0F " + supersetInfo.safety),
+        supersetInfo.note && e("div", {style:{fontSize:10, color:C.warning, marginTop:4}}, "\u26A0\uFE0F " + supersetInfo.note)
+      )
     )
   );
 }
@@ -1472,8 +1940,285 @@ function ProgressClock() {
   );
 }
 
+// ===== NUTRITION & RECOVERY CHECKLIST =====
+var NUTRITION_ITEMS = [
+  {id:"meal1", label:"Meal 1 \u2014 30g+ protein", type:"meal"},
+  {id:"meal2", label:"Meal 2 \u2014 30g+ protein", type:"meal"},
+  {id:"meal3", label:"Meal 3 \u2014 30g+ protein", type:"meal"},
+  {id:"meal4", label:"Meal 4 \u2014 30g+ protein", type:"meal"},
+  {id:"meal5", label:"Meal 5 \u2014 30g+ protein", type:"meal", optional:true},
+  {id:"creatine", label:"Creatine \u2014 5g", type:"supp"},
+  {id:"omega3", label:"Omega-3s \u2014 3-5g EPA/DHA", type:"supp"},
+  {id:"vitd", label:"Vitamin D \u2014 2000-4000 IU", type:"supp"},
+  {id:"hydration", label:"Hydration", type:"other"},
+  {id:"cardio", label:"Cardio Session", type:"cardio"}
+];
+var SUPP_IDS = ["creatine","omega3","vitd"];
+var MEAL_IDS = ["meal1","meal2","meal3","meal4"];
+var CARDIO_TYPES = ["Arm Bike","Battle Ropes","Seated Boxing","Other"];
+
+function getTodayKey() {
+  var d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function NutritionSection({isOpen, onToggle}) {
+  const todayKey = getTodayKey();
+  const green = "#10b981";
+
+  const _s = useState(function() {
+    const all = loadState("nwb_nutrition", {});
+    return all[todayKey] || {checks:{}, notes:{}, cardioType:"", cardioDuration:"", cardioSkipped:false};
+  });
+  const data = _s[0]; const setData = _s[1];
+
+  const _h = useState(function(){
+    const loaded = loadState("nwb_nutrition_history", {});
+    // Prune entries older than 90 days
+    const keys = Object.keys(loaded);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    const cutoffKey = cutoff.toISOString().slice(0,10);
+    keys.forEach(function(k) {
+      if (k < cutoffKey) delete loaded[k];
+    });
+    return loaded;
+  });
+  const history = _h[0]; const setHistory = _h[1];
+
+  const _d = useState(function(){ return loadState("nwb_nutrition_dismissed", {}); });
+  const dismissed = _d[0]; const setDismissed = _d[1];
+
+  const _hv = useState(false);
+  const showHistory = _hv[0]; const setShowHistory = _hv[1];
+
+  const _hd = useState(null);
+  const historyDetail = _hd[0]; const setHistoryDetail = _hd[1];
+
+  // Persist on change
+  useEffect(function() {
+    const all = loadState("nwb_nutrition", {});
+    all[todayKey] = data;
+    saveState("nwb_nutrition", all);
+    // Update history record
+    const checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
+    const checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
+    const perfect = checkedMeals >= 4 && checkedSupps >= 3;
+    const partial = checkedMeals > 0 || checkedSupps > 0;
+    setHistory(function(prev) {
+      const h = Object.assign({}, prev);
+      h[todayKey] = {perfect:perfect, partial:partial, meals:checkedMeals, supps:checkedSupps};
+      saveState("nwb_nutrition_history", h);
+      return h;
+    });
+  }, [data]);
+
+  // Reset dismissed alerts on new app open (check dismissed date)
+  useEffect(function() {
+    if (dismissed._date !== todayKey) {
+      setDismissed({_date: todayKey});
+      saveState("nwb_nutrition_dismissed", {_date: todayKey});
+    }
+  }, []);
+
+  const toggle = function(id) {
+    setData(function(prev) {
+      const c = Object.assign({}, prev.checks);
+      c[id] = !c[id];
+      return Object.assign({}, prev, {checks:c});
+    });
+  };
+
+  const setNote = function(id, val) {
+    setData(function(prev) {
+      const n = Object.assign({}, prev.notes);
+      n[id] = val;
+      return Object.assign({}, prev, {notes:n});
+    });
+  };
+
+  const setCardioType = function(val) {
+    setData(function(prev) { return Object.assign({}, prev, {cardioType:val}); });
+  };
+
+  const setCardioDuration = function(val) {
+    setData(function(prev) { return Object.assign({}, prev, {cardioDuration:val}); });
+  };
+
+  const skipCardio = function() {
+    setData(function(prev) { return Object.assign({}, prev, {cardioSkipped:!prev.cardioSkipped}); });
+  };
+
+  const dismissAlert = function(key) {
+    const d = Object.assign({}, dismissed);
+    d[key] = true;
+    d._date = todayKey;
+    setDismissed(d);
+    saveState("nwb_nutrition_dismissed", d);
+  };
+
+  // Counts
+  const checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
+  const checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
+  const totalChecked = NUTRITION_ITEMS.filter(function(it){ return it.id === "cardio" ? (data.checks.cardio || data.cardioSkipped) : data.checks[it.id]; }).length;
+  const totalItems = NUTRITION_ITEMS.length;
+
+  // Streak calculation
+  let streak = 0;
+  let bestStreak = 0;
+  const d2 = new Date();
+  d2.setDate(d2.getDate() - 1); // start from yesterday for completed days
+  while (true) {
+    const k = d2.getFullYear()+"-"+String(d2.getMonth()+1).padStart(2,"0")+"-"+String(d2.getDate()).padStart(2,"0");
+    if (history[k] && history[k].perfect) { streak++; d2.setDate(d2.getDate()-1); }
+    else break;
+  }
+  // Include today if perfect
+  if (history[todayKey] && history[todayKey].perfect) streak++;
+  // Best streak from all history
+  const keys = Object.keys(history).sort();
+  let run = 0;
+  for (let si = 0; si < keys.length; si++) {
+    if (history[keys[si]] && history[keys[si]].perfect) { run++; if (run > bestStreak) bestStreak = run; }
+    else run = 0;
+  }
+
+  // Time-based alerts
+  const now = new Date();
+  const hour = now.getHours();
+  const alerts = [];
+
+  const uncheckedSupps = SUPP_IDS.filter(function(id){ return !data.checks[id]; }).map(function(id){
+    return NUTRITION_ITEMS.find(function(it){ return it.id === id; }).label.split(" \u2014 ")[0];
+  });
+
+  if (hour >= 20 && uncheckedSupps.length > 0 && !dismissed.supp_red) {
+    alerts.push({key:"supp_red", color:C.danger, bg:C.dangerBg, border:C.dangerBorder, text:"Still haven\u2019t taken: " + uncheckedSupps.join(", ")});
+  } else if (hour >= 14 && uncheckedSupps.length > 0 && !dismissed.supp_yellow) {
+    alerts.push({key:"supp_yellow", color:C.warning, bg:C.warningBg, border:C.warningBorder, text:"Don\u2019t forget your supplements: " + uncheckedSupps.join(", ")});
+  }
+
+  if (hour >= 21 && checkedMeals < 4 && !dismissed.meal_red) {
+    alerts.push({key:"meal_red", color:C.danger, bg:C.dangerBg, border:C.dangerBorder, text:"Only " + checkedMeals + " protein meal" + (checkedMeals !== 1 ? "s" : "") + " today \u2014 try to get one more in before bed"});
+  } else if (hour >= 17 && checkedMeals < 3 && !dismissed.meal_orange) {
+    alerts.push({key:"meal_orange", color:"#f97316", bg:"#431407", border:"#7c2d12", text:"Only " + checkedMeals + " protein meal" + (checkedMeals !== 1 ? "s" : "") + " logged \u2014 aim for at least 4 today"});
+  }
+
+  // Sort: red first
+  alerts.sort(function(a, b) { return a.color === C.danger ? -1 : b.color === C.danger ? 1 : 0; });
+
+  // Last 7 days for history view
+  const last7 = [];
+  const dayNames3 = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  for (let di = 6; di >= 0; di--) {
+    const dd = new Date();
+    dd.setDate(dd.getDate() - di);
+    const dk = dd.getFullYear()+"-"+String(dd.getMonth()+1).padStart(2,"0")+"-"+String(dd.getDate()).padStart(2,"0");
+    last7.push({key:dk, label:dayNames3[dd.getDay()], date:dd.getDate(), data:history[dk]||null, isToday:dk===todayKey});
+  }
+
+  const headerExtra = e("div", {style:{display:"flex", alignItems:"center", gap:8}},
+    streak > 0 && e("span", {style:{fontSize:11, fontWeight:700, color:green}}, "\uD83D\uDD25 " + streak + "d streak"),
+    streak === 0 && bestStreak > 0 && e("span", {style:{fontSize:10, color:C.textMuted}}, "Best: " + bestStreak + "d"),
+    e("span", {style:{fontSize:11, color:C.textMuted}}, totalChecked + "/" + totalItems + " \u2713")
+  );
+
+  return e("div", {style:{marginBottom:10, borderRadius:10, border:"1px solid "+(isOpen?green+"44":C.border), background:C.card, overflow:"hidden"}},
+    e("div", {style:{display:"flex", alignItems:"center", gap:9, padding:"13px 14px", cursor:"pointer"}, onClick:onToggle},
+      e("span", {style:{fontSize:17}}, "\uD83E\uDD66"),
+      e("span", {style:{flex:1, fontWeight:600, fontSize:14, color:green}}, "Daily Nutrition & Recovery"),
+      headerExtra,
+      e("span", {style:{transform:isOpen?"rotate(180deg)":"rotate(0deg)", transition:"transform 0.2s", fontSize:11, color:C.textMuted, marginLeft:6}}, "\u25BC")
+    ),
+    isOpen && e("div", {style:{padding:"0 14px 14px"}},
+      // Alerts
+      alerts.length > 0 && e("div", {style:{marginBottom:10}},
+        alerts.map(function(a) {
+          return e("div", {key:a.key, style:{padding:"8px 12px", borderRadius:8, background:a.bg, border:"1px solid "+a.border, marginBottom:4, display:"flex", alignItems:"center", justifyContent:"space-between", fontSize:12, color:a.color}},
+            e("span", null, a.text),
+            e("button", {onClick:function(ev){ ev.stopPropagation(); dismissAlert(a.key); }, style:{background:"none", border:"none", color:a.color, cursor:"pointer", fontSize:14, padding:"0 4px", fontFamily:"inherit"}}, "\u2715")
+          );
+        })
+      ),
+
+      // History toggle + view
+      e("div", {style:{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}},
+        e("div", {style:{fontSize:10, fontWeight:700, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1px"}}, "Today\u2019s Checklist"),
+        e("button", {onClick:function(){ setShowHistory(!showHistory); setHistoryDetail(null); }, style:{fontSize:10, padding:"3px 8px", borderRadius:6, background:showHistory?green+"22":"transparent", border:"1px solid "+(showHistory?green:C.border), color:showHistory?green:C.textMuted, cursor:"pointer", fontFamily:"inherit"}}, showHistory ? "Hide History" : "History")
+      ),
+
+      showHistory && e("div", {style:{marginBottom:12, padding:10, borderRadius:8, background:C.bg, border:"1px solid "+C.border}},
+        e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4, marginBottom:historyDetail?8:0}},
+          last7.map(function(day) {
+            const clr = day.data ? (day.data.perfect ? green : "#f59e0b") : "#334155";
+            const isSel = historyDetail === day.key;
+            return e("div", {key:day.key, onClick:function(){ setHistoryDetail(isSel ? null : day.key); }, style:{textAlign:"center", padding:"6px 2px", borderRadius:6, background:isSel?clr+"22":"transparent", border:"1px solid "+(isSel?clr:"transparent"), cursor:"pointer"}},
+              e("div", {style:{fontSize:9, fontWeight:700, color:day.isToday?green:C.textMuted}}, day.isToday?"Today":day.label),
+              e("div", {style:{width:20, height:20, borderRadius:"50%", background:clr, margin:"4px auto", display:"flex", alignItems:"center", justifyContent:"center"}},
+                day.data && day.data.perfect && e("span", {style:{fontSize:10, color:"#fff"}}, "\u2713")
+              ),
+              e("div", {style:{fontSize:8, color:C.textMuted}}, day.date)
+            );
+          })
+        ),
+        historyDetail && (function() {
+          const hd = history[historyDetail];
+          if (!hd) return e("div", {style:{fontSize:11, color:C.textMuted, textAlign:"center", padding:8}}, "No data recorded");
+          return e("div", {style:{fontSize:11, color:C.textDim, padding:"4px 0"}},
+            e("div", null, "\u2022 Protein meals: " + hd.meals + "/4"),
+            e("div", null, "\u2022 Supplements: " + hd.supps + "/3"),
+            e("div", {style:{color:hd.perfect?green:C.warning, fontWeight:600, marginTop:2}}, hd.perfect ? "\u2713 Perfect day" : "Partial completion")
+          );
+        })()
+      ),
+
+      // Checklist items
+      NUTRITION_ITEMS.map(function(item) {
+        const checked = !!data.checks[item.id];
+        const isCardio = item.type === "cardio";
+
+        if (isCardio) {
+          const skipped = data.cardioSkipped;
+          return e("div", {key:item.id, style:{padding:"8px 10px", marginBottom:4, borderRadius:8, background:checked||skipped?"#0f1629":C.bg, border:"1px solid "+(checked?green+"44":skipped?"#64748b33":C.border), opacity:skipped?0.6:1}},
+            e("div", {style:{display:"flex", alignItems:"center", gap:8}},
+              e("div", {onClick:function(){ if(!skipped) toggle(item.id); }, style:{width:18, height:18, borderRadius:4, border:"2px solid "+(checked?green:C.textMuted), background:checked?green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0}},
+                checked && e("span", {style:{color:"#fff", fontSize:11, fontWeight:800}}, "\u2713")
+              ),
+              e("span", {style:{fontSize:12, fontWeight:500, color:checked?C.text:skipped?"#64748b":C.textDim, flex:1, textDecoration:skipped?"line-through":"none"}}, item.label),
+              e("button", {onClick:function(){ skipCardio(); }, style:{fontSize:9, padding:"3px 8px", borderRadius:6, background:skipped?"#64748b22":"transparent", border:"1px solid "+(skipped?"#64748b":C.border), color:skipped?"#64748b":C.textMuted, cursor:"pointer", fontFamily:"inherit"}}, skipped ? "Unskip" : "Rest Day \u2014 Skip")
+            ),
+            !skipped && checked && e("div", {style:{marginTop:6, display:"flex", gap:4, flexWrap:"wrap", alignItems:"center", paddingLeft:26}},
+              CARDIO_TYPES.map(function(ct) {
+                const isSel = data.cardioType === ct;
+                return e("button", {key:ct, onClick:function(){ setCardioType(ct); }, style:{fontSize:9, padding:"3px 8px", borderRadius:10, background:isSel?green+"22":"transparent", border:"1px solid "+(isSel?green:C.border), color:isSel?green:C.textMuted, cursor:"pointer", fontFamily:"inherit"}}, ct);
+              }),
+              e("input", {type:"text", placeholder:"min", value:data.cardioDuration||"", onChange:function(ev){ setCardioDuration(ev.target.value); }, onClick:function(ev){ ev.stopPropagation(); }, style:{width:40, fontSize:10, padding:"3px 6px", borderRadius:6, border:"1px solid "+C.border, background:C.bg, color:C.text, fontFamily:"inherit", textAlign:"center"}})
+            )
+          );
+        }
+
+        return e("div", {key:item.id, style:{padding:"8px 10px", marginBottom:4, borderRadius:8, background:checked?"#0f1629":C.bg, border:"1px solid "+(checked?green+"44":C.border), opacity:item.optional&&!checked?0.5:1}},
+          e("div", {style:{display:"flex", alignItems:"center", gap:8}},
+            e("div", {onClick:function(){ toggle(item.id); }, style:{width:18, height:18, borderRadius:4, border:"2px solid "+(checked?green:C.textMuted), background:checked?green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0}},
+              checked && e("span", {style:{color:"#fff", fontSize:11, fontWeight:800}}, "\u2713")
+            ),
+            e("span", {style:{fontSize:12, fontWeight:500, color:checked?C.text:C.textDim}}, item.label + (item.optional ? " (optional)" : "")),
+            item.type === "meal" && checked && e("input", {type:"text", placeholder:"what did you eat?", value:data.notes[item.id]||"", onChange:function(ev){ setNote(item.id, ev.target.value); }, onClick:function(ev){ ev.stopPropagation(); }, style:{flex:1, maxWidth:160, fontSize:10, padding:"3px 6px", borderRadius:6, border:"1px solid "+C.border, background:"transparent", color:C.textMuted, fontFamily:"inherit"}})
+          )
+        );
+      })
+    )
+  );
+}
+
 // ===== MAIN APP =====
 function App() {
+  var SCHEMA_VERSION = 4;
+  var storedVersion = localStorage.getItem('nwb_schema_version');
+  if (!storedVersion) {
+    localStorage.setItem('nwb_schema_version', SCHEMA_VERSION);
+  }
+
   const [tab, setTab] = useState(0);
   const [phase, setPhase] = useState(loadState("nwb_phase", 0));
   const [openSections, setOpenSections] = useState(function(){
@@ -1496,6 +2241,9 @@ function App() {
     "Legs B": "s5QsLGXsVAy"
   }));
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
+  const [supplementToggles, setSupplementToggles] = useState(loadState("nwb_supplements", {leftLeg: true, core: true}));
+  const [variantSelections, setVariantSelections] = useState(loadState("nwb_variants", {}));
+  const [coreFilter, setCoreFilter] = useState("all");
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
 
@@ -1504,6 +2252,16 @@ function App() {
   useEffect(function(){ saveState("nwb_swaps", swaps); }, [swaps]);
   useEffect(function(){ saveState("nwb_hevy", hevyIds); }, [hevyIds]);
   useEffect(function(){ saveState("nwb_startDay", startDay); }, [startDay]);
+  useEffect(function(){ saveState("nwb_supplements", supplementToggles); }, [supplementToggles]);
+  useEffect(function(){ saveState("nwb_variants", variantSelections); }, [variantSelections]);
+
+  const toggleSupplement = function(key) {
+    setSupplementToggles(function(prev) {
+      var n = Object.assign({}, prev);
+      n[key] = !n[key];
+      return n;
+    });
+  };
 
   const getWorkoutForDay = function(dayIdx) {
     var rotationIdx = (dayIdx - startDay + 7) % 7;
@@ -1551,6 +2309,41 @@ function App() {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
     var hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
+    var isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
+    var isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
+    // Find first cable exercise in this workout for superset tracking
+    var firstCableEx = null;
+    for (var ci = 0; ci < w.exercises.length; ci++) {
+      var cn = getExName(workoutKey, w.exercises[ci]);
+      if (EQ_VARIANTS[cn] && EQ_VARIANTS[cn].isCable) { firstCableEx = cn; break; }
+    }
+    // Build supplement pairings: distribute LL and Core exercises across main exercises
+    var suppMap = {};
+    var coreSubtitle = "";
+    if (isTrainingDay) {
+      var llExercises = SUPPLEMENT_LEFT_LEG.base.slice();
+      if (isLegsDay) llExercises = llExercises.concat(SUPPLEMENT_LEFT_LEG.legsExtra);
+      var coreExData = SUPPLEMENT_CORE[workoutKey].exercises;
+      coreSubtitle = SUPPLEMENT_CORE[workoutKey].subtitle;
+      // Interleave: L, C, L, C, L, C, (extras)
+      var allSupps = [];
+      var maxSL = Math.max(llExercises.length, coreExData.length);
+      for (var si = 0; si < maxSL; si++) {
+        if (si < llExercises.length) allSupps.push({type:"leftleg", name:llExercises[si]});
+        if (si < coreExData.length) allSupps.push({type:"core", name:coreExData[si].name, region:coreExData[si].region});
+      }
+      // Get active exercises list (respecting phase gates)
+      var activeEx = w.exercises.filter(function(orig) {
+        var en = getExName(workoutKey, orig);
+        var exd = EX[en];
+        return exd && (exd.phase == null || phase >= exd.phase);
+      });
+      for (var sj = 0; sj < allSupps.length; sj++) {
+        var target = activeEx[sj % activeEx.length];
+        if (!suppMap[target]) suppMap[target] = [];
+        suppMap[target].push(allSupps[sj]);
+      }
+    }
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
       hevyId ? e("div", {style:{marginBottom:10}},
         e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", textAlign:"center", padding:"8px", borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:600, textDecoration:"none"}}, "Open in HEVY")
@@ -1571,18 +2364,130 @@ function App() {
           e("span", {style:{marginLeft:"auto", color:"#64748b", fontSize:12}}, "\u2192")
         )
       ),
+      // Supplement toggle controls
+      isTrainingDay && e("div", {style:{display:"flex", gap:6, marginBottom:10, flexWrap:"wrap"}},
+        e("button", {onClick:function(ev){ ev.stopPropagation(); toggleSupplement("leftLeg"); }, style:{fontSize:10, padding:"4px 10px", borderRadius:10, background:supplementToggles.leftLeg?"#14b8a618":"transparent", border:"1px solid "+(supplementToggles.leftLeg?"#14b8a644":C.border), color:supplementToggles.leftLeg?"#14b8a6":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:supplementToggles.leftLeg?600:400}}, "\uD83E\uDDBF L-Leg Supersets " + (supplementToggles.leftLeg ? "ON" : "OFF")),
+        e("button", {onClick:function(ev){ ev.stopPropagation(); toggleSupplement("core"); }, style:{fontSize:10, padding:"4px 10px", borderRadius:10, background:supplementToggles.core?"#f9731618":"transparent", border:"1px solid "+(supplementToggles.core?"#f9731644":C.border), color:supplementToggles.core?"#f97316":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:supplementToggles.core?600:400}}, "\uD83C\uDFAF Core Supersets " + (supplementToggles.core ? "ON" : "OFF") + (coreSubtitle ? " \u2014 " + coreSubtitle : ""))
+      ),
       w.exercises.map(function(origName) {
         var exName = getExName(workoutKey, origName);
         var ex = EX[exName];
         if (!ex) return null;
         if (ex.phase != null && phase < ex.phase) return null;
         var unavail = !isAvailable(exName);
+        // Equipment variant data
+        var vData = EQ_VARIANTS[exName] || null;
+        var selVariant = vData ? (variantSelections[exName] || vData.variants[0].id) : null;
+        // Equipment-specific superset (controlled by left leg toggle)
+        var ssInfo = null;
+        if (supplementToggles.leftLeg) {
+          if (vData) {
+            if (vData.isCable) {
+              if (exName === firstCableEx) {
+                ssInfo = {title: CABLE_SUPERSET.title, sets: CABLE_SUPERSET.sets, instruction: CABLE_SUPERSET.instruction, safety: CABLE_SUPERSET.safety};
+                if (selVariant === "lat-machine") {
+                  ssInfo.note = "No low cable available on this machine \u2014 do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.";
+                }
+              }
+            } else if (vData.variantSuperset && vData.variantSuperset[selVariant]) {
+              ssInfo = vData.variantSuperset[selVariant];
+            } else if (vData.superset) {
+              ssInfo = Object.assign({}, vData.superset);
+              if (vData.variantSupersetNotes && vData.variantSupersetNotes[selVariant]) {
+                ssInfo.note = vData.variantSupersetNotes[selVariant];
+              }
+            }
+          }
+        }
+        // Supplement superset cards for this exercise
+        var suppCards = suppMap[origName] || [];
+        var activeSuppCards = suppCards.filter(function(supp) {
+          var isLL = supp.type === "leftleg";
+          return (isLL && supplementToggles.leftLeg) || (!isLL && supplementToggles.core);
+        });
+        var isExp = !!expandedEx[exName];
         return e("div", {key: origName},
           exName !== origName && e("div", {style:{fontSize:10, color:C.textMuted, padding:"2px 12px", display:"flex", alignItems:"center", gap:4}},
-            e("span", null, "↻ was: " + origName),
+            e("span", null, "\u21bb was: " + origName),
             e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
           ),
-          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment})
+          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:isExp, onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo}),
+          // Collapsed supplement indicator
+          !isExp && activeSuppCards.length > 0 && e("div", {onClick:function(){ toggleEx(exName); }, style:{cursor:"pointer", margin:"-4px 0 4px", padding:"4px 12px 6px", display:"flex", alignItems:"center", gap:6, background:"linear-gradient(90deg, #14b8a608, #f9731608)", borderRadius:"0 0 8px 8px", borderLeft:"3px solid transparent", borderImage:"linear-gradient(to bottom, #14b8a644, #f9731644) 1"}},
+            activeSuppCards.map(function(supp, si) {
+              var isLL = supp.type === "leftleg";
+              var accent = isLL ? "#14b8a6" : "#f97316";
+              var label = isLL ? "L" : "C";
+              return e("span", {key:"ind-"+si, style:{display:"inline-flex", alignItems:"center", gap:3}},
+                e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:14, height:14, borderRadius:3, background:accent+"22", border:"1px solid "+accent+"44", fontSize:7, fontWeight:800, color:accent}}, label),
+                e("span", {style:{fontSize:9, color:accent, opacity:0.8, fontWeight:600}}, supp.name.length > 20 ? supp.name.substring(0,18)+"..." : supp.name)
+              );
+            }),
+            e("span", {style:{marginLeft:"auto", fontSize:8, color:C.textMuted}}, "\u25BC tap to expand")
+          ),
+          // Inline supplement superset cards (expanded)
+          isExp && suppCards.length > 0 && e("div", {style:{padding:"0 4px 4px"}},
+            suppCards.map(function(supp, suppIdx) {
+              var isLL = supp.type === "leftleg";
+              if (isLL && !supplementToggles.leftLeg) return null;
+              if (!isLL && !supplementToggles.core) return null;
+              var suppEx = EX[supp.name];
+              if (!suppEx) return null;
+              var accent = isLL ? "#14b8a6" : "#f97316";
+              var suppSets = suppEx.sets[phase] || suppEx.sets[0];
+              var suppExpKey = "supp_" + supp.name;
+              var suppIsExp = !!expandedEx[suppExpKey];
+              // Group numbering
+              var groupTotal = isLL ? llExercises.length : coreExData.length;
+              var groupIdx = isLL
+                ? llExercises.indexOf(supp.name) + 1
+                : coreExData.findIndex(function(c){ return c.name === supp.name; }) + 1;
+              var groupLabel = groupIdx + "/" + groupTotal;
+
+              if (isLL) {
+                // LEFT LEG: compact teal card, left accent bar
+                return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, background:"#14b8a609", border:"1px solid #14b8a628", borderLeft:"3px solid #14b8a6", overflow:"hidden"}},
+                  e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
+                    e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:18, height:18, borderRadius:4, background:"#14b8a622", border:"1px solid #14b8a644", fontSize:9, fontWeight:800, color:"#14b8a6", flexShrink:0}}, "L"),
+                    e("span", {style:{fontSize:9, fontWeight:700, color:"#14b8a6", opacity:0.7}}, groupLabel),
+                    e("span", {style:{fontSize:10, fontWeight:600, color:"#14b8a6", textTransform:"uppercase", letterSpacing:"0.3px"}}, "Left Leg"),
+                    e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
+                    e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
+                    e("span", {style:{fontSize:9, color:"#14b8a6", marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
+                  ),
+                  suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:"#14b8a6", fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
+                    e("div", null, e("span", {style:{fontWeight:700, color:"#14b8a6", fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
+                    suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:"#14b8a618", border:"1px solid #14b8a633", color:"#14b8a6", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
+                  )
+                );
+              } else {
+                // CORE: distinct style — top accent bar, darker bg, dashed border
+                var regionColors = {"Upper Abs":"#f59e0b","Lower Abs":"#ec4899","Obliques":"#a78bfa"};
+                var regionColor = regionColors[supp.region] || "#f97316";
+                return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, overflow:"hidden", border:"1px dashed #f9731633", background:"linear-gradient(135deg, #f9731608 0%, #f9731603 100%)"}},
+                  // Top accent bar
+                  e("div", {style:{height:3, background:"linear-gradient(90deg, "+regionColor+", "+regionColor+"66)"}}),
+                  e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
+                    // Core circuit badge
+                    e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:20, height:20, borderRadius:10, background:"#f9731622", border:"1px solid #f9731644", fontSize:8, fontWeight:800, color:"#f97316", flexShrink:0, padding:"0 4px"}}, groupLabel),
+                    // Region pill
+                    e("span", {style:{fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:8, background:regionColor+"22", border:"1px solid "+regionColor+"44", color:regionColor, textTransform:"uppercase", letterSpacing:"0.5px", flexShrink:0}}, supp.region || "Core"),
+                    e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
+                    e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
+                    e("span", {style:{fontSize:9, color:"#f97316", marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
+                  ),
+                  suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:"#f97316", fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
+                    e("div", null, e("span", {style:{fontWeight:700, color:"#f97316", fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
+                    suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:"#f9731618", border:"1px solid #f9731633", color:"#f97316", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
+                  )
+                );
+              }
+            })
+          )
         );
       }),
       w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
@@ -1625,6 +2530,7 @@ function App() {
           })
         ),
         selWorkout && renderWorkout(selSched.t),
+        e(NutritionSection, {isOpen:!!openSections["nutrition-daily"], onToggle:function(){ toggleSection("nutrition-daily"); }}),
         e(Section, {title:"Cross-Education Protocol", icon:"🧠", isOpen:!!openSections["cross-ed"], onToggle:function(){ toggleSection("cross-ed"); }},
           e(Callout, {type:"info"}, "Manca et al. meta-analysis: 11.9% strength gains in untrained limb. Eccentric-focused work → 17.7% crossover."),
           e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
@@ -1683,33 +2589,51 @@ function App() {
       break;
 
     case 3: // Core
+      // Collect equipment types from all core exercises for filter pills
+      var coreBlocks = [
+        {key:"core-antiext", title:"Block 1: Anti-Extension", icon:"\uD83D\uDC80", accent:C.danger, exercises:["Forearm Plank Saw","Plank Knee Tuck (R only)","Wheelbarrow Hold","Spiderman Plank (R only)","Slow Mountain Climber (R)","Dead Bug (R Leg Only)","Hollow Body Hold","Body Saw (Sliders)"]},
+        {key:"core-antirot", title:"Block 2: Anti-Rotation", icon:"\uD83D\uDD04", accent:C.accent, exercises:["Pallof Press (Seated)","Pallof Overhead Reach","Bird-Dog (Prone Bench)"]},
+        {key:"core-antilat", title:"Block 3: Anti-Lateral-Flexion", icon:"\u2194\uFE0F", accent:C.warning, exercises:["Side Plank (R Side Down)","Side Plank (L Oblique Bias \u2014 R Side Down)","Suitcase Hold (Seated)"]},
+        {key:"core-rotation", title:"Block 4: Rotation + Integrated", icon:"\uD83C\uDF00", accent:"#a78bfa", exercises:["Russian Twist (Seated Bench)","Cable Woodchop (Seated)","Bicycle Crunch (R Leg Only)","Stir the Pot","McGill Curl-Up"]}
+      ];
+      var coreEquipSet = {};
+      coreBlocks.forEach(function(b){ b.exercises.forEach(function(name){ var ex = EX[name]; if(ex) ex.requires.forEach(function(r){ if(r!=="mat") coreEquipSet[r]=true; }); }); });
+      var coreEquipKeys = Object.keys(coreEquipSet);
+      var coreFilterFn = function(name) {
+        if (coreFilter === "all") return true;
+        var ex = EX[name];
+        if (!ex) return false;
+        if (coreFilter === "floor") return ex.requires.length === 0 || ex.requires.every(function(r){ return r === "mat"; });
+        return ex.requires.indexOf(coreFilter) >= 0;
+      };
+      var coreFilterCount = 0;
+      coreBlocks.forEach(function(b){ b.exercises.forEach(function(n){ if(coreFilterFn(n)) coreFilterCount++; }); });
       content = e("div", null,
         e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture. Left leg passive in ALL exercises."),
         e(Callout, {type:"info"}, "Slow tempo protocol: 4-count movements, time-based sets, continuous tension. BASE \u2192 AMP 1 \u2192 AMP 2. Target muscle failure in the final 10-15 seconds of each set. If you finish the set comfortably, move up an amp level."),
-        e(Section, {title:"Block 1: Anti-Extension", icon:"\uD83D\uDC80", isOpen:!!openSections["core-antiext"], onToggle:function(){ toggleSection("core-antiext"); }, count:8, accent:C.danger},
-          ["Forearm Plank Saw","Plank Knee Tuck (R only)","Wheelbarrow Hold","Spiderman Plank (R only)","Slow Mountain Climber (R)","Dead Bug (R Leg Only)","Hollow Body Hold","Body Saw (Sliders)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
+        // Equipment filter
+        e("div", {style:{marginBottom:12}},
+          e("div", {style:{fontSize:10, fontWeight:700, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1px", marginBottom:6}}, "Filter by equipment \u2014 " + (coreFilter === "all" ? "showing all" : coreFilterCount + " matching")),
+          e("div", {style:{display:"flex", flexWrap:"wrap", gap:4}},
+            e("button", {onClick:function(){ setCoreFilter("all"); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:coreFilter==="all"?C.accent+"22":"transparent", border:"1px solid "+(coreFilter==="all"?C.accent:C.border), color:coreFilter==="all"?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:coreFilter==="all"?700:400}}, "All"),
+            e("button", {onClick:function(){ setCoreFilter("floor"); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:coreFilter==="floor"?"#10b98122":"transparent", border:"1px solid "+(coreFilter==="floor"?"#10b981":C.border), color:coreFilter==="floor"?"#10b981":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:coreFilter==="floor"?700:400}}, "\uD83E\uDDD8 Floor / Mat Only"),
+            coreEquipKeys.map(function(eqKey) {
+              var eq = EQUIPMENT[eqKey];
+              var isSel = coreFilter === eqKey;
+              return e("button", {key:eqKey, onClick:function(){ setCoreFilter(isSel ? "all" : eqKey); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:isSel?C.accent+"22":"transparent", border:"1px solid "+(isSel?C.accent:C.border), color:isSel?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:isSel?700:400}}, (eq?eq.icon+" ":"") + (eq?eq.name:eqKey));
+            })
+          )
         ),
-        e(Section, {title:"Block 2: Anti-Rotation", icon:"\uD83D\uDD04", isOpen:!!openSections["core-antirot"], onToggle:function(){ toggleSection("core-antirot"); }, count:3, accent:C.accent},
-          ["Pallof Press (Seated)","Pallof Overhead Reach","Bird-Dog (Prone Bench)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
-        e(Section, {title:"Block 3: Anti-Lateral-Flexion", icon:"\u2194\uFE0F", isOpen:!!openSections["core-antilat"], onToggle:function(){ toggleSection("core-antilat"); }, count:3, accent:C.warning},
-          ["Side Plank (R Side Down)","Side Plank (L Oblique Bias \u2014 R Side Down)","Suitcase Hold (Seated)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
-        e(Section, {title:"Block 4: Rotation + Integrated", icon:"\uD83C\uDF00", isOpen:!!openSections["core-rotation"], onToggle:function(){ toggleSection("core-rotation"); }, count:5, accent:"#a78bfa"},
-          ["Russian Twist (Seated Bench)","Cable Woodchop (Seated)","Bicycle Crunch (R Leg Only)","Stir the Pot","McGill Curl-Up"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
+        coreBlocks.map(function(block) {
+          var filtered = block.exercises.filter(coreFilterFn);
+          if (coreFilter !== "all" && filtered.length === 0) return null;
+          return e(Section, {key:block.key, title:block.title, icon:block.icon, isOpen:!!openSections[block.key], onToggle:function(){ toggleSection(block.key); }, count:filtered.length, accent:block.accent},
+            filtered.map(function(name) {
+              var ex = EX[name];
+              return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
+            })
+          );
+        }),
         e(Section, {title:"Removed Exercises", icon:"\uD83D\uDEAB", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
           e(RemovedRow, {name:"Active Straight Leg Raises", reason:"Hip flexor contraction compresses femoral neck stress fracture. NEVER do these."}),
           e(RemovedRow, {name:"Hanging Leg Raises", reason:"Deep hip flexion + massive hip flexor force = fracture danger."}),
