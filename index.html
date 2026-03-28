@@ -2401,6 +2401,10 @@ function App() {
         }
         // Supplement superset cards for this exercise
         var suppCards = suppMap[origName] || [];
+        var activeSuppCards = suppCards.filter(function(supp) {
+          var isLL = supp.type === "leftleg";
+          return (isLL && supplementToggles.leftLeg) || (!isLL && supplementToggles.core);
+        });
         var isExp = !!expandedEx[exName];
         return e("div", {key: origName},
           exName !== origName && e("div", {style:{fontSize:10, color:C.textMuted, padding:"2px 12px", display:"flex", alignItems:"center", gap:4}},
@@ -2408,7 +2412,20 @@ function App() {
             e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
           ),
           e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:isExp, onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo}),
-          // Inline supplement superset cards
+          // Collapsed supplement indicator
+          !isExp && activeSuppCards.length > 0 && e("div", {onClick:function(){ toggleEx(exName); }, style:{cursor:"pointer", margin:"-4px 0 4px", padding:"4px 12px 6px", display:"flex", alignItems:"center", gap:6, background:"linear-gradient(90deg, #14b8a608, #f9731608)", borderRadius:"0 0 8px 8px", borderLeft:"3px solid transparent", borderImage:"linear-gradient(to bottom, #14b8a644, #f9731644) 1"}},
+            activeSuppCards.map(function(supp, si) {
+              var isLL = supp.type === "leftleg";
+              var accent = isLL ? "#14b8a6" : "#f97316";
+              var label = isLL ? "L" : "C";
+              return e("span", {key:"ind-"+si, style:{display:"inline-flex", alignItems:"center", gap:3}},
+                e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:14, height:14, borderRadius:3, background:accent+"22", border:"1px solid "+accent+"44", fontSize:7, fontWeight:800, color:accent}}, label),
+                e("span", {style:{fontSize:9, color:accent, opacity:0.8, fontWeight:600}}, supp.name.length > 20 ? supp.name.substring(0,18)+"..." : supp.name)
+              );
+            }),
+            e("span", {style:{marginLeft:"auto", fontSize:8, color:C.textMuted}}, "\u25BC tap to expand")
+          ),
+          // Inline supplement superset cards (expanded)
           isExp && suppCards.length > 0 && e("div", {style:{padding:"0 4px 4px"}},
             suppCards.map(function(supp, suppIdx) {
               var isLL = supp.type === "leftleg";
