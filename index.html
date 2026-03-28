@@ -515,6 +515,208 @@ const EX = {
     swaps: []
   },
 
+  // LEFT LEG MAINTENANCE supplements
+  "Quad Sets": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","15 (5s hold)"],["3","15 (5s hold)"],["3","15 (5s hold)"]], rest: 30,
+    setup: "Supine, left leg straight on the floor.",
+    execution: "Press the back of your knee hard into the floor. Hold 5 seconds, release fully, repeat.",
+    nwbCues: "Zero hip flexor activation — pure quad isometric. If you feel hip crease tension, you're lifting the leg instead of pressing down.",
+    why: "Maintains quad neural drive in the immobilized limb without any joint loading.",
+    safety: "safe", swaps: []
+  },
+  "Short Arc Quads": {
+    requires: ["mat"], category: "legs",
+    sets: [["3","12 (2s hold)"],["3","12 (2s hold)"],["3","12 (2s hold)"]], rest: 30,
+    setup: "Supine, rolled towel under left knee creating ~30° bend.",
+    execution: "Extend knee to full lockout, hold 2s, lower slowly back to the towel.",
+    nwbCues: "Hip stays completely static — no iliopsoas activation. The towel limits ROM to safe range.",
+    why: "Quad activation through limited ROM. Builds on quad sets with slightly more demand.",
+    safety: "safe", swaps: []
+  },
+  "Ankle Pumps & Circles": {
+    requires: [], category: "legs",
+    sets: [["2","20 each direction"],["2","20 each direction"],["2","20 each direction"]], rest: 0,
+    setup: "Supine or seated, left leg elevated on a pillow or bolster.",
+    execution: "Alternate between pointing and flexing the ankle (20 reps), then draw circles in both directions.",
+    nwbCues: "DVT prevention and calf maintenance. Perform frequently throughout the day, not just during workouts.",
+    why: "Prevents blood clots (DVT) and maintains ankle ROM and calf engagement during immobilization.",
+    safety: "safe", swaps: []
+  },
+  "Banded Terminal Knee Extensions": {
+    requires: ["bands"], category: "legs",
+    sets: [["3","12"],["3","12"],["3","12"]], rest: 60,
+    setup: "Seated, loop band behind left knee anchored to a post behind you. Start at ~30° knee bend.",
+    execution: "Press knee to full extension against band resistance. Squeeze quad at lockout, return slowly.",
+    nwbCues: "Pure knee extension only — no hip flexor engagement. If you feel hip crease tension, reposition the anchor point.",
+    why: "Resisted knee extension builds quad strength without hip flexor demand. Good progression from quad sets.",
+    safety: "safe", swaps: []
+  },
+  "Reclined Knee Extensions": {
+    requires: [], category: "legs",
+    sets: [["3","10 (3s ecc)"],["3","10 (3s ecc)"],["3","10 (3s ecc)"]], rest: 60,
+    setup: "Leg extension machine or ankle-banded. Recline the seat back so hip angle stays well under 90°.",
+    execution: "Extend to full lockout, then lower over 3 seconds (controlled eccentric).",
+    nwbCues: "Recline the seat to keep hip angle safe for FAI. If seat doesn't recline enough, use ankle band from a reclined bench instead.",
+    why: "Loaded quad work with controlled eccentric in an FAI-safe hip position.",
+    safety: "safe", swaps: []
+  },
+
+  // DAILY CORE SUPPLEMENTS
+  "Modified Plank": {
+    requires: ["mat"], category: "core",
+    sets: [["3","45-60s"],["3","45-60s"],["3","45-60s"]], rest: 30,
+    setup: "Forearms on floor, RIGHT knee on floor as base. Left leg stacked passively on top of right leg.",
+    execution: "Maintain a rigid line from shoulders through right knee. Left leg is dead weight — do not engage it.",
+    nwbCues: "Zero left hip flexor activation. No weight bearing on left leg. If left hip engages, widen right knee base.",
+    why: "Anti-extension hold modified for NWB. Right knee base keeps left leg completely passive.",
+    safety: "safe", swaps: []
+  },
+  "Modified Hollow Body Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","30s"],["3","30s"],["3","30s"]], rest: 30,
+    setup: "Supine, arms extended overhead.",
+    execution: "Extend right leg 6 inches off floor, press lower back firmly into mat. Left leg stays bent with foot resting on floor.",
+    nwbCues: "Only right leg extends — left hip flexor stays completely off. If lower back lifts off mat, raise right leg higher.",
+    why: "Asymmetric hollow body targets core anti-extension while keeping left hip flexor silent.",
+    safety: "safe", swaps: []
+  },
+  "Seated Cable Crunch": {
+    requires: ["cables"], category: "core",
+    sets: [["3","15"],["3","15"],["3","15"]], rest: 60,
+    setup: "Seated on bench facing away from cable stack. Rope attachment behind head, hands at temples.",
+    execution: "Crunch down contracting abs hard, return to upright with control. Focus on rib-to-pelvis shortening.",
+    nwbCues: "Fully seated — zero hip flexor demand. All movement comes from spinal flexion, not hip flexion.",
+    why: "Direct rectus abdominis work with zero hip flexor involvement. Seated position is ideal for NWB.",
+    safety: "safe", swaps: []
+  },
+  "Pallof Press with Overhead Reach": {
+    requires: ["bands"], category: "core",
+    sets: [["3","8/side (3s hold)"],["3","8/side (3s hold)"],["3","8/side (3s hold)"]], rest: 60,
+    setup: "Seated on bench, band anchored at chest height to your side.",
+    execution: "Press band out to full extension, then raise arms overhead. Hold 3s at top. Reverse the motion back to chest.",
+    nwbCues: "Overhead reach increases lever arm dramatically — go lighter than standard Pallof. Fully seated eliminates all lower body demand.",
+    why: "Anti-rotation with an extended overhead lever arm. The overhead position multiplies the rotational force.",
+    safety: "safe", swaps: []
+  },
+  "Single-Arm Seated Cable Row": {
+    requires: ["cables"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 60,
+    setup: "Seated at cable machine, single D-handle at chest height. Feet flat, torso upright.",
+    execution: "Row with one arm while resisting trunk rotation. Drive elbow straight back, squeeze, return slowly.",
+    nwbCues: "Anti-rotation demand is the primary core stimulus. Fully seated. Keep pelvis square — zero trunk twist.",
+    why: "Unilateral rowing creates powerful anti-rotation demand as a training effect, not just a side effect.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank with Band Row": {
+    requires: ["mat", "bands"], category: "core",
+    sets: [["3","8/side"],["3","8/side"],["3","8/side"]], rest: 60,
+    setup: "Side plank on right forearm and right knee. Left leg stacked on top. Band anchored in front of you at floor level.",
+    execution: "Hold side plank steady. Row band to hip with top arm, squeezing shoulder blade. Return slowly.",
+    nwbCues: "Left leg stays passive on BOTH sides — when you switch, keep right knee/forearm as base and just rotate. Left leg is always dead weight.",
+    why: "Anti-lateral-flexion combined with horizontal rowing. Multi-planar core challenge.",
+    safety: "safe", swaps: []
+  },
+  "Seated Landmine Rotation": {
+    requires: ["barbell", "bench"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 60,
+    setup: "Seated on bench straddling it or sideways. Hold the end of a landmine barbell at chest height with both hands.",
+    execution: "Rotate torso and press bar in an arc from hip to hip. Control the weight through the full rotation.",
+    nwbCues: "Fully seated — no hip flexor demand. Rotation comes from thoracic spine only.",
+    why: "Loaded rotational power from a seated position. The barbell arc creates progressive resistance through range.",
+    safety: "safe", swaps: []
+  },
+  "High-to-Low Woodchop": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable or band anchored high above and to one side.",
+    execution: "Pull diagonally from high anchor to opposite hip with trunk rotation. Control the return over 2-3 seconds.",
+    nwbCues: "Seated — rotational force only. No hip flexor involvement. If left hip crease engages, reduce weight.",
+    why: "Diagonal pulling pattern trains obliques through full rotational range with eccentric control on return.",
+    safety: "safe", swaps: []
+  },
+  "Pallof Alphabet": {
+    requires: ["bands"], category: "core",
+    sets: [["2","A-Z/side"],["2","A-Z/side"],["2","A-Z/side"]], rest: 60,
+    setup: "Seated on bench, band anchored at chest height to your side. Both hands on band at chest.",
+    execution: "Press band out to full extension and trace the letters A through Z with your hands, maintaining arm extension throughout.",
+    nwbCues: "Extended time under tension with anti-rotation endurance. Fully seated. Go lighter than standard Pallof — this set is long.",
+    why: "Anti-rotation endurance. Tracing letters creates unpredictable force vectors that challenge stabilization constantly.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank Hip Dips": {
+    requires: ["mat"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Side plank on right forearm and right knee as base. Left leg stacked on top, passive.",
+    execution: "Lower hip toward the floor with control, then drive back up to full side plank. Never fully rest on the floor.",
+    nwbCues: "Left leg stays passive dead weight on both sides. Right side bears all load through forearm and knee.",
+    why: "Dynamic anti-lateral-flexion. Hip dips add concentric/eccentric demand to the isometric side plank.",
+    safety: "safe", swaps: []
+  },
+  "Seated Oblique Cable Crunch": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable set at head height to one side. Hold handle at temple.",
+    execution: "Lateral crunch TOWARD the cable — shorten the distance between ribs and hip on that side. Return with control.",
+    nwbCues: "Fully seated — targets obliques with zero hip flexor demand. Pure lateral spinal flexion.",
+    why: "Isolated oblique work from a fully seated NWB-safe position.",
+    safety: "safe", swaps: []
+  },
+  "Modified Hollow Body Flutter": {
+    requires: ["mat"], category: "core",
+    sets: [["3","20"],["3","20"],["3","20"]], rest: 30,
+    setup: "Supine, arms at sides or extended overhead. Left knee bent, left foot flat on floor.",
+    execution: "Flutter kick with RIGHT leg only — small range, 6-12 inches off the floor. Left leg stays bent and still.",
+    nwbCues: "Only right leg moves. Left hip flexor stays completely off. Press lower back into mat throughout.",
+    why: "Unilateral flutter adds anti-extension and anti-rotation challenge simultaneously.",
+    safety: "safe", swaps: []
+  },
+  "Modified Plank Shoulder Taps": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10/side"],["3","10/side"],["3","10/side"]], rest: 30,
+    setup: "Forearm plank position, right knee down as base. Left leg stacked on top, passive.",
+    execution: "Shift weight to one forearm, tap opposite shoulder with free hand. Return forearm to floor. Alternate sides.",
+    nwbCues: "Anti-rotation under instability — resist the urge to rotate when lifting a hand. Left leg stays passive throughout.",
+    why: "Shoulder taps force anti-rotation under shifting load. Each tap removes a base of support.",
+    safety: "safe", swaps: []
+  },
+  "Pallof ISO Hold": {
+    requires: ["bands"], category: "core",
+    sets: [["3","30s/side"],["3","30s/side"],["3","30s/side"]], rest: 30,
+    setup: "Seated on bench, band anchored at chest height to your side. Both hands on band.",
+    execution: "Press band out to full arm extension and HOLD for the entire set duration. Fight rotation.",
+    nwbCues: "Sustained anti-rotation demand. Fully seated. If band feels easy at 30s, step up to heavier band.",
+    why: "Isometric anti-rotation endurance. Simple but effective — sustained tension builds stabilizer endurance.",
+    safety: "safe", swaps: []
+  },
+  "Modified Side Plank Hold": {
+    requires: ["mat"], category: "core",
+    sets: [["3","60s/side"],["3","60s/side"],["3","60s/side"]], rest: 30,
+    setup: "Side plank on right forearm and right knee as base. Left leg stacked on top, completely passive.",
+    execution: "Hold a rigid side plank line. Breathe steadily. Focus on keeping hips elevated and body straight.",
+    nwbCues: "Left leg is passive dead weight. All load through right forearm and right knee. Never go left-side-down.",
+    why: "Isometric anti-lateral-flexion endurance. Long holds build stabilizer capacity.",
+    safety: "safe", swaps: []
+  },
+  "Low-to-High Woodchop": {
+    requires: ["cables"], category: "core",
+    sets: [["3","12/side"],["3","12/side"],["3","12/side"]], rest: 60,
+    setup: "Seated on bench, cable or band anchored low and to one side.",
+    execution: "Pull diagonally from low anchor to high across body with trunk rotation. Control return over 2-3 seconds.",
+    nwbCues: "Seated — rotation only, no hip flexor. Different muscle emphasis than high-to-low variation.",
+    why: "Low-to-high diagonal pull emphasizes different oblique fiber recruitment than the high-to-low pattern.",
+    safety: "safe", swaps: []
+  },
+  "Slow Dead Bugs (Modified)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","8/side"],["3","8/side"],["3","8/side"]], rest: 30,
+    setup: "Supine, arms extended to ceiling, knees bent, both feet flat on the floor.",
+    execution: "Extend RIGHT leg and opposite (left) arm on a 4-second count. Return over 4 seconds. Left leg stays bent with foot on floor the entire time.",
+    nwbCues: "4-second tempo increases time under tension dramatically. Left hip flexor never activates — left foot stays planted.",
+    why: "Slow tempo dead bug maximizes time under tension for deep core activation. 8 reps per side = over 60 seconds of work.",
+    safety: "safe", swaps: []
+  },
+
   // CORE exercises — Block 1: Anti-Extension
   "Forearm Plank Saw": {
     requires: ["mat"], category: "core",
@@ -910,6 +1112,21 @@ const CORE_FINISHERS = {
   "Pull B": ["Suitcase Hold (Seated)", "McGill Curl-Up"],
   "Legs A": ["Hollow Body Hold", "Side Plank (L Oblique Bias \u2014 R Side Down)"],
   "Legs B": ["Wheelbarrow Hold", "Bicycle Crunch (R Leg Only)"]
+};
+
+// ===== DAILY SUPPLEMENT SECTIONS =====
+const SUPPLEMENT_LEFT_LEG = {
+  base: ["Quad Sets", "Short Arc Quads", "Ankle Pumps & Circles"],
+  legsExtra: ["Banded Terminal Knee Extensions", "Reclined Knee Extensions"]
+};
+
+const SUPPLEMENT_CORE = {
+  "Push A": {subtitle: "Anti-Extension", exercises: ["Modified Plank", "Modified Hollow Body Hold", "Seated Cable Crunch"]},
+  "Push B": {subtitle: "Anti-Rotation", exercises: ["Pallof Press with Overhead Reach", "Single-Arm Seated Cable Row", "Modified Side Plank with Band Row"]},
+  "Pull A": {subtitle: "Rotational Power", exercises: ["Seated Landmine Rotation", "High-to-Low Woodchop", "Pallof Alphabet"]},
+  "Pull B": {subtitle: "Lateral + Isometric", exercises: ["Modified Side Plank Hip Dips", "Suitcase Hold (Seated)", "Seated Oblique Cable Crunch"]},
+  "Legs A": {subtitle: "Compound Core", exercises: ["Modified Hollow Body Flutter", "Modified Plank Shoulder Taps", "Pallof ISO Hold"]},
+  "Legs B": {subtitle: "Core Endurance", exercises: ["Modified Side Plank Hold", "Low-to-High Woodchop", "Slow Dead Bugs (Modified)"]}
 };
 
 const SCHED = [
@@ -1496,6 +1713,7 @@ function App() {
     "Legs B": "s5QsLGXsVAy"
   }));
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
+  const [supplementToggles, setSupplementToggles] = useState(loadState("nwb_supplements", {leftLeg: true, core: true}));
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
 
@@ -1504,6 +1722,15 @@ function App() {
   useEffect(function(){ saveState("nwb_swaps", swaps); }, [swaps]);
   useEffect(function(){ saveState("nwb_hevy", hevyIds); }, [hevyIds]);
   useEffect(function(){ saveState("nwb_startDay", startDay); }, [startDay]);
+  useEffect(function(){ saveState("nwb_supplements", supplementToggles); }, [supplementToggles]);
+
+  const toggleSupplement = function(key) {
+    setSupplementToggles(function(prev) {
+      var n = Object.assign({}, prev);
+      n[key] = !n[key];
+      return n;
+    });
+  };
 
   const getWorkoutForDay = function(dayIdx) {
     var rotationIdx = (dayIdx - startDay + 7) % 7;
@@ -1599,6 +1826,72 @@ function App() {
     );
   }
 
+  function renderSupplements(workoutKey) {
+    var isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
+    if (!isTrainingDay) return null;
+    var isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
+    var llOn = supplementToggles.leftLeg;
+    var coreOn = supplementToggles.core;
+    var coreData = SUPPLEMENT_CORE[workoutKey];
+    var teal = "#14b8a6";
+    var orange = "#f97316";
+
+    var llExercises = SUPPLEMENT_LEFT_LEG.base.slice();
+    if (isLegsDay) llExercises = llExercises.concat(SUPPLEMENT_LEFT_LEG.legsExtra);
+
+    var toggleStyle = function(isOn, color) {
+      return {width:40, height:22, borderRadius:11, background:isOn?color:C.textMuted+"44", position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0};
+    };
+    var knobStyle = function(isOn) {
+      return {width:18, height:18, borderRadius:9, background:C.white, position:"absolute", top:2, left:isOn?20:2, transition:"left 0.2s"};
+    };
+
+    return e("div", null,
+      // Visual separator
+      e("div", {style:{margin:"18px 0 14px", position:"relative", textAlign:"center", borderTop:"1px dashed #334155"}},
+        e("span", {style:{background:C.bg, padding:"0 12px", position:"relative", top:-9, fontSize:10, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1.5px", fontWeight:700}}, "Daily Supplements")
+      ),
+
+      // Left Leg Maintenance
+      e("div", {style:{marginBottom:10, borderRadius:10, border:"1px solid "+(llOn?teal+"44":C.border), background:C.card, overflow:"hidden"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:9, padding:"13px 14px"}},
+          e("span", {style:{fontSize:17}}, "\uD83E\uDDBF"),
+          e("span", {style:{flex:1, fontWeight:600, fontSize:14, color:teal}}, "Left Leg Maintenance"),
+          e("span", {style:{fontSize:11, color:C.textMuted, marginRight:8}}, llExercises.length + " exercises"),
+          e("div", {onClick:function(){ toggleSupplement("leftLeg"); }, style:toggleStyle(llOn, teal)},
+            e("div", {style:knobStyle(llOn)})
+          )
+        ),
+        llOn && e("div", {style:{padding:"0 14px 14px"}},
+          llExercises.map(function(name, idx) {
+            var ex = EX[name];
+            if (!ex) return null;
+            return e(ExRow, {key:"ll-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
+          })
+        )
+      ),
+
+      // Core
+      e("div", {style:{marginBottom:10, borderRadius:10, border:"1px solid "+(coreOn?orange+"44":C.border), background:C.card, overflow:"hidden"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:9, padding:"13px 14px"}},
+          e("span", {style:{fontSize:17}}, "\uD83C\uDFAF"),
+          e("span", {style:{flex:1, fontWeight:600, fontSize:14, color:orange}}, "Core \u2014 " + coreData.subtitle),
+          e("span", {style:{fontSize:11, color:C.textMuted, marginRight:8}}, coreData.exercises.length + " exercises"),
+          e("div", {onClick:function(){ toggleSupplement("core"); }, style:toggleStyle(coreOn, orange)},
+            e("div", {style:knobStyle(coreOn)})
+          )
+        ),
+        coreOn && e("div", {style:{padding:"0 14px 14px"}},
+          coreData.exercises.map(function(name) {
+            var ex = EX[name];
+            if (!ex) return null;
+            return e(ExRow, {key:"sc-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
+          })
+        )
+      )
+    );
+  }
+
   var content = null;
   switch(tab) {
     case 0: // Today
@@ -1625,6 +1918,7 @@ function App() {
           })
         ),
         selWorkout && renderWorkout(selSched.t),
+        selWorkout && renderSupplements(selSched.t),
         e(Section, {title:"Cross-Education Protocol", icon:"🧠", isOpen:!!openSections["cross-ed"], onToggle:function(){ toggleSection("cross-ed"); }},
           e(Callout, {type:"info"}, "Manca et al. meta-analysis: 11.9% strength gains in untrained limb. Eccentric-focused work → 17.7% crossover."),
           e("div", {style:{fontSize:12, color:C.textDim, lineHeight:1.7}},
@@ -1637,7 +1931,7 @@ function App() {
     case 1: // Workouts
       content = e("div", null,
         ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B", "Recovery"].map(function(k) {
-          return e("div", {key:k}, renderWorkout(k));
+          return e("div", {key:k}, renderWorkout(k), renderSupplements(k));
         })
       );
       break;
