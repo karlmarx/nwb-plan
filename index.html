@@ -1129,6 +1129,126 @@ const SUPPLEMENT_CORE = {
   "Legs B": {subtitle: "Core Endurance", exercises: ["Modified Side Plank Hold", "Low-to-High Woodchop", "Slow Dead Bugs (Modified)"]}
 };
 
+// ===== EQUIPMENT VARIANT SYSTEM =====
+const CABLE_VARIANTS = [
+  {id: "single-col", label: "Single Column"},
+  {id: "dual-pulleys", label: "Dual Pulleys"},
+  {id: "lat-machine", label: "Lat Pulldown Machine"},
+  {id: "functional", label: "Functional Trainer"}
+];
+
+const CABLE_SUPERSET = {
+  title: "Left Ankle Dorsiflexion",
+  sets: "2\u00d715",
+  instruction: "Low cable, strap around top of left foot. Pull toes toward shin against cable resistance.",
+  safety: "Tibialis anterior maintenance for gait recovery. Fully seated or reclined."
+};
+
+const GENERIC_SEATED_SUPERSET = {
+  title: "Quad Sets",
+  sets: "2\u00d710, 5s hold",
+  instruction: "Press back of left knee into seat surface. Hold 5 seconds, release, repeat.",
+  safety: "Pure isometric, zero joint stress. Can be done between any seated exercise."
+};
+
+const EQ_VARIANTS = {
+  "SL Leg Press (Right)": {
+    variants: [
+      {id: "45-sled", label: "45\u00b0 Sled (Incline)"},
+      {id: "seated", label: "Seated/Horizontal"},
+      {id: "plate-sled", label: "Plate-Loaded Sled"}
+    ],
+    variantSetup: {
+      "45-sled": "Sit in 45\u00b0 incline sled leg press. Place RIGHT foot HIGH on the plate (above center) to minimize hip flexion at the bottom. Left foot off the machine entirely. Back flat against pad, grip side handles.",
+      "seated": "Sit in seated/horizontal leg press. Place RIGHT foot centered on the press plate. Left foot off to the side. Adjust seat depth so hip flexion stays under 90\u00b0 at bottom of rep. Back against pad.",
+      "plate-sled": "Sit in plate-loaded sled press. Place RIGHT foot HIGH on the plate. Left foot off the machine. Load plates evenly if machine has bilateral loading. Grip side handles firmly."
+    },
+    superset: {
+      title: "Left Leg Extension",
+      sets: "3\u00d710, 3s eccentric",
+      instruction: "Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00d710, 5s hold) before walking to extension machine.",
+      safety: "Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas."
+    }
+  },
+  "SL Leg Extension (Right)": {
+    variants: [
+      {id: "selectorized", label: "Selectorized"},
+      {id: "plate-loaded", label: "Plate-Loaded"}
+    ],
+    variantSetup: {
+      "selectorized": "Sit in selectorized leg extension machine. Adjust back pad and shin pad for RIGHT leg. Left leg off the machine. Pin-select your weight.",
+      "plate-loaded": "Sit in plate-loaded leg extension. Adjust pads for RIGHT leg. Left leg off the machine. Load plates manually."
+    },
+    superset: {
+      title: "Left Leg Extension",
+      sets: "3\u00d712, 3s eccentric",
+      instruction: "Same machine \u2014 reduce weight to ~40-50% of right side. Stay seated, switch legs.",
+      safety: "Hip stays static and reclined, pure knee extension, zero iliopsoas."
+    },
+    variantSupersetNotes: {
+      "plate-loaded": "Plate-loaded requires manual weight change between legs \u2014 strip plates before switching."
+    }
+  },
+  "Prone Ham Curl (Right)": {
+    variants: [
+      {id: "seated", label: "Seated Machine"},
+      {id: "prone", label: "Prone/Lying"},
+      {id: "plate-loaded", label: "Plate-Loaded"}
+    ],
+    variantSetup: {
+      "seated": "Sit in seated hamstring curl machine. RIGHT leg on the pad, left leg off the machine. Adjust back pad so you\u2019re comfortably upright.",
+      "prone": "Lie face-down on prone/lying hamstring curl machine. RIGHT leg only under the pad. Left leg off to the side or resting on the machine frame.",
+      "plate-loaded": "Position on plate-loaded curl machine (seated or prone depending on type). RIGHT leg only. Load plates manually."
+    },
+    variantSuperset: {
+      "seated": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly. Stay seated, switch legs. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only. Seated position keeps hip neutral."
+      },
+      "prone": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly. Stay face down, switch legs. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only. Prone position keeps hip completely neutral."
+      },
+      "plate-loaded": {
+        title: "Left Leg Curl",
+        sets: "3\u00d710",
+        instruction: "Same machine \u2014 reduce weight significantly, switch legs. Strip plates as needed. Go light (bilateral hamstring tendinosis).",
+        safety: "Force across knee only."
+      }
+    }
+  },
+  "Machine Chest Press": {
+    variants: [
+      {id: "selectorized", label: "Selectorized"},
+      {id: "plate-loaded", label: "Plate-Loaded"},
+      {id: "smith", label: "Smith Machine"}
+    ],
+    variantSetup: {
+      "selectorized": "Sit at selectorized chest press machine. Adjust seat height so handles align with mid-chest. Pin-select weight. Back against pad.",
+      "plate-loaded": "Sit at plate-loaded chest press machine. Adjust seat height so handles align with mid-chest. Load plates evenly on both sides.",
+      "smith": "Set up on a flat bench inside the Smith machine. Unrack the bar at chest height. Right foot flat on floor, left leg straight and relaxed."
+    },
+    superset: {
+      title: "Quad Sets",
+      sets: "2\u00d710, 5s hold",
+      instruction: "Press back of left knee into seat surface. Hold 5 seconds, release, repeat.",
+      safety: "Pure isometric, zero joint stress."
+    }
+  },
+  "Lat Pulldown (Wide)": {isCable: true, variants: CABLE_VARIANTS},
+  "Neutral Grip Pulldown": {isCable: true, variants: CABLE_VARIANTS},
+  "Seated Cable Row": {isCable: true, variants: CABLE_VARIANTS},
+  "One-Arm Cable Row": {isCable: true, variants: CABLE_VARIANTS},
+  "Cable Chest Fly": {isCable: true, variants: CABLE_VARIANTS},
+  "Tricep Rope Pushdown": {isCable: true, variants: CABLE_VARIANTS},
+  "OH Triceps Extension": {isCable: true, variants: CABLE_VARIANTS},
+  "Seated Face Pulls": {isCable: true, variants: CABLE_VARIANTS}
+};
+
 const SCHED = [
   {d:"Mon", t:"Push A", i:"💪", c:"#38bdf8"},
   {d:"Tue", t:"Pull A", i:"🔗", c:"#a78bfa"},
@@ -1418,10 +1538,14 @@ var DIAGRAMS = {
   sideplank: SidePlankDiagram
 };
 
-function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment}) {
+function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavailable, equipment, variantData, selectedVariant, onVariantChange, supersetInfo}) {
   if (!ex) return null;
   const sc = ex.safety === "caution" ? C.warning : ex.safety === "danger" ? C.danger : C.safe;
   const s = ex.sets[phase] || ex.sets[0];
+  var effectiveSetup = ex.setup;
+  if (variantData && variantData.variantSetup && selectedVariant && variantData.variantSetup[selectedVariant]) {
+    effectiveSetup = variantData.variantSetup[selectedVariant];
+  }
 
   return e("div", {style: {marginBottom:6, borderRadius:8, background: isExpanded?"#0f1629":C.bg, borderLeft:"3px solid "+(unavailable?C.danger:sc), opacity: unavailable?0.5:1, overflow:"hidden"}},
     e("div", {onClick: onToggle, style:{padding:"10px 12px", cursor:"pointer"}},
@@ -1433,26 +1557,32 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           unavailable && e(Badge, {color:C.danger}, "NO EQUIP")
         ),
         e("div", {style:{display:"flex", alignItems:"center", gap:8}},
-          !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"×"+s[1]),
-          e("span", {style:{fontSize:10, color:C.accent}}, isExpanded ? "▲" : "ⓘ")
+          !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"\u00d7"+s[1]),
+          e("span", {style:{fontSize:10, color:C.accent}}, isExpanded ? "\u25b2" : "\u24d8")
         )
       )
     ),
     isExpanded && e("div", {style:{padding:"0 12px 12px"}},
       e("div", {style:{display:"flex", gap:12, marginBottom:12, padding:"8px 0", borderBottom:"1px solid "+C.border}},
-        e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Sets × Reps"), e("div", {style:{fontSize:14, fontWeight:700, color:C.accent}}, s[0]+" × "+s[1])),
+        e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Sets \u00d7 Reps"), e("div", {style:{fontSize:14, fontWeight:700, color:C.accent}}, s[0]+" \u00d7 "+s[1])),
         ex.rest > 0 && e("div", null, e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase"}}, "Rest"), e("div", {style:{fontSize:14, fontWeight:700, color:C.text}}, ex.rest+"s"))
       ),
+      variantData && variantData.variants && e("div", {style:{display:"flex", flexWrap:"wrap", gap:4, marginBottom:10}},
+        variantData.variants.map(function(v) {
+          var isSel = v.id === selectedVariant;
+          return e("button", {key:v.id, onClick:function(ev){ ev.stopPropagation(); onVariantChange && onVariantChange(v.id); }, style:{fontSize:10, padding:"5px 10px", borderRadius:12, background:isSel?C.accent+"22":"transparent", border:"1px solid "+(isSel?C.accent:C.border), color:isSel?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:isSel?700:400, transition:"all 0.15s"}}, v.label);
+        })
+      ),
       e("div", {style:{fontSize:11, lineHeight:1.7}},
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📍 SETUP & POSITION"), e("div", {style:{color:C.textDim}}, ex.setup)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "🔄 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "🛡️ NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
-        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "🎯 WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "\uD83D\uDCCD SETUP & POSITION"), e("div", {style:{color:C.textDim}}, effectiveSetup)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.safe, marginBottom:4, fontSize:10}}, "\uD83D\uDD04 HOW TO EXECUTE"), e("div", {style:{color:C.textDim}}, ex.execution)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.warning, marginBottom:4, fontSize:10}}, "\uD83D\uDEE1\uFE0F NWB SAFETY CUES"), e("div", {style:{color:C.textDim}}, ex.nwbCues)),
+        e("div", {style:{marginBottom:10}}, e("div", {style:{fontWeight:700, color:C.text, marginBottom:4, fontSize:10}}, "\uD83C\uDFAF WHY THIS EXERCISE"), e("div", {style:{color:C.textDim}}, ex.why)),
         ex.diagram && DIAGRAMS[ex.diagram] && e("div", {style:{marginBottom:10}},
-          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "📐 View Movement Diagram")
+          e("button", {onClick:function(ev){ ev.stopPropagation(); onDiagram(ex.diagram); }, style:{width:"100%", padding:"12px", borderRadius:8, background:"#161616", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:8}}, "\uD83D\uDCD0 View Movement Diagram")
         ),
         ex.visual && !ex.diagram && e("div", {style:{marginBottom:10}},
-          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "📐 VISUAL GUIDE"),
+          e("div", {style:{fontWeight:700, color:C.accent, marginBottom:4, fontSize:10}}, "\uD83D\uDCD0 VISUAL GUIDE"),
           e("pre", {style:{fontFamily:"monospace", fontSize:11, whiteSpace:"pre", overflowX:"auto", background:"#0a0f1a", padding:"10px 12px", borderRadius:8, color:C.textDim, border:"1px solid "+C.border, margin:0}}, ex.visual)
         ),
         ex.tempo && e("div", {style:{display:"flex", gap:8, marginBottom:10}},
@@ -1463,7 +1593,6 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           e("div", {style:{fontSize:9, color:C.textMuted, textTransform:"uppercase", fontWeight:700, marginBottom:6}}, "\uD83D\uDD25 AMPLIFICATION TIERS"),
           ex.amp.map(function(level, i) {
             var colors = [C.safe, C.warning, C.danger];
-            var labels = ["BASE", "AMP 1", "AMP 2"];
             return e("div", {key:"amp-"+i, style:{padding:"6px 8px", marginBottom:3, borderRadius:6, background:colors[i]+"11", borderLeft:"3px solid "+colors[i]+"66", fontSize:11, color:C.textDim, lineHeight:1.5}}, level);
           })
         )
@@ -1481,11 +1610,21 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           ex.swaps.map(function(sw) {
             var swEx = EX[sw];
             var swAvail = swEx && swEx.requires.every(function(r){ return equipment[r] !== false; });
-            return e("button", {key:sw, onClick:function(ev){ ev.stopPropagation(); onSwap(sw); }, style:{fontSize:11, padding:"6px 10px", borderRadius:6, background:swAvail?C.accent+"22":C.bg, color:swAvail?C.accent:C.textMuted, border:"1px solid "+(swAvail?C.accent+"44":C.border), cursor:"pointer", fontFamily:"inherit"}}, sw + (swAvail?" ✓":" ✗"));
+            return e("button", {key:sw, onClick:function(ev){ ev.stopPropagation(); onSwap(sw); }, style:{fontSize:11, padding:"6px 10px", borderRadius:6, background:swAvail?C.accent+"22":C.bg, color:swAvail?C.accent:C.textMuted, border:"1px solid "+(swAvail?C.accent+"44":C.border), cursor:"pointer", fontFamily:"inherit"}}, sw + (swAvail?" \u2713":" \u2717"));
           })
         )
       ),
-      ex.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); onSwap("__timer__"+ex.rest); }, style:{marginTop:10, width:"100%", padding:"10px", borderRadius:8, background:C.accent+"22", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}, "⏱ Start "+ex.rest+"s Rest Timer")
+      ex.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); onSwap("__timer__"+ex.rest); }, style:{marginTop:10, width:"100%", padding:"10px", borderRadius:8, background:C.accent+"22", border:"1px solid "+C.accent+"44", color:C.accent, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+ex.rest+"s Rest Timer"),
+      supersetInfo && e("div", {style:{marginTop:12, padding:"10px 12px", borderRadius:8, background:"#14b8a611", border:"1px solid #14b8a633", borderLeft:"3px solid #14b8a6"}},
+        e("div", {style:{display:"flex", alignItems:"center", gap:6, marginBottom:6}},
+          e("span", {style:{display:"inline-block", width:20, height:20, borderRadius:4, background:"#14b8a622", border:"1px solid #14b8a644", textAlign:"center", lineHeight:"20px", fontSize:11, fontWeight:800, color:"#14b8a6"}}, "L"),
+          e("span", {style:{fontWeight:700, fontSize:12, color:"#14b8a6"}}, supersetInfo.title),
+          e("span", {style:{fontSize:11, color:C.textDim, marginLeft:4}}, supersetInfo.sets)
+        ),
+        e("div", {style:{fontSize:11, color:C.textDim, lineHeight:1.6, marginBottom:4}}, supersetInfo.instruction),
+        e("div", {style:{fontSize:10, color:"#14b8a6"}}, "\uD83D\uDEE1\uFE0F " + supersetInfo.safety),
+        supersetInfo.note && e("div", {style:{fontSize:10, color:C.warning, marginTop:4}}, "\u26A0\uFE0F " + supersetInfo.note)
+      )
     )
   );
 }
@@ -1714,6 +1853,7 @@ function App() {
   }));
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
   const [supplementToggles, setSupplementToggles] = useState(loadState("nwb_supplements", {leftLeg: true, core: true}));
+  const [variantSelections, setVariantSelections] = useState(loadState("nwb_variants", {}));
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
 
@@ -1723,6 +1863,7 @@ function App() {
   useEffect(function(){ saveState("nwb_hevy", hevyIds); }, [hevyIds]);
   useEffect(function(){ saveState("nwb_startDay", startDay); }, [startDay]);
   useEffect(function(){ saveState("nwb_supplements", supplementToggles); }, [supplementToggles]);
+  useEffect(function(){ saveState("nwb_variants", variantSelections); }, [variantSelections]);
 
   const toggleSupplement = function(key) {
     setSupplementToggles(function(prev) {
@@ -1778,6 +1919,12 @@ function App() {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
     var hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
+    // Find first cable exercise in this workout for superset tracking
+    var firstCableEx = null;
+    for (var ci = 0; ci < w.exercises.length; ci++) {
+      var cn = getExName(workoutKey, w.exercises[ci]);
+      if (EQ_VARIANTS[cn] && EQ_VARIANTS[cn].isCable) { firstCableEx = cn; break; }
+    }
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
       hevyId ? e("div", {style:{marginBottom:10}},
         e("a", {href:"https://hevy.com/routine/"+hevyId, target:"_blank", rel:"noopener", onClick:function(ev){ ev.stopPropagation(); }, style:{display:"block", textAlign:"center", padding:"8px", borderRadius:8, background:"#a78bfa22", border:"1px solid #a78bfa44", color:"#a78bfa", fontSize:13, fontWeight:600, textDecoration:"none"}}, "Open in HEVY")
@@ -1804,12 +1951,38 @@ function App() {
         if (!ex) return null;
         if (ex.phase != null && phase < ex.phase) return null;
         var unavail = !isAvailable(exName);
+        // Equipment variant data
+        var vData = EQ_VARIANTS[exName] || null;
+        var selVariant = vData ? (variantSelections[exName] || vData.variants[0].id) : null;
+        // Superset computation (controlled by left leg toggle)
+        var ssInfo = null;
+        if (supplementToggles.leftLeg) {
+          if (vData) {
+            if (vData.isCable) {
+              if (exName === firstCableEx) {
+                ssInfo = {title: CABLE_SUPERSET.title, sets: CABLE_SUPERSET.sets, instruction: CABLE_SUPERSET.instruction, safety: CABLE_SUPERSET.safety};
+                if (selVariant === "lat-machine") {
+                  ssInfo.note = "No low cable available on this machine \u2014 do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.";
+                }
+              }
+            } else if (vData.variantSuperset && vData.variantSuperset[selVariant]) {
+              ssInfo = vData.variantSuperset[selVariant];
+            } else if (vData.superset) {
+              ssInfo = Object.assign({}, vData.superset);
+              if (vData.variantSupersetNotes && vData.variantSupersetNotes[selVariant]) {
+                ssInfo.note = vData.variantSupersetNotes[selVariant];
+              }
+            }
+          } else if (ex.setup && /\b(sit|seated)\b/i.test(ex.setup)) {
+            ssInfo = GENERIC_SEATED_SUPERSET;
+          }
+        }
         return e("div", {key: origName},
           exName !== origName && e("div", {style:{fontSize:10, color:C.textMuted, padding:"2px 12px", display:"flex", alignItems:"center", gap:4}},
-            e("span", null, "↻ was: " + origName),
+            e("span", null, "\u21bb was: " + origName),
             e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
           ),
-          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment})
+          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo})
         );
       }),
       w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
