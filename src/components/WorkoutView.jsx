@@ -175,13 +175,13 @@ export default function WorkoutView({
             </svg>
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#F5F0EB' }}>
-                NWB Yoga \u2014 Companion App
+                NWB Yoga — Companion App
               </div>
               <div style={{ fontSize: 11, color: C.textDim, marginTop: 2 }}>
-                3 guided tiers \u00b7 14 animated poses \u00b7 built-in timer
+                3 guided tiers · 14 animated poses · built-in timer
               </div>
             </div>
-            <span style={{ marginLeft: 'auto', color: '#64748b', fontSize: 12 }}>\u2192</span>
+            <span style={{ marginLeft: 'auto', color: '#64748b', fontSize: 12 }}>→</span>
           </div>
         </a>
       )}
@@ -203,7 +203,7 @@ export default function WorkoutView({
               fontWeight: supplementToggles.leftLeg ? 600 : 400
             }}
           >
-            \ud83e\uddbf L-Leg Supersets {supplementToggles.leftLeg ? 'ON' : 'OFF'}
+            🦿 L-Leg Supersets {supplementToggles.leftLeg ? 'ON' : 'OFF'}
           </button>
           <button
             onClick={(ev) => { ev.stopPropagation(); onToggleSupplement('core'); }}
@@ -219,8 +219,8 @@ export default function WorkoutView({
               fontWeight: supplementToggles.core ? 600 : 400
             }}
           >
-            \ud83c\udfaf Core Supersets {supplementToggles.core ? 'ON' : 'OFF'}
-            {coreSubtitle ? ' \u2014 ' + coreSubtitle : ''}
+            🎯 Core Supersets {supplementToggles.core ? 'ON' : 'OFF'}
+            {coreSubtitle ? ' — ' + coreSubtitle : ''}
           </button>
         </div>
       )}
@@ -249,7 +249,7 @@ export default function WorkoutView({
                 };
                 if (selVariant === 'lat-machine') {
                   ssInfo.note =
-                    'No low cable available on this machine \u2014 do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.';
+                    'No low cable available on this machine — do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.';
                 }
               }
             } else if (vData.variantSuperset && vData.variantSuperset[selVariant]) {
@@ -279,7 +279,7 @@ export default function WorkoutView({
           <div key={origName}>
             {exName !== origName && (
               <div style={{ fontSize: 10, color: C.textMuted, padding: '2px 12px', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span>\u21bb was: {origName}</span>
+                <span>↻ was: {origName}</span>
                 <button
                   onClick={() => resetSwap(origName)}
                   style={{ fontSize: 10, color: C.accent, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}
@@ -350,7 +350,7 @@ export default function WorkoutView({
                     </span>
                   );
                 })}
-                <span style={{ marginLeft: 'auto', fontSize: 8, color: C.textMuted }}>\u25bc tap to expand</span>
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: C.textMuted }}>▼ tap to expand</span>
               </div>
             )}
 
@@ -414,21 +414,21 @@ export default function WorkoutView({
                             Left Leg
                           </span>
                           <span style={{ fontWeight: 600, fontSize: 12, color: C.text, flex: 1 }}>{supp.name}</span>
-                          <span style={{ fontSize: 10, color: C.textDim }}>{suppSets[0] + '\u00d7' + suppSets[1]}</span>
-                          <span style={{ fontSize: 9, color: '#14b8a6', marginLeft: 4 }}>{suppIsExp ? '\u25b2' : '\u25bc'}</span>
+                          <span style={{ fontSize: 10, color: C.textDim }}>{suppSets[0] + '×' + suppSets[1]}</span>
+                          <span style={{ fontSize: 9, color: '#14b8a6', marginLeft: 4 }}>{suppIsExp ? '▲' : '▼'}</span>
                         </div>
                         {suppIsExp && (
                           <div style={{ padding: '0 10px 10px', fontSize: 11, lineHeight: 1.6 }}>
                             <div style={{ marginBottom: 6 }}>
-                              <span style={{ fontWeight: 700, color: '#14b8a6', fontSize: 10 }}>\ud83d\udccd Setup: </span>
+                              <span style={{ fontWeight: 700, color: '#14b8a6', fontSize: 10 }}>📍 Setup: </span>
                               <span style={{ color: C.textDim }}>{suppEx.setup}</span>
                             </div>
                             <div style={{ marginBottom: 6 }}>
-                              <span style={{ fontWeight: 700, color: C.safe, fontSize: 10 }}>\ud83d\udd04 Execute: </span>
+                              <span style={{ fontWeight: 700, color: C.safe, fontSize: 10 }}>🔄 Execute: </span>
                               <span style={{ color: C.textDim }}>{suppEx.execution}</span>
                             </div>
                             <div>
-                              <span style={{ fontWeight: 700, color: '#14b8a6', fontSize: 10 }}>\ud83d\udee1\ufe0f Safety: </span>
+                              <span style={{ fontWeight: 700, color: '#14b8a6', fontSize: 10 }}>🛡️ Safety: </span>
                               <span style={{ color: C.textDim }}>{suppEx.nwbCues}</span>
                             </div>
                             {suppEx.rest > 0 && (
@@ -448,7 +448,7 @@ export default function WorkoutView({
                                   fontFamily: 'inherit'
                                 }}
                               >
-                                \u23f1 Start {suppEx.rest}s Rest
+                                ⏱ Start {suppEx.rest}s Rest
                               </button>
                             )}
                           </div>
@@ -510,21 +510,21 @@ export default function WorkoutView({
                             {supp.region || 'Core'}
                           </span>
                           <span style={{ fontWeight: 600, fontSize: 12, color: C.text, flex: 1 }}>{supp.name}</span>
-                          <span style={{ fontSize: 10, color: C.textDim }}>{suppSets[0] + '\u00d7' + suppSets[1]}</span>
-                          <span style={{ fontSize: 9, color: '#f97316', marginLeft: 4 }}>{suppIsExp ? '\u25b2' : '\u25bc'}</span>
+                          <span style={{ fontSize: 10, color: C.textDim }}>{suppSets[0] + '×' + suppSets[1]}</span>
+                          <span style={{ fontSize: 9, color: '#f97316', marginLeft: 4 }}>{suppIsExp ? '▲' : '▼'}</span>
                         </div>
                         {suppIsExp && (
                           <div style={{ padding: '0 10px 10px', fontSize: 11, lineHeight: 1.6 }}>
                             <div style={{ marginBottom: 6 }}>
-                              <span style={{ fontWeight: 700, color: '#f97316', fontSize: 10 }}>\ud83d\udccd Setup: </span>
+                              <span style={{ fontWeight: 700, color: '#f97316', fontSize: 10 }}>📍 Setup: </span>
                               <span style={{ color: C.textDim }}>{suppEx.setup}</span>
                             </div>
                             <div style={{ marginBottom: 6 }}>
-                              <span style={{ fontWeight: 700, color: C.safe, fontSize: 10 }}>\ud83d\udd04 Execute: </span>
+                              <span style={{ fontWeight: 700, color: C.safe, fontSize: 10 }}>🔄 Execute: </span>
                               <span style={{ color: C.textDim }}>{suppEx.execution}</span>
                             </div>
                             <div>
-                              <span style={{ fontWeight: 700, color: '#f97316', fontSize: 10 }}>\ud83d\udee1\ufe0f Safety: </span>
+                              <span style={{ fontWeight: 700, color: '#f97316', fontSize: 10 }}>🛡️ Safety: </span>
                               <span style={{ color: C.textDim }}>{suppEx.nwbCues}</span>
                             </div>
                             {suppEx.rest > 0 && (
@@ -544,7 +544,7 @@ export default function WorkoutView({
                                   fontFamily: 'inherit'
                                 }}
                               >
-                                \u23f1 Start {suppEx.rest}s Rest
+                                ⏱ Start {suppEx.rest}s Rest
                               </button>
                             )}
                           </div>
@@ -578,7 +578,7 @@ export default function WorkoutView({
           }}
         >
           <div style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b', marginBottom: 8, letterSpacing: 0.3 }}>
-            \ud83d\udd25 Core Finisher \u2014 pick 1\u20132
+            🔥 Core Finisher — pick 1–2
           </div>
           {CORE_FINISHERS[workoutKey].map((name) => {
             const ex = EX[name];

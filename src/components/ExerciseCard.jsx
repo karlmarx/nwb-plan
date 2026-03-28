@@ -66,8 +66,8 @@ export default function ExerciseCard({
               ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {!isExpanded && <span style={{ fontSize: 11, color: C.textDim }}>{s[0] + '\u00d7' + s[1]}</span>}
-            <span style={{ fontSize: 10, color: C.accent }}>{isExpanded ? '\u25b2' : '\u24d8'}</span>
+            {!isExpanded && <span style={{ fontSize: 11, color: C.textDim }}>{s[0] + '×' + s[1]}</span>}
+            <span style={{ fontSize: 10, color: C.accent }}>{isExpanded ? '▲' : 'ⓘ'}</span>
           </div>
         </div>
       </div>
@@ -84,8 +84,8 @@ export default function ExerciseCard({
             }}
           >
             <div>
-              <div style={{ fontSize: 9, color: C.textMuted, textTransform: 'uppercase' }}>Sets \u00d7 Reps</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>{s[0] + ' \u00d7 ' + s[1]}</div>
+              <div style={{ fontSize: 9, color: C.textMuted, textTransform: 'uppercase' }}>Sets × Reps</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>{s[0] + ' × ' + s[1]}</div>
             </div>
             {ex.rest > 0 && (
               <div>
@@ -129,25 +129,25 @@ export default function ExerciseCard({
           <div style={{ fontSize: 11, lineHeight: 1.7 }}>
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: 700, color: C.accent, marginBottom: 4, fontSize: 10 }}>
-                \ud83d\udccd SETUP & POSITION
+                📍 SETUP & POSITION
               </div>
               <div style={{ color: C.textDim }}>{effectiveSetup}</div>
             </div>
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: 700, color: C.safe, marginBottom: 4, fontSize: 10 }}>
-                \ud83d\udd04 HOW TO EXECUTE
+                🔄 HOW TO EXECUTE
               </div>
               <div style={{ color: C.textDim }}>{ex.execution}</div>
             </div>
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: 700, color: C.warning, marginBottom: 4, fontSize: 10 }}>
-                \ud83d\udee1\ufe0f NWB SAFETY CUES
+                🛡️ NWB SAFETY CUES
               </div>
               <div style={{ color: C.textDim }}>{ex.nwbCues}</div>
             </div>
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: 700, color: C.text, marginBottom: 4, fontSize: 10 }}>
-                \ud83c\udfaf WHY THIS EXERCISE
+                🎯 WHY THIS EXERCISE
               </div>
               <div style={{ color: C.textDim }}>{ex.why}</div>
             </div>
@@ -176,7 +176,7 @@ export default function ExerciseCard({
                     gap: 8
                   }}
                 >
-                  \ud83d\udcd0 View Movement Diagram
+                  📐 View Movement Diagram
                 </button>
               </div>
             )}
@@ -184,7 +184,7 @@ export default function ExerciseCard({
             {ex.visual && !ex.diagram && (
               <div style={{ marginBottom: 10 }}>
                 <div style={{ fontWeight: 700, color: C.accent, marginBottom: 4, fontSize: 10 }}>
-                  \ud83d\udcd0 VISUAL GUIDE
+                  📐 VISUAL GUIDE
                 </div>
                 <pre
                   style={{
@@ -219,7 +219,7 @@ export default function ExerciseCard({
             {ex.amp && (
               <div style={{ marginBottom: 10 }}>
                 <div style={{ fontSize: 9, color: C.textMuted, textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>
-                  \ud83d\udd25 AMPLIFICATION TIERS
+                  🔥 AMPLIFICATION TIERS
                 </div>
                 {ex.amp.map((level, i) => {
                   const colors = [C.safe, C.warning, C.danger];
@@ -296,7 +296,7 @@ export default function ExerciseCard({
                         fontFamily: 'inherit'
                       }}
                     >
-                      {sw + (swAvail ? ' \u2713' : ' \u2717')}
+                      {sw + (swAvail ? ' ✓' : ' ✗')}
                     </button>
                   );
                 })}
@@ -324,7 +324,7 @@ export default function ExerciseCard({
                 fontFamily: 'inherit'
               }}
             >
-              \u23f1 Start {ex.rest}s Rest Timer
+              ⏱ Start {ex.rest}s Rest Timer
             </button>
           )}
 
@@ -363,10 +363,10 @@ export default function ExerciseCard({
               <div style={{ fontSize: 11, color: C.textDim, lineHeight: 1.6, marginBottom: 4 }}>
                 {supersetInfo.instruction}
               </div>
-              <div style={{ fontSize: 10, color: '#14b8a6' }}>\ud83d\udee1\ufe0f {supersetInfo.safety}</div>
+              <div style={{ fontSize: 10, color: '#14b8a6' }}>🛡️ {supersetInfo.safety}</div>
               {supersetInfo.note && (
                 <div style={{ fontSize: 10, color: C.warning, marginTop: 4 }}>
-                  \u26a0\ufe0f {supersetInfo.note}
+                  ⚠️ {supersetInfo.note}
                 </div>
               )}
             </div>

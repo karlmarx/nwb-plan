@@ -1,7 +1,7 @@
 export const WORKOUTS = {
   'Push A': {
-    title: 'Push A \u2014 Heavy Strength',
-    icon: '\ud83d\udcaa',
+    title: 'Push A — Heavy Strength',
+    icon: '💪',
     color: '#38bdf8',
     hevy: 'https://hevy.com/routine/T2lMXhz4NFS',
     exercises: [
@@ -18,8 +18,8 @@ export const WORKOUTS = {
     ]
   },
   'Push B': {
-    title: 'Push B \u2014 Volume / Hypertrophy',
-    icon: '\ud83d\udcaa',
+    title: 'Push B — Volume / Hypertrophy',
+    icon: '💪',
     color: '#38bdf8',
     hevy: 'https://hevy.com/routine/j0XrGQzMyF1',
     exercises: [
@@ -34,8 +34,8 @@ export const WORKOUTS = {
     removed: []
   },
   'Pull A': {
-    title: 'Pull A \u2014 Heavy Strength',
-    icon: '\ud83d\udd17',
+    title: 'Pull A — Heavy Strength',
+    icon: '🔗',
     color: '#a78bfa',
     hevy: 'https://hevy.com/routine/c91UqmMdwz7',
     exercises: [
@@ -50,13 +50,13 @@ export const WORKOUTS = {
     removed: [
       {
         name: 'Bent-Over Row',
-        reason: 'Unsupported spinal position \u2014 use chest-supported rows instead'
+        reason: 'Unsupported spinal position — use chest-supported rows instead'
       }
     ]
   },
   'Pull B': {
-    title: 'Pull B \u2014 Volume / Density',
-    icon: '\ud83d\udd17',
+    title: 'Pull B — Volume / Density',
+    icon: '🔗',
     color: '#a78bfa',
     hevy: 'https://hevy.com/routine/J1rggKx4PIk',
     exercises: [
@@ -71,8 +71,8 @@ export const WORKOUTS = {
     removed: []
   },
   'Legs A': {
-    title: 'Legs A \u2014 Quad/Glute (Cross-Ed)',
-    icon: '\ud83e\uddb5',
+    title: 'Legs A — Quad/Glute (Cross-Ed)',
+    icon: '🦵',
     color: '#10b981',
     hevy: 'https://hevy.com/routine/FKCWOPCUE4H',
     exercises: [
@@ -86,12 +86,12 @@ export const WORKOUTS = {
     ],
     removed: [
       { name: 'Pistol Squats', reason: 'Deep hip flexion damages labrum' },
-      { name: 'Bulgarian Split Squat', reason: 'Exceeds 90\u00b0 flexion limit' }
+      { name: 'Bulgarian Split Squat', reason: 'Exceeds 90° flexion limit' }
     ]
   },
   'Legs B': {
-    title: 'Legs B \u2014 Posterior Chain',
-    icon: '\ud83e\uddb5',
+    title: 'Legs B — Posterior Chain',
+    icon: '🦵',
     color: '#10b981',
     hevy: 'https://hevy.com/routine/s5QsLGXsVAy',
     exercises: [
@@ -112,7 +112,7 @@ export const WORKOUTS = {
   },
   Recovery: {
     title: 'Active Recovery (Sunday)',
-    icon: '\ud83e\uddd8',
+    icon: '🧘',
     color: '#64748b',
     exercises: [
       'Arm Ergometer',
@@ -130,18 +130,18 @@ export const CORE_FINISHERS = {
   'Push B': ['Dead Bug (R Leg Only)', 'Bird-Dog (Prone Bench)'],
   'Pull A': ['Side Plank (R Side Down)', 'Russian Twist (Seated Bench)'],
   'Pull B': ['Suitcase Hold (Seated)', 'McGill Curl-Up'],
-  'Legs A': ['Hollow Body Hold', 'Side Plank (L Oblique Bias \u2014 R Side Down)'],
+  'Legs A': ['Hollow Body Hold', 'Side Plank (L Oblique Bias — R Side Down)'],
   'Legs B': ['Wheelbarrow Hold', 'Bicycle Crunch (R Leg Only)']
 };
 
 export const SCHED = [
-  { d: 'Mon', t: 'Push A', i: '\ud83d\udcaa', c: '#38bdf8' },
-  { d: 'Tue', t: 'Pull A', i: '\ud83d\udd17', c: '#a78bfa' },
-  { d: 'Wed', t: 'Legs A', i: '\ud83e\uddb5', c: '#10b981' },
-  { d: 'Thu', t: 'Push B', i: '\ud83d\udcaa', c: '#38bdf8' },
-  { d: 'Fri', t: 'Pull B', i: '\ud83d\udd17', c: '#a78bfa' },
-  { d: 'Sat', t: 'Legs B', i: '\ud83e\uddb5', c: '#10b981' },
-  { d: 'Sun', t: 'Recovery', i: '\ud83e\uddd8', c: '#64748b' }
+  { d: 'Mon', t: 'Push A', i: '💪', c: '#38bdf8' },
+  { d: 'Tue', t: 'Pull A', i: '🔗', c: '#a78bfa' },
+  { d: 'Wed', t: 'Legs A', i: '🦵', c: '#10b981' },
+  { d: 'Thu', t: 'Push B', i: '💪', c: '#38bdf8' },
+  { d: 'Fri', t: 'Pull B', i: '🔗', c: '#a78bfa' },
+  { d: 'Sat', t: 'Legs B', i: '🦵', c: '#10b981' },
+  { d: 'Sun', t: 'Recovery', i: '🧘', c: '#64748b' }
 ];
 
 export const PHASES = [

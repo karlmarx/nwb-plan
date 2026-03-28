@@ -69,7 +69,7 @@ export const CABLE_VARIANTS = [
 
 export const CABLE_SUPERSET = {
   title: 'Left Ankle Dorsiflexion',
-  sets: '2\u00d715',
+  sets: '2×15',
   instruction:
     'Low cable, strap around top of left foot. Pull toes toward shin against cable resistance.',
   safety:
@@ -78,7 +78,7 @@ export const CABLE_SUPERSET = {
 
 export const GENERIC_SEATED_SUPERSET = {
   title: 'Quad Sets',
-  sets: '2\u00d710, 5s hold',
+  sets: '2×10, 5s hold',
   instruction:
     'Press back of left knee into seat surface. Hold 5 seconds, release, repeat.',
   safety: 'Pure isometric, zero joint stress. Can be done between any seated exercise.'
@@ -87,25 +87,25 @@ export const GENERIC_SEATED_SUPERSET = {
 export const EQ_VARIANTS = {
   'SL Leg Press (Right)': {
     variants: [
-      { id: '45-sled', label: '45\u00b0 Sled (Incline)' },
+      { id: '45-sled', label: '45° Sled (Incline)' },
       { id: 'seated', label: 'Seated/Horizontal' },
       { id: 'plate-sled', label: 'Plate-Loaded Sled' }
     ],
     variantSetup: {
       '45-sled':
-        'Sit in 45\u00b0 incline sled leg press. Place RIGHT foot HIGH on the plate (above center) to minimize hip flexion at the bottom. Left foot off the machine entirely. Back flat against pad, grip side handles.',
+        'Sit in 45° incline sled leg press. Place RIGHT foot HIGH on the plate (above center) to minimize hip flexion at the bottom. Left foot off the machine entirely. Back flat against pad, grip side handles.',
       seated:
-        'Sit in seated/horizontal leg press. Place RIGHT foot centered on the press plate. Left foot off to the side. Adjust seat depth so hip flexion stays under 90\u00b0 at bottom of rep. Back against pad.',
+        'Sit in seated/horizontal leg press. Place RIGHT foot centered on the press plate. Left foot off to the side. Adjust seat depth so hip flexion stays under 90° at bottom of rep. Back against pad.',
       'plate-sled':
         'Sit in plate-loaded sled press. Place RIGHT foot HIGH on the plate. Left foot off the machine. Load plates evenly if machine has bilateral loading. Grip side handles firmly.'
     },
     superset: {
       title: 'Left Leg Extension',
-      sets: '3\u00d710, 3s eccentric',
+      sets: '3×10, 3s eccentric',
       instruction:
-        'Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00d710, 5s hold) before walking to extension machine.',
+        'Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2×10, 5s hold) before walking to extension machine.',
       safety:
-        'Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas.'
+        'Can’t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas.'
     }
   },
   'SL Leg Extension (Right)': {
@@ -121,14 +121,14 @@ export const EQ_VARIANTS = {
     },
     superset: {
       title: 'Left Leg Extension',
-      sets: '3\u00d712, 3s eccentric',
+      sets: '3×12, 3s eccentric',
       instruction:
-        'Same machine \u2014 reduce weight to ~40-50% of right side. Stay seated, switch legs.',
+        'Same machine — reduce weight to ~40-50% of right side. Stay seated, switch legs.',
       safety: 'Hip stays static and reclined, pure knee extension, zero iliopsoas.'
     },
     variantSupersetNotes: {
       'plate-loaded':
-        'Plate-loaded requires manual weight change between legs \u2014 strip plates before switching.'
+        'Plate-loaded requires manual weight change between legs — strip plates before switching.'
     }
   },
   'Prone Ham Curl (Right)': {
@@ -139,7 +139,7 @@ export const EQ_VARIANTS = {
     ],
     variantSetup: {
       seated:
-        'Sit in seated hamstring curl machine. RIGHT leg on the pad, left leg off the machine. Adjust back pad so you\u2019re comfortably upright.',
+        'Sit in seated hamstring curl machine. RIGHT leg on the pad, left leg off the machine. Adjust back pad so you’re comfortably upright.',
       prone:
         'Lie face-down on prone/lying hamstring curl machine. RIGHT leg only under the pad. Left leg off to the side or resting on the machine frame.',
       'plate-loaded':
@@ -148,23 +148,23 @@ export const EQ_VARIANTS = {
     variantSuperset: {
       seated: {
         title: 'Left Leg Curl',
-        sets: '3\u00d710',
+        sets: '3×10',
         instruction:
-          'Same machine \u2014 reduce weight significantly. Stay seated, switch legs. Go light (bilateral hamstring tendinosis).',
+          'Same machine — reduce weight significantly. Stay seated, switch legs. Go light (bilateral hamstring tendinosis).',
         safety: 'Force across knee only. Seated position keeps hip neutral.'
       },
       prone: {
         title: 'Left Leg Curl',
-        sets: '3\u00d710',
+        sets: '3×10',
         instruction:
-          'Same machine \u2014 reduce weight significantly. Stay face down, switch legs. Go light (bilateral hamstring tendinosis).',
+          'Same machine — reduce weight significantly. Stay face down, switch legs. Go light (bilateral hamstring tendinosis).',
         safety: 'Force across knee only. Prone position keeps hip completely neutral.'
       },
       'plate-loaded': {
         title: 'Left Leg Curl',
-        sets: '3\u00d710',
+        sets: '3×10',
         instruction:
-          'Same machine \u2014 reduce weight significantly, switch legs. Strip plates as needed. Go light (bilateral hamstring tendinosis).',
+          'Same machine — reduce weight significantly, switch legs. Strip plates as needed. Go light (bilateral hamstring tendinosis).',
         safety: 'Force across knee only.'
       }
     }
@@ -185,7 +185,7 @@ export const EQ_VARIANTS = {
     },
     superset: {
       title: 'Quad Sets',
-      sets: '2\u00d710, 5s hold',
+      sets: '2×10, 5s hold',
       instruction:
         'Press back of left knee into seat surface. Hold 5 seconds, release, repeat.',
       safety: 'Pure isometric, zero joint stress.'

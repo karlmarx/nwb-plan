@@ -2,7 +2,7 @@ function PlancheDiagram({ onClose }) {
   const callouts = [
     {
       key: 'leftleg',
-      title: '\u2713 Left Leg',
+      title: '✓ Left Leg',
       color: '#4ade80',
       bg: '#0d1f14',
       border: '#4ade80',
@@ -10,7 +10,7 @@ function PlancheDiagram({ onClose }) {
     },
     {
       key: 'lean',
-      title: '\u2197 The Forward Lean',
+      title: '↗ The Forward Lean',
       color: '#60a5fa',
       bg: '#0d1525',
       border: '#60a5fa',
@@ -18,15 +18,15 @@ function PlancheDiagram({ onClose }) {
     },
     {
       key: 'hip',
-      title: '\u25ce Hip Position',
+      title: '◎ Hip Position',
       color: '#a78bfa',
       bg: '#130d1f',
       border: '#a78bfa',
-      text: 'Your hip sits at roughly neutral extension \u2014 not flexed, not compressed. The joint is just connecting your torso to your leg. No FAI impingement zone.'
+      text: 'Your hip sits at roughly neutral extension — not flexed, not compressed. The joint is just connecting your torso to your leg. No FAI impingement zone.'
     },
     {
       key: 'sag',
-      title: '\u26a0 Don\u2019t Let Hips Sag',
+      title: '⚠ Don’t Let Hips Sag',
       color: '#facc15',
       bg: '#1a1700',
       border: '#facc15',
@@ -37,15 +37,15 @@ function PlancheDiagram({ onClose }) {
   const steps = [
     {
       n: 1,
-      text: 'Place parallettes on the floor near your waist level \u2014 much further back than a normal push-up. Kneel to get into position.'
+      text: 'Place parallettes on the floor near your waist level — much further back than a normal push-up. Kneel to get into position.'
     },
     {
       n: 2,
-      text: 'Right foot goes on the box behind you. Left leg hangs alongside it \u2014 same height roughly, just not bearing weight or touching anything.'
+      text: 'Right foot goes on the box behind you. Left leg hangs alongside it — same height roughly, just not bearing weight or touching anything.'
     },
     {
       n: 3,
-      text: 'Lean your whole body forward over your wrists. You should feel immediate shoulder tension just holding this position. That\u2019s correct.'
+      text: 'Lean your whole body forward over your wrists. You should feel immediate shoulder tension just holding this position. That’s correct.'
     },
     {
       n: 4,
@@ -53,7 +53,7 @@ function PlancheDiagram({ onClose }) {
     },
     {
       n: 5,
-      text: 'Press back up to start. AMRAP \u2014 if your lean is aggressive, 3\u20135 reps is genuinely hard. Stop if form breaks.'
+      text: 'Press back up to start. AMRAP — if your lean is aggressive, 3–5 reps is genuinely hard. Stop if form breaks.'
     }
   ];
 
@@ -103,7 +103,7 @@ function PlancheDiagram({ onClose }) {
         }}
       >
         <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555', marginBottom: 8 }}>
-          Side View \u2014 Top Position (Arms Extended)
+          Side View — Top Position (Arms Extended)
         </div>
         <svg viewBox="0 0 760 320" width="100%" xmlns="http://www.w3.org/2000/svg">
           <line x1={30} y1={285} x2={730} y2={285} stroke="#333" strokeWidth={1.5} />
@@ -141,14 +141,14 @@ function PlancheDiagram({ onClose }) {
           <text x={152} y={86} fontSize={10} fill="#555">forward of hands</text>
           <circle cx={418} cy={172} r={5} fill="#a78bfa" opacity={0.9} />
           <line x1={423} y1={165} x2={468} y2={138} stroke="#a78bfa" strokeWidth={1} strokeDasharray="3,3" />
-          <text x={472} y={134} fontSize={11} fill="#a78bfa">hip \u2014 neutral</text>
+          <text x={472} y={134} fontSize={11} fill="#a78bfa">hip — neutral</text>
           <text x={472} y={146} fontSize={10} fill="#555">not flexed / not loaded</text>
           <line x1={568} y1={218} x2={618} y2={188} stroke="#f0ede6" strokeWidth={1} strokeDasharray="3,3" />
           <text x={622} y={184} fontSize={11} fill="#f0ede6">right foot</text>
-          <text x={622} y={196} fontSize={10} fill="#555">on box \u2014 stability</text>
+          <text x={622} y={196} fontSize={10} fill="#555">on box — stability</text>
           <line x1={558} y1={257} x2={625} y2={248} stroke="#facc15" strokeWidth={1} strokeDasharray="3,3" />
           <text x={628} y={244} fontSize={11} fill="#facc15">left foot</text>
-          <text x={628} y={256} fontSize={10} fill="#555">floats \u2014 zero</text>
+          <text x={628} y={256} fontSize={10} fill="#555">floats — zero</text>
           <text x={628} y={268} fontSize={10} fill="#555">weight / push</text>
         </svg>
       </div>
@@ -211,31 +211,31 @@ function SidePlankDiagram({ onClose }) {
   const callouts = [
     {
       key: 'rside',
-      title: '\u2713 Right Side Down',
+      title: '✓ Right Side Down',
       color: '#2ecc71',
       bg: '#0d1f14',
       border: '#2ecc71',
-      text: 'ALL weight goes through your right elbow + right knee (BASE) or right foot (AMP). Right femur is uninjured \u2014 load it freely. Your right obliques and QL do the heavy lifting.'
+      text: 'ALL weight goes through your right elbow + right knee (BASE) or right foot (AMP). Right femur is uninjured — load it freely. Your right obliques and QL do the heavy lifting.'
     },
     {
       key: 'lleg',
-      title: '\u26a0 Left Leg',
+      title: '⚠ Left Leg',
       color: '#c0392b',
       bg: '#1f0d0d',
       border: '#c0392b',
-      text: 'Rests passively on top or in front on the floor. Dead weight. NEVER go left-side-down \u2014 that loads the left femoral neck directly through the elbow-hip-knee chain.'
+      text: 'Rests passively on top or in front on the floor. Dead weight. NEVER go left-side-down — that loads the left femoral neck directly through the elbow-hip-knee chain.'
     },
     {
       key: 'loblique',
-      title: '\u2197 Left Oblique Bias',
+      title: '↗ Left Oblique Bias',
       color: '#a78bfa',
       bg: '#130d1f',
       border: '#a78bfa',
-      text: "Stay right-side-down but reach LEFT arm overhead toward the floor beyond your head. Gravity pulls your top arm down \u2014 left obliques work eccentrically to control it. Solves the 'can\u2019t train left obliques' problem."
+      text: "Stay right-side-down but reach LEFT arm overhead toward the floor beyond your head. Gravity pulls your top arm down — left obliques work eccentrically to control it. Solves the 'can’t train left obliques' problem."
     },
     {
       key: 'amp',
-      title: '\ud83d\udd25 Amplification',
+      title: '🔥 Amplification',
       color: '#facc15',
       bg: '#1a1700',
       border: '#facc15',
@@ -254,7 +254,7 @@ function SidePlankDiagram({ onClose }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 'clamp(1.1rem,3.5vw,1.5rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-            Side Plank \u2014 Leg Configuration
+            Side Plank — Leg Configuration
           </div>
           <div style={{ fontSize: 10, color: '#666', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
             Why right-side-down only + left oblique bias trick
@@ -290,7 +290,7 @@ function SidePlankDiagram({ onClose }) {
         }}
       >
         <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555', marginBottom: 8 }}>
-          Right Side Down \u2014 Safe Position
+          Right Side Down — Safe Position
         </div>
         <svg viewBox="0 0 760 240" width="100%" xmlns="http://www.w3.org/2000/svg">
           <line x1={30} y1={210} x2={730} y2={210} stroke="#333" strokeWidth={1.5} />
@@ -318,9 +318,9 @@ function SidePlankDiagram({ onClose }) {
           <text x={535} y={90} fill="#c0392b" fontSize={9}>dead weight, zero load</text>
           <text x={40} y={80} fill="#a78bfa" fontSize={9} textAnchor="middle">L arm overhead</text>
           <text x={40} y={92} fill="#a78bfa" fontSize={9} textAnchor="middle">(oblique bias)</text>
-          <text x={85} y={228} fill="#888" fontSize={9}>ALL weight \u2192</text>
+          <text x={85} y={228} fill="#888" fontSize={9}>ALL weight →</text>
           <text x={85} y={239} fill="#2ecc71" fontSize={9} fontWeight="bold">R elbow + R knee/foot</text>
-          <text x={680} y={120} fill="#2ecc71" fontSize={24}>\u2713</text>
+          <text x={680} y={120} fill="#2ecc71" fontSize={24}>✓</text>
           <text x={668} y={142} fill="#2ecc71" fontSize={10} fontWeight="bold">SAFE</text>
         </svg>
       </div>
@@ -337,7 +337,7 @@ function SidePlankDiagram({ onClose }) {
         }}
       >
         <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#c0392b', marginBottom: 8 }}>
-          Left Side Down \u2014 \u26d4 Never Do This
+          Left Side Down — ⛔ Never Do This
         </div>
         <svg viewBox="0 0 760 200" width="100%" xmlns="http://www.w3.org/2000/svg">
           <line x1={30} y1={175} x2={730} y2={175} stroke="#333" strokeWidth={1.5} />
@@ -351,7 +351,7 @@ function SidePlankDiagram({ onClose }) {
           <circle cx={400} cy={115} r={22} fill="none" stroke="#c0392b" strokeWidth={2} strokeDasharray="4,3" />
           <text x={430} y={108} fill="#c0392b" fontSize={9} fontWeight="bold">LOADS LEFT</text>
           <text x={430} y={120} fill="#c0392b" fontSize={9} fontWeight="bold">FEMORAL NECK</text>
-          <text x={672} y={90} fill="#c0392b" fontSize={36} fontWeight="bold">\u2717</text>
+          <text x={672} y={90} fill="#c0392b" fontSize={36} fontWeight="bold">✗</text>
           <text x={165} y={192} textAnchor="middle" fontSize={10} fill="#c0392b" fontWeight="bold">L elbow</text>
           <text x={460} y={192} textAnchor="middle" fontSize={10} fill="#c0392b" fontWeight="bold">L knee on ground = fracture load</text>
         </svg>

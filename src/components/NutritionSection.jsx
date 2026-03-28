@@ -129,7 +129,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
   const alerts = [];
 
   const uncheckedSupps = SUPP_IDS.filter((id) => !data.checks[id]).map(
-    (id) => NUTRITION_ITEMS.find((it) => it.id === id).label.split(' \u2014 ')[0]
+    (id) => NUTRITION_ITEMS.find((it) => it.id === id).label.split(' — ')[0]
   );
 
   if (hour >= 20 && uncheckedSupps.length > 0 && !dismissed.supp_red) {
@@ -138,7 +138,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
       color: C.danger,
       bg: C.dangerBg,
       border: C.dangerBorder,
-      text: "Still haven\u2019t taken: " + uncheckedSupps.join(', ')
+      text: "Still haven’t taken: " + uncheckedSupps.join(', ')
     });
   } else if (hour >= 14 && uncheckedSupps.length > 0 && !dismissed.supp_yellow) {
     alerts.push({
@@ -146,7 +146,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
       color: C.warning,
       bg: C.warningBg,
       border: C.warningBorder,
-      text: 'Don\u2019t forget your supplements: ' + uncheckedSupps.join(', ')
+      text: 'Don’t forget your supplements: ' + uncheckedSupps.join(', ')
     });
   }
 
@@ -161,7 +161,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
         checkedMeals +
         ' protein meal' +
         (checkedMeals !== 1 ? 's' : '') +
-        ' today \u2014 try to get one more in before bed'
+        ' today — try to get one more in before bed'
     });
   } else if (hour >= 17 && checkedMeals < 3 && !dismissed.meal_orange) {
     alerts.push({
@@ -174,7 +174,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
         checkedMeals +
         ' protein meal' +
         (checkedMeals !== 1 ? 's' : '') +
-        ' logged \u2014 aim for at least 4 today'
+        ' logged — aim for at least 4 today'
     });
   }
 
@@ -208,17 +208,17 @@ export default function NutritionSection({ isOpen, onToggle }) {
         style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '13px 14px', cursor: 'pointer' }}
         onClick={onToggle}
       >
-        <span style={{ fontSize: 17 }}>\ud83e\udd66</span>
+        <span style={{ fontSize: 17 }}>🥦</span>
         <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: green }}>Daily Nutrition & Recovery</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {streak > 0 && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: green }}>\ud83d\udd25 {streak}d streak</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: green }}>🔥 {streak}d streak</span>
           )}
           {streak === 0 && bestStreak > 0 && (
             <span style={{ fontSize: 10, color: C.textMuted }}>Best: {bestStreak}d</span>
           )}
           <span style={{ fontSize: 11, color: C.textMuted }}>
-            {totalChecked}/{totalItems} \u2713
+            {totalChecked}/{totalItems} ✓
           </span>
         </div>
         <span
@@ -230,7 +230,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
             marginLeft: 6
           }}
         >
-          \u25bc
+          ▼
         </span>
       </div>
 
@@ -271,7 +271,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
                       fontFamily: 'inherit'
                     }}
                   >
-                    \u2715
+                    ✕
                   </button>
                 </div>
               ))}
@@ -281,7 +281,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
           {/* History toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '1px' }}>
-              Today\u2019s Checklist
+              Today’s Checklist
             </div>
             <button
               onClick={() => { setShowHistory(!showHistory); setHistoryDetail(null); }}
@@ -334,7 +334,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
                           justifyContent: 'center'
                         }}
                       >
-                        {day.data && day.data.perfect && <span style={{ fontSize: 10, color: '#fff' }}>\u2713</span>}
+                        {day.data && day.data.perfect && <span style={{ fontSize: 10, color: '#fff' }}>✓</span>}
                       </div>
                       <div style={{ fontSize: 8, color: C.textMuted }}>{day.date}</div>
                     </div>
@@ -350,10 +350,10 @@ export default function NutritionSection({ isOpen, onToggle }) {
                 );
                 return (
                   <div style={{ fontSize: 11, color: C.textDim, padding: '4px 0' }}>
-                    <div>\u2022 Protein meals: {hd.meals}/4</div>
-                    <div>\u2022 Supplements: {hd.supps}/3</div>
+                    <div>• Protein meals: {hd.meals}/4</div>
+                    <div>• Supplements: {hd.supps}/3</div>
                     <div style={{ color: hd.perfect ? green : C.warning, fontWeight: 600, marginTop: 2 }}>
-                      {hd.perfect ? '\u2713 Perfect day' : 'Partial completion'}
+                      {hd.perfect ? '✓ Perfect day' : 'Partial completion'}
                     </div>
                   </div>
                 );
@@ -396,7 +396,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
                         flexShrink: 0
                       }}
                     >
-                      {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800 }}>\u2713</span>}
+                      {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800 }}>✓</span>}
                     </div>
                     <span
                       style={{
@@ -422,7 +422,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
                         fontFamily: 'inherit'
                       }}
                     >
-                      {skipped ? 'Unskip' : 'Rest Day \u2014 Skip'}
+                      {skipped ? 'Unskip' : 'Rest Day — Skip'}
                     </button>
                   </div>
                   {!skipped && checked && (
@@ -500,7 +500,7 @@ export default function NutritionSection({ isOpen, onToggle }) {
                       flexShrink: 0
                     }}
                   >
-                    {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800 }}>\u2713</span>}
+                    {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800 }}>✓</span>}
                   </div>
                   <span style={{ fontSize: 12, fontWeight: 500, color: checked ? C.text : C.textDim }}>
                     {item.label + (item.optional ? ' (optional)' : '')}
