@@ -712,8 +712,35 @@ const EX = {
     sets: [["3","8/side"],["3","8/side"],["3","8/side"]], rest: 30,
     setup: "Supine, arms extended to ceiling, knees bent, both feet flat on the floor.",
     execution: "Extend RIGHT leg and opposite (left) arm on a 4-second count. Return over 4 seconds. Left leg stays bent with foot on floor the entire time.",
-    nwbCues: "4-second tempo increases time under tension dramatically. Left hip flexor never activates — left foot stays planted.",
+    nwbCues: "4-second tempo increases time under tension dramatically. Left hip flexor never activates \u2014 left foot stays planted.",
     why: "Slow tempo dead bug maximizes time under tension for deep core activation. 8 reps per side = over 60 seconds of work.",
+    safety: "safe", swaps: []
+  },
+  "Weighted Crunch (Seated)": {
+    requires: ["dumbbells", "bench"], category: "core",
+    sets: [["3","15"],["3","15"],["3","12"]], rest: 60,
+    setup: "Seated on bench, hold dumbbell or plate at chest with both hands. Feet flat on floor.",
+    execution: "Crunch torso forward, driving ribs toward pelvis. Squeeze upper abs hard at bottom. Return to upright with control over 2 seconds.",
+    nwbCues: "Fully seated \u2014 zero hip flexor demand. Pure spinal flexion, no hip flexion. Go heavy.",
+    why: "Loaded upper rectus abdominis work from a safe seated position. Weight forces harder contraction.",
+    safety: "safe", swaps: []
+  },
+  "Reverse Crunch (R Leg Only)": {
+    requires: ["mat"], category: "core",
+    sets: [["3","12"],["3","12"],["3","15"]], rest: 30,
+    setup: "Supine, left foot planted on floor. Right knee bent at 90\u00b0, foot hovering off the floor.",
+    execution: "Draw right knee toward chest by curling your PELVIS off the floor. Lower slowly over 3 seconds. Left foot stays planted.",
+    nwbCues: "Only right leg moves \u2014 left hip flexor completely off. The motion is pelvic curl, not hip flexion. Press left foot into floor for stability.",
+    why: "Lower rectus abdominis isolation. The pelvic curl pattern targets the abs below the navel.",
+    safety: "safe", swaps: []
+  },
+  "Right Leg Lowers": {
+    requires: ["mat"], category: "core",
+    sets: [["3","10"],["3","10"],["3","12"]], rest: 30,
+    setup: "Supine, arms pressed into floor at sides. Left knee bent, foot planted. Right leg vertical (90\u00b0 at hip).",
+    execution: "Lower right leg toward floor over 4 seconds. Stop before your back arches off the mat. Return to vertical over 2 seconds.",
+    nwbCues: "Press lower back into mat throughout. Only right leg moves. Left foot stays planted. If back arches, you went too far \u2014 reduce range.",
+    why: "Eccentric lower ab work. 4-second lowering phase maximizes time under tension at the hardest part of the range.",
     safety: "safe", swaps: []
   },
 
@@ -1115,18 +1142,102 @@ const CORE_FINISHERS = {
 };
 
 // ===== DAILY SUPPLEMENT SECTIONS =====
+// ===== MUSCLE GROUP TAGS =====
+const MUSCLE_TAGS = {
+  // Push
+  "Barbell Floor Press":["Chest","Triceps"],"DB Floor Press":["Chest","Triceps"],"Machine Chest Press":["Chest","Triceps"],
+  "Seated DB OH Press":["Shoulders","Triceps"],"Seated Arnold Press":["Shoulders","Triceps"],"Landmine Press (seated)":["Shoulders","Core"],
+  "Incline DB Press + Lat Raises":["Upper Chest","Side Delts"],"Cable Chest Fly":["Chest"],
+  "Lying Skull Crushers":["Triceps"],"OH Triceps Extension":["Triceps"],"Tricep Rope Pushdown":["Triceps"],
+  "Mechanical Drop Set (Press)":["Chest","Triceps"],"Dip Machine":["Chest","Triceps"],
+  "Pseudo Planche Push-Up":["Chest","Shoulders"],"Parallette L-Sit":["Triceps","Core"],
+  // Pull
+  "Lat Pulldown (Wide)":["Lats","Biceps"],"Neutral Grip Pulldown":["Lats","Biceps"],
+  "Weighted Pull-Up":["Lats","Biceps"],"Finger-Assist One-Arm Pull-Up":["Lats","Biceps"],
+  "Chest-Supported DB Row":["Upper Back","Lats"],"Seated Cable Row":["Upper Back","Lats"],
+  "One-Arm Cable Row":["Upper Back","Core"],"Mechanical Drop Set (Pull)":["Lats","Biceps"],
+  "Seated Face Pulls":["Rear Delts","Rotator Cuff"],"Reverse Fly":["Rear Delts"],
+  "Preacher Curls":["Biceps"],"Hammer Curls":["Biceps","Forearms"],"Incline DB Curl":["Biceps"],
+  // Legs
+  "SL Leg Press (Right)":["Quads","Glutes"],"Hack Squat (Right)":["Quads","Glutes"],
+  "SL Leg Extension (Right)":["Quads"],"SL Glute Bridge (Right)":["Glutes","Hamstrings"],
+  "SL Hip Thrust (Right)":["Glutes","Hamstrings"],"Prone Ham Curl (Right)":["Hamstrings"],
+  "Stab Ball Ham Curl (Right)":["Hamstrings","Glutes"],"Low-Box Step-Up (Right)":["Quads","Glutes"],
+  "Nordic Ham Curl":["Hamstrings"],"Standing Calf Raise (R)":["Calves"],
+  "Banded Clamshells":["Glute Med"],"Isometric Quad Sets (Left)":["Quads (L)"],
+  "Ankle Pumps (Left)":["Calves (L)"],
+  // Core — Block exercises
+  "Forearm Plank Saw":["Upper Abs","Lower Abs"],"Plank Knee Tuck (R only)":["Lower Abs","Obliques"],
+  "Wheelbarrow Hold":["Upper Abs","Lower Abs"],"Spiderman Plank (R only)":["Obliques","Lower Abs"],
+  "Slow Mountain Climber (R)":["Lower Abs","Obliques"],"Dead Bug (R Leg Only)":["Lower Abs","TVA"],
+  "Hollow Body Hold":["Lower Abs","Upper Abs"],"Body Saw (Sliders)":["Upper Abs","Lower Abs"],
+  "Pallof Press (Seated)":["Obliques"],"Pallof Overhead Reach":["Obliques","Upper Abs"],
+  "Bird-Dog (Prone Bench)":["Lower Back","Obliques"],
+  "Side Plank (R Side Down)":["Obliques"],"Side Plank (L Oblique Bias \u2014 R Side Down)":["Obliques"],
+  "Suitcase Hold (Seated)":["Obliques"],
+  "Russian Twist (Seated Bench)":["Obliques"],"Cable Woodchop (Seated)":["Obliques"],
+  "Bicycle Crunch (R Leg Only)":["Obliques","Upper Abs"],"Stir the Pot":["Upper Abs","Obliques"],
+  "McGill Curl-Up":["Upper Abs"],
+  // Core supplements
+  "Modified Plank":["Upper Abs","Lower Abs"],"Modified Hollow Body Hold":["Lower Abs"],
+  "Seated Cable Crunch":["Upper Abs"],"Pallof Press with Overhead Reach":["Obliques"],
+  "Single-Arm Seated Cable Row":["Obliques"],"Modified Side Plank with Band Row":["Obliques"],
+  "Seated Landmine Rotation":["Obliques"],"High-to-Low Woodchop":["Obliques"],
+  "Pallof Alphabet":["Obliques"],"Modified Side Plank Hip Dips":["Obliques"],
+  "Seated Oblique Cable Crunch":["Obliques"],"Modified Hollow Body Flutter":["Lower Abs"],
+  "Modified Plank Shoulder Taps":["Upper Abs","Obliques"],"Pallof ISO Hold":["Obliques"],
+  "Modified Side Plank Hold":["Obliques"],"Low-to-High Woodchop":["Obliques"],
+  "Slow Dead Bugs (Modified)":["Lower Abs","TVA"],
+  "Weighted Crunch (Seated)":["Upper Abs"],"Reverse Crunch (R Leg Only)":["Lower Abs"],
+  "Right Leg Lowers":["Lower Abs"],
+  // Left Leg supplements
+  "Quad Sets":["Quads (L)"],"Short Arc Quads":["Quads (L)"],
+  "Ankle Pumps & Circles":["Calves (L)"],"Banded Terminal Knee Extensions":["Quads (L)"],
+  "Reclined Knee Extensions":["Quads (L)"]
+};
+
 const SUPPLEMENT_LEFT_LEG = {
   base: ["Quad Sets", "Short Arc Quads", "Ankle Pumps & Circles"],
   legsExtra: ["Banded Terminal Knee Extensions", "Reclined Knee Extensions"]
 };
 
 const SUPPLEMENT_CORE = {
-  "Push A": {subtitle: "Anti-Extension", exercises: ["Modified Plank", "Modified Hollow Body Hold", "Seated Cable Crunch"]},
-  "Push B": {subtitle: "Anti-Rotation", exercises: ["Pallof Press with Overhead Reach", "Single-Arm Seated Cable Row", "Modified Side Plank with Band Row"]},
-  "Pull A": {subtitle: "Rotational Power", exercises: ["Seated Landmine Rotation", "High-to-Low Woodchop", "Pallof Alphabet"]},
-  "Pull B": {subtitle: "Lateral + Isometric", exercises: ["Modified Side Plank Hip Dips", "Suitcase Hold (Seated)", "Seated Oblique Cable Crunch"]},
-  "Legs A": {subtitle: "Compound Core", exercises: ["Modified Hollow Body Flutter", "Modified Plank Shoulder Taps", "Pallof ISO Hold"]},
-  "Legs B": {subtitle: "Core Endurance", exercises: ["Modified Side Plank Hold", "Low-to-High Woodchop", "Slow Dead Bugs (Modified)"]}
+  "Push A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Seated Cable Crunch", region: "Upper Abs"},
+    {name: "Modified Hollow Body Hold", region: "Lower Abs"},
+    {name: "Pallof Press with Overhead Reach", region: "Obliques"},
+    {name: "Modified Side Plank Hip Dips", region: "Obliques"}
+  ]},
+  "Push B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank", region: "Upper Abs"},
+    {name: "Reverse Crunch (R Leg Only)", region: "Lower Abs"},
+    {name: "Single-Arm Seated Cable Row", region: "Obliques"},
+    {name: "Seated Oblique Cable Crunch", region: "Obliques"}
+  ]},
+  "Pull A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Weighted Crunch (Seated)", region: "Upper Abs"},
+    {name: "Modified Hollow Body Flutter", region: "Lower Abs"},
+    {name: "Seated Landmine Rotation", region: "Obliques"},
+    {name: "Modified Side Plank with Band Row", region: "Obliques"}
+  ]},
+  "Pull B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank Shoulder Taps", region: "Upper Abs"},
+    {name: "Slow Dead Bugs (Modified)", region: "Lower Abs"},
+    {name: "High-to-Low Woodchop", region: "Obliques"},
+    {name: "Suitcase Hold (Seated)", region: "Obliques"}
+  ]},
+  "Legs A": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Seated Cable Crunch", region: "Upper Abs"},
+    {name: "Right Leg Lowers", region: "Lower Abs"},
+    {name: "Pallof Alphabet", region: "Obliques"},
+    {name: "Modified Side Plank Hold", region: "Obliques"}
+  ]},
+  "Legs B": {subtitle: "Upper + Lower + Obliques", exercises: [
+    {name: "Modified Plank", region: "Upper Abs"},
+    {name: "Reverse Crunch (R Leg Only)", region: "Lower Abs"},
+    {name: "Low-to-High Woodchop", region: "Obliques"},
+    {name: "Pallof ISO Hold", region: "Obliques"}
+  ]}
 };
 
 // ===== EQUIPMENT VARIANT SYSTEM =====
@@ -1554,7 +1665,8 @@ function ExRow({name, ex, phase, isExpanded, onToggle, onSwap, onDiagram, unavai
           e("span", {style:{fontWeight:600, fontSize:13, color: unavailable?C.danger:C.text}}, name),
           ex.safety === "caution" && e(Badge, {color:C.warning}, "MODIFIED"),
           ex.phase != null && phase < ex.phase && e(Badge, {color:C.textMuted}, "Wk "+(ex.phase*2+1)+"+"),
-          unavailable && e(Badge, {color:C.danger}, "NO EQUIP")
+          unavailable && e(Badge, {color:C.danger}, "NO EQUIP"),
+          MUSCLE_TAGS[name] && !isExpanded && MUSCLE_TAGS[name].map(function(m) { return e("span", {key:m, style:{fontSize:8, padding:"1px 4px", borderRadius:3, background:C.border, color:C.textMuted, fontWeight:600, letterSpacing:"0.3px"}}, m); })
         ),
         e("div", {style:{display:"flex", alignItems:"center", gap:8}},
           !isExpanded && e("span", {style:{fontSize:11, color:C.textDim}}, s[0]+"\u00d7"+s[1]),
@@ -2192,14 +2304,14 @@ function App() {
     if (isTrainingDay) {
       var llExercises = SUPPLEMENT_LEFT_LEG.base.slice();
       if (isLegsDay) llExercises = llExercises.concat(SUPPLEMENT_LEFT_LEG.legsExtra);
-      var coreExercises = SUPPLEMENT_CORE[workoutKey].exercises.slice();
+      var coreExData = SUPPLEMENT_CORE[workoutKey].exercises;
       coreSubtitle = SUPPLEMENT_CORE[workoutKey].subtitle;
       // Interleave: L, C, L, C, L, C, (extras)
       var allSupps = [];
-      var maxSL = Math.max(llExercises.length, coreExercises.length);
+      var maxSL = Math.max(llExercises.length, coreExData.length);
       for (var si = 0; si < maxSL; si++) {
         if (si < llExercises.length) allSupps.push({type:"leftleg", name:llExercises[si]});
-        if (si < coreExercises.length) allSupps.push({type:"core", name:coreExercises[si]});
+        if (si < coreExData.length) allSupps.push({type:"core", name:coreExData[si].name, region:coreExData[si].region});
       }
       // Get active exercises list (respecting phase gates)
       var activeEx = w.exercises.filter(function(orig) {
@@ -2292,7 +2404,7 @@ function App() {
               return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, background:accent+"09", border:"1px solid "+accent+"28", borderLeft:"3px solid "+accent, overflow:"hidden"}},
                 e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
                   e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:18, height:18, borderRadius:4, background:accent+"22", border:"1px solid "+accent+"44", fontSize:9, fontWeight:800, color:accent, flexShrink:0}}, isLL ? "L" : "C"),
-                  e("span", {style:{fontSize:10, fontWeight:700, color:accent, textTransform:"uppercase", letterSpacing:"0.3px"}}, isLL ? "Left Leg" : "Core"),
+                  e("span", {style:{fontSize:10, fontWeight:700, color:accent, textTransform:"uppercase", letterSpacing:"0.3px"}}, isLL ? "Left Leg" : (supp.region || "Core")),
                   e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
                   e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
                   e("span", {style:{fontSize:9, color:accent, marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
