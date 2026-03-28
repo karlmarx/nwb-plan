@@ -2112,6 +2112,7 @@ function App() {
   const [startDay, setStartDay] = useState(loadState("nwb_startDay", 0));
   const [supplementToggles, setSupplementToggles] = useState(loadState("nwb_supplements", {leftLeg: true, core: true}));
   const [variantSelections, setVariantSelections] = useState(loadState("nwb_variants", {}));
+  const [coreFilter, setCoreFilter] = useState("all");
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
 
@@ -2406,33 +2407,51 @@ function App() {
       break;
 
     case 3: // Core
+      // Collect equipment types from all core exercises for filter pills
+      var coreBlocks = [
+        {key:"core-antiext", title:"Block 1: Anti-Extension", icon:"\uD83D\uDC80", accent:C.danger, exercises:["Forearm Plank Saw","Plank Knee Tuck (R only)","Wheelbarrow Hold","Spiderman Plank (R only)","Slow Mountain Climber (R)","Dead Bug (R Leg Only)","Hollow Body Hold","Body Saw (Sliders)"]},
+        {key:"core-antirot", title:"Block 2: Anti-Rotation", icon:"\uD83D\uDD04", accent:C.accent, exercises:["Pallof Press (Seated)","Pallof Overhead Reach","Bird-Dog (Prone Bench)"]},
+        {key:"core-antilat", title:"Block 3: Anti-Lateral-Flexion", icon:"\u2194\uFE0F", accent:C.warning, exercises:["Side Plank (R Side Down)","Side Plank (L Oblique Bias \u2014 R Side Down)","Suitcase Hold (Seated)"]},
+        {key:"core-rotation", title:"Block 4: Rotation + Integrated", icon:"\uD83C\uDF00", accent:"#a78bfa", exercises:["Russian Twist (Seated Bench)","Cable Woodchop (Seated)","Bicycle Crunch (R Leg Only)","Stir the Pot","McGill Curl-Up"]}
+      ];
+      var coreEquipSet = {};
+      coreBlocks.forEach(function(b){ b.exercises.forEach(function(name){ var ex = EX[name]; if(ex) ex.requires.forEach(function(r){ if(r!=="mat") coreEquipSet[r]=true; }); }); });
+      var coreEquipKeys = Object.keys(coreEquipSet);
+      var coreFilterFn = function(name) {
+        if (coreFilter === "all") return true;
+        var ex = EX[name];
+        if (!ex) return false;
+        if (coreFilter === "floor") return ex.requires.length === 0 || ex.requires.every(function(r){ return r === "mat"; });
+        return ex.requires.indexOf(coreFilter) >= 0;
+      };
+      var coreFilterCount = 0;
+      coreBlocks.forEach(function(b){ b.exercises.forEach(function(n){ if(coreFilterFn(n)) coreFilterCount++; }); });
       content = e("div", null,
         e(Callout, {type:"danger"}, "ZERO active left hip flexion. Protects femoral neck stress fracture. Left leg passive in ALL exercises."),
         e(Callout, {type:"info"}, "Slow tempo protocol: 4-count movements, time-based sets, continuous tension. BASE \u2192 AMP 1 \u2192 AMP 2. Target muscle failure in the final 10-15 seconds of each set. If you finish the set comfortably, move up an amp level."),
-        e(Section, {title:"Block 1: Anti-Extension", icon:"\uD83D\uDC80", isOpen:!!openSections["core-antiext"], onToggle:function(){ toggleSection("core-antiext"); }, count:8, accent:C.danger},
-          ["Forearm Plank Saw","Plank Knee Tuck (R only)","Wheelbarrow Hold","Spiderman Plank (R only)","Slow Mountain Climber (R)","Dead Bug (R Leg Only)","Hollow Body Hold","Body Saw (Sliders)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
+        // Equipment filter
+        e("div", {style:{marginBottom:12}},
+          e("div", {style:{fontSize:10, fontWeight:700, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1px", marginBottom:6}}, "Filter by equipment \u2014 " + (coreFilter === "all" ? "showing all" : coreFilterCount + " matching")),
+          e("div", {style:{display:"flex", flexWrap:"wrap", gap:4}},
+            e("button", {onClick:function(){ setCoreFilter("all"); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:coreFilter==="all"?C.accent+"22":"transparent", border:"1px solid "+(coreFilter==="all"?C.accent:C.border), color:coreFilter==="all"?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:coreFilter==="all"?700:400}}, "All"),
+            e("button", {onClick:function(){ setCoreFilter("floor"); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:coreFilter==="floor"?"#10b98122":"transparent", border:"1px solid "+(coreFilter==="floor"?"#10b981":C.border), color:coreFilter==="floor"?"#10b981":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:coreFilter==="floor"?700:400}}, "\uD83E\uDDD8 Floor / Mat Only"),
+            coreEquipKeys.map(function(eqKey) {
+              var eq = EQUIPMENT[eqKey];
+              var isSel = coreFilter === eqKey;
+              return e("button", {key:eqKey, onClick:function(){ setCoreFilter(isSel ? "all" : eqKey); }, style:{fontSize:10, padding:"5px 10px", borderRadius:10, background:isSel?C.accent+"22":"transparent", border:"1px solid "+(isSel?C.accent:C.border), color:isSel?C.accent:C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:isSel?700:400}}, (eq?eq.icon+" ":"") + (eq?eq.name:eqKey));
+            })
+          )
         ),
-        e(Section, {title:"Block 2: Anti-Rotation", icon:"\uD83D\uDD04", isOpen:!!openSections["core-antirot"], onToggle:function(){ toggleSection("core-antirot"); }, count:3, accent:C.accent},
-          ["Pallof Press (Seated)","Pallof Overhead Reach","Bird-Dog (Prone Bench)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
-        e(Section, {title:"Block 3: Anti-Lateral-Flexion", icon:"\u2194\uFE0F", isOpen:!!openSections["core-antilat"], onToggle:function(){ toggleSection("core-antilat"); }, count:3, accent:C.warning},
-          ["Side Plank (R Side Down)","Side Plank (L Oblique Bias \u2014 R Side Down)","Suitcase Hold (Seated)"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
-        e(Section, {title:"Block 4: Rotation + Integrated", icon:"\uD83C\uDF00", isOpen:!!openSections["core-rotation"], onToggle:function(){ toggleSection("core-rotation"); }, count:5, accent:"#a78bfa"},
-          ["Russian Twist (Seated Bench)","Cable Woodchop (Seated)","Bicycle Crunch (R Leg Only)","Stir the Pot","McGill Curl-Up"].map(function(name) {
-            var ex = EX[name];
-            return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
-          })
-        ),
+        coreBlocks.map(function(block) {
+          var filtered = block.exercises.filter(coreFilterFn);
+          if (coreFilter !== "all" && filtered.length === 0) return null;
+          return e(Section, {key:block.key, title:block.title, icon:block.icon, isOpen:!!openSections[block.key], onToggle:function(){ toggleSection(block.key); }, count:filtered.length, accent:block.accent},
+            filtered.map(function(name) {
+              var ex = EX[name];
+              return e(ExRow, {key:name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!ex || (ex.requires||[]).some(function(r){ return equipment[r] === false; }), equipment:equipment});
+            })
+          );
+        }),
         e(Section, {title:"Removed Exercises", icon:"\uD83D\uDEAB", isOpen:!!openSections["danger-core"], onToggle:function(){ toggleSection("danger-core"); }},
           e(RemovedRow, {name:"Active Straight Leg Raises", reason:"Hip flexor contraction compresses femoral neck stress fracture. NEVER do these."}),
           e(RemovedRow, {name:"Hanging Leg Raises", reason:"Deep hip flexion + massive hip flexor force = fracture danger."}),
