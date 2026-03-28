@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0f1a"/>
+      <stop offset="100%" style="stop-color:#1a2236"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Shield shape -->
+  <path d="M256 60 L420 130 L420 280 Q420 400 256 460 Q92 400 92 280 L92 130 Z" fill="none" stroke="#38bdf8" stroke-width="8" opacity="0.3"/>
+  <path d="M256 80 L400 142 L400 275 Q400 385 256 440 Q112 385 112 275 L112 142 Z" fill="#111827" stroke="#38bdf8" stroke-width="3" opacity="0.8"/>
+  <!-- Dumbbell icon -->
+  <rect x="180" y="230" width="152" height="16" rx="8" fill="#38bdf8"/>
+  <rect x="155" y="205" width="30" height="66" rx="6" fill="#38bdf8"/>
+  <rect x="327" y="205" width="30" height="66" rx="6" fill="#38bdf8"/>
+  <rect x="140" y="215" width="20" height="46" rx="4" fill="#10b981"/>
+  <rect x="352" y="215" width="20" height="46" rx="4" fill="#10b981"/>
+  <!-- NWB text -->
+  <text x="256" y="175" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="bold" fill="#38bdf8" letter-spacing="6">NWB</text>
+  <!-- PPL text -->
+  <text x="256" y="340" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="bold" fill="#94a3b8" letter-spacing="4">PPL PLAN</text>
+  <!-- Safety cross -->
+  <circle cx="256" y="400" r="18" fill="#10b981" opacity="0.8" cy="400"/>
+  <rect x="250" y="390" width="12" height="20" rx="2" fill="#0a0f1a"/>
+  <rect x="246" y="396" width="20" height="8" rx="2" fill="#0a0f1a"/>
+</svg>
