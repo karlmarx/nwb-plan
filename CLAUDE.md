@@ -1,39 +1,124 @@
-# CLAUDE.md
+# CLAUDE.md — NWB Training Plan (Femur Fracture Fitness)
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## What Is This
 
-## Project Overview
+A PWA for non-weight-bearing (NWB) Push/Pull/Legs training protocol after a left femur stress fracture. Tracks workouts, supplements (left leg rehab + core), nutrition, and equipment availability.
 
-NWB Workout Plan — a PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Pure static site deployed on Vercel with no build step.
-
-## Development
-
-No build tools, bundler, or package manager needed. The entire app is a single `index.html` file using React 18.2 from CDN (no JSX — uses `React.createElement` directly).
-
-- **Run locally:** Open `index.html` in a browser, or use any static file server
-- **Deploy:** Push to `main` — Vercel auto-deploys (no build command, output directory is root)
-- **No tests, linter, or type checking configured**
+**Live:** https://nwbfit.vercel.app
 
 ## Architecture
 
-Single-file SPA (`index.html`, ~838 lines) with everything inline:
+**As of PR #30 (refactor branch):** Vite + React with JSX components.
+**Main branch:** Still single `index.html` with inline React until refactor merges.
 
-- **React components** defined as plain functions using `React.createElement` (aliased as `e()`)
-- **Stateless sub-components:** `Badge`, `Section` (collapsible), `ExRow` (exercise row with expandable details), `Callout`, `EqTable`
-- **Main `App` component:** Tab-based UI (Schedule, Workouts, Cardio, Core, Equipment, Safety) with state for active tab, phase selection, open sections, and expanded exercises
-- **Data constants:** `PHASES` (3 progression phases), `SCHED` (6-day PPL calendar), `EX_DETAILS` (exercise descriptions with setup/execution/safety cues)
-- **Styling:** Inline JS style objects with a centralized color palette constant `C`
-- **Dark theme** throughout, designed for mobile/gym use
+### Refactored Structure (refactor/react-app branch)
+```
+nwb-plan/
+├── index.html              ← Minimal Vite entry
+├── vite.config.js
+├── package.json
+├── vercel.json             ← buildCommand: npm run build, outputDirectory: dist
+├── public/
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   ├── icon.svg
+│   ├── manifest.json
+│   └── sw.js
+├── scripts/
+│   └── verify-build.ps1   ← Local build + Playwright smoke test
+└── src/
+    ├── main.jsx
+    ├── App.jsx             ← All state management, tab routing
+    ├── App.css
+    ├── theme.js            ← Color palette constants
+    ├── components/
+    │   ├── TodayTab.jsx
+    │   ├── WorkoutsTab.jsx
+    │   ├── WorkoutView.jsx
+    │   ├── ExerciseCard.jsx
+    │   ├── SupplementCard.jsx
+    │   ├── NutritionSection.jsx
+    │   ├── CoreTab.jsx
+    │   ├── CardioTab.jsx
+    │   ├── EquipmentTab.jsx
+    │   ├── SafetyTab.jsx
+    │   ├── ProgramClock.jsx
+    │   ├── RestTimer.jsx
+    │   ├── DiagramModal.jsx
+    │   ├── Badge.jsx
+    │   ├── Callout.jsx
+    │   └── Section.jsx
+    ├── data/
+    │   ├── exercises.js    ← All exercise definitions (~84KB)
+    │   ├── supplements.js  ← Left leg + core supplement data
+    │   ├── nutrition.js    ← Daily nutrition checklist items
+    │   ├── program.js      ← Workout schedule, phases
+    │   └── equipment.js    ← Equipment definitions
+    └── utils/
+        ├── storage.js      ← localStorage helpers + schema versioning
+        ├── dates.js        ← Week/day calculations
+        └── timer.js        ← Countdown/countup logic
+```
 
-## PWA
+## Development
 
-- `sw.js` — service worker with cache-first strategy (cache name `nwb-plan-v1`)
-- `manifest.json` — standalone mode, dark theme, maskable icons
-- Cached assets: `index.html`, `manifest.json`, icons
+```bash
+npm install
+npm run dev              # Vite dev server
+npm run build            # Production build → dist/
 
-## Key Constraints
+# Verify build mimics Vercel (includes Playwright smoke test):
+.\scripts\verify-build.ps1
+```
 
-- No JSX — all components use `React.createElement` (abbreviated as `e`)
-- React and ReactDOM loaded from CDN `<script>` tags — no imports/modules
-- All state management uses `React.useState` hooks in the App component
-- Sub-components are stateless to avoid React Error 310 (see commit 42e438b)
+## Deploy
+
+Push to `main` — Vercel auto-deploys. Or manually:
+```bash
+npx vercel --yes --prod
+```
+
+## Key Features
+
+- **6-tab UI:** Today, Workouts, Cardio, Core, Equipment, Safety
+- **3 progression phases** with exercise modifications per phase
+- **Equipment toggles** — exercises grey out when equipment unavailable, suggest swaps
+- **Exercise variants** — pill selector for different machine types (e.g., plate-loaded vs cable)
+- **Supplement supersets** — left leg rehab + core exercises interleaved into main workouts
+- **Daily nutrition checklist** — 10 items with streak tracking and escalating alerts
+- **Rest timer** with countdown
+- **Program clock** — countup from program start date
+- **Movement diagrams** — ASCII art exercise guides
+- **Hevy deep links** — open workouts in Hevy app
+
+## State (localStorage)
+
+All state persisted to localStorage:
+- `nwb_phase` — current training phase (0-2)
+- `nwb_equipment` — equipment availability toggles
+- `nwb_swaps` — exercise swap selections
+- `nwb_variants` — equipment variant selections
+- `nwb_supplements` — supplement section toggles (leftLeg, core)
+- `nwb_nutrition` — today's nutrition checklist state
+- `nwb_nutrition_history` — historical nutrition data (pruned to 90 days)
+- `nwb_nutrition_dismissed` — dismissed nutrition alerts
+- `nwb_startDay` — week start day preference
+- `nwb_hevy` — Hevy workout template IDs
+- `nwb_schema_version` — data migration version (currently 4)
+
+## NWB Safety Constraints
+
+This is a medical protocol app. Every exercise has NWB safety cues. Key rules:
+- No weight bearing on left leg
+- No exercises that load the femur
+- Cross-education (training right side to maintain left side neural pathways)
+- Modified ROM and positioning for safety
+
+## Related Project
+
+**NWB Yoga:** https://nwb-yoga.vercel.app — yoga companion app (separate repo)
+
+## Open Issues
+
+- #29 — React refactor (PR #30 open)
+- #31 — Visual regression testing for deployment pipeline
