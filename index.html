@@ -1963,41 +1963,54 @@ function getTodayKey() {
 }
 
 function NutritionSection({isOpen, onToggle}) {
-  var todayKey = getTodayKey();
-  var green = "#10b981";
+  const todayKey = getTodayKey();
+  const green = "#10b981";
 
-  var _s = useState(function() {
-    var all = loadState("nwb_nutrition", {});
+  const _s = useState(function() {
+    const all = loadState("nwb_nutrition", {});
     return all[todayKey] || {checks:{}, notes:{}, cardioType:"", cardioDuration:"", cardioSkipped:false};
   });
-  var data = _s[0]; var setData = _s[1];
+  const data = _s[0]; const setData = _s[1];
 
-  var _h = useState(function(){ return loadState("nwb_nutrition_history", {}); });
-  var history = _h[0]; var setHistory = _h[1];
+  const _h = useState(function(){
+    const loaded = loadState("nwb_nutrition_history", {});
+    // Prune entries older than 90 days
+    const keys = Object.keys(loaded);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    const cutoffKey = cutoff.toISOString().slice(0,10);
+    keys.forEach(function(k) {
+      if (k < cutoffKey) delete loaded[k];
+    });
+    return loaded;
+  });
+  const history = _h[0]; const setHistory = _h[1];
 
-  var _d = useState(function(){ return loadState("nwb_nutrition_dismissed", {}); });
-  var dismissed = _d[0]; var setDismissed = _d[1];
+  const _d = useState(function(){ return loadState("nwb_nutrition_dismissed", {}); });
+  const dismissed = _d[0]; const setDismissed = _d[1];
 
-  var _hv = useState(false);
-  var showHistory = _hv[0]; var setShowHistory = _hv[1];
+  const _hv = useState(false);
+  const showHistory = _hv[0]; const setShowHistory = _hv[1];
 
-  var _hd = useState(null);
-  var historyDetail = _hd[0]; var setHistoryDetail = _hd[1];
+  const _hd = useState(null);
+  const historyDetail = _hd[0]; const setHistoryDetail = _hd[1];
 
   // Persist on change
   useEffect(function() {
-    var all = loadState("nwb_nutrition", {});
+    const all = loadState("nwb_nutrition", {});
     all[todayKey] = data;
     saveState("nwb_nutrition", all);
     // Update history record
-    var checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
-    var checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
-    var perfect = checkedMeals >= 4 && checkedSupps >= 3;
-    var partial = checkedMeals > 0 || checkedSupps > 0;
-    var h = Object.assign({}, history);
-    h[todayKey] = {perfect:perfect, partial:partial, meals:checkedMeals, supps:checkedSupps};
-    setHistory(h);
-    saveState("nwb_nutrition_history", h);
+    const checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
+    const checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
+    const perfect = checkedMeals >= 4 && checkedSupps >= 3;
+    const partial = checkedMeals > 0 || checkedSupps > 0;
+    setHistory(function(prev) {
+      const h = Object.assign({}, prev);
+      h[todayKey] = {perfect:perfect, partial:partial, meals:checkedMeals, supps:checkedSupps};
+      saveState("nwb_nutrition_history", h);
+      return h;
+    });
   }, [data]);
 
   // Reset dismissed alerts on new app open (check dismissed date)
@@ -2008,36 +2021,36 @@ function NutritionSection({isOpen, onToggle}) {
     }
   }, []);
 
-  var toggle = function(id) {
+  const toggle = function(id) {
     setData(function(prev) {
-      var c = Object.assign({}, prev.checks);
+      const c = Object.assign({}, prev.checks);
       c[id] = !c[id];
       return Object.assign({}, prev, {checks:c});
     });
   };
 
-  var setNote = function(id, val) {
+  const setNote = function(id, val) {
     setData(function(prev) {
-      var n = Object.assign({}, prev.notes);
+      const n = Object.assign({}, prev.notes);
       n[id] = val;
       return Object.assign({}, prev, {notes:n});
     });
   };
 
-  var setCardioType = function(val) {
+  const setCardioType = function(val) {
     setData(function(prev) { return Object.assign({}, prev, {cardioType:val}); });
   };
 
-  var setCardioDuration = function(val) {
+  const setCardioDuration = function(val) {
     setData(function(prev) { return Object.assign({}, prev, {cardioDuration:val}); });
   };
 
-  var skipCardio = function() {
+  const skipCardio = function() {
     setData(function(prev) { return Object.assign({}, prev, {cardioSkipped:!prev.cardioSkipped}); });
   };
 
-  var dismissAlert = function(key) {
-    var d = Object.assign({}, dismissed);
+  const dismissAlert = function(key) {
+    const d = Object.assign({}, dismissed);
     d[key] = true;
     d._date = todayKey;
     setDismissed(d);
@@ -2045,37 +2058,37 @@ function NutritionSection({isOpen, onToggle}) {
   };
 
   // Counts
-  var checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
-  var checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
-  var totalChecked = NUTRITION_ITEMS.filter(function(it){ return it.id === "cardio" ? (data.checks.cardio || data.cardioSkipped) : data.checks[it.id]; }).length;
-  var totalItems = NUTRITION_ITEMS.length;
+  const checkedMeals = MEAL_IDS.filter(function(id){ return data.checks[id]; }).length;
+  const checkedSupps = SUPP_IDS.filter(function(id){ return data.checks[id]; }).length;
+  const totalChecked = NUTRITION_ITEMS.filter(function(it){ return it.id === "cardio" ? (data.checks.cardio || data.cardioSkipped) : data.checks[it.id]; }).length;
+  const totalItems = NUTRITION_ITEMS.length;
 
   // Streak calculation
-  var streak = 0;
-  var bestStreak = 0;
-  var d2 = new Date();
+  let streak = 0;
+  let bestStreak = 0;
+  const d2 = new Date();
   d2.setDate(d2.getDate() - 1); // start from yesterday for completed days
   while (true) {
-    var k = d2.getFullYear()+"-"+String(d2.getMonth()+1).padStart(2,"0")+"-"+String(d2.getDate()).padStart(2,"0");
+    const k = d2.getFullYear()+"-"+String(d2.getMonth()+1).padStart(2,"0")+"-"+String(d2.getDate()).padStart(2,"0");
     if (history[k] && history[k].perfect) { streak++; d2.setDate(d2.getDate()-1); }
     else break;
   }
   // Include today if perfect
   if (history[todayKey] && history[todayKey].perfect) streak++;
   // Best streak from all history
-  var keys = Object.keys(history).sort();
-  var run = 0;
-  for (var si = 0; si < keys.length; si++) {
+  const keys = Object.keys(history).sort();
+  let run = 0;
+  for (let si = 0; si < keys.length; si++) {
     if (history[keys[si]] && history[keys[si]].perfect) { run++; if (run > bestStreak) bestStreak = run; }
     else run = 0;
   }
 
   // Time-based alerts
-  var now = new Date();
-  var hour = now.getHours();
-  var alerts = [];
+  const now = new Date();
+  const hour = now.getHours();
+  const alerts = [];
 
-  var uncheckedSupps = SUPP_IDS.filter(function(id){ return !data.checks[id]; }).map(function(id){
+  const uncheckedSupps = SUPP_IDS.filter(function(id){ return !data.checks[id]; }).map(function(id){
     return NUTRITION_ITEMS.find(function(it){ return it.id === id; }).label.split(" \u2014 ")[0];
   });
 
@@ -2095,16 +2108,16 @@ function NutritionSection({isOpen, onToggle}) {
   alerts.sort(function(a, b) { return a.color === C.danger ? -1 : b.color === C.danger ? 1 : 0; });
 
   // Last 7 days for history view
-  var last7 = [];
-  for (var di = 6; di >= 0; di--) {
-    var dd = new Date();
+  const last7 = [];
+  const dayNames3 = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  for (let di = 6; di >= 0; di--) {
+    const dd = new Date();
     dd.setDate(dd.getDate() - di);
-    var dk = dd.getFullYear()+"-"+String(dd.getMonth()+1).padStart(2,"0")+"-"+String(dd.getDate()).padStart(2,"0");
-    var dayNames3 = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const dk = dd.getFullYear()+"-"+String(dd.getMonth()+1).padStart(2,"0")+"-"+String(dd.getDate()).padStart(2,"0");
     last7.push({key:dk, label:dayNames3[dd.getDay()], date:dd.getDate(), data:history[dk]||null, isToday:dk===todayKey});
   }
 
-  var headerExtra = e("div", {style:{display:"flex", alignItems:"center", gap:8}},
+  const headerExtra = e("div", {style:{display:"flex", alignItems:"center", gap:8}},
     streak > 0 && e("span", {style:{fontSize:11, fontWeight:700, color:green}}, "\uD83D\uDD25 " + streak + "d streak"),
     streak === 0 && bestStreak > 0 && e("span", {style:{fontSize:10, color:C.textMuted}}, "Best: " + bestStreak + "d"),
     e("span", {style:{fontSize:11, color:C.textMuted}}, totalChecked + "/" + totalItems + " \u2713")
@@ -2137,8 +2150,8 @@ function NutritionSection({isOpen, onToggle}) {
       showHistory && e("div", {style:{marginBottom:12, padding:10, borderRadius:8, background:C.bg, border:"1px solid "+C.border}},
         e("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4, marginBottom:historyDetail?8:0}},
           last7.map(function(day) {
-            var clr = day.data ? (day.data.perfect ? green : "#f59e0b") : "#334155";
-            var isSel = historyDetail === day.key;
+            const clr = day.data ? (day.data.perfect ? green : "#f59e0b") : "#334155";
+            const isSel = historyDetail === day.key;
             return e("div", {key:day.key, onClick:function(){ setHistoryDetail(isSel ? null : day.key); }, style:{textAlign:"center", padding:"6px 2px", borderRadius:6, background:isSel?clr+"22":"transparent", border:"1px solid "+(isSel?clr:"transparent"), cursor:"pointer"}},
               e("div", {style:{fontSize:9, fontWeight:700, color:day.isToday?green:C.textMuted}}, day.isToday?"Today":day.label),
               e("div", {style:{width:20, height:20, borderRadius:"50%", background:clr, margin:"4px auto", display:"flex", alignItems:"center", justifyContent:"center"}},
@@ -2149,7 +2162,7 @@ function NutritionSection({isOpen, onToggle}) {
           })
         ),
         historyDetail && (function() {
-          var hd = history[historyDetail];
+          const hd = history[historyDetail];
           if (!hd) return e("div", {style:{fontSize:11, color:C.textMuted, textAlign:"center", padding:8}}, "No data recorded");
           return e("div", {style:{fontSize:11, color:C.textDim, padding:"4px 0"}},
             e("div", null, "\u2022 Protein meals: " + hd.meals + "/4"),
@@ -2161,11 +2174,11 @@ function NutritionSection({isOpen, onToggle}) {
 
       // Checklist items
       NUTRITION_ITEMS.map(function(item) {
-        var checked = !!data.checks[item.id];
-        var isCardio = item.type === "cardio";
+        const checked = !!data.checks[item.id];
+        const isCardio = item.type === "cardio";
 
         if (isCardio) {
-          var skipped = data.cardioSkipped;
+          const skipped = data.cardioSkipped;
           return e("div", {key:item.id, style:{padding:"8px 10px", marginBottom:4, borderRadius:8, background:checked||skipped?"#0f1629":C.bg, border:"1px solid "+(checked?green+"44":skipped?"#64748b33":C.border), opacity:skipped?0.6:1}},
             e("div", {style:{display:"flex", alignItems:"center", gap:8}},
               e("div", {onClick:function(){ if(!skipped) toggle(item.id); }, style:{width:18, height:18, borderRadius:4, border:"2px solid "+(checked?green:C.textMuted), background:checked?green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0}},
@@ -2176,7 +2189,7 @@ function NutritionSection({isOpen, onToggle}) {
             ),
             !skipped && checked && e("div", {style:{marginTop:6, display:"flex", gap:4, flexWrap:"wrap", alignItems:"center", paddingLeft:26}},
               CARDIO_TYPES.map(function(ct) {
-                var isSel = data.cardioType === ct;
+                const isSel = data.cardioType === ct;
                 return e("button", {key:ct, onClick:function(){ setCardioType(ct); }, style:{fontSize:9, padding:"3px 8px", borderRadius:10, background:isSel?green+"22":"transparent", border:"1px solid "+(isSel?green:C.border), color:isSel?green:C.textMuted, cursor:"pointer", fontFamily:"inherit"}}, ct);
               }),
               e("input", {type:"text", placeholder:"min", value:data.cardioDuration||"", onChange:function(ev){ setCardioDuration(ev.target.value); }, onClick:function(ev){ ev.stopPropagation(); }, style:{width:40, fontSize:10, padding:"3px 6px", borderRadius:6, border:"1px solid "+C.border, background:C.bg, color:C.text, fontFamily:"inherit", textAlign:"center"}})
@@ -2200,6 +2213,12 @@ function NutritionSection({isOpen, onToggle}) {
 
 // ===== MAIN APP =====
 function App() {
+  var SCHEMA_VERSION = 4;
+  var storedVersion = localStorage.getItem('nwb_schema_version');
+  if (!storedVersion) {
+    localStorage.setItem('nwb_schema_version', SCHEMA_VERSION);
+  }
+
   const [tab, setTab] = useState(0);
   const [phase, setPhase] = useState(loadState("nwb_phase", 0));
   const [openSections, setOpenSections] = useState(function(){
