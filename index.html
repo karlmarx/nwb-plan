@@ -2177,11 +2177,40 @@ function App() {
     var w = WORKOUTS[workoutKey];
     if (!w) return null;
     var hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
+    var isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
+    var isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
     // Find first cable exercise in this workout for superset tracking
     var firstCableEx = null;
     for (var ci = 0; ci < w.exercises.length; ci++) {
       var cn = getExName(workoutKey, w.exercises[ci]);
       if (EQ_VARIANTS[cn] && EQ_VARIANTS[cn].isCable) { firstCableEx = cn; break; }
+    }
+    // Build supplement pairings: distribute LL and Core exercises across main exercises
+    var suppMap = {};
+    var coreSubtitle = "";
+    if (isTrainingDay) {
+      var llExercises = SUPPLEMENT_LEFT_LEG.base.slice();
+      if (isLegsDay) llExercises = llExercises.concat(SUPPLEMENT_LEFT_LEG.legsExtra);
+      var coreExercises = SUPPLEMENT_CORE[workoutKey].exercises.slice();
+      coreSubtitle = SUPPLEMENT_CORE[workoutKey].subtitle;
+      // Interleave: L, C, L, C, L, C, (extras)
+      var allSupps = [];
+      var maxSL = Math.max(llExercises.length, coreExercises.length);
+      for (var si = 0; si < maxSL; si++) {
+        if (si < llExercises.length) allSupps.push({type:"leftleg", name:llExercises[si]});
+        if (si < coreExercises.length) allSupps.push({type:"core", name:coreExercises[si]});
+      }
+      // Get active exercises list (respecting phase gates)
+      var activeEx = w.exercises.filter(function(orig) {
+        var en = getExName(workoutKey, orig);
+        var exd = EX[en];
+        return exd && (exd.phase == null || phase >= exd.phase);
+      });
+      for (var sj = 0; sj < allSupps.length; sj++) {
+        var target = activeEx[sj % activeEx.length];
+        if (!suppMap[target]) suppMap[target] = [];
+        suppMap[target].push(allSupps[sj]);
+      }
     }
     return e(Section, {title: w.title, icon: w.icon, accent: w.color, isOpen: !!openSections[workoutKey], onToggle: function(){ toggleSection(workoutKey); }, count: w.exercises.length},
       hevyId ? e("div", {style:{marginBottom:10}},
@@ -2203,6 +2232,11 @@ function App() {
           e("span", {style:{marginLeft:"auto", color:"#64748b", fontSize:12}}, "\u2192")
         )
       ),
+      // Supplement toggle controls
+      isTrainingDay && e("div", {style:{display:"flex", gap:6, marginBottom:10, flexWrap:"wrap"}},
+        e("button", {onClick:function(ev){ ev.stopPropagation(); toggleSupplement("leftLeg"); }, style:{fontSize:10, padding:"4px 10px", borderRadius:10, background:supplementToggles.leftLeg?"#14b8a618":"transparent", border:"1px solid "+(supplementToggles.leftLeg?"#14b8a644":C.border), color:supplementToggles.leftLeg?"#14b8a6":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:supplementToggles.leftLeg?600:400}}, "\uD83E\uDDBF L-Leg Supersets " + (supplementToggles.leftLeg ? "ON" : "OFF")),
+        e("button", {onClick:function(ev){ ev.stopPropagation(); toggleSupplement("core"); }, style:{fontSize:10, padding:"4px 10px", borderRadius:10, background:supplementToggles.core?"#f9731618":"transparent", border:"1px solid "+(supplementToggles.core?"#f9731644":C.border), color:supplementToggles.core?"#f97316":C.textMuted, cursor:"pointer", fontFamily:"inherit", fontWeight:supplementToggles.core?600:400}}, "\uD83C\uDFAF Core Supersets " + (supplementToggles.core ? "ON" : "OFF") + (coreSubtitle ? " \u2014 " + coreSubtitle : ""))
+      ),
       w.exercises.map(function(origName) {
         var exName = getExName(workoutKey, origName);
         var ex = EX[exName];
@@ -2212,7 +2246,7 @@ function App() {
         // Equipment variant data
         var vData = EQ_VARIANTS[exName] || null;
         var selVariant = vData ? (variantSelections[exName] || vData.variants[0].id) : null;
-        // Superset computation (controlled by left leg toggle)
+        // Equipment-specific superset (controlled by left leg toggle)
         var ssInfo = null;
         if (supplementToggles.leftLeg) {
           if (vData) {
@@ -2231,16 +2265,46 @@ function App() {
                 ssInfo.note = vData.variantSupersetNotes[selVariant];
               }
             }
-          } else if (ex.setup && /\b(sit|seated)\b/i.test(ex.setup)) {
-            ssInfo = GENERIC_SEATED_SUPERSET;
           }
         }
+        // Supplement superset cards for this exercise
+        var suppCards = suppMap[origName] || [];
+        var isExp = !!expandedEx[exName];
         return e("div", {key: origName},
           exName !== origName && e("div", {style:{fontSize:10, color:C.textMuted, padding:"2px 12px", display:"flex", alignItems:"center", gap:4}},
             e("span", null, "\u21bb was: " + origName),
             e("button", {onClick:function(){ resetSwap(workoutKey, origName); }, style:{fontSize:10, color:C.accent, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textDecoration:"underline"}}, "undo")
           ),
-          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:!!expandedEx[exName], onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo})
+          e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:isExp, onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo}),
+          // Inline supplement superset cards
+          isExp && suppCards.length > 0 && e("div", {style:{padding:"0 4px 4px"}},
+            suppCards.map(function(supp) {
+              var isLL = supp.type === "leftleg";
+              if (isLL && !supplementToggles.leftLeg) return null;
+              if (!isLL && !supplementToggles.core) return null;
+              var suppEx = EX[supp.name];
+              if (!suppEx) return null;
+              var accent = isLL ? "#14b8a6" : "#f97316";
+              var suppSets = suppEx.sets[phase] || suppEx.sets[0];
+              var suppExpKey = "supp_" + supp.name;
+              var suppIsExp = !!expandedEx[suppExpKey];
+              return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, background:accent+"09", border:"1px solid "+accent+"28", borderLeft:"3px solid "+accent, overflow:"hidden"}},
+                e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
+                  e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:18, height:18, borderRadius:4, background:accent+"22", border:"1px solid "+accent+"44", fontSize:9, fontWeight:800, color:accent, flexShrink:0}}, isLL ? "L" : "C"),
+                  e("span", {style:{fontSize:10, fontWeight:700, color:accent, textTransform:"uppercase", letterSpacing:"0.3px"}}, isLL ? "Left Leg" : "Core"),
+                  e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
+                  e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
+                  e("span", {style:{fontSize:9, color:accent, marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
+                ),
+                suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
+                  e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:accent, fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
+                  e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
+                  e("div", null, e("span", {style:{fontWeight:700, color:accent, fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
+                  suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:accent+"18", border:"1px solid "+accent+"33", color:accent, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
+                )
+              );
+            })
+          )
         );
       }),
       w.removed.length > 0 && e("div", {style:{marginTop:10, paddingTop:10, borderTop:"1px solid "+C.border}},
@@ -2253,72 +2317,6 @@ function App() {
           if (!ex) return null;
           return e(ExRow, {key:"cf-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
         })
-      )
-    );
-  }
-
-  function renderSupplements(workoutKey) {
-    var isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
-    if (!isTrainingDay) return null;
-    var isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
-    var llOn = supplementToggles.leftLeg;
-    var coreOn = supplementToggles.core;
-    var coreData = SUPPLEMENT_CORE[workoutKey];
-    var teal = "#14b8a6";
-    var orange = "#f97316";
-
-    var llExercises = SUPPLEMENT_LEFT_LEG.base.slice();
-    if (isLegsDay) llExercises = llExercises.concat(SUPPLEMENT_LEFT_LEG.legsExtra);
-
-    var toggleStyle = function(isOn, color) {
-      return {width:40, height:22, borderRadius:11, background:isOn?color:C.textMuted+"44", position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0};
-    };
-    var knobStyle = function(isOn) {
-      return {width:18, height:18, borderRadius:9, background:C.white, position:"absolute", top:2, left:isOn?20:2, transition:"left 0.2s"};
-    };
-
-    return e("div", null,
-      // Visual separator
-      e("div", {style:{margin:"18px 0 14px", position:"relative", textAlign:"center", borderTop:"1px dashed #334155"}},
-        e("span", {style:{background:C.bg, padding:"0 12px", position:"relative", top:-9, fontSize:10, color:C.textMuted, textTransform:"uppercase", letterSpacing:"1.5px", fontWeight:700}}, "Daily Supplements")
-      ),
-
-      // Left Leg Maintenance
-      e("div", {style:{marginBottom:10, borderRadius:10, border:"1px solid "+(llOn?teal+"44":C.border), background:C.card, overflow:"hidden"}},
-        e("div", {style:{display:"flex", alignItems:"center", gap:9, padding:"13px 14px"}},
-          e("span", {style:{fontSize:17}}, "\uD83E\uDDBF"),
-          e("span", {style:{flex:1, fontWeight:600, fontSize:14, color:teal}}, "Left Leg Maintenance"),
-          e("span", {style:{fontSize:11, color:C.textMuted, marginRight:8}}, llExercises.length + " exercises"),
-          e("div", {onClick:function(){ toggleSupplement("leftLeg"); }, style:toggleStyle(llOn, teal)},
-            e("div", {style:knobStyle(llOn)})
-          )
-        ),
-        llOn && e("div", {style:{padding:"0 14px 14px"}},
-          llExercises.map(function(name, idx) {
-            var ex = EX[name];
-            if (!ex) return null;
-            return e(ExRow, {key:"ll-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
-          })
-        )
-      ),
-
-      // Core
-      e("div", {style:{marginBottom:10, borderRadius:10, border:"1px solid "+(coreOn?orange+"44":C.border), background:C.card, overflow:"hidden"}},
-        e("div", {style:{display:"flex", alignItems:"center", gap:9, padding:"13px 14px"}},
-          e("span", {style:{fontSize:17}}, "\uD83C\uDFAF"),
-          e("span", {style:{flex:1, fontWeight:600, fontSize:14, color:orange}}, "Core \u2014 " + coreData.subtitle),
-          e("span", {style:{fontSize:11, color:C.textMuted, marginRight:8}}, coreData.exercises.length + " exercises"),
-          e("div", {onClick:function(){ toggleSupplement("core"); }, style:toggleStyle(coreOn, orange)},
-            e("div", {style:knobStyle(coreOn)})
-          )
-        ),
-        coreOn && e("div", {style:{padding:"0 14px 14px"}},
-          coreData.exercises.map(function(name) {
-            var ex = EX[name];
-            if (!ex) return null;
-            return e(ExRow, {key:"sc-"+name, name:name, ex:ex, phase:phase, isExpanded:!!expandedEx[name], onToggle:function(){ toggleEx(name); }, onSwap:function(sw){ if(sw.startsWith("__timer__")) setTimer(parseInt(sw.replace("__timer__",""))); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:!isAvailable(name), equipment:equipment});
-          })
-        )
       )
     );
   }
@@ -2349,7 +2347,6 @@ function App() {
           })
         ),
         selWorkout && renderWorkout(selSched.t),
-        selWorkout && renderSupplements(selSched.t),
         e(NutritionSection, {isOpen:!!openSections["nutrition-daily"], onToggle:function(){ toggleSection("nutrition-daily"); }}),
         e(Section, {title:"Cross-Education Protocol", icon:"🧠", isOpen:!!openSections["cross-ed"], onToggle:function(){ toggleSection("cross-ed"); }},
           e(Callout, {type:"info"}, "Manca et al. meta-analysis: 11.9% strength gains in untrained limb. Eccentric-focused work → 17.7% crossover."),
@@ -2363,7 +2360,7 @@ function App() {
     case 1: // Workouts
       content = e("div", null,
         ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B", "Recovery"].map(function(k) {
-          return e("div", {key:k}, renderWorkout(k), renderSupplements(k));
+          return e("div", {key:k}, renderWorkout(k));
         })
       );
       break;
