@@ -2391,7 +2391,7 @@ function App() {
           e(ExRow, {name:exName, ex:ex, phase:phase, isExpanded:isExp, onToggle:function(){ toggleEx(exName); }, onSwap:function(sw){ handleSwap(workoutKey, origName, sw); }, onDiagram:function(d){ setDiagramOpen(d); }, unavailable:unavail, equipment:equipment, variantData:vData, selectedVariant:selVariant, onVariantChange:function(vid){ setVariantSelections(function(prev){ var n = Object.assign({}, prev); n[exName] = vid; return n; }); }, supersetInfo:ssInfo}),
           // Inline supplement superset cards
           isExp && suppCards.length > 0 && e("div", {style:{padding:"0 4px 4px"}},
-            suppCards.map(function(supp) {
+            suppCards.map(function(supp, suppIdx) {
               var isLL = supp.type === "leftleg";
               if (isLL && !supplementToggles.leftLeg) return null;
               if (!isLL && !supplementToggles.core) return null;
@@ -2401,21 +2401,55 @@ function App() {
               var suppSets = suppEx.sets[phase] || suppEx.sets[0];
               var suppExpKey = "supp_" + supp.name;
               var suppIsExp = !!expandedEx[suppExpKey];
-              return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, background:accent+"09", border:"1px solid "+accent+"28", borderLeft:"3px solid "+accent, overflow:"hidden"}},
-                e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
-                  e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:18, height:18, borderRadius:4, background:accent+"22", border:"1px solid "+accent+"44", fontSize:9, fontWeight:800, color:accent, flexShrink:0}}, isLL ? "L" : "C"),
-                  e("span", {style:{fontSize:10, fontWeight:700, color:accent, textTransform:"uppercase", letterSpacing:"0.3px"}}, isLL ? "Left Leg" : (supp.region || "Core")),
-                  e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
-                  e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
-                  e("span", {style:{fontSize:9, color:accent, marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
-                ),
-                suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
-                  e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:accent, fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
-                  e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
-                  e("div", null, e("span", {style:{fontWeight:700, color:accent, fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
-                  suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:accent+"18", border:"1px solid "+accent+"33", color:accent, fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
-                )
-              );
+              // Group numbering
+              var groupTotal = isLL ? llExercises.length : coreExData.length;
+              var groupIdx = isLL
+                ? llExercises.indexOf(supp.name) + 1
+                : coreExData.findIndex(function(c){ return c.name === supp.name; }) + 1;
+              var groupLabel = groupIdx + "/" + groupTotal;
+
+              if (isLL) {
+                // LEFT LEG: compact teal card, left accent bar
+                return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, background:"#14b8a609", border:"1px solid #14b8a628", borderLeft:"3px solid #14b8a6", overflow:"hidden"}},
+                  e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
+                    e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", width:18, height:18, borderRadius:4, background:"#14b8a622", border:"1px solid #14b8a644", fontSize:9, fontWeight:800, color:"#14b8a6", flexShrink:0}}, "L"),
+                    e("span", {style:{fontSize:9, fontWeight:700, color:"#14b8a6", opacity:0.7}}, groupLabel),
+                    e("span", {style:{fontSize:10, fontWeight:600, color:"#14b8a6", textTransform:"uppercase", letterSpacing:"0.3px"}}, "Left Leg"),
+                    e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
+                    e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
+                    e("span", {style:{fontSize:9, color:"#14b8a6", marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
+                  ),
+                  suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:"#14b8a6", fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
+                    e("div", null, e("span", {style:{fontWeight:700, color:"#14b8a6", fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
+                    suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:"#14b8a618", border:"1px solid #14b8a633", color:"#14b8a6", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
+                  )
+                );
+              } else {
+                // CORE: distinct style — top accent bar, darker bg, dashed border
+                var regionColors = {"Upper Abs":"#f59e0b","Lower Abs":"#ec4899","Obliques":"#a78bfa"};
+                var regionColor = regionColors[supp.region] || "#f97316";
+                return e("div", {key:"supp-"+supp.name, style:{margin:"2px 0 4px", borderRadius:8, overflow:"hidden", border:"1px dashed #f9731633", background:"linear-gradient(135deg, #f9731608 0%, #f9731603 100%)"}},
+                  // Top accent bar
+                  e("div", {style:{height:3, background:"linear-gradient(90deg, "+regionColor+", "+regionColor+"66)"}}),
+                  e("div", {onClick:function(){ toggleEx(suppExpKey); }, style:{padding:"8px 10px", cursor:"pointer", display:"flex", alignItems:"center", gap:6}},
+                    // Core circuit badge
+                    e("span", {style:{display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:20, height:20, borderRadius:10, background:"#f9731622", border:"1px solid #f9731644", fontSize:8, fontWeight:800, color:"#f97316", flexShrink:0, padding:"0 4px"}}, groupLabel),
+                    // Region pill
+                    e("span", {style:{fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:8, background:regionColor+"22", border:"1px solid "+regionColor+"44", color:regionColor, textTransform:"uppercase", letterSpacing:"0.5px", flexShrink:0}}, supp.region || "Core"),
+                    e("span", {style:{fontWeight:600, fontSize:12, color:C.text, flex:1}}, supp.name),
+                    e("span", {style:{fontSize:10, color:C.textDim}}, suppSets[0]+"\u00d7"+suppSets[1]),
+                    e("span", {style:{fontSize:9, color:"#f97316", marginLeft:4}}, suppIsExp ? "\u25b2" : "\u25bc")
+                  ),
+                  suppIsExp && e("div", {style:{padding:"0 10px 10px", fontSize:11, lineHeight:1.6}},
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:"#f97316", fontSize:10}}, "\uD83D\uDCCD Setup: "), e("span", {style:{color:C.textDim}}, suppEx.setup)),
+                    e("div", {style:{marginBottom:6}}, e("span", {style:{fontWeight:700, color:C.safe, fontSize:10}}, "\uD83D\uDD04 Execute: "), e("span", {style:{color:C.textDim}}, suppEx.execution)),
+                    e("div", null, e("span", {style:{fontWeight:700, color:"#f97316", fontSize:10}}, "\uD83D\uDEE1\uFE0F Safety: "), e("span", {style:{color:C.textDim}}, suppEx.nwbCues)),
+                    suppEx.rest > 0 && e("button", {onClick:function(ev){ ev.stopPropagation(); setTimer(suppEx.rest); }, style:{marginTop:8, width:"100%", padding:"7px", borderRadius:6, background:"#f9731618", border:"1px solid #f9731633", color:"#f97316", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit"}}, "\u23F1 Start "+suppEx.rest+"s Rest")
+                  )
+                );
+              }
             })
           )
         );
