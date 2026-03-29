@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import WorkoutEditor from './WorkoutEditor';
 import { C } from '../theme';
 import { EX } from '../data/exercises';
 import { WORKOUTS, CORE_FINISHERS } from '../data/program';
@@ -50,10 +51,15 @@ export default function WorkoutView({
   onToggleSupplement,
   variantSelections,
   onVariantChange,
-  onTimer
+  onTimer,
+  customExercises,
+  onSaveCustomExercises,
 }) {
   const w = WORKOUTS[workoutKey];
   if (!w) return null;
+
+  const [editorOpen, setEditorOpen] = useState(false);
+  const activeExercises = customExercises || w.exercises;
 
   const hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
   const isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
@@ -77,12 +83,12 @@ export default function WorkoutView({
 
   // Find first cable exercise
   const firstCableEx = useMemo(() => {
-    for (let ci = 0; ci < w.exercises.length; ci++) {
-      const cn = getExName(w.exercises[ci]);
+    for (let ci = 0; ci < activeExercises.length; ci++) {
+      const cn = getExName(activeExercises[ci]);
       if (EQ_VARIANTS[cn] && EQ_VARIANTS[cn].isCable) return cn;
     }
     return null;
-  }, [workoutKey, swaps, w.exercises]);
+  }, [workoutKey, swaps, activeExercises]);
 
   // Build supplement pairings
   const { suppMap, coreSubtitle } = useMemo(() => {
@@ -100,7 +106,7 @@ export default function WorkoutView({
       if (si < coreExData.length) allSupps.push({ type: 'core', name: coreExData[si].name, region: coreExData[si].region });
     }
 
-    const activeEx = w.exercises.filter((orig) => {
+    const activeEx = activeExercises.filter((orig) => {
       const en = getExName(orig);
       const exd = EX[en];
       return exd && (exd.phase == null || phase >= exd.phase);
@@ -116,22 +122,24 @@ export default function WorkoutView({
   }, [workoutKey, phase, isTrainingDay, isLegsDay, swaps]);
 
   return (
+    <>
     <Section
       title={w.title}
       icon={w.icon}
       accent={w.color}
       isOpen={isOpen}
       onToggle={onToggle}
-      count={w.exercises.length}
+      count={activeExercises.length}
     >
-      {hevyId && (
-        <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+        {hevyId && (
           <a
             href={'https://hevy.com/routine/' + hevyId}
             target="_blank"
             rel="noopener"
             onClick={(ev) => ev.stopPropagation()}
             style={{
+              flex: 1,
               display: 'block',
               textAlign: 'center',
               padding: '8px',
@@ -141,13 +149,31 @@ export default function WorkoutView({
               color: '#a78bfa',
               fontSize: 13,
               fontWeight: 600,
-              textDecoration: 'none'
+              textDecoration: 'none',
             }}
           >
             Open in HEVY
           </a>
-        </div>
-      )}
+        )}
+        {workoutKey !== 'Recovery' && onSaveCustomExercises && (
+          <button
+            onClick={(ev) => { ev.stopPropagation(); setEditorOpen(true); }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              background: customExercises ? '#2ecc7122' : 'transparent',
+              border: '1px solid ' + (customExercises ? '#2ecc71' : C.border),
+              color: customExercises ? '#2ecc71' : C.textMuted,
+              fontSize: 12,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ✏ Edit
+          </button>
+        )}
+      </div>
 
       {workoutKey === 'Recovery' && (
         <a
@@ -225,7 +251,7 @@ export default function WorkoutView({
         </div>
       )}
 
-      {w.exercises.map((origName) => {
+      {activeExercises.map((origName) => {
         const exName = getExName(origName);
         const ex = EX[exName];
         if (!ex) return null;
@@ -603,5 +629,16 @@ export default function WorkoutView({
         </div>
       )}
     </Section>
+
+    {editorOpen && (
+      <WorkoutEditor
+        workoutKey={workoutKey}
+        exercises={activeExercises}
+        equipment={equipment}
+        onSave={(newList) => onSaveCustomExercises(workoutKey, newList)}
+        onClose={() => setEditorOpen(false)}
+      />
+    )}
+    </>
   );
 }
