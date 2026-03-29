@@ -1660,7 +1660,8 @@ export const EX = {
       'LEFT LEG IS PASSIVE DEAD WEIGHT — zero left iliopsoas activation. All balance on right leg. Hip flexion stays under 90°. Exhale before every press.',
     why: 'Anti-rotation core training using TRX instability. Standing single-leg demands extra stabilization vs seated Pallof.',
     safety: 'safe',
-    swaps: ['Pallof Press (Seated)']
+    swaps: ['Pallof Press (Seated)'],
+    diagram: 'core-demos'
   },
   'TRX Standing Rollout': {
     requires: ['trx'],
@@ -1675,7 +1676,8 @@ export const EX = {
       'LEFT LEG TRAILS BEHIND PASSIVELY — zero left iliopsoas. Anti-extension demand increases as you lean further. Exhale before every rep. Stop if lower back arches.',
     why: 'Standing anti-extension rollout. Longer lever arm = more core demand than a standard plank.',
     safety: 'safe',
-    swaps: ['Forearm Plank Saw']
+    swaps: ['Forearm Plank Saw'],
+    diagram: 'core-demos'
   },
   'TRX Single-Arm Row': {
     requires: ['trx'],
@@ -1690,7 +1692,8 @@ export const EX = {
       'LEFT LEG IS PASSIVE — zero left iliopsoas activation. Unilateral pull creates massive anti-rotation demand through core. Keep pelvis square. Exhale before each row.',
     why: 'Unilateral rowing with anti-rotation as the primary core stimulus. Single-leg stance amplifies stability demand.',
     safety: 'safe',
-    swaps: ['Single-Arm Seated Cable Row']
+    swaps: ['Single-Arm Seated Cable Row'],
+    diagram: 'core-demos'
   },
   'TRX Kneeling Rollout': {
     requires: ['trx', 'kneepad'],
@@ -1705,7 +1708,8 @@ export const EX = {
       'LEFT LEG TRAILS BEHIND IN HIP EXTENSION — iliopsoas is at zero. Right knee is the sole base of support. Exhale before every rep. Stop if lower back arches.',
     why: 'Kneeling anti-extension rollout with TRX instability. More demanding than floor rollouts due to unstable handles.',
     safety: 'safe',
-    swaps: ['TRX Standing Rollout']
+    swaps: ['TRX Standing Rollout'],
+    diagram: 'core-demos'
   },
   'TRX Kneeling Chop': {
     requires: ['trx', 'kneepad'],
@@ -1720,7 +1724,8 @@ export const EX = {
       'LEFT LEG IS PASSIVE — trails behind in hip extension. Rotational core demand, not hip flexor. Exhale before each chop. Keep hip flexion under 90° on the right side.',
     why: 'Rotational core training from a kneeling base. TRX instability adds anti-rotation demand on top of the chop pattern.',
     safety: 'safe',
-    swaps: ['Cable Woodchop (Seated)']
+    swaps: ['Cable Woodchop (Seated)'],
+    diagram: 'core-demos'
   },
   'TRX Body Saw': {
     requires: ['trx'],
@@ -1741,7 +1746,8 @@ export const EX = {
       'BASE: Right foot in strap, small range rocks.',
       'AMP 1: Full range forward/back, 4-count tempo.',
       'AMP 2: Full range + pause 3s at end-range extension. Expect failure around 30s.'
-    ]
+    ],
+    diagram: 'core-demos'
   },
   'TRX Side Plank': {
     requires: ['trx'],
@@ -1757,7 +1763,8 @@ export const EX = {
       'LEFT LEG RESTS PASSIVELY on top of right — zero activation. Only RIGHT foot in the strap. Oblique endurance hold. Exhale to brace. Use side-roll method for transitions.',
     why: 'TRX-elevated side plank increases oblique demand via instability. Builds lateral core endurance.',
     safety: 'safe',
-    swaps: ['Side Plank (R Side Down)']
+    swaps: ['Side Plank (R Side Down)'],
+    diagram: 'core-demos'
   },
 
   // ── ARM BALANCE PREP ──────────────────────────────────────
@@ -1774,7 +1781,8 @@ export const EX = {
       'LEFT HIP STAYS AT FIXED ANGLE IN FIG-4 HOOK — iliopsoas is mechanically disadvantaged (shortened + externally rotated). Zero active left hip flexion. Lower abs drive the tuck. Exhale before every tuck. Hip flexion capped at <90° for bilateral FAI/labral tears.',
     why: 'Lower ab compression strength with left leg safely locked in figure-4. Builds toward crow and flying pigeon arm balances.',
     safety: 'safe',
-    swaps: ['Plank Knee Tuck (R only)']
+    swaps: ['Plank Knee Tuck (R only)'],
+    diagram: 'core-demos'
   },
   'TRX Body Saw (Fig-4 Hook)': {
     requires: ['trx'],
@@ -1795,7 +1803,8 @@ export const EX = {
       'BASE: Small range rocks, right foot in strap + fig-4 hook.',
       'AMP 1: Full range, 4-count tempo.',
       'AMP 2: Full range + 3s pause at end-range. Expect failure around 25-30s.'
-    ]
+    ],
+    diagram: 'core-demos'
   },
   'L-Sit Knee Tuck': {
     requires: ['parallettes'],
@@ -1810,7 +1819,8 @@ export const EX = {
       'LEFT LEG HANGS PASSIVELY under gravity — zero iliopsoas activation, gravity keeps it extended. Right knee drives up only. Exhale before each tuck. Hip flexion under 90°.',
     why: 'Unilateral compression strength for L-sit and arm balance progressions. Builds hip flexor endurance on the right side.',
     safety: 'safe',
-    swaps: ['Parallette L-Sit']
+    swaps: ['Parallette L-Sit'],
+    diagram: 'core-demos'
   },
   'L-Sit Hold (R Leg Extended)': {
     requires: ['parallettes'],
@@ -1826,7 +1836,8 @@ export const EX = {
       'LEFT LEG HANGS PASSIVE — gravity keeps it extended, zero iliopsoas. Right hip flexor and abs maintain the L-sit. Exhale to brace. Use side-roll method for transitions.',
     why: 'Unilateral L-sit hold builds compression strength and shoulder endurance. Direct prerequisite for full L-sit and arm balances.',
     safety: 'safe',
-    swaps: ['Parallette L-Sit']
+    swaps: ['Parallette L-Sit'],
+    diagram: 'core-demos'
   },
   'Tuck Planche Lean': {
     requires: ['parallettes'],
@@ -1842,7 +1853,8 @@ export const EX = {
       'LEFT LEG TRAILS BEHIND IN HIP EXTENSION — zero iliopsoas. Right knee tucks to reduce lever arm. Forward lean loads shoulders progressively. Exhale to brace.',
     why: 'Builds forward-lean shoulder loading prerequisite for crow, side crow, and planche progressions.',
     safety: 'safe',
-    swaps: ['Wheelbarrow Hold']
+    swaps: ['Wheelbarrow Hold'],
+    diagram: 'core-demos'
   },
   'Support Hold + Protraction Pulses': {
     requires: ['parallettes'],
@@ -1857,7 +1869,8 @@ export const EX = {
       'BOTH LEGS HANG PASSIVELY — zero hip flexor demand. Pure scapular movement. Foundational for crow, side crow, flying pigeon. Exhale on each protraction pulse.',
     why: 'Scapular protraction strength is the #1 prerequisite for all arm balances. Builds the "push the floor away" pattern.',
     safety: 'safe',
-    swaps: []
+    swaps: [],
+    diagram: 'core-demos'
   },
 
   // ── SUPINE OBLIQUE ────────────────────────────────────────
@@ -1874,7 +1887,8 @@ export const EX = {
       'LEGS STAY STILL — zero hip flexor activation. Movement is pure thoracic rotation lifting shoulder blade. Exhale as you reach. Use side-roll method for supine-to-sitting transitions.',
     why: 'Low-intensity oblique activation through thoracic rotation. Zero hip flexor demand. Good warm-up or finisher.',
     safety: 'safe',
-    swaps: []
+    swaps: [],
+    diagram: 'core-demos'
   },
   'Supine Side Bend (Heel Slide)': {
     requires: ['mat'],
@@ -1889,7 +1903,8 @@ export const EX = {
       'LEGS STAY STILL — zero hip movement. Lateral trunk flexion only. Exhale as you side-bend. Use side-roll method for transitions.',
     why: 'Lateral flexion targets obliques and QL in a spine-neutral supine position. Safe and low-load.',
     safety: 'safe',
-    swaps: []
+    swaps: [],
+    diagram: 'core-demos'
   },
   'Right Knee Drop + Oblique Return': {
     requires: ['mat'],
@@ -1904,7 +1919,8 @@ export const EX = {
       'LEFT LEG STAYS FLAT ON THE FLOOR — zero left hip flexor activation. Only the right knee moves. Left oblique does the return work. Exhale as you pull knee back. Hip flexion capped at <90°.',
     why: 'Left oblique activation through right knee return. Eccentrically loads left oblique without any left hip flexor demand.',
     safety: 'safe',
-    swaps: []
+    swaps: [],
+    diagram: 'core-demos'
   },
   'Dead Bug — Right Side Only': {
     requires: ['mat'],
@@ -1919,6 +1935,7 @@ export const EX = {
       'LEFT ARM AND LEFT LEG STAY PINNED TO FLOOR — zero left hip flexor activation. Right side only. Anti-rotation demand as you resist trunk twist. Exhale before each extension. Hip flexion capped at <90°.',
     why: 'Unilateral dead bug isolates anti-rotation demand to one side. Left side stays completely passive.',
     safety: 'safe',
-    swaps: ['Dead Bug (R Leg Only)']
+    swaps: ['Dead Bug (R Leg Only)'],
+    diagram: 'core-demos'
   }
 };
