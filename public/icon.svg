@@ -1,26 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a0f1a"/>
-      <stop offset="100%" style="stop-color:#1a2236"/>
+    <!-- Warm inner glow at petal convergence -->
+    <radialGradient id="glow" cx="256" cy="290" r="130" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF8EE"/>
+      <stop offset="40%" stop-color="#FAF0E2" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#F5F0EB" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Outer petal fill — deep terracotta -->
+    <linearGradient id="petal-outer" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#A04828"/>
+      <stop offset="60%" stop-color="#B85C38"/>
+      <stop offset="100%" stop-color="#C87050"/>
     </linearGradient>
+
+    <!-- Mid petal fill — warm sienna -->
+    <linearGradient id="petal-mid" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#B06040"/>
+      <stop offset="60%" stop-color="#C88060"/>
+      <stop offset="100%" stop-color="#D89878"/>
+    </linearGradient>
+
+    <!-- Inner petals — clay/sand -->
+    <linearGradient id="petal-inner" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#C88868"/>
+      <stop offset="60%" stop-color="#D8A888"/>
+      <stop offset="100%" stop-color="#E4BEA0"/>
+    </linearGradient>
+
+    <!-- Center petal — lightest peach -->
+    <linearGradient id="petal-center" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#D09870"/>
+      <stop offset="60%" stop-color="#E0B898"/>
+      <stop offset="100%" stop-color="#EAD0B8"/>
+    </linearGradient>
+
+    <!-- Petal template: almond/leaf pointing up, 60x180 -->
+    <!-- Each petal is then transformed (scaled + rotated) in place -->
   </defs>
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- Shield shape -->
-  <path d="M256 60 L420 130 L420 280 Q420 400 256 460 Q92 400 92 280 L92 130 Z" fill="none" stroke="#38bdf8" stroke-width="8" opacity="0.3"/>
-  <path d="M256 80 L400 142 L400 275 Q400 385 256 440 Q112 385 112 275 L112 142 Z" fill="#111827" stroke="#38bdf8" stroke-width="3" opacity="0.8"/>
-  <!-- Dumbbell icon -->
-  <rect x="180" y="230" width="152" height="16" rx="8" fill="#38bdf8"/>
-  <rect x="155" y="205" width="30" height="66" rx="6" fill="#38bdf8"/>
-  <rect x="327" y="205" width="30" height="66" rx="6" fill="#38bdf8"/>
-  <rect x="140" y="215" width="20" height="46" rx="4" fill="#10b981"/>
-  <rect x="352" y="215" width="20" height="46" rx="4" fill="#10b981"/>
-  <!-- NWB text -->
-  <text x="256" y="175" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="bold" fill="#38bdf8" letter-spacing="6">NWB</text>
-  <!-- PPL text -->
-  <text x="256" y="340" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="bold" fill="#94a3b8" letter-spacing="4">PPL PLAN</text>
-  <!-- Safety cross -->
-  <circle cx="256" y="400" r="18" fill="#10b981" opacity="0.8" cy="400"/>
-  <rect x="250" y="390" width="12" height="20" rx="2" fill="#0a0f1a"/>
-  <rect x="246" y="396" width="20" height="8" rx="2" fill="#0a0f1a"/>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#F5F0EB"/>
+
+  <!-- Glow behind the lotus -->
+  <ellipse cx="256" cy="275" rx="110" ry="90" fill="url(#glow)"/>
+
+  <!--
+    Lotus — 7 petals arranged symmetrically.
+    Base convergence at (256, 340).
+    Each petal: an almond shape that tapers at both ends.
+    Using a standard leaf path, then rotating around the base.
+
+    Petal shape (pointing upward from origin):
+    M 0,0 C -W,-H*0.3  -W,-H*0.7  0,-H C W,-H*0.7  W,-H*0.3  0,0 Z
+  -->
+  <g transform="translate(256,340)">
+
+    <!-- === Outer petals: wide, nearly horizontal === -->
+    <!-- Left far -->
+    <path d="M0,0 C-18,-30 -22,-85 0,-130 C22,-85 18,-30 0,0Z"
+          transform="rotate(62) scale(1.1,1.0)" fill="url(#petal-outer)"/>
+    <!-- Right far -->
+    <path d="M0,0 C-18,-30 -22,-85 0,-130 C22,-85 18,-30 0,0Z"
+          transform="rotate(-62) scale(1.1,1.0)" fill="url(#petal-outer)"/>
+
+    <!-- === Mid-outer petals === -->
+    <!-- Left -->
+    <path d="M0,0 C-16,-38 -20,-100 0,-155 C20,-100 16,-38 0,0Z"
+          transform="rotate(38)" fill="url(#petal-mid)"/>
+    <!-- Right -->
+    <path d="M0,0 C-16,-38 -20,-100 0,-155 C20,-100 16,-38 0,0Z"
+          transform="rotate(-38)" fill="url(#petal-mid)"/>
+
+    <!-- === Inner petals === -->
+    <!-- Left inner -->
+    <path d="M0,0 C-14,-44 -18,-115 0,-180 C18,-115 14,-44 0,0Z"
+          transform="rotate(18)" fill="url(#petal-inner)"/>
+    <!-- Right inner -->
+    <path d="M0,0 C-14,-44 -18,-115 0,-180 C18,-115 14,-44 0,0Z"
+          transform="rotate(-18)" fill="url(#petal-inner)"/>
+
+    <!-- === Center petal: tallest, vertical === -->
+    <path d="M0,0 C-14,-54 -16,-130 0,-210 C16,-130 14,-54 0,0Z"
+          fill="url(#petal-center)"/>
+
+    <!-- Inner vesica highlight on center petal -->
+    <path d="M0,-20 C-7,-55 -8,-115 0,-185 C8,-115 7,-55 0,-20Z"
+          fill="#F5F0EB" opacity="0.22"/>
+
+    <!-- Stamen -->
+    <circle cx="0" cy="-8" r="10" fill="#7B3A1C"/>
+    <circle cx="0" cy="-8" r="4.5" fill="#C89070" opacity="0.5"/>
+  </g>
 </svg>
