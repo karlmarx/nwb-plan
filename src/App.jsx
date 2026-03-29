@@ -12,6 +12,7 @@ import CardioTab from './components/CardioTab';
 import CoreTab from './components/CoreTab';
 import EquipmentTab from './components/EquipmentTab';
 import SafetyTab from './components/SafetyTab';
+import HevySyncPanel from './components/HevySyncPanel';
 
 initSchema();
 
@@ -24,7 +25,7 @@ const DEFAULT_HEVY_IDS = {
   'Legs B': 's5QsLGXsVAy',
 };
 
-const TABS = ['Today', 'Workouts', 'Cardio', 'Core', 'Equip', 'Safety'];
+const TABS = ['Today', 'Workouts', 'Cardio', 'Core', 'Equip', 'Safety', 'Hevy'];
 const TAB_TIPS = [
   "Today's scheduled workout",
   'All push/pull/legs exercises',
@@ -32,6 +33,7 @@ const TAB_TIPS = [
   'Core & ab routines',
   'Toggle available equipment',
   'Injury cues & safety rules',
+  'Sync workouts to Hevy',
 ];
 
 export default function App() {
@@ -59,6 +61,7 @@ export default function App() {
     loadState('nwb_variants', {})
   );
   const [coreFilter, setCoreFilter] = useState('all');
+  const [customWorkouts, setCustomWorkouts] = useState(() => loadState('nwb_custom_workouts', {}));
 
   const realToday = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
   const [selectedDay, setSelectedDay] = useState(realToday);
@@ -94,6 +97,18 @@ export default function App() {
       return next;
     });
   };
+
+  function saveCustomWorkout(workoutKey, exerciseList) {
+    const next = { ...customWorkouts, [workoutKey]: exerciseList };
+    setCustomWorkouts(next);
+    saveState('nwb_custom_workouts', next);
+  }
+
+  function handleHevyIdChange(workoutKey, newId) {
+    const next = { ...hevyIds, [workoutKey]: newId };
+    setHevyIds(next);
+    saveState('nwb_hevy', next);
+  }
 
   function toggleSection(t) {
     setOpenSections((s) => Object.assign({}, s, { [t]: !s[t] }));
@@ -175,6 +190,8 @@ export default function App() {
         <WorkoutsTab
           {...sharedProps}
           hevyIds={hevyIds}
+          customWorkouts={customWorkouts}
+          onSaveCustomExercises={saveCustomWorkout}
         />
       );
       break;
@@ -212,6 +229,16 @@ export default function App() {
         <SafetyTab
           openSections={openSections}
           onToggleSection={toggleSection}
+        />
+      );
+      break;
+    case 6:
+      content = (
+        <HevySyncPanel
+          phase={phase}
+          hevyIds={hevyIds}
+          onHevyIdChange={handleHevyIdChange}
+          customWorkouts={customWorkouts}
         />
       );
       break;

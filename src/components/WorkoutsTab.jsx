@@ -18,6 +18,8 @@ export default function WorkoutsTab({
   variantSelections,
   onVariantChange,
   onTimer,
+  customWorkouts,
+  onSaveCustomExercises,
 }) {
   return (
     <div>
@@ -40,6 +42,8 @@ export default function WorkoutsTab({
           variantSelections={variantSelections}
           onVariantChange={onVariantChange}
           onTimer={onTimer}
+          customExercises={customWorkouts?.[k] || null}
+          onSaveCustomExercises={onSaveCustomExercises}
         />
       ))}
     </div>
