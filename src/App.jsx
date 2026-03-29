@@ -221,8 +221,9 @@ export default function App() {
 
   return (
     <div
+      className="app-container"
       style={{
-        maxWidth: 500,
+        maxWidth: 600,
         margin: '0 auto',
         padding: '0 10px 80px',
         minHeight: '100vh',
