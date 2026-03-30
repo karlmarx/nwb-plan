@@ -95,6 +95,47 @@ const CORE_BLOCKS = [
       'McGill Curl-Up',
     ],
   },
+  {
+    key: 'core-trx',
+    title: 'Block 5: TRX Core',
+    icon: '🪢',
+    accent: '#06b6d4',
+    exercises: [
+      'TRX Pallof Press',
+      'TRX Standing Rollout',
+      'TRX Single-Arm Row',
+      'TRX Kneeling Rollout',
+      'TRX Kneeling Chop',
+      'TRX Body Saw',
+      'TRX Side Plank',
+    ],
+  },
+  {
+    key: 'core-armbalance',
+    title: 'Block 6: Arm Balance Prep',
+    icon: '🤸',
+    accent: '#f472b6',
+    exercises: [
+      'TRX Knee Tuck (Fig-4 Hook)',
+      'TRX Body Saw (Fig-4 Hook)',
+      'L-Sit Knee Tuck',
+      'L-Sit Hold (R Leg Extended)',
+      'Tuck Planche Lean',
+      'Support Hold + Protraction Pulses',
+    ],
+  },
+  {
+    key: 'core-supineoblique',
+    title: 'Block 7: Supine Oblique',
+    icon: '🔃',
+    accent: '#facc15',
+    exercises: [
+      'Cross-Body Reach',
+      'Supine Side Bend (Heel Slide)',
+      'Right Knee Drop + Oblique Return',
+      'Dead Bug — Right Side Only',
+    ],
+  },
 ];
 
 export default function CoreTab({
@@ -284,6 +325,10 @@ export default function CoreTab({
         <RemovedRow
           name="Standard Bird-Dog (quadruped)"
           reason="Left knee at 90° hip flexion approaches FAI limit + loads femoral neck. Use Prone Bench version instead. Quadruped needs PT clearance."
+        />
+        <RemovedRow
+          name="Both Feet in TRX Straps"
+          reason="Reflexive left iliopsoas firing when both feet are suspended. Always use RIGHT foot only in TRX strap."
         />
       </Section>
     </div>

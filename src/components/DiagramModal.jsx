@@ -395,9 +395,12 @@ function SidePlankDiagram({ onClose }) {
   );
 }
 
+import CoreDemoGuide from './CoreDemoGuide';
+
 export const DIAGRAMS = {
   planche: PlancheDiagram,
-  sideplank: SidePlankDiagram
+  sideplank: SidePlankDiagram,
+  'core-demos': CoreDemoGuide,
 };
 
 export default function DiagramModal({ diagramKey, onClose }) {

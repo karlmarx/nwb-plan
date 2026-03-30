@@ -115,3 +115,16 @@ body {
 .diagram-sheet::-webkit-scrollbar {
   width: 0;
 }
+
+/* Desktop: scale up the narrow mobile layout for readability */
+@media (min-width: 700px) {
+  .app-container {
+    zoom: 1.25;
+  }
+}
+
+@media (min-width: 900px) {
+  .app-container {
+    zoom: 1.4;
+  }
+}
