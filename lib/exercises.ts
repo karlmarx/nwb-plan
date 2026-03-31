@@ -1843,9 +1843,8 @@ export const WORKOUTS: Record<string, Workout> = {
     hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
       "Finger-Assist One-Arm Pull-Up",
-      "Lat Pulldown (Wide)",
       "Chest-Supported DB Row",
-      "Seated Cable Row",
+      "Lat Pulldown (Wide)",
       "Seated Face Pulls",
       "Preacher Curls",
       "Pallof Press (Seated)",

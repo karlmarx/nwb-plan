@@ -797,6 +797,9 @@ export default function WorkoutView() {
                 onDiagram={(d) => setDiagramOpen(d)}
                 unavailable={unavail}
                 equipment={equipment}
+                workoutExercises={w.exercises.map((o) =>
+                  getExName(workoutKey, o)
+                )}
               />
 
               {/* Equipment-specific superset card */}
@@ -2187,19 +2190,6 @@ export default function WorkoutView() {
       {/* Tab content */}
       {content}
 
-      {/* Medical disclaimer */}
-      <div
-        className="mt-5 rounded-[10px] text-[11px] text-center text-danger"
-        style={{
-          padding: 12,
-          background: "var(--color-danger-bg)",
-          border: "1px solid var(--color-danger-border)",
-        }}
-      >
-        <b>Medical Disclaimer: </b>Confirm all exercises with your
-        PT/Orthopedic Surgeon. Groin pain = Absolute Stop.
-      </div>
-
       {/* Footer links */}
       <div className="mt-3 flex justify-center gap-3.5 items-center">
         <a
@@ -2284,18 +2274,6 @@ export default function WorkoutView() {
                   data, safety constraints, and progression phases are baked into
                   the app for offline use.
                 </p>
-                <div
-                  className="rounded-lg text-[11px] text-danger"
-                  style={{
-                    padding: 12,
-                    background: "var(--color-danger-bg)",
-                    border: "1px solid var(--color-danger-border)",
-                  }}
-                >
-                  <strong>Medical Disclaimer:</strong> This app is for personal use
-                  only and does not constitute medical advice. All exercises should
-                  be confirmed with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop.
-                </div>
                 <p className="text-text-muted text-[11px]">
                   <a
                     href="https://github.com/karlmarx/nwb-plan"

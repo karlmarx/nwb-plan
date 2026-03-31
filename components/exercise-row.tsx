@@ -14,6 +14,7 @@ interface ExerciseRowProps {
   onDiagram: (diagram: string) => void;
   unavailable: boolean;
   equipment: Record<string, boolean>;
+  workoutExercises?: string[];
 }
 
 export default function ExerciseRow({
@@ -26,6 +27,7 @@ export default function ExerciseRow({
   onDiagram,
   unavailable,
   equipment,
+  workoutExercises = [],
 }: ExerciseRowProps) {
   if (!ex) return null;
 
@@ -248,20 +250,18 @@ export default function ExerciseRow({
           )}
 
           {/* Swap buttons */}
-          {ex.swaps && ex.swaps.length > 0 && (
+          {ex.swaps && ex.swaps.length > 0 && (() => {
+            const availableSwaps = ex.swaps.filter(
+              (sw) => !workoutExercises.includes(sw) || sw === name
+            );
+            if (availableSwaps.length === 0) return null;
+            return (
             <div>
               <div className="text-[10px] font-bold text-text-muted mb-1.5 uppercase">
                 Swap for:
               </div>
               <div className="flex flex-wrap gap-1">
-                {ex.swaps.map((sw) => {
-                  const swAvail =
-                    EQUIPMENT &&
-                    (() => {
-                      // We can't look up the swap exercise details here since we don't
-                      // have the full EX database, so we just show the button
-                      return true;
-                    })();
+                {availableSwaps.map((sw) => {
                   return (
                     <button
                       key={sw}
@@ -283,7 +283,8 @@ export default function ExerciseRow({
                 })}
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Rest timer button */}
           {ex.rest > 0 && (
