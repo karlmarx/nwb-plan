@@ -56,6 +56,19 @@ html.light {
   --color-text-muted: #94a3b8;
 }
 
+/* Desktop: scale up the narrow mobile layout for readability */
+@media (min-width: 700px) {
+  .app-container {
+    zoom: 1.25;
+  }
+}
+
+@media (min-width: 900px) {
+  .app-container {
+    zoom: 1.4;
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

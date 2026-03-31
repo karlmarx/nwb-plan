@@ -13,12 +13,11 @@ import {
 import {
   SUPPLEMENT_LEFT_LEG,
   SUPPLEMENT_CORE,
-  EQ_VARIANTS,
   CABLE_SUPERSET,
   EQUIP_TO_NEARBY,
   NEARBY_SUPERSETS,
-  type SupersetInfo,
 } from "@/lib/supplements";
+import type { VariantSuperset } from "@/lib/exercises";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
@@ -342,9 +341,6 @@ export default function WorkoutView() {
     leftLeg: boolean;
     core: boolean;
   }>(() => loadState("nwb_supplements", { leftLeg: true, core: true }));
-  const [variantSelections, setVariantSelections] = useState<
-    Record<string, string>
-  >(() => loadState("nwb_eq_variants", {}));
   const [aboutOpen, setAboutOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
@@ -379,9 +375,6 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_supplements", supplementToggles);
   }, [supplementToggles]);
-  useEffect(() => {
-    saveState("nwb_eq_variants", variantSelections);
-  }, [variantSelections]);
   useEffect(() => {
     document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("nwb_theme", theme);
@@ -531,7 +524,7 @@ export default function WorkoutView() {
     // Find first cable exercise for cable superset
     const firstCableEx = w.exercises.find((orig) => {
       const en = getExName(workoutKey, orig);
-      return EQ_VARIANTS[en]?.isCable;
+      return EX[en]?.cableSuperset;
     });
     const firstCableName = firstCableEx
       ? getExName(workoutKey, firstCableEx)
@@ -724,40 +717,25 @@ export default function WorkoutView() {
           const unavail = !isAvailable(exName);
           const isExp = !!expandedEx[exName];
 
-          // Equipment-specific superset
-          let ssInfo: SupersetInfo | null = null;
+          // Equipment-specific superset (driven by machineVariants selection)
+          let ssInfo: VariantSuperset | null = null;
           if (supplementToggles.leftLeg) {
-            const vData = EQ_VARIANTS[exName];
-            if (vData) {
-              if (vData.isCable) {
-                if (exName === firstCableName) {
-                  ssInfo = { ...CABLE_SUPERSET };
-                  const selV = variantSelections[exName];
-                  if (selV === "lat-machine") {
-                    ssInfo.note =
-                      "No low cable available on this machine \u2014 do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.";
-                  }
-                }
-              } else if (
-                vData.variantSuperset &&
-                vData.variantSuperset[
-                  variantSelections[exName] || vData.variants[0].id
-                ]
-              ) {
-                ssInfo =
-                  vData.variantSuperset[
-                    variantSelections[exName] || vData.variants[0].id
-                  ];
-              } else if (vData.superset) {
-                ssInfo = { ...vData.superset };
-                const selV =
-                  variantSelections[exName] || vData.variants[0].id;
-                if (
-                  vData.variantSupersetNotes &&
-                  vData.variantSupersetNotes[selV]
-                ) {
-                  ssInfo.note = vData.variantSupersetNotes[selV];
-                }
+            if (ex.cableSuperset && exName === firstCableName) {
+              ssInfo = { ...CABLE_SUPERSET };
+              // Check if selected machine variant is a lat pulldown machine (no low cable)
+              const selMachine = machineSelections[exName];
+              if (selMachine === "band_rack") {
+                ssInfo.note =
+                  "No cable available with band setup \u2014 do ankle dorsiflexion at nearest cable column between sets.";
+              }
+            } else if (ex.machineVariants) {
+              const selId =
+                machineSelections[exName] || ex.machineVariants[0]?.id;
+              const selectedVariant = ex.machineVariants.find(
+                (v) => v.id === selId
+              );
+              if (selectedVariant?.superset) {
+                ssInfo = { ...selectedVariant.superset };
               }
             }
           }
@@ -2061,7 +2039,7 @@ export default function WorkoutView() {
 
   // ===== MAIN LAYOUT =====
   return (
-    <div className="max-w-[500px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
+    <div className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
       {/* Header */}
       <div className="pt-6 pb-4 text-center">
         <div className="flex items-center justify-center gap-2">

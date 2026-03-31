@@ -6,12 +6,21 @@ export interface ExerciseConstraints {
   requiresWeightBearing: boolean;
 }
 
+export interface VariantSuperset {
+  title: string;
+  sets: string;
+  instruction: string;
+  safety: string;
+  note?: string;
+}
+
 export interface MachineVariant {
   id: string;
   label: string;
   icon: string;
   description: string;
   setupCues: string[];
+  superset?: VariantSuperset;
 }
 
 export interface Exercise {
@@ -34,6 +43,7 @@ export interface Exercise {
   phase?: number;
   tier?: number;
   machineVariants?: MachineVariant[];
+  cableSuperset?: boolean;
   constraints: ExerciseConstraints;
 }
 
@@ -336,6 +346,7 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"],
     visual: "   |\n   |--o\n   | /\n   O \n  /|\\\\ \n / | \\\\\n  / \\\\ ",
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
@@ -357,6 +368,7 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Lying Skull Crushers", "OH Triceps Extension"],
     visual: "   |\n   |\n   o\n  /| \n O | \n/ \\\\| \n  / \\\\ ",
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -378,6 +390,7 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Incline DB Press + Lat Raises"],
     visual: "o       o\n \\\\     /\n  \\\\ O /\n   \\\\|/\n    |\n   / \\\\",
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
@@ -556,6 +569,7 @@ export const EX: Record<string, Exercise> = {
         ],
       },
     ],
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -576,6 +590,7 @@ export const EX: Record<string, Exercise> = {
     why: "Neutral grip shifts emphasis to lower lats and brachialis, easier on shoulder joints. Volume complement to wide grip.",
     safety: "safe",
     swaps: ["Lat Pulldown (Wide)", "Weighted Pull-Up"],
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -693,6 +708,7 @@ export const EX: Record<string, Exercise> = {
         ],
       },
     ],
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -714,6 +730,7 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
     visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -735,6 +752,7 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Reverse Fly"],
     visual: "| (Pulley)\n|------_ []\n|     /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -860,6 +878,60 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Hack Squat (Right)"],
     visual: "     [=======]\n        /   \n     R /    \n    __/\n   |   \\\n   |  L \\",
+    machineVariants: [
+      {
+        id: "45_sled",
+        label: "45\u00B0 Sled (Incline)",
+        icon: "\u{1F9B5}",
+        description: "Standard 45\u00B0 incline sled leg press",
+        setupCues: [
+          "Place RIGHT foot HIGH on plate (above center) to minimize hip flexion",
+          "Left foot off the machine entirely",
+          "Back flat against pad, grip side handles",
+        ],
+        superset: {
+          title: "Left Leg Extension",
+          sets: "3\u00D710, 3s eccentric",
+          instruction: "Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00D710, 5s hold) before walking to extension machine.",
+          safety: "Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas.",
+        },
+      },
+      {
+        id: "seated_horizontal",
+        label: "Seated/Horizontal",
+        icon: "\u{1F4BA}",
+        description: "Seated or horizontal leg press machine",
+        setupCues: [
+          "Place RIGHT foot centered on the press plate",
+          "Left foot off to the side",
+          "Adjust seat depth so hip flexion stays under 90\u00B0 at bottom of rep",
+        ],
+        superset: {
+          title: "Left Leg Extension",
+          sets: "3\u00D710, 3s eccentric",
+          instruction: "Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00D710, 5s hold) before walking to extension machine.",
+          safety: "Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas.",
+        },
+      },
+      {
+        id: "plate_sled",
+        label: "Plate-Loaded Sled",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded sled press",
+        setupCues: [
+          "Place RIGHT foot HIGH on the plate",
+          "Left foot off the machine",
+          "Load plates evenly if machine has bilateral loading",
+          "Grip side handles firmly",
+        ],
+        superset: {
+          title: "Left Leg Extension",
+          sets: "3\u00D710, 3s eccentric",
+          instruction: "Go to nearest leg extension machine. Between leg press sets, do quad sets pressing left knee into the seat (2\u00D710, 5s hold) before walking to extension machine.",
+          safety: "Can\u2019t use leg press for left leg (NWB). Hip stays static and reclined on extension machine, pure knee extension, zero iliopsoas.",
+        },
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -912,6 +984,12 @@ export const EX: Record<string, Exercise> = {
           "Set shin pad just above ankle on RIGHT leg only",
           "Left leg stays off the machine entirely",
         ],
+        superset: {
+          title: "Left Leg Extension",
+          sets: "3\u00D712, 3s eccentric",
+          instruction: "Same machine \u2014 reduce weight to ~40-50% of right side. Stay seated, switch legs.",
+          safety: "Hip stays static and reclined, pure knee extension, zero iliopsoas.",
+        },
       },
       {
         id: "ankle_weight_bench",
@@ -924,6 +1002,12 @@ export const EX: Record<string, Exercise> = {
           "Extend right leg to full lockout, squeeze quad at top",
           "Good for home or when machine is unavailable",
         ],
+        superset: {
+          title: "Left Leg Extension (Ankle Weight)",
+          sets: "3\u00D712, 3s eccentric",
+          instruction: "Same setup \u2014 switch the ankle weight to left leg. Use same or lighter weight.",
+          safety: "Pure knee extension, zero hip flexion. Ankle weight keeps it simple.",
+        },
       },
       {
         id: "band_seated",
@@ -936,6 +1020,12 @@ export const EX: Record<string, Exercise> = {
           "Sit on a bench and extend right leg against band resistance",
           "Band provides increasing resistance through the range",
         ],
+        superset: {
+          title: "Left Leg Extension (Band)",
+          sets: "3\u00D712",
+          instruction: "Same setup \u2014 switch band to left ankle. Use lighter resistance.",
+          safety: "Pure knee extension, zero hip flexion. Band is forgiving on the joint.",
+        },
       },
     ],
     constraints: {
@@ -998,6 +1088,59 @@ export const EX: Record<string, Exercise> = {
     why: "Slow eccentric loading builds hamstring strength at long muscle lengths. Prone keeps it NWB-simple.",
     safety: "safe",
     swaps: ["Stab Ball Ham Curl (Right)"],
+    machineVariants: [
+      {
+        id: "prone_lying",
+        label: "Prone/Lying",
+        icon: "\u{1F9B5}",
+        description: "Face-down prone hamstring curl machine",
+        setupCues: [
+          "Lie face-down, RIGHT leg only under the pad",
+          "Left leg off to the side or resting on the machine frame",
+          "Pad should sit just above the Achilles tendon",
+        ],
+        superset: {
+          title: "Left Leg Curl",
+          sets: "3\u00D710",
+          instruction: "Same machine \u2014 reduce weight significantly. Stay face down, switch legs. Go light (bilateral hamstring tendinosis).",
+          safety: "Force across knee only. Prone position keeps hip completely neutral.",
+        },
+      },
+      {
+        id: "seated_curl",
+        label: "Seated Machine",
+        icon: "\u{1F4BA}",
+        description: "Seated hamstring curl machine",
+        setupCues: [
+          "RIGHT leg on the pad, left leg off the machine",
+          "Adjust back pad so you\u2019re comfortably upright",
+          "Pad sits just above the Achilles tendon",
+        ],
+        superset: {
+          title: "Left Leg Curl",
+          sets: "3\u00D710",
+          instruction: "Same machine \u2014 reduce weight significantly. Stay seated, switch legs. Go light (bilateral hamstring tendinosis).",
+          safety: "Force across knee only. Seated position keeps hip neutral.",
+        },
+      },
+      {
+        id: "plate_loaded_curl",
+        label: "Plate-Loaded",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded curl machine (seated or prone)",
+        setupCues: [
+          "Position on plate-loaded curl machine, RIGHT leg only",
+          "Load plates manually",
+          "Left leg off the machine",
+        ],
+        superset: {
+          title: "Left Leg Curl",
+          sets: "3\u00D710",
+          instruction: "Same machine \u2014 reduce weight significantly, switch legs. Strip plates as needed. Go light (bilateral hamstring tendinosis).",
+          safety: "Force across knee only.",
+        },
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
