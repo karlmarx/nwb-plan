@@ -4,36 +4,52 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NWB Workout Plan — a PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Pure static site deployed on Vercel with no build step.
+NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Deployed on Vercel at nwb-plan.vercel.app / nfit.93.fyi.
 
 ## Development
 
-No build tools, bundler, or package manager needed. The entire app is a single `index.html` file using React 18.2 from CDN (no JSX — uses `React.createElement` directly).
-
-- **Run locally:** Open `index.html` in a browser, or use any static file server
-- **Deploy:** Push to `main` — Vercel auto-deploys (no build command, output directory is root)
-- **No tests, linter, or type checking configured**
+- **Run locally:** `npm run dev` (uses Turbopack)
+- **Build:** `npm run build`
+- **Deploy:** Push to `main` — Vercel auto-deploys
+- **No tests configured yet**
 
 ## Architecture
 
-Single-file SPA (`index.html`, ~838 lines) with everything inline:
+Next.js 16 App Router with TypeScript and Tailwind CSS v4.
 
-- **React components** defined as plain functions using `React.createElement` (aliased as `e()`)
-- **Stateless sub-components:** `Badge`, `Section` (collapsible), `ExRow` (exercise row with expandable details), `Callout`, `EqTable`
-- **Main `App` component:** Tab-based UI (Schedule, Workouts, Cardio, Core, Equipment, Safety) with state for active tab, phase selection, open sections, and expanded exercises
-- **Data constants:** `PHASES` (3 progression phases), `SCHED` (6-day PPL calendar), `EX_DETAILS` (exercise descriptions with setup/execution/safety cues)
-- **Styling:** Inline JS style objects with a centralized color palette constant `C`
-- **Dark theme** throughout, designed for mobile/gym use
+### Key directories
+- `app/` — App Router pages and API routes
+- `components/` — React client components
+- `lib/` — Data, auth config, API clients
+- `public/` — PWA assets (icons, manifest, service worker)
+
+### Data flow
+- Exercise data in `lib/exercises.ts` (typed, ~90KB)
+- All UI state in `components/workout-view.tsx` (localStorage persistence)
+- Auth via NextAuth v5 (`lib/auth.ts`, Google OAuth)
+- AI suggestions via `/api/suggest` (Anthropic Claude, behind feature flag)
+
+### Feature flags
+- `NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS` — enables AI suggestion system (default: false)
+
+### Key components
+- `workout-view.tsx` — Main app shell, all state, 6 tabs
+- `exercise-row.tsx` — Exercise detail panel with safety cues
+- `machine-selector.tsx` — Visual machine type picker (NEW)
+- `nearby-picker.tsx` — Multi-select nearby equipment chips (NEW)
+- `suggestion-card.tsx` — AI suggestion display (behind feature flag)
+- `progress-clock.tsx` — 6-week program timer
 
 ## PWA
 
-- `sw.js` — service worker with cache-first strategy (cache name `nwb-plan-v1`)
-- `manifest.json` — standalone mode, dark theme, maskable icons
-- Cached assets: `index.html`, `manifest.json`, icons
+- `public/sw.js` — service worker with cache-first strategy
+- `public/manifest.json` — standalone mode, dark theme
+- Base workout fully offline; AI suggestions show offline indicator
 
 ## Key Constraints
 
-- No JSX — all components use `React.createElement` (abbreviated as `e`)
-- React and ReactDOM loaded from CDN `<script>` tags — no imports/modules
-- All state management uses `React.useState` hooks in the App component
-- Sub-components are stateless to avoid React Error 310 (see commit 42e438b)
+- ZERO left leg weight bearing (femoral neck stress fracture)
+- ZERO left iliopsoas activation (no left hip flexion against gravity)
+- Hip flexion <90° both sides (bilateral FAI + labral tears)
+- No swimming
+- The AI system prompt in `app/api/suggest/system-prompt.ts` enforces all safety constraints

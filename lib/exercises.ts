@@ -1,0 +1,1985 @@
+// ===== TYPE DEFINITIONS =====
+
+export interface ExerciseConstraints {
+  requiresIliopsoas: boolean;
+  maxHipFlexion: number;
+  requiresWeightBearing: boolean;
+}
+
+export interface MachineVariant {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  setupCues: string[];
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  requires: string[];
+  category: string;
+  sets: [string, string][];
+  rest: number;
+  setup: string;
+  execution: string;
+  nwbCues: string;
+  why: string;
+  safety: "safe" | "caution" | "danger";
+  swaps: string[];
+  visual?: string;
+  diagram?: string;
+  tempo?: string;
+  amp?: string[];
+  phase?: number;
+  tier?: number;
+  machineVariants?: MachineVariant[];
+  constraints: ExerciseConstraints;
+}
+
+export interface EquipmentItem {
+  name: string;
+  icon: string;
+  category: string;
+}
+
+export interface Workout {
+  title: string;
+  icon: string;
+  color: string;
+  hevy?: string;
+  exercises: string[];
+  removed: { name: string; reason: string }[];
+}
+
+export interface ScheduleDay {
+  d: string;
+  t: string;
+  i: string;
+  c: string;
+}
+
+export interface Phase {
+  weeks: string;
+  name: string;
+  color: string;
+  desc: string;
+}
+
+// ===== EQUIPMENT REGISTRY =====
+
+export const EQUIPMENT: Record<string, EquipmentItem> = {
+  barbell: { name: "Barbell", icon: "\u{1F3CB}\uFE0F", category: "weights" },
+  dumbbells: { name: "Dumbbells", icon: "\u{1F4AA}", category: "weights" },
+  ezbar: { name: "EZ-Bar", icon: "\u{1F529}", category: "weights" },
+  cables: { name: "Cable Machine", icon: "\u{1F527}", category: "machines" },
+  legpress: { name: "Leg Press", icon: "\u{1F9B5}", category: "machines" },
+  hacksquat: { name: "Hack Squat", icon: "\u{1F9BF}", category: "machines" },
+  latpulldown: { name: "Lat Pulldown", icon: "\u2B07\uFE0F", category: "machines" },
+  pecdeck: { name: "Pec Deck / Fly", icon: "\u{1F98B}", category: "machines" },
+  dipMachine: { name: "Dip Machine", icon: "\u2B07\uFE0F", category: "machines" },
+  preacher: { name: "Preacher Bench", icon: "\u{1F4BA}", category: "machines" },
+  hamcurl: { name: "Ham Curl Machine", icon: "\u{1F9B5}", category: "machines" },
+  pullupbar: { name: "Pull-Up Bar", icon: "\u{1FA9C}", category: "functional" },
+  rings: { name: "Gymnastic Rings", icon: "\u2B55", category: "functional" },
+  battleRopes: { name: "Battle Ropes", icon: "\u{1FAA2}", category: "cardio" },
+  skierg: { name: "SkiErg", icon: "\u26F7\uFE0F", category: "cardio" },
+  rower: { name: "Rowing Machine", icon: "\u{1F6A3}", category: "cardio" },
+  armBike: { name: "Arm Ergometer", icon: "\u{1F6B4}", category: "cardio" },
+  echoBike: { name: "Echo/Assault Bike", icon: "\u{1F300}", category: "cardio" },
+  bench: { name: "Adj. Weight Bench", icon: "\u{1F6CB}\uFE0F", category: "basic" },
+  plyobox: { name: "Plyo Box", icon: "\u{1F4E6}", category: "basic" },
+  stabball: { name: "Stability Ball", icon: "\u26BD", category: "basic" },
+  medball: { name: "Medicine Ball", icon: "\u{1F3C0}", category: "basic" },
+  bands: { name: "Resistance Bands", icon: "\u{1F517}", category: "basic" },
+  parallettes: { name: "Parallettes", icon: "\u{1F938}", category: "home" },
+  feetup: { name: "FeetUp Trainer", icon: "\u{1F643}", category: "home" },
+  slider: { name: "Furniture Slider", icon: "\u{1F6F7}", category: "home" },
+  mat: { name: "Thick Mat", icon: "\u{1F9D8}", category: "basic" },
+};
+
+// ===== NEARBY EQUIPMENT PICKER =====
+
+export const NEARBY_EQUIPMENT = [
+  { id: "dip_assist", label: "Dip/Chin Assist", icon: "\u{1F9BE}" },
+  { id: "pullup_bar", label: "Pull-Up Bar", icon: "\u{1F938}" },
+  { id: "cable_station", label: "Cable Station", icon: "\u2696\uFE0F" },
+  { id: "flat_bench", label: "Flat Bench", icon: "\u{1FA91}" },
+  { id: "adj_bench", label: "Adjustable Bench", icon: "\u{1F4D0}" },
+  { id: "barbell_rack", label: "Barbell + Rack", icon: "\u{1F3CB}\uFE0F" },
+  { id: "bands", label: "Resistance Bands", icon: "\u{1F380}" },
+  { id: "mat_floor", label: "Mat / Floor Space", icon: "\u{1F9D8}" },
+];
+
+// ===== EXERCISE DATABASE =====
+
+export const EX: Record<string, Exercise> = {
+  // ==================== PUSH EXERCISES ====================
+
+  "Barbell Floor Press": {
+    id: "barbell_floor_press",
+    name: "Barbell Floor Press",
+    requires: ["barbell", "mat"],
+    category: "push",
+    sets: [["4", "5-6"], ["4", "4-5"], ["5", "3-5"]],
+    rest: 120,
+    setup: "Lie flat on the floor with a barbell racked above you (use a squat rack or have a partner hand it off). Right leg bent with foot flat, left leg straight and relaxed.",
+    execution: "Lower the bar until your triceps touch the floor. Full dead-stop for 1 second \u2014 no bouncing. Press explosively back up. The floor limits ROM, eliminating the stretch reflex.",
+    nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive \u2014 like a log on the floor. If you need leg drive, the weight is too heavy.",
+    why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
+    safety: "safe",
+    swaps: ["DB Floor Press", "Machine Chest Press"],
+    visual: "      O===+===O      (Barbell)\n      |       |\n  o__/|\\_    _|__   (Torso on floor)\n     / \\\n    L   R            (L straight, R bent)",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "DB Floor Press": {
+    id: "db_floor_press",
+    name: "DB Floor Press",
+    requires: ["dumbbells", "mat"],
+    category: "push",
+    sets: [["4", "8-10"], ["4", "6-8"], ["4", "5-6"]],
+    rest: 90,
+    setup: "Lie on the floor with dumbbells. Neutral grip (palms facing each other) is recommended for shoulder health.",
+    execution: "Lower the weights until your elbows touch the floor. Pause, then press up.",
+    nwbCues: "Similar to barbell floor press. Avoid arching or bridging. Floor contact = feedback for flat back.",
+    why: "Volume chest work with restricted ROM. Dumbbells allow neutral grip for shoulder comfort.",
+    safety: "safe",
+    swaps: ["Barbell Floor Press", "Machine Chest Press"],
+    visual: "      [=]  [=]\n       |    |\n       \\----/\n        (__)\n==================",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Machine Chest Press": {
+    id: "machine_chest_press",
+    name: "Machine Chest Press",
+    requires: ["cables"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "8-10"], ["3", "6-8"]],
+    rest: 90,
+    setup: "Sit at the machine chest press. Adjust the seat so handles are at mid-chest height.",
+    execution: "Press forward until arms are extended. Slow 3-second return. Final set: TRIPLE DROP SET (drop 20%, \u00D710, drop 20%, \u00D7AMRAP).",
+    nwbCues: "Pin-loaded machine makes drops instant. Keep back pressed against pad. Zero spinal load.",
+    why: "Machines provide stability and allow safe failure. Drop sets for metabolic muscle damage.",
+    safety: "safe",
+    swaps: ["DB Floor Press", "Barbell Floor Press"],
+    visual: "   |    (o)\n   |   /|  \\===]\n   |===| \\\n   |   |  \\\n  _|_ _|_ _|_",
+    machineVariants: [
+      {
+        id: "plate_loaded",
+        label: "Plate-Loaded",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded chest press machine with independent arms",
+        setupCues: [
+          "Load plates evenly on both sides",
+          "Adjust seat so handles align with mid-chest",
+          "Grip handles with full palm, not just fingers",
+        ],
+      },
+      {
+        id: "pin_loaded",
+        label: "Pin-Loaded Stack",
+        icon: "\u{1F4CC}",
+        description: "Selectorized weight stack machine \u2014 fastest for drop sets",
+        setupCues: [
+          "Set pin to desired weight on the stack",
+          "For drop sets: pre-plan your drops (e.g. 120 \u2192 100 \u2192 80)",
+          "Adjust seat height so handles are at nipple line",
+        ],
+      },
+      {
+        id: "cable_crossover",
+        label: "Cable Crossover Station",
+        icon: "\u2696\uFE0F",
+        description: "Dual cable station with adjustable pulleys set at chest height",
+        setupCues: [
+          "Set both pulleys to chest height",
+          "Use D-handles or stirrup handles",
+          "Sit on a bench between the cables for NWB safety",
+          "Press handles forward and together in front of chest",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated DB OH Press": {
+    id: "seated_db_oh_press",
+    name: "Seated DB OH Press",
+    requires: ["dumbbells", "bench"],
+    category: "push",
+    sets: [["4", "6-8"], ["4", "6-8"], ["4", "5-6"]],
+    rest: 120,
+    setup: "Sit on bench with back at 80-85\u00B0. Kick dumbbells up from knees to shoulder height. Feet flat on floor, left foot just resting.",
+    execution: "Press weights directly overhead until arms are locked out. Control the descent. Don't lock elbows at top \u2014 keep slight bend.",
+    nwbCues: "Keep back pressed against bench. Do NOT arch your lower back. Right leg stable, left leg passive.",
+    why: "Vertical press with full spine support. Seated position eliminates balance demands.",
+    safety: "safe",
+    swaps: ["Seated Arnold Press", "Landmine Press (seated)"],
+    visual: "   [=]      [=]\n    |        |\n    \\  (oo)  /\n     \\--||--/\n       /  \\\n     _/__\\__",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated Arnold Press": {
+    id: "seated_arnold_press",
+    name: "Seated Arnold Press",
+    requires: ["dumbbells", "bench"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "8-10"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit with back supported. Start with dumbbells at shoulder height, palms facing you.",
+    execution: "Rotate palms outward as you press overhead. Reverse the rotation on the way down. The rotation hits all three delt heads.",
+    nwbCues: "Keep core braced. Don't lean back. Controlled rotation \u2014 no jerking.",
+    why: "The rotation pattern recruits anterior, lateral, and posterior deltoid heads in one movement.",
+    safety: "safe",
+    swaps: ["Seated DB OH Press", "Landmine Press (seated)"],
+    visual: "   Start      Finish\n              [=]  [=]\n                \\  /\n   (oo)         (oo)\n  [=]||[=]     / || \\\n   /  \\        /  \\",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Incline DB Press + Lat Raises": {
+    id: "incline_db_press_lat_raises",
+    name: "Incline DB Press + Lat Raises",
+    requires: ["dumbbells", "bench"],
+    category: "push",
+    sets: [["3", "8-10 / 12-15"], ["3", "8-10 / 12-15"], ["3", "6-8 / 12-15"]],
+    rest: 90,
+    setup: "INCLINE PRESS: Bench at 30-45\u00B0. LAT RAISES: Stay seated on the bench.",
+    execution: "PRESS: 8-10 reps with 3-second eccentric. Immediately grab lighter DBs for LAT RAISES: 12-15 reps. No rest between exercises.",
+    nwbCues: "Keep spine neutral on bench. Minimize body swing on raises. Seated removes all momentum cheating.",
+    why: "Superset for upper chest and medial delt volume with efficient time use.",
+    safety: "safe",
+    swaps: ["Cable Chest Fly"],
+    machineVariants: [
+      {
+        id: "adj_bench_dbs",
+        label: "Adjustable Bench + DBs",
+        icon: "\u{1F4D0}",
+        description: "Standard adjustable bench with separate dumbbells for press and raises",
+        setupCues: [
+          "Set bench to 30-45\u00B0 incline",
+          "Have two pairs of dumbbells ready (heavier for press, lighter for raises)",
+          "Keep lighter pair within reach to minimize transition time",
+        ],
+      },
+      {
+        id: "smith_incline",
+        label: "Smith Machine Incline",
+        icon: "\u{1F3ED}",
+        description: "Smith machine bar for the incline press portion, then switch to DBs for raises",
+        setupCues: [
+          "Position bench inside the Smith machine at 30-45\u00B0",
+          "Set safety catches at chest level",
+          "Unrack bar with rotation, press, then re-rack for lat raises with DBs",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Lying Skull Crushers": {
+    id: "lying_skull_crushers",
+    name: "Lying Skull Crushers",
+    requires: ["ezbar"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "10-12"], ["4", "8-10"]],
+    rest: 90,
+    setup: "Lie on bench or floor. Hold EZ-bar or dumbbells directly over shoulders with narrow grip.",
+    execution: "Lower toward forehead by bending ONLY at elbows. Angle arms slightly back to maintain tension. Press back to start.",
+    nwbCues: "Elbows stay tucked and pointed at ceiling. Upper arms don't move. Floor position is safest.",
+    why: "Excellent triceps isolation targeting the long head. Minimal stress on rest of body.",
+    safety: "safe",
+    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown"],
+    visual: "      ==[ ]\n     /\n  O-< \n /| |\n[___|___]",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "OH Triceps Extension": {
+    id: "oh_triceps_extension",
+    name: "OH Triceps Extension",
+    requires: ["cables"],
+    category: "push",
+    sets: [["3", "12-15"], ["3", "10-12"], ["3", "10-12"]],
+    rest: 60,
+    setup: "Face away from cable machine. Hold rope attachment overhead with elbows bent.",
+    execution: "Extend arms upward until straight. Control the return behind your head. Keep elbows close to ears.",
+    nwbCues: "Keep core tight to prevent rib flare or back arch.",
+    why: "Targets the long head of triceps \u2014 often neglected in standard pressing.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers", "Tricep Rope Pushdown"],
+    visual: "   |\n   |--o\n   | /\n   O \n  /|\\\\ \n / | \\\\\n  / \\\\ ",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Tricep Rope Pushdown": {
+    id: "tricep_rope_pushdown",
+    name: "Tricep Rope Pushdown",
+    requires: ["cables"],
+    category: "push",
+    sets: [["2", "RP: 10+5+3"], ["2", "RP: 10+5+3"], ["2", "RP: 12+6+4"]],
+    rest: 120,
+    setup: "SIT at cable machine on a bench (preferred) or stand on RIGHT leg only with left leg non-weight-bearing. Rope attachment at high position. If standing, hold the cable station frame with one hand between sets for balance.",
+    execution: "REST-PAUSE: Do 10 reps, rest 15 seconds, 5 more reps, rest 15 seconds, 3-5 reps to failure. One extended set = full stimulus.",
+    nwbCues: "Seated is strongly preferred \u2014 eliminates balance risk. If standing: all weight on right leg, left leg hangs. Keep elbows pinned to sides. Torso stays upright \u2014 no leaning into it.",
+    why: "Rest-pause technique maximizes recruitment with less total volume. Time-efficient.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers", "OH Triceps Extension"],
+    visual: "   |\n   |\n   o\n  /| \n O | \n/ \\\\| \n  / \\\\ ",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Cable Chest Fly": {
+    id: "cable_chest_fly",
+    name: "Cable Chest Fly",
+    requires: ["cables"],
+    category: "push",
+    sets: [["3", "12-15"], ["3", "12-15"], ["3", "10-12"]],
+    rest: 60,
+    setup: "Set cables to chest height. Sit on a bench between the cables, or lie on a flat bench.",
+    execution: "Bring hands together in front of chest with slight elbow bend. Squeeze chest hard at top. Return slowly with control.",
+    nwbCues: "Don't overextend shoulders at the stretch. Slow, controlled tempo. Lying on bench is safest position.",
+    why: "Constant cable tension throughout ROM. Isolated pectoral work.",
+    safety: "safe",
+    swaps: ["Incline DB Press + Lat Raises"],
+    visual: "o       o\n \\\\     /\n  \\\\ O /\n   \\\\|/\n    |\n   / \\\\",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Mechanical Drop Set (Press)": {
+    id: "mechanical_drop_set_press",
+    name: "Mechanical Drop Set (Press)",
+    requires: ["dumbbells", "bench"],
+    category: "push",
+    sets: [["2", "8+8+8"], ["2", "8+8+8"], ["2", "8+8+8"]],
+    rest: 120,
+    setup: "Start with bench at incline (30-45\u00B0). Have same weight dumbbells ready. Set up near a rack or support you can grab with your right hand during transitions.",
+    execution: "8 reps INCLINE \u2192 set DBs down, adjust bench flat \u2192 8 reps FLAT \u2192 adjust to decline \u2192 8 reps DECLINE. Same weight throughout \u2014 each angle change gives mechanical advantage so you can keep pressing past failure.",
+    nwbCues: "\u26A0\uFE0F TRANSITION SAFETY: Set dumbbells down BEFORE changing bench angles. Lean RIGHT to shift weight when sitting up or adjusting position. Left leg stays passive \u2014 do NOT brace or push with it to adjust the bench. If you cannot safely change bench angles alone, have a training partner adjust for you or use a machine chest press with drop sets instead.",
+    why: "High-intensity volume for chest growth without needing extremely heavy weights. Mechanical advantage keeps you pressing past failure.",
+    safety: "caution",
+    phase: 1,
+    swaps: ["Machine Chest Press"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Landmine Press (seated)": {
+    id: "landmine_press_seated",
+    name: "Landmine Press (seated)",
+    requires: ["barbell", "bench"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    tempo: "4-4-0",
+    setup: "Sit on bench or floor next to a landmine attachment (or wedge barbell in a corner). Hold end of barbell at shoulder height with one hand.",
+    execution: "Press the bar up and forward \u2014 4-count press, 4-count lower. Focus on NOT rotating your torso. The unilateral load tries to twist you; your core fights it.",
+    nwbCues: "CAUTION: Anti-rotation demand can recruit left iliopsoas as a stabilizer. Go lighter than ego wants. Stop immediately if you feel hip crease pinch or left hip tightening.",
+    why: "Functional unilateral pressing that doubles as elite anti-rotation core work at slow tempo.",
+    safety: "caution",
+    swaps: ["Seated DB OH Press"],
+    amp: [
+      "BASE: Light weight, 4-4 tempo.",
+      "AMP 1: Moderate weight + 3-second hold at top of press.",
+      "AMP 2: Moderate weight + 3-second hold + alternate pressing (left hand, right hand, no rest). Anti-rotation overload.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Dip Machine": {
+    id: "dip_machine",
+    name: "Dip Machine",
+    requires: ["dipMachine"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit in the dip machine. Grip handles at shoulder width. Feet on platform or hanging.",
+    execution: "Lower yourself by bending elbows until upper arms are parallel. Press back up. Final set: DROP SET \u00D72 (drop ~20% each time).",
+    nwbCues: "Machine provides stability. Keep torso upright for triceps focus, lean forward slightly for chest emphasis.",
+    why: "Compound push movement with machine stability. Drop sets for metabolic exhaustion.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers"],
+    visual: " |     |\n O-___-O\n | | | |\n |_|_|_|\n   | |\n  [_|_]",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Pseudo Planche Push-Up": {
+    id: "pseudo_planche_pushup",
+    name: "Pseudo Planche Push-Up",
+    requires: ["parallettes"],
+    category: "push",
+    sets: [["3", "AMRAP"], ["3", "AMRAP"], ["3", "AMRAP"]],
+    rest: 90,
+    setup: "Place parallettes near your waistline (fingers pointing backward or sideways). Rest your right foot on a box/bench behind you. Left leg rests on the same box/bench or hangs passively \u2014 zero engagement.",
+    execution: "Lean your body weight FORWARD over your wrists. Lower your chest toward the floor. Press back up. The forward lean makes this exponentially harder than a regular push-up.",
+    nwbCues: "Left leg is dead weight \u2014 never bracing or pushing. Rest it on the box alongside the right foot for simplicity. Open-hip position keeps hip flexion minimal = safe for FAI. If wrists hurt, adjust parallette angle. Exhale before each rep.",
+    why: "Elite calisthenics push. Builds massive shoulder and chest strength with bodyweight. Open-hip position = safe for FAI.",
+    safety: "safe",
+    swaps: ["DB Floor Press"],
+    diagram: "planche",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Parallette L-Sit": {
+    id: "parallette_l_sit",
+    name: "Parallette L-Sit",
+    requires: ["parallettes"],
+    category: "push",
+    sets: [["4", "Max Hold"], ["4", "Max Hold"], ["4", "Max Hold"]],
+    rest: 60,
+    setup: "Place parallettes shoulder-width apart. Sit between them and grip with palms down. Use SUPPORT HOLD: legs hang straight down, not extended forward.",
+    execution: "Lock elbows, depress scapulae (push shoulders DOWN away from ears), lift your body off the floor. Legs hang straight down. Hold. For extra core challenge, add a slight knee raise with the RIGHT leg only.",
+    nwbCues: "Full L-sit requires maximal bilateral iliopsoas activation \u2014 directly loads the fracture site. Support Hold only (legs hanging down). Tuck hold is also contraindicated (deep hip flexion past 90\u00B0).",
+    why: "Elite gymnastics isometric for scapular depression + tricep strength. Support Hold modification eliminates hip flexor activation.",
+    safety: "caution",
+    swaps: ["Pallof Press (Seated)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== PULL EXERCISES ====================
+
+  "Lat Pulldown (Wide)": {
+    id: "lat_pulldown_wide",
+    name: "Lat Pulldown (Wide)",
+    requires: ["latpulldown"],
+    category: "pull",
+    sets: [["4", "6-8"], ["4", "6-8"], ["4", "5-6"]],
+    rest: 150,
+    setup: "Sit at machine with wide bar. Adjust thigh pad snug on quads. Grab bar outside shoulder width with overhand grip.",
+    execution: "Pull bar to upper chest \u2014 think 'drive elbows into front pockets.' Full scapular depression. Lean back no more than 15\u00B0. Control the return.",
+    nwbCues: "Thigh pad anchors you, NOT your feet. Left foot just rests on the platform. Zero force through it.",
+    why: "Primary lat width and upper back strength builder. Machine provides stability.",
+    safety: "safe",
+    swaps: ["Neutral Grip Pulldown", "Weighted Pull-Up"],
+    machineVariants: [
+      {
+        id: "plate_loaded_lat",
+        label: "Plate-Loaded Machine",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded lat pulldown with wide bar attachment",
+        setupCues: [
+          "Load plates evenly",
+          "Adjust thigh pad to lock quads in place",
+          "Wide overhand grip outside shoulder width",
+        ],
+      },
+      {
+        id: "cable_wide_bar",
+        label: "Free Cable + Bar",
+        icon: "\u2696\uFE0F",
+        description: "Standard cable station with a wide lat pulldown bar attachment",
+        setupCues: [
+          "Attach wide bar to high pulley",
+          "Sit on bench or floor below the cable",
+          "Use a thigh strap or have partner press down on your knees for stability",
+        ],
+      },
+      {
+        id: "cable_vbar",
+        label: "Free Cable + V-Bar",
+        icon: "\u2696\uFE0F",
+        description: "Cable station with V-bar for neutral-grip lat pulldown variation",
+        setupCues: [
+          "Attach V-bar handle to high pulley",
+          "Sit below cable, lean back slightly",
+          "Pull to upper chest with neutral grip",
+        ],
+      },
+      {
+        id: "band_rack",
+        label: "Band at Rack",
+        icon: "\u{1F380}",
+        description: "Heavy resistance band looped over a high point on a power rack",
+        setupCues: [
+          "Loop band over top of rack or pull-up bar",
+          "Sit on the floor or a low bench below the band",
+          "Grip both ends of the band and pull down to chest",
+          "Best for warm-ups or deload weeks \u2014 resistance curve differs from cables",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Neutral Grip Pulldown": {
+    id: "neutral_grip_pulldown",
+    name: "Neutral Grip Pulldown",
+    requires: ["latpulldown"],
+    category: "pull",
+    sets: [["4", "10-12"], ["4", "10-12"], ["4", "8-10"]],
+    rest: 90,
+    setup: "Sit at lat pulldown. Attach V-bar handle. Thigh pad snug. Grab with neutral (palms facing) grip.",
+    execution: "Lean back 10\u00B0. Pull to upper chest. Squeeze shoulder blades 1 second. Return slowly with full stretch at top. REST-PAUSE on last 2 sets: 8 reps \u2192 20s \u2192 4 reps \u2192 20s \u2192 2-3 reps.",
+    nwbCues: "Thigh pad anchors you, not your legs. Left foot rests like a book on a table. Zero force through it.",
+    why: "Neutral grip shifts emphasis to lower lats and brachialis, easier on shoulder joints. Volume complement to wide grip.",
+    safety: "safe",
+    swaps: ["Lat Pulldown (Wide)", "Weighted Pull-Up"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Weighted Pull-Up": {
+    id: "weighted_pullup",
+    name: "Weighted Pull-Up",
+    requires: ["pullupbar"],
+    category: "pull",
+    sets: [["5", "To Failure"], ["5", "To Failure"], ["5", "3-5 Weighted"]],
+    rest: 150,
+    setup: "Hang from pull-up bar with overhand grip outside shoulder width. Use a weight belt for added load if bodyweight is too easy. \u26A0\uFE0F GETTING UP: Use a tall box \u2014 step up with RIGHT foot only, grip bar, then step off. Do NOT jump up. Left leg hangs passive.",
+    execution: "From dead hang, pull your chin over the bar by driving elbows down. Control the descent. Full extension at bottom.",
+    nwbCues: "Lower body hangs completely passive \u2014 do NOT swing or kip. Step down carefully to a box, do NOT jump down.",
+    why: "King of vertical pulling. Directly trains dragon boat 'catch' phase. Decompresses spine naturally.",
+    safety: "safe",
+    swaps: ["Lat Pulldown (Wide)", "Neutral Grip Pulldown"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Finger-Assist One-Arm Pull-Up": {
+    id: "finger_assist_one_arm_pullup",
+    name: "Finger-Assist One-Arm Pull-Up",
+    requires: ["pullupbar"],
+    category: "pull",
+    sets: [["4", "3-5/arm"], ["4", "3-5/arm"], ["4", "2-4/arm"]],
+    rest: 150,
+    setup: "Hang from pull-up bar with your working hand (pronated or neutral grip). Place just your INDEX FINGER of the other hand on the bar to assist.",
+    execution: "Pull your chin directly over your working hand. Use the index finger only for minimal assist. Lower slowly with control. Complete all reps one side then switch.",
+    nwbCues: "Lower body hangs completely dead \u2014 no swinging, no kipping. Zero hip flexor engagement.",
+    why: "Elite calisthenics pull. Builds massive unilateral pulling strength. Hanging = spine decompression + zero hip flexor load. Perfect NWB exercise.",
+    safety: "safe",
+    swaps: ["Weighted Pull-Up", "Lat Pulldown (Wide)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Chest-Supported DB Row": {
+    id: "chest_supported_db_row",
+    name: "Chest-Supported DB Row",
+    requires: ["dumbbells", "bench"],
+    category: "pull",
+    sets: [["4", "6-8"], ["4", "8-10"], ["4", "6-8"]],
+    rest: 120,
+    setup: "Set incline bench to 30-45\u00B0. Lie face-down with chest on the pad. Arms hang straight down holding dumbbells.",
+    execution: "Row weights upward, pulling to lower ribcage. Squeeze shoulder blades hard at the top. Lower slowly.",
+    nwbCues: "SAFEST exercise in the program \u2014 chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively.",
+    why: "Heavy horizontal row with zero spine load. Chest support means pure back isolation. Go heavy.",
+    safety: "safe",
+    swaps: ["Seated Cable Row"],
+    visual: "      O\n    / | \\_[]\n   /  |\n======|======== (Bench)",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated Cable Row": {
+    id: "seated_cable_row",
+    name: "Seated Cable Row",
+    requires: ["cables"],
+    category: "pull",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit at cable station. Feet on plate (left foot just resting, zero force). Grab V-bar or wide bar attachment.",
+    execution: "Initiate with scapular retraction (pinch shoulder blades), THEN drive elbows back. Pull to lower ribs. Squeeze. Return slowly.",
+    nwbCues: "CAUTION: Do NOT lean forward (rounds lumbar = bad for disc) or lean back (momentum). Torso stays at SAME angle entire set. If form breaks, stop.",
+    why: "Mid-back thickness builder. Different grips target different areas (V-bar = lats, wide = traps/rhomboids).",
+    safety: "caution",
+    swaps: ["Chest-Supported DB Row", "One-Arm Cable Row"],
+    visual: "| (Pulley)\n|   \\\n|    \\ _ []\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    machineVariants: [
+      {
+        id: "vbar_handle",
+        label: "V-Bar Handle",
+        icon: "\u2696\uFE0F",
+        description: "Close-grip V-bar for lat-dominant rowing",
+        setupCues: [
+          "Attach V-bar to low cable",
+          "Sit with chest tall, slight lean back",
+          "Pull to lower ribs, squeeze shoulder blades",
+        ],
+      },
+      {
+        id: "wide_bar_handle",
+        label: "Wide Bar Handle",
+        icon: "\u2696\uFE0F",
+        description: "Wide overhand bar for upper-back and trap emphasis",
+        setupCues: [
+          "Attach wide bar to low cable",
+          "Overhand grip outside shoulder width",
+          "Pull to sternum, drive elbows wide",
+        ],
+      },
+      {
+        id: "single_d_handle",
+        label: "Single D-Handle",
+        icon: "\u2696\uFE0F",
+        description: "Single D-handle for unilateral rowing with anti-rotation demand",
+        setupCues: [
+          "Attach single D-handle to low cable",
+          "Row one arm at a time for imbalance correction",
+          "Keep torso square \u2014 do not rotate toward the pulling side",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "One-Arm Cable Row": {
+    id: "one_arm_cable_row",
+    name: "One-Arm Cable Row",
+    requires: ["cables"],
+    category: "pull",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit facing cable machine on a bench. Right foot flat on floor, left foot resting passively. Set pulley to chest height. Grab D-handle with one hand.",
+    execution: "Pull handle to lower rib cage, driving elbow straight back. Squeeze 1 second. Return slowly over 2-3 seconds. Complete all reps one side then switch. PULLING WITH RIGHT ARM: Anti-rotation demand is on the left side \u2014 the left iliopsoas may recruit. Use slightly lighter weight if needed. PULLING WITH LEFT ARM: Anti-rotation demand is on the right side \u2014 fully safe.",
+    nwbCues: "CRITICAL: Do NOT twist your trunk. Keep pelvis square and spine neutral. If lumbar twists AT ALL, drop weight immediately. \u26A0\uFE0F When pulling with the RIGHT arm, stop if you feel any pull in the left hip crease \u2014 this means the left iliopsoas is stabilizing. Exhale before each rep.",
+    why: "Unilateral pulling corrects imbalances and doubles as anti-rotation core training. Two exercises in one.",
+    safety: "caution",
+    swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
+    visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated Face Pulls": {
+    id: "seated_face_pulls",
+    name: "Seated Face Pulls",
+    requires: ["cables"],
+    category: "pull",
+    sets: [["3", "15-20"], ["3", "15-20"], ["3", "15-20"]],
+    rest: 60,
+    setup: "Sit at cable machine with rope attachment set at face height. Grab rope with overhand grip.",
+    execution: "Pull rope toward your face, pulling the ends apart at the end. Elbows HIGH, externally rotate at the end position. Squeeze rear delts.",
+    nwbCues: "Focus on external rotation at end of movement. Essential for shoulder health with this much pressing volume.",
+    why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health and paddling resilience.",
+    safety: "safe",
+    swaps: ["Reverse Fly"],
+    visual: "| (Pulley)\n|------_ []\n|     /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Reverse Fly": {
+    id: "reverse_fly",
+    name: "Reverse Fly",
+    requires: ["dumbbells", "bench"],
+    category: "pull",
+    sets: [["3", "12-15"], ["3", "15-20"], ["3", "12-15"]],
+    rest: 60,
+    setup: "Lie face-down on incline bench (chest-supported) OR sit and lean forward slightly, OR use the pec deck machine in reverse.",
+    execution: "Raise arms out to sides, squeezing rear delts. Light weight, constant tension. Lower slowly.",
+    nwbCues: "Keep spine neutral. Don't round lower back. Chest-supported version keeps form honest.",
+    why: "Rear delt development to balance the shoulder joint from all the pressing.",
+    safety: "safe",
+    swaps: ["Seated Face Pulls"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Preacher Curls": {
+    id: "preacher_curls",
+    name: "Preacher Curls",
+    requires: ["preacher", "ezbar"],
+    category: "pull",
+    sets: [["3", "8-10"], ["3", "8-10"], ["3", "6-8"]],
+    rest: 90,
+    setup: "Sit at preacher bench with arms rested on the pad. EZ-bar preferred for wrist comfort.",
+    execution: "Curl bar toward shoulders. Control the negative \u2014 3 seconds down. Full stretch at bottom.",
+    nwbCues: "Bench keeps torso stationary, protecting spine from swinging. Zero momentum allowed.",
+    why: "Strict bicep isolation without lumbar stress. The pad prevents cheating.",
+    safety: "safe",
+    swaps: ["Hammer Curls", "Incline DB Curl"],
+    visual: "     O\n   / | \\\n []\\ | /[]\n   +-+-+ (Seat)\n     |",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Hammer Curls": {
+    id: "hammer_curls",
+    name: "Hammer Curls",
+    requires: ["dumbbells"],
+    category: "pull",
+    sets: [["3", "10-12"], ["3", "10-12"], ["4", "10-12"]],
+    rest: 60,
+    setup: "Sit on a bench (preferred) or stand on RIGHT leg only holding a support for balance. Hold dumbbells with neutral grip (palms facing each other).",
+    execution: "Curl weights toward shoulders keeping neutral grip throughout. Lower slowly. No body swing.",
+    nwbCues: "Seated is strongly preferred \u2014 eliminates balance risk and any chance of left leg bracing. If standing: all weight on right leg, left leg hangs passively. If you need to swing for momentum, weight is too heavy.",
+    why: "Targets brachialis and brachioradialis for forearm and outer bicep development.",
+    safety: "safe",
+    swaps: ["Preacher Curls", "Incline DB Curl"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Incline DB Curl": {
+    id: "incline_db_curl",
+    name: "Incline DB Curl",
+    requires: ["dumbbells", "bench"],
+    category: "pull",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit on incline bench at 45-60\u00B0. Let arms hang straight down with dumbbells.",
+    execution: "Curl dumbbells keeping elbows pinned to sides. Deep stretch at bottom. Drop set on last set: drop weight twice.",
+    nwbCues: "Keep head and back against bench. The incline creates maximum bicep stretch. Don't let elbows drift forward.",
+    why: "Maximal bicep stretch position for peak growth stimulus.",
+    safety: "safe",
+    swaps: ["Hammer Curls", "Preacher Curls"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Mechanical Drop Set (Pull)": {
+    id: "mechanical_drop_set_pull",
+    name: "Mechanical Drop Set (Pull)",
+    requires: ["latpulldown"],
+    category: "pull",
+    sets: [["2", "8+8+8"], ["2", "8+8+8"], ["2", "8+8+8"]],
+    rest: 120,
+    setup: "Start with WIDE overhand grip on lat pulldown. Same weight throughout.",
+    execution: "8 reps WIDE grip \u2192 immediately switch to NEUTRAL grip \u2192 8 reps \u2192 immediately switch to UNDERHAND grip \u2192 8 reps. Each grip change gives you mechanical advantage to keep pulling past failure.",
+    nwbCues: "Smooth grip transitions. Don't jerk the weight. Maintain same posture throughout.",
+    why: "Extreme lat stimulus without adding plates. Grip changes shift emphasis while maintaining intensity.",
+    safety: "safe",
+    phase: 1,
+    swaps: ["Lat Pulldown (Wide)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== LEG EXERCISES ====================
+
+  "SL Leg Press (Right)": {
+    id: "sl_leg_press_right",
+    name: "SL Leg Press (Right)",
+    requires: ["legpress"],
+    category: "legs",
+    sets: [["4", "10-12"], ["4", "8-10"], ["4", "6-8"]],
+    rest: 150,
+    setup: "Sit in leg press. Place RIGHT foot HIGH on the plate. Left foot off the machine entirely.",
+    execution: "Lower the sled until JUST before 90\u00B0 hip flexion \u2014 then press back up. In Weeks 3+: use 4-second eccentric (lowering). Start at ~50% bilateral 1RM.",
+    nwbCues: "HIGH foot placement = less hip flexion = protects FAI/labrum. 90\u00B0 limit is NON-NEGOTIABLE. Do NOT lock out knee. Left leg hangs free.",
+    why: "MOST IMPORTANT exercise for cross-education effect. Eccentric emphasis drives up to 17.7% contralateral strength preservation (Manca et al. meta-analysis).",
+    safety: "caution",
+    swaps: ["Hack Squat (Right)"],
+    visual: "     [=======]\n        /   \n     R /    \n    __/\n   |   \\\n   |  L \\",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Hack Squat (Right)": {
+    id: "hack_squat_right",
+    name: "Hack Squat (Right)",
+    requires: ["hacksquat"],
+    category: "legs",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 120,
+    setup: "Step into hack squat with RIGHT foot on platform. Left leg off to the side or hanging.",
+    execution: "Lower until just before 90\u00B0 hip flexion. Press back up through the heel.",
+    nwbCues: "Same 90\u00B0 hip flexion limit as leg press. Machine provides stability so you can focus on the right leg without balance concerns.",
+    why: "Squat-pattern stimulus without standing balance demands. Good complement to leg press.",
+    safety: "caution",
+    swaps: ["SL Leg Press (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "SL Leg Extension (Right)": {
+    id: "sl_leg_extension_right",
+    name: "SL Leg Extension (Right)",
+    requires: ["cables"],
+    category: "legs",
+    sets: [["4", "12-15"], ["4", "12-15"], ["4", "10-12"]],
+    rest: 90,
+    setup: "Sit in leg extension machine. Pad against RIGHT shin. Left leg off the machine.",
+    execution: "Extend knee to full lockout. 2-second SQUEEZE at top. 3-second eccentric lowering. Last set: DROP SET \u00D72.",
+    nwbCues: "Full lockout is safe here \u2014 it's open-chain, no hip compression. Go for the burn.",
+    why: "Quad isolation king. Drop sets force metabolic exhaustion for maximum growth stimulus.",
+    safety: "safe",
+    swaps: ["SL Leg Press (Right)"],
+    visual: "      O\n     /|\\_   __R(Pad)\n      |   \\/\n     / \\   \\\n    L   (Seat)",
+    machineVariants: [
+      {
+        id: "seated_machine",
+        label: "Seated Machine",
+        icon: "\u{1F9B5}",
+        description: "Standard pin-loaded or plate-loaded seated leg extension machine",
+        setupCues: [
+          "Adjust back pad so knees align with machine pivot point",
+          "Set shin pad just above ankle on RIGHT leg only",
+          "Left leg stays off the machine entirely",
+        ],
+      },
+      {
+        id: "ankle_weight_bench",
+        label: "Ankle Weight on Bench",
+        icon: "\u{1FA91}",
+        description: "Seated on a bench with an ankle weight strapped to the right ankle",
+        setupCues: [
+          "Strap ankle weight securely above right ankle",
+          "Sit on the edge of a bench with knees at 90\u00B0",
+          "Extend right leg to full lockout, squeeze quad at top",
+          "Good for home or when machine is unavailable",
+        ],
+      },
+      {
+        id: "band_seated",
+        label: "Band Seated",
+        icon: "\u{1F380}",
+        description: "Resistance band anchored behind you, looped around right ankle for extension",
+        setupCues: [
+          "Anchor band to a low fixed point behind you",
+          "Loop band around right ankle",
+          "Sit on a bench and extend right leg against band resistance",
+          "Band provides increasing resistance through the range",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "SL Glute Bridge (Right)": {
+    id: "sl_glute_bridge_right",
+    name: "SL Glute Bridge (Right)",
+    requires: ["mat"],
+    category: "legs",
+    sets: [["4", "12-15"], ["4", "12-15"], ["4", "10-12"]],
+    rest: 90,
+    setup: "Lie on back with RIGHT knee bent and foot flat. Left leg extended or bent with foot resting.",
+    execution: "Drive through right heel to lift hips. Squeeze glutes 2 seconds at top. Lower with control. Add dumbbell on hip in Weeks 3+.",
+    nwbCues: "Avoid over-arching lower back at top. Use hip power only. Left leg stays passive.",
+    why: "Unilateral glute strength with zero hip flexion demand. Safe and effective NWB exercise.",
+    safety: "safe",
+    swaps: ["SL Hip Thrust (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "SL Hip Thrust (Right)": {
+    id: "sl_hip_thrust_right",
+    name: "SL Hip Thrust (Right)",
+    requires: ["bench"],
+    category: "legs",
+    sets: [["3", "12"], ["4", "10-12"], ["4", "8-10"]],
+    rest: 120,
+    setup: "Shoulders on bench edge. RIGHT foot flat on floor. Left leg extended or resting.",
+    execution: "Drive through R heel to lift hips to full extension. Squeeze glutes hard at top. Chin tucked, ribs down.",
+    nwbCues: "Keep chin tucked and ribs down to prevent lumbar arching. Load with barbell or dumbbell across hips for progressive overload.",
+    why: "Superior glute isolation with peak tension at the top of the movement. Primary glute builder.",
+    safety: "safe",
+    swaps: ["SL Glute Bridge (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Prone Ham Curl (Right)": {
+    id: "prone_ham_curl_right",
+    name: "Prone Ham Curl (Right)",
+    requires: ["hamcurl"],
+    category: "legs",
+    sets: [["3", "12"], ["3", "10-12"], ["4", "8-10"]],
+    rest: 120,
+    setup: "Lie face-down on prone (lying) hamstring curl machine. RIGHT leg only. Left leg off the machine.",
+    execution: "3 seconds up, 1 second hold, 3 seconds down. Controlled eccentric for maximum muscle activation.",
+    nwbCues: "Prone position is preferred \u2014 no hip flexion involved. Left leg stays off the machine.",
+    why: "Slow eccentric loading builds hamstring strength at long muscle lengths. Prone keeps it NWB-simple.",
+    safety: "safe",
+    swaps: ["Stab Ball Ham Curl (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Stab Ball Ham Curl (Right)": {
+    id: "stab_ball_ham_curl_right",
+    name: "Stab Ball Ham Curl (Right)",
+    requires: ["stabball"],
+    category: "legs",
+    sets: [["3", "12-15"], ["3", "12-15"], ["3", "10-12"]],
+    rest: 90,
+    setup: "Lie on back. Place RIGHT heel on stability ball. Left leg bent with foot resting on floor.",
+    execution: "Bridge hips up, then curl the ball toward your glutes using your right heel. Extend back out. Slow and controlled.",
+    nwbCues: "Smoother contraction than heavy RDLs. Keep hips up throughout the set.",
+    why: "Excellent hamstring-glute connection exercise. Smooth contraction, zero spinal load.",
+    safety: "safe",
+    swaps: ["Prone Ham Curl (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Low-Box Step-Up (Right)": {
+    id: "low_box_step_up_right",
+    name: "Low-Box Step-Up (Right)",
+    requires: ["plyobox", "dumbbells"],
+    category: "legs",
+    sets: [["3", "10-12"], ["3", "10-12"], ["4", "6-8"]],
+    rest: 120,
+    setup: "Use a box BELOW knee height. Place RIGHT foot on top. Hold dumbbells at sides. Position near a wall or rack you can grab for balance if needed. Crutches nearby.",
+    execution: "Push through RIGHT heel to stand on box. Let left leg dangle behind you passively \u2014 dead weight. Slow, controlled descent back to floor, right leg lowering you down. Do NOT let left foot touch down first.",
+    nwbCues: "\u26A0\uFE0F TRANSITION RISK: This involves a standing balance on one leg. Keep hip flexion under 90\u00B0 \u2014 the low box ensures this. Do NOT hop or use left leg to push off. Pure right leg drive. Lean RIGHT before stepping up. Left leg is passive dead weight throughout \u2014 never bracing, stabilizing, or pushing. Have a support within arm\u2019s reach.",
+    why: "Functional strength and balance for right leg. Low-impact power development without plyometric shock.",
+    safety: "caution",
+    swaps: ["SL Leg Press (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Nordic Ham Curl": {
+    id: "nordic_ham_curl",
+    name: "Nordic Ham Curl",
+    requires: ["mat"],
+    category: "legs",
+    sets: [["3", "6"], ["3", "6"], ["3", "8"]],
+    rest: 120,
+    setup: "Kneel on a thick pad with your feet anchored (under a heavy dumbbell, bench, or have someone hold them). Right knee bears the load.",
+    execution: "Slowly lower your torso forward by extending at the knees \u2014 fight gravity all the way down. Catch yourself with hands. Push off hands to return to start.",
+    nwbCues: "Only 0-20\u00B0 of hip flexion throughout. Minimal hip involvement.",
+    why: "Gold standard for hamstring injury prevention. Eccentric strength at long muscle lengths.",
+    safety: "safe",
+    swaps: ["Prone Ham Curl (Right)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Standing Calf Raise (R)": {
+    id: "standing_calf_raise_r",
+    name: "Standing Calf Raise (R)",
+    requires: ["plyobox"],
+    category: "legs",
+    sets: [["4", "15-20"], ["4", "15-20"], ["4", "15-20"]],
+    rest: 60,
+    setup: "Stand on a step or platform edge with RIGHT foot only. Hold a rack or wall with BOTH hands for balance. Left leg hangs passively.",
+    execution: "Full ROM: deep stretch at bottom, peak contraction at top. Pause 1 second at top. Move vertically only.",
+    nwbCues: "Hold a stable support with both hands \u2014 single-leg balance on an elevated surface is a fall risk. Left leg hangs as dead weight. All force through right foot only. No lateral shifts.",
+    why: "Calf development for ankle stability and balance. Full ROM prevents tightness.",
+    safety: "safe",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Isometric Quad Sets (Left)": {
+    id: "isometric_quad_sets_left",
+    name: "Isometric Quad Sets (Left)",
+    requires: ["mat"],
+    category: "legs",
+    sets: [["3", "15\u00D75s"], ["3", "15\u00D75s"], ["3", "15\u00D75s"]],
+    rest: 30,
+    setup: "Sit or lie with LEFT leg straight on the ground.",
+    execution: "Tighten your left quad as hard as possible, pushing the back of your knee DOWN into the floor. Hold 5 seconds. Release. Repeat.",
+    nwbCues: "Focus purely on the muscle contraction \u2014 no hip movement whatsoever. This keeps neural pathways active without loading the fracture.",
+    why: "Prevents muscle atrophy in immobilized limb by maintaining neural drive. Zero joint stress.",
+    safety: "safe",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Ankle Pumps (Left)": {
+    id: "ankle_pumps_left",
+    name: "Ankle Pumps (Left)",
+    requires: [],
+    category: "legs",
+    sets: [["3", "20+alphabet"], ["3", "20+alphabet"], ["3", "20+alphabet"]],
+    rest: 0,
+    setup: "Lie or sit with LEFT leg extended. Can be done anywhere, anytime.",
+    execution: "Move ankle up and down through full range (20 pumps). Then trace the alphabet with your toes for ROM.",
+    nwbCues: "Perform FREQUENTLY throughout the day \u2014 not just during workouts. Critical for circulation.",
+    why: "Prevents DVT (blood clots). Maintains ankle range of motion. Do these constantly.",
+    safety: "safe",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Banded Clamshells": {
+    id: "banded_clamshells",
+    name: "Banded Clamshells",
+    requires: ["bands"],
+    category: "legs",
+    sets: [["3", "20/side"], ["3", "20/side"], ["3", "20/side"]],
+    rest: 60,
+    setup: "RIGHT SIDE (lie on LEFT side): Lie on your left side with knees bent ~45\u00B0 (keep hip flexion well under 90\u00B0). Band above knees. Right leg is the working leg on top. LEFT SIDE (lie on RIGHT side): Lie on your right side. Left leg is on top. Use a LIGHT band \u2014 this is gluteus medius isolation only, not a strength exercise for the left side.",
+    execution: "Open top knee like a clamshell while keeping feet together. Squeeze glute med at top. Lower slowly. This is HIP EXTERNAL ROTATION, not hip flexion \u2014 the iliopsoas is not involved.",
+    nwbCues: "Both sides are NWB-safe in the lying position. Left side: use light resistance and stop if you feel any pinch in the left hip crease (this would indicate hip flexor recruitment). Keep hip flexion angle mild (~45\u00B0). The motion is pure external rotation through the gluteus medius.",
+    why: "Gluteus medius maintenance for both legs. Prevents hip drop gait pattern when you return to walking.",
+    safety: "safe",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== CORE EXERCISES -- BLOCK 1: ANTI-EXTENSION ====================
+
+  "Forearm Plank Saw": {
+    id: "forearm_plank_saw",
+    name: "Forearm Plank Saw",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "4-4-0",
+    setup: "Forearm plank. RIGHT knee or foot as base (choose per amp level). Left leg extended behind, resting passively on mat.",
+    execution: "Rock forward past elbows, then backward \u2014 slow, controlled, 4-count each direction. Maintain rigid plank line. Never rest at either end \u2014 continuous tension.",
+    nwbCues: "Left leg is dead weight on the mat. If you feel your left hip flexor trying to stabilize, widen your right foot base. Exhale to brace.",
+    why: "Anti-extension under dynamic load. Time-based sets force sustained tension.",
+    safety: "safe",
+    swaps: ["Wheelbarrow Hold"],
+    amp: [
+      "BASE: Right knee down. Slow rocks, small range.",
+      "AMP 1: Right foot base. Full range forward/back.",
+      "AMP 2: Right foot base + 10lb plate on upper back. Full range, 4-count tempo. Expect failure around 30-35s initially.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Plank Knee Tuck (R only)": {
+    id: "plank_knee_tuck_r_only",
+    name: "Plank Knee Tuck (R only)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "4-4-5",
+    setup: "Forearm plank on right knee. Left leg extended behind on mat, completely passive.",
+    execution: "Draw RIGHT knee toward right elbow \u2014 4-count in, 5-second HOLD at peak contraction, 4-count return. Never touch knee to ground between reps. Continuous tension.",
+    nwbCues: "Only the RIGHT knee moves. Left leg stays dead on the mat the entire time. If left hip flexor engages, stop and reset position.",
+    why: "Unilateral flexion under anti-extension load. Your obliques and right hip flexor do all the work while your core fights extension.",
+    safety: "safe",
+    swaps: ["Slow Mountain Climber (R)"],
+    amp: [
+      "BASE: Right knee on pad, small range to elbow.",
+      "AMP 1: Right foot base, full range knee-to-elbow.",
+      "AMP 2: Right foot base + band around right foot for resistance. 5-second hold at peak. Expect failure around 35-40s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Wheelbarrow Hold": {
+    id: "wheelbarrow_hold",
+    name: "Wheelbarrow Hold",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "30s"], ["3", "45s"], ["4", "45s"]],
+    rest: 30,
+    tempo: "isometric",
+    setup: "High plank, hands on floor. Shift weight FORWARD until shoulders are well past wrists \u2014 like the start of a planche lean. Right knee or foot base.",
+    execution: "Hold. Fight the urge to sag or pike. Breathe. The further forward you shift, the harder it gets. Find your failure point and live there.",
+    nwbCues: "Left leg rests on mat behind you. This is pure anti-extension \u2014 your core fights gravity trying to hyperextend your spine. Zero hip flexor demand.",
+    why: "Isometric anti-extension at extreme lever arm. Longer hold = harder.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: [
+      "BASE: Right knee down, moderate forward shift.",
+      "AMP 1: Right foot base, aggressive forward shift past wrists.",
+      "AMP 2: Right foot base, max forward shift + 4-count slow weight shifts side to side. Expect failure around 25-30s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Spiderman Plank (R only)": {
+    id: "spiderman_plank_r_only",
+    name: "Spiderman Plank (R only)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["3", "60s"]],
+    rest: 30,
+    tempo: "4-4-3",
+    setup: "Forearm plank on right foot. Left leg extended behind on mat.",
+    execution: "Bring RIGHT knee to RIGHT elbow OUTSIDE the body \u2014 4-count out, 3-second hold, 4-count return. Hip opens laterally. Obliques fire hard.",
+    nwbCues: "Right side only. Left leg stays completely dead. Great for right hip mobility + oblique activation simultaneously.",
+    why: "Oblique-dominant plank variation with hip mobility on the good side.",
+    safety: "safe",
+    swaps: ["Plank Knee Tuck (R only)"],
+    amp: [
+      "BASE: Right knee base, small range.",
+      "AMP 1: Right foot base, full range knee-to-elbow.",
+      "AMP 2: Right foot base + 3-second hold at peak + band around right foot. Expect failure around 35-40s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Slow Mountain Climber (R)": {
+    id: "slow_mountain_climber_r",
+    name: "Slow Mountain Climber (R)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["3", "60s"]],
+    rest: 30,
+    tempo: "4-4-0",
+    setup: "High plank, hands on floor or parallettes. Right foot as base. Left leg extended on mat.",
+    execution: "Draw RIGHT knee toward chest \u2014 4-count in, 4-count out. No momentum. Never touch foot to ground between reps. Continuous tension on the core.",
+    nwbCues: "LEFT LEG STAYS COMPLETELY STILL. It rests on the mat and does not move. Only the right knee travels. If your left hip twitches, pause and exhale to reset.",
+    why: "Slow mountain climber \u2014 removes all momentum. At 4-4 tempo, 45 seconds is only ~5 reps.",
+    safety: "safe",
+    swaps: ["Plank Knee Tuck (R only)"],
+    amp: [
+      "BASE: Right knee base to start, climb to right foot as strength builds.",
+      "AMP 1: Right foot base + band around right foot.",
+      "AMP 2: Right foot base + band + 3-second hold at peak flexion. Expect failure around 30-35s (~4 reps).",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Dead Bug (R Leg Only)": {
+    id: "dead_bug_r_leg_only",
+    name: "Dead Bug (R Leg Only)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "4-4-3",
+    setup: "Lie on back. LEFT foot PLANTED on floor at all times \u2014 it never moves. Right leg up at 90\u00B0. Arms toward ceiling.",
+    execution: "Slowly lower RIGHT leg + LEFT arm toward floor \u2014 4-count down, 3-second hold 1 inch off floor, 4-count return. Press lower back INTO the mat throughout. Never let it arch.",
+    nwbCues: "Left foot stays planted \u2014 this eliminates left iliopsoas entirely. The low back press is everything: if your back arches off the mat, you've gone too far.",
+    why: "Safe deep core (TVA + rectus) activation without loading the injured hip flexor. The 3-second hold at bottom maximizes tension.",
+    safety: "safe",
+    swaps: ["Hollow Body Hold"],
+    amp: [
+      "BASE: Bodyweight only, right leg extends to 45\u00B0.",
+      "AMP 1: Band around right foot + 5lb weight in left hand. Full extension.",
+      "AMP 2: Band + weight + single-arm overhead hold (left arm only, contralateral to right leg) + 4-4-5 tempo. Expect failure around 35-40s (~3 reps).",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Hollow Body Hold": {
+    id: "hollow_body_hold",
+    name: "Hollow Body Hold",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "30s"], ["3", "45s"], ["4", "45s"]],
+    rest: 30,
+    tempo: "isometric",
+    setup: "Lie on back. Right leg extended straight, hovering 6 inches off floor. LEFT leg bent with foot on floor (passive \u2014 do NOT extend it). Arms overhead.",
+    execution: "Hold. Press lower back flat into mat. Think about pulling ribs toward pelvis. Breathe steadily.",
+    nwbCues: "Left leg stays bent with foot on floor. Bilateral hollow body would fire left iliopsoas to hold left leg up \u2014 not safe. This asymmetric version isolates the right side + core.",
+    why: "Gymnastics-grade anti-extension isometric. The asymmetric position is actually harder because your core fights rotation too.",
+    safety: "safe",
+    swaps: ["Dead Bug (R Leg Only)"],
+    amp: [
+      "BASE: Arms by ears, right leg at 45\u00B0.",
+      "AMP 1: Arms overhead holding 5-10lb plate. Right leg lower (harder).",
+      "AMP 2: Plate overhead + slow right-leg flutter (6-inch range, 4-count up/down). Left leg stays bent and still. Expect failure around 25-30s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Body Saw (Sliders)": {
+    id: "body_saw_sliders",
+    name: "Body Saw (Sliders)",
+    requires: ["slider", "mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["3", "60s"]],
+    rest: 30,
+    tempo: "4-4-0",
+    setup: "Forearms on sliders (or towels on hard floor). Right knee or foot base. Left leg extended behind on mat.",
+    execution: "Push forearms forward, extending body long \u2014 4-count forward, 4-count pull back. The longer you extend, the harder the anti-extension demand. Never fully return to easy position.",
+    nwbCues: "Left leg passive on mat. At full extension your core is fighting extreme anti-extension force. Exhale hard to brace. If back arches, shorten range.",
+    why: "One of the hardest plank variations. The slider removes friction so your core does all the stabilization work.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: [
+      "BASE: Right knee base, small range.",
+      "AMP 1: Right foot base, full range extension.",
+      "AMP 2: Right foot base, full range + 3-second hold at max extension. Expect failure around 30-35s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== CORE EXERCISES -- BLOCK 2: ANTI-ROTATION ====================
+
+  "Pallof Press (Seated)": {
+    id: "pallof_press_seated",
+    name: "Pallof Press (Seated)",
+    requires: ["bands", "bench"],
+    category: "core",
+    sets: [["3", "45s/side"], ["3", "60s/side"], ["4", "60s/side"]],
+    rest: 30,
+    tempo: "4-4-3",
+    setup: "Sit on bench, feet flat (right foot active, left foot resting). Band anchored at chest height to your side. Hold band at chest with both hands.",
+    execution: "Press hands straight out \u2014 4-count press, 3-second HOLD at full extension, 4-count return. The band tries to rotate you. FIGHT IT. Do not let your torso turn even 1 degree.",
+    nwbCues: "Seated = zero femoral load. The anti-rotation demand is all core. If you feel left hip crease engaging to stabilize, go lighter. Both sides: right-side anchor works left obliques, left-side anchor works right obliques.",
+    why: "Gold standard anti-rotation. Seated version is perfect for NWB. Slow tempo with hold increases difficulty.",
+    safety: "safe",
+    swaps: ["Pallof Overhead Reach"],
+    amp: [
+      "BASE: Light band, press to chest distance.",
+      "AMP 1: Medium band + 3-second hold at extension.",
+      "AMP 2: Heavy band + overhead reach from extended position (press out, then reach UP while extended \u2014 anti-rotation + anti-extension combined). Hold 3 seconds overhead. Expect failure around 35-40s/side.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Pallof Overhead Reach": {
+    id: "pallof_overhead_reach",
+    name: "Pallof Overhead Reach",
+    requires: ["bands", "bench"],
+    category: "core",
+    sets: [["3", "45s/side"], ["3", "60s/side"], ["3", "60s/side"]],
+    rest: 30,
+    tempo: "4-4-3",
+    setup: "Same seated Pallof position. Band anchored at side, hands at chest.",
+    execution: "Press out to full extension, then slowly raise hands OVERHEAD \u2014 4-count up, 3-second hold overhead, 4-count down to chest level, 4-count return to chest. The overhead position combines anti-rotation with anti-extension.",
+    nwbCues: "This one recruits more core than standard Pallof because the overhead lever arm is enormous. Go lighter than you think. Seated = NWB safe.",
+    why: "Pallof progression. The overhead reach doubles the anti-movement demand. If the band feels easy, go heavier.",
+    safety: "safe",
+    swaps: ["Pallof Press (Seated)"],
+    amp: [
+      "BASE: Light band, partial overhead reach.",
+      "AMP 1: Medium band, full overhead reach + 3-second hold.",
+      "AMP 2: Heavy band, full overhead reach + 5-second hold + eyes closed. Expect failure around 30-35s/side.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Bird-Dog (Prone Bench)": {
+    id: "bird_dog_prone_bench",
+    name: "Bird-Dog (Prone Bench)",
+    requires: ["bench"],
+    category: "core",
+    sets: [["3", "8/side"], ["3", "10/side"], ["4", "10/side"]],
+    rest: 45,
+    tempo: "4-4-5",
+    setup: "Lie face-down on a bench, torso supported. Hips at bench edge so legs hang free. Hold bench with one hand. DEFAULT: prone bench modification \u2014 NOT quadruped. Quadruped version loads left femoral neck at ~90\u00B0 hip flexion.",
+    execution: "Extend RIGHT leg straight back (hip extension via glutes) + LEFT arm straight forward \u2014 4-count up, 5-second HOLD at top, 4-count lower. Keep hips level. Alternate sides: LEFT leg stays passive/hanging when it's not the working leg.",
+    nwbCues: "Prone bench eliminates femoral neck loading. Left leg HANGS freely when not working. When extending left arm, the anti-rotation demand is high \u2014 fight the urge to rotate. Standard quadruped bird-dog needs PT clearance (left knee at 90\u00B0 hip flexion = FAI limit).",
+    why: "McGill Big 3 exercise made NWB-safe. Prone bench version is actually harder because you fight gravity without the ground's help.",
+    safety: "safe",
+    swaps: ["Pallof Press (Seated)"],
+    amp: [
+      "BASE: Bodyweight, partial range.",
+      "AMP 1: Ankle weight on right leg + 3-5lb dumbbell in left hand.",
+      "AMP 2: Ankle weight + dumbbell + 4-4-5 tempo (5-second hold at top). Each rep takes 13+ seconds. Expect failure around rep 6-8.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== CORE EXERCISES -- BLOCK 3: ANTI-LATERAL-FLEXION ====================
+
+  "Side Plank (R Side Down)": {
+    id: "side_plank_r_side_down",
+    name: "Side Plank (R Side Down)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "isometric / 4-4 dips",
+    setup: "RIGHT side down, right elbow under shoulder. RIGHT KNEE (base) or RIGHT FOOT (amp). Left leg stacked on top or resting on floor in front.",
+    execution: "Lift hips until body forms straight line. HOLD. At AMP 2: add 4-count hip dips \u2014 lower hip toward floor, drive back up. Never touch floor. Continuous tension.",
+    nwbCues: "Right femur takes the load here \u2014 which is safe (it's the uninjured side). Left leg rests passively on top or on floor. This is the GOOD side where we can load normally.",
+    why: "McGill Big 3. Right side down directly loads right obliques and QL. The gold standard anti-lateral-flexion exercise.",
+    safety: "safe",
+    swaps: [],
+    amp: [
+      "BASE: Right knee down, isometric hold.",
+      "AMP 1: Right FOOT base, isometric hold + top arm reaches to ceiling.",
+      "AMP 2: Right foot + top arm holding 5-10lb weight overhead + 4-count hip dips. Expect failure around 30-40s.",
+    ],
+    diagram: "sideplank",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Side Plank (L Oblique Bias \u2014 R Side Down)": {
+    id: "side_plank_l_oblique_bias_r_side_down",
+    name: "Side Plank (L Oblique Bias \u2014 R Side Down)",
+    requires: ["mat", "bands"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "4-4-3",
+    setup: "Stay RIGHT side down (we CANNOT load the left femur by going left-side-down). This variation biases LEFT obliques through overhead reach and rotation.",
+    execution: "From right-side-down side plank: reach TOP (left) arm overhead toward the floor beyond your head \u2014 4-count reach, 3-second hold at max stretch, 4-count return. Your left obliques work eccentrically to control the reach and concentrically to pull back.",
+    nwbCues: "LEFT femur stays completely unloaded. Right side bears all the weight. The left oblique bias comes from the overhead reach and gravity pulling your top arm. You can also add a Pallof rotation hold from this position.",
+    why: "Solves the 'can't do left side plank' problem. Right-side-down position with left-arm overhead reach creates massive left oblique demand without loading left femur.",
+    safety: "safe",
+    swaps: ["Pallof Press (Seated)"],
+    amp: [
+      "BASE: Right knee down, left arm reach overhead (no weight).",
+      "AMP 1: Right foot base, left arm holding 3-5lb weight, slow reach.",
+      "AMP 2: Right foot base, weight overhead reach + Pallof band in top hand for added anti-rotation. Expect failure around 35-40s.",
+    ],
+    diagram: "sideplank",
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Suitcase Hold (Seated)": {
+    id: "suitcase_hold_seated",
+    name: "Suitcase Hold (Seated)",
+    requires: ["dumbbells", "bench"],
+    category: "core",
+    sets: [["3", "45s/side"], ["3", "60s/side"], ["3", "60s/side"]],
+    rest: 30,
+    tempo: "isometric",
+    setup: "Sit on bench, spine tall. Hold one dumbbell at your side in one hand, arm straight. Gravity pulls you toward the weight \u2014 fight it.",
+    execution: "HOLD. Sit perfectly straight. Do not lean toward or away from the weight. Breathe. Switch sides. Your obliques and QL fire isometrically to prevent lateral flexion.",
+    nwbCues: "Seated = zero femoral load. Pure anti-lateral-flexion. If you feel any hip crease tension, go lighter.",
+    why: "Simple but effective. Isometric anti-lateral-flexion under load. Scale weight up as 60 seconds gets easy.",
+    safety: "safe",
+    swaps: ["Side Plank (R Side Down)"],
+    amp: [
+      "BASE: 15-20lb, 45 seconds.",
+      "AMP 1: 25-30lb, 60 seconds.",
+      "AMP 2: 30-40lb, 60 seconds + slow overhead press (5 reps) while holding the suitcase weight in the other hand. Expect failure around 40-50s/side.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== CORE EXERCISES -- BLOCK 4: ROTATION + INTEGRATED ====================
+
+  "Russian Twist (Seated Bench)": {
+    id: "russian_twist_seated_bench",
+    name: "Russian Twist (Seated Bench)",
+    requires: ["bench", "dumbbells"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["3", "60s"]],
+    rest: 30,
+    tempo: "4-4-0",
+    setup: "Sit on bench, feet off the ground or right foot lightly anchoring. Left leg hangs passively or rests on bench. Lean back slightly to engage core. Hold weight at chest.",
+    execution: "Rotate torso LEFT, then RIGHT \u2014 4-count each direction. Full rotation through thoracic spine. DO NOT rush. The slow tempo removes all momentum and forces your obliques to control the entire movement.",
+    nwbCues: "Left leg stays passive \u2014 does not rotate with you. Only your torso and arms move. If left hip crease pinches during rotation, reduce lean-back angle.",
+    why: "Classic rotation exercise, now unlocked. At 4-count tempo, this is nothing like fast momentum-driven Russian twists. Your obliques will feel every degree of rotation.",
+    safety: "safe",
+    swaps: ["Cable Woodchop (Seated)"],
+    amp: [
+      "BASE: 5-10lb weight, moderate lean.",
+      "AMP 1: 10-15lb, deeper lean + feet fully off floor.",
+      "AMP 2: 15-20lb + feet off floor + 3-second hold at each end of rotation. Expect failure around 35-45s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Cable Woodchop (Seated)": {
+    id: "cable_woodchop_seated",
+    name: "Cable Woodchop (Seated)",
+    requires: ["cables", "bench"],
+    category: "core",
+    sets: [["3", "10/side"], ["3", "12/side"], ["4", "12/side"]],
+    rest: 45,
+    tempo: "4-4-0",
+    setup: "Sit on bench sideways to cable machine. Cable at high position (high-to-low chop) or low position (low-to-high chop). Both hands on handle. Right foot can anchor, left leg passive.",
+    execution: "Pull cable diagonally across body with ROTATION \u2014 4-count chop, 4-count return. Control every inch. The weight should be challenging but not so heavy that you lurch.",
+    nwbCues: "Seated = NWB safe. Rotation happens through thoracic spine. If left hip engages to stabilize, go lighter or widen your base.",
+    why: "Loaded rotation with eccentric control. The 4-count return is where the real work happens \u2014 your obliques decelerate the load.",
+    safety: "safe",
+    swaps: ["Russian Twist (Seated Bench)"],
+    amp: [
+      "BASE: Light weight, high-to-low only.",
+      "AMP 1: Moderate weight, both high-to-low and low-to-high.",
+      "AMP 2: Moderate weight + 3-second hold at end of chop + slow return. Continuous tension \u2014 don't let the stack touch between reps. Expect failure around rep 8-10/side.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Bicycle Crunch (R Leg Only)": {
+    id: "bicycle_crunch_r_leg_only",
+    name: "Bicycle Crunch (R Leg Only)",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["3", "60s"]],
+    rest: 30,
+    tempo: "4-4-0",
+    setup: "Lie on back, hands behind head. LEFT FOOT STAYS PLANTED on floor \u2014 it never moves. Right leg up at 90\u00B0.",
+    execution: "Bring RIGHT knee toward LEFT elbow while rotating torso \u2014 4-count in, 4-count extend right leg out. Controlled rotation through the trunk. The left foot stays planted and the left leg stays still.",
+    nwbCues: "Left foot PLANTED = left iliopsoas stays silent. Only the right leg cycles. The rotation comes from your thoracic spine and obliques, not from hip flexor momentum.",
+    why: "Combines spinal rotation with anti-extension. At slow tempo, dramatically harder than fast bicycle crunches. Rotation is now allowed \u2014 use it.",
+    safety: "safe",
+    swaps: ["Russian Twist (Seated Bench)"],
+    amp: [
+      "BASE: Bodyweight, right leg extends to 45\u00B0 only.",
+      "AMP 1: Right leg full extension (nearly straight) + 3-second hold at peak rotation.",
+      "AMP 2: Ankle weight on right leg + full extension + 3-second hold. Expect failure around 35-40s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Stir the Pot": {
+    id: "stir_the_pot",
+    name: "Stir the Pot",
+    requires: ["stabball"],
+    category: "core",
+    sets: [["3", "30s/dir"], ["3", "45s/dir"], ["3", "45s/dir"]],
+    rest: 30,
+    tempo: "slow continuous",
+    setup: "Forearms on stability ball. Right foot or knee on ground. Left leg extended behind on mat, passive.",
+    execution: "Make slow circles with your forearms \u2014 clockwise, then counter-clockwise. The ball creates instability that demands constant anti-rotation AND anti-extension. Make the circles as large as you can control.",
+    nwbCues: "Left leg rests on mat. If it starts to tense or stabilize, reposition. Anti-rotation + anti-extension + anti-lateral-flexion all at once \u2014 the ultimate integrated core challenge.",
+    why: "One of the most demanding plank variations. The ball instability forces constant anti-rotation + anti-extension + anti-lateral-flexion.",
+    safety: "safe",
+    swaps: ["Forearm Plank Saw"],
+    amp: [
+      "BASE: Right knee base, small circles.",
+      "AMP 1: Right foot base, medium circles.",
+      "AMP 2: Right foot base, large circles + 3-second hold at the 12, 3, 6, 9 o'clock positions. Expect failure around 25-30s/direction.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "McGill Curl-Up": {
+    id: "mcgill_curl_up",
+    name: "McGill Curl-Up",
+    requires: ["mat"],
+    category: "core",
+    sets: [["3", "45s"], ["3", "60s"], ["4", "60s"]],
+    rest: 30,
+    tempo: "4-0-5",
+    setup: "Lie on back. Hands under lumbar curve as a monitoring system. RIGHT knee bent, left leg straight on floor.",
+    execution: "Lift ONLY head and shoulder blades 2-3 inches off floor \u2014 4-count up, 5-second HOLD, lower. Your lumbar spine stays in its natural arch throughout. If the arch disappears into your hands, you went too high.",
+    nwbCues: "Left leg stays straight and passive on the floor. This is NOT a crunch \u2014 the range of motion is tiny. The hold at the top is where the work happens.",
+    why: "McGill Big 3. The only safe upper-ab exercise that preserves spinal curves. 5-second holds increase difficulty significantly.",
+    safety: "safe",
+    swaps: ["Hollow Body Hold"],
+    amp: [
+      "BASE: Bodyweight, 3-second hold.",
+      "AMP 1: Arms crossed holding 5lb plate on chest, 5-second hold.",
+      "AMP 2: Arms extended toward ceiling holding plate, 5-second hold. Expect failure around 35-45s.",
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== CARDIO EXERCISES ====================
+
+  "Arm Ergometer": {
+    id: "arm_ergometer",
+    name: "Arm Ergometer",
+    requires: ["armBike"],
+    category: "cardio",
+    sets: [["1", "20-30 min"], ["1", "25-30 min"], ["1", "30 min"]],
+    rest: 0,
+    setup: "Sit at arm bike with slight bend in elbows at full extension. Adjust seat height so you're comfortable.",
+    execution: "Pedal at steady pace. Upright posture. For HIIT: alternate 30s all-out / 30s recovery for 20 minutes.",
+    nwbCues: "Zero hip involvement. Gold standard NWB cardio. AAPM&R recommended.",
+    why: "Highest safety rating for NWB cardio. Maintains VO2 max without any lower body loading.",
+    safety: "safe",
+    tier: 1,
+    swaps: ["Seated SkiErg", "Arms-Only Echo Bike"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated Battle Ropes": {
+    id: "seated_battle_ropes",
+    name: "Seated Battle Ropes",
+    requires: ["battleRopes"],
+    category: "cardio",
+    sets: [["8", "20s on/10s off"], ["8", "20s on/10s off"], ["8", "20s on/10s off"]],
+    rest: 60,
+    setup: "Sit on a STURDY BENCH or CHAIR facing the anchor point (NOT on the floor \u2014 floor V-sit requires hip flexor activation to maintain position, which loads the femoral neck). Sit tall with right foot flat on the ground for stability, left foot resting passively.",
+    execution: "ALTERNATING WAVES: Rapid up-and-down arm motion. T-WAVES: Arms lateral, tight rapid waves. Protocol: Tabata \u2014 20s max effort / 10s rest \u00D7 8 rounds. Keep torso upright \u2014 do NOT lean back into a V-sit.",
+    nwbCues: "\u26A0\uFE0F Do NOT use a V-sit or floor-sit position \u2014 both recruit the iliopsoas to stabilize the trunk. Bench/chair sitting eliminates hip flexor demand entirely. Core still works in overdrive to stabilize against rope force. If you feel hip crease engagement, sit more upright.",
+    why: "Savage anaerobic demand. Burns 10-12 cal/min. Core works in overdrive to stabilize against rope force.",
+    safety: "safe",
+    tier: 1,
+    swaps: ["Arm Ergometer"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Seated SkiErg": {
+    id: "seated_skierg",
+    name: "Seated SkiErg",
+    requires: ["skierg"],
+    category: "cardio",
+    sets: [["1", "20 min"], ["1", "25 min"], ["1", "30 min"]],
+    rest: 0,
+    setup: "Pull a plyometric box or bench up to the SkiErg. Sit directly under the handles. If handles bottom out, use a higher box.",
+    execution: "Arms extended overhead. Violent downward contraction using core crunch + lat pull. Handles past hips. Protocol: 4-3-2-1 Descending Intervals (4min moderate \u2192 3min hard \u2192 2min very hard \u2192 1min all-out \u2192 2min rest \u2192 repeat reverse).",
+    nwbCues: "Focus on ARM pull rather than spinal crunch. Keep hips stable in the seat.",
+    why: "Upper-body + core cardiovascular stimulus. Burns 8-12 cal/min seated. Air resistance scales infinitely with effort.",
+    safety: "safe",
+    tier: 1,
+    swaps: ["Arm Ergometer"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Arms-Only Echo Bike": {
+    id: "arms_only_echo_bike",
+    name: "Arms-Only Echo Bike",
+    requires: ["echoBike"],
+    category: "cardio",
+    sets: [["1", "20-30 min"], ["1", "25-30 min"], ["1", "30 min"]],
+    rest: 0,
+    setup: "Sit on the echo/assault bike. Feet on pegs (not pedals). Grab the handles.",
+    execution: "Push and pull the handles using only your arms. Fan resistance is self-regulating and unlimited.",
+    nwbCues: "Feet rest on pegs \u2014 zero leg involvement. Arms-only output reaches 8-12 cal/min for a strong athlete.",
+    why: "Self-regulating resistance. Great for intervals or steady state. No impact.",
+    safety: "safe",
+    tier: 1,
+    swaps: ["Arm Ergometer", "Seated SkiErg"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "SL Slider Row": {
+    id: "sl_slider_row",
+    name: "SL Slider Row",
+    requires: ["rower", "slider"],
+    category: "cardio",
+    sets: [["1", "10-20 \u00D7 200m"], ["1", "10-20 \u00D7 200m"], ["1", "10-20 \u00D7 200m"]],
+    rest: 30,
+    setup: "Strap RIGHT foot into ergometer footplate. Left foot on a FURNITURE SLIDER on the floor next to the rail. Left leg glides passively \u2014 zero push force.",
+    execution: "Drive explosively through RIGHT foot only. Left leg slides back frictionlessly on the slider. 200m sprints with 30s rest between. 10-20 rounds.",
+    nwbCues: "Furniture slider preferred over skateboard \u2014 won't roll away. Left leg is PASSIVE \u2014 it glides along with zero drive force. If you feel any left hip engagement, check that the slider is frictionless. Asymmetric drive creates massive anti-rotational core demand. Keep torso straight. Exhale before each drive phase.",
+    why: "Combines right-leg cross-education training with intense cardio. Anti-rotational core work built in.",
+    safety: "caution",
+    tier: 1,
+    swaps: ["Arm Ergometer"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  // ==================== RECOVERY EXERCISES ====================
+
+  "Upper Body Stretching": {
+    id: "upper_body_stretching",
+    name: "Upper Body Stretching",
+    requires: [],
+    category: "recovery",
+    sets: [["1", "10 min"], ["1", "10 min"], ["1", "10 min"]],
+    rest: 0,
+    setup: "Seated or standing on R leg. Focus on chest, lats, and shoulders.",
+    execution: "Gentle stretches held 20-30 seconds. Doorway pec stretch. Lat hang. Shoulder cross-body stretch.",
+    nwbCues: "CAUTION: NO hamstring stretching allowed. NO deep hip flexion stretches. Upper body only.",
+    why: "Relieves tension from crutching. Maintains range of motion in upper body.",
+    safety: "caution",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "T-Spine Mobility": {
+    id: "t_spine_mobility",
+    name: "T-Spine Mobility",
+    requires: ["mat"],
+    category: "recovery",
+    sets: [["1", "5 min"], ["1", "5 min"], ["1", "5 min"]],
+    rest: 0,
+    setup: "Quadruped (hands and knees) or seated in a chair.",
+    execution: "Cat-cow focusing on UPPER back only. T-spine rotation: thread one arm under the other, rotate upper back, return.",
+    nwbCues: "Keep hips and lumbar spine still. All movement comes from thoracic spine (mid-back).",
+    why: "Prevents stiffness in mid-back. Improves overhead pressing and pulling form.",
+    safety: "safe",
+    swaps: [],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+};
+
+// ===== WORKOUT STRUCTURE =====
+
+export const WORKOUTS: Record<string, Workout> = {
+  "Push A": {
+    title: "Push A \u2014 Heavy Strength",
+    icon: "\u{1F4AA}",
+    color: "#38bdf8",
+    hevy: "https://hevy.com/routine/T2lMXhz4NFS",
+    exercises: [
+      "Barbell Floor Press",
+      "Seated DB OH Press",
+      "Incline DB Press + Lat Raises",
+      "Lying Skull Crushers",
+      "Pseudo Planche Push-Up",
+      "McGill Curl-Up",
+    ],
+    removed: [
+      { name: "Standing OHP", reason: "Requires bilateral stance" },
+      { name: "Dips (freestanding)", reason: "Lower body swing risk" },
+    ],
+  },
+  "Push B": {
+    title: "Push B \u2014 Volume / Hypertrophy",
+    icon: "\u{1F4AA}",
+    color: "#38bdf8",
+    hevy: "https://hevy.com/routine/j0XrGQzMyF1",
+    exercises: [
+      "DB Floor Press",
+      "Mechanical Drop Set (Press)",
+      "Landmine Press (seated)",
+      "Cable Chest Fly",
+      "Tricep Rope Pushdown",
+      "Parallette L-Sit",
+      "Side Plank (R Side Down)",
+    ],
+    removed: [],
+  },
+  "Pull A": {
+    title: "Pull A \u2014 Heavy Strength",
+    icon: "\u{1F517}",
+    color: "#a78bfa",
+    hevy: "https://hevy.com/routine/c91UqmMdwz7",
+    exercises: [
+      "Finger-Assist One-Arm Pull-Up",
+      "Lat Pulldown (Wide)",
+      "Chest-Supported DB Row",
+      "Seated Cable Row",
+      "Seated Face Pulls",
+      "Preacher Curls",
+      "Pallof Press (Seated)",
+    ],
+    removed: [
+      {
+        name: "Bent-Over Row",
+        reason:
+          "Unsupported spinal position \u2014 use chest-supported rows instead",
+      },
+    ],
+  },
+  "Pull B": {
+    title: "Pull B \u2014 Volume / Density",
+    icon: "\u{1F517}",
+    color: "#a78bfa",
+    hevy: "https://hevy.com/routine/J1rggKx4PIk",
+    exercises: [
+      "Neutral Grip Pulldown",
+      "Mechanical Drop Set (Pull)",
+      "One-Arm Cable Row",
+      "Reverse Fly",
+      "Hammer Curls",
+      "Incline DB Curl",
+      "Bird-Dog (Prone Bench)",
+    ],
+    removed: [],
+  },
+  "Legs A": {
+    title: "Legs A \u2014 Quad/Glute (Cross-Ed)",
+    icon: "\u{1F9B5}",
+    color: "#10b981",
+    hevy: "https://hevy.com/routine/FKCWOPCUE4H",
+    exercises: [
+      "SL Leg Press (Right)",
+      "SL Leg Extension (Right)",
+      "SL Glute Bridge (Right)",
+      "Banded Clamshells",
+      "Isometric Quad Sets (Left)",
+      "Ankle Pumps (Left)",
+      "Dead Bug (R Leg Only)",
+    ],
+    removed: [
+      { name: "Pistol Squats", reason: "Deep hip flexion damages labrum" },
+      {
+        name: "Bulgarian Split Squat",
+        reason: "Exceeds 90\u00B0 flexion limit",
+      },
+    ],
+  },
+  "Legs B": {
+    title: "Legs B \u2014 Posterior Chain",
+    icon: "\u{1F9B5}",
+    color: "#10b981",
+    hevy: "https://hevy.com/routine/s5QsLGXsVAy",
+    exercises: [
+      "Low-Box Step-Up (Right)",
+      "SL Hip Thrust (Right)",
+      "Prone Ham Curl (Right)",
+      "Nordic Ham Curl",
+      "Standing Calf Raise (R)",
+      "Stir the Pot",
+    ],
+    removed: [
+      {
+        name: "Seated Ham Curl",
+        reason: "Compresses ischial tuberosity (tendinopathy)",
+      },
+      {
+        name: "Deep RDLs",
+        reason: "Violent eccentric load on tendinosis",
+      },
+    ],
+  },
+  Recovery: {
+    title: "Active Recovery (Sunday)",
+    icon: "\u{1F9D8}",
+    color: "#64748b",
+    exercises: [
+      "Arm Ergometer",
+      "Upper Body Stretching",
+      "T-Spine Mobility",
+      "Isometric Quad Sets (Left)",
+      "Ankle Pumps (Left)",
+    ],
+    removed: [],
+  },
+};
+
+// ===== CORE FINISHER RECOMMENDATIONS =====
+
+export const CORE_FINISHERS: Record<string, string[]> = {
+  "Push A": ["Forearm Plank Saw", "Pallof Press (Seated)"],
+  "Push B": ["Dead Bug (R Leg Only)", "Bird-Dog (Prone Bench)"],
+  "Pull A": ["Side Plank (R Side Down)", "Russian Twist (Seated Bench)"],
+  "Pull B": ["Suitcase Hold (Seated)", "McGill Curl-Up"],
+  "Legs A": [
+    "Hollow Body Hold",
+    "Side Plank (L Oblique Bias \u2014 R Side Down)",
+  ],
+  "Legs B": ["Wheelbarrow Hold", "Bicycle Crunch (R Leg Only)"],
+};
+
+// ===== WEEKLY SCHEDULE =====
+
+export const SCHED: ScheduleDay[] = [
+  { d: "Mon", t: "Push A", i: "\u{1F4AA}", c: "#38bdf8" },
+  { d: "Tue", t: "Pull A", i: "\u{1F517}", c: "#a78bfa" },
+  { d: "Wed", t: "Legs A", i: "\u{1F9B5}", c: "#10b981" },
+  { d: "Thu", t: "Push B", i: "\u{1F4AA}", c: "#38bdf8" },
+  { d: "Fri", t: "Pull B", i: "\u{1F517}", c: "#a78bfa" },
+  { d: "Sat", t: "Legs B", i: "\u{1F9B5}", c: "#10b981" },
+  { d: "Sun", t: "Recovery", i: "\u{1F9D8}", c: "#64748b" },
+];
+
+// ===== TRAINING PHASES =====
+
+export const PHASES: Phase[] = [
+  {
+    weeks: "1-2",
+    name: "Foundation",
+    color: "#38bdf8",
+    desc: "Adaptation phase. Higher reps, learn safe patterns.",
+  },
+  {
+    weeks: "3-4",
+    name: "Build",
+    color: "#a78bfa",
+    desc: "Increase load. 4-sec eccentrics. Add drop sets & rest-pause.",
+  },
+  {
+    weeks: "5-6",
+    name: "Peak",
+    color: "#f97316",
+    desc: "Maximum safe output. Heavy singles. Pre-weight-bearing.",
+  },
+];

@@ -43,3 +43,12 @@ screenshot-*.png
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# backup files from migration
+*.bak
+
+# gemini workspace
+gemini-workspace/
+
+# nanobanana
+nanobanana-output/
