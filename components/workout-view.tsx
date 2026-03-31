@@ -15,6 +15,8 @@ import {
   SUPPLEMENT_CORE,
   EQ_VARIANTS,
   CABLE_SUPERSET,
+  EQUIP_TO_NEARBY,
+  NEARBY_SUPERSETS,
   type SupersetInfo,
 } from "@/lib/supplements";
 import Section from "@/components/section";
@@ -489,22 +491,31 @@ export default function WorkoutView() {
             />
           </div>
         )}
-        {expandedEx[name] && (
-          <div className="px-3 pb-3">
-            <NearbyPicker
-              selected={nearbySelections[name] ?? []}
-              onToggle={(id) =>
-                setNearbySelections((prev) => {
-                  const current = prev[name] ?? [];
-                  const next = current.includes(id)
-                    ? current.filter((x) => x !== id)
-                    : [...current, id];
-                  return { ...prev, [name]: next };
-                })
-              }
-            />
-          </div>
-        )}
+        {expandedEx[name] && (() => {
+          const exData = EX[name];
+          const inUseIds = exData
+            ? exData.requires
+                .map((r) => EQUIP_TO_NEARBY[r])
+                .filter(Boolean)
+            : [];
+          return (
+            <div className="px-3 pb-3">
+              <NearbyPicker
+                selected={nearbySelections[name] ?? []}
+                inUse={inUseIds}
+                onToggle={(id) =>
+                  setNearbySelections((prev) => {
+                    const current = prev[name] ?? [];
+                    const next = current.includes(id)
+                      ? current.filter((x) => x !== id)
+                      : [...current, id];
+                    return { ...prev, [name]: next };
+                  })
+                }
+              />
+            </div>
+          );
+        })()}
       </div>
     );
   }
@@ -856,22 +867,92 @@ export default function WorkoutView() {
                 </div>
               )}
               {/* Nearby picker */}
-              {isExp && (
-                <div className="px-3 pb-3">
-                  <NearbyPicker
-                    selected={nearbySelections[exName] ?? []}
-                    onToggle={(id) =>
-                      setNearbySelections((prev) => {
-                        const current = prev[exName] ?? [];
-                        const next = current.includes(id)
-                          ? current.filter((x) => x !== id)
-                          : [...current, id];
-                        return { ...prev, [exName]: next };
-                      })
-                    }
-                  />
-                </div>
-              )}
+              {isExp && (() => {
+                const exData = EX[exName];
+                const inUseIds = exData
+                  ? exData.requires
+                      .map((r) => EQUIP_TO_NEARBY[r])
+                      .filter(Boolean)
+                  : [];
+                const allNearby = [
+                  ...new Set([
+                    ...inUseIds,
+                    ...(nearbySelections[exName] ?? []),
+                  ]),
+                ];
+                const nearbySupersets = supplementToggles.leftLeg
+                  ? NEARBY_SUPERSETS.filter(
+                      (ns) =>
+                        allNearby.includes(ns.nearbyId) &&
+                        !inUseIds.includes(ns.nearbyId) &&
+                        !ssInfo // don't duplicate if we already have an equipment-specific superset
+                    )
+                  : [];
+                return (
+                  <div className="px-3 pb-3">
+                    <NearbyPicker
+                      selected={nearbySelections[exName] ?? []}
+                      inUse={inUseIds}
+                      onToggle={(id) =>
+                        setNearbySelections((prev) => {
+                          const current = prev[exName] ?? [];
+                          const next = current.includes(id)
+                            ? current.filter((x) => x !== id)
+                            : [...current, id];
+                          return { ...prev, [exName]: next };
+                        })
+                      }
+                    />
+                    {nearbySupersets.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {nearbySupersets.map((ns) => (
+                          <div
+                            key={ns.nearbyId}
+                            className="rounded-lg"
+                            style={{
+                              padding: "8px 10px",
+                              background: "#14b8a60d",
+                              border: "1px solid #14b8a633",
+                              borderLeft: "3px solid #14b8a6",
+                            }}
+                          >
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span
+                                className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                                style={{
+                                  background: "#14b8a622",
+                                  border: "1px solid #14b8a644",
+                                  color: "#14b8a6",
+                                }}
+                              >
+                                NEARBY
+                              </span>
+                              <span
+                                className="text-xs font-semibold"
+                                style={{ color: "#14b8a6" }}
+                              >
+                                {ns.title}
+                              </span>
+                              <span className="ml-auto text-[10px] text-text-dim">
+                                {ns.sets}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-text-dim leading-relaxed">
+                              {ns.instruction}
+                            </div>
+                            <div
+                              className="text-[10px] mt-1"
+                              style={{ color: "#14b8a6" }}
+                            >
+                              {"\uD83D\uDEE1\uFE0F"} {ns.safety}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Collapsed supplement indicator */}
               {!isExp && activeSuppCards.length > 0 && (

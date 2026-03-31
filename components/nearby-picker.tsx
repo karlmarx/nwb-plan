@@ -6,11 +6,13 @@ import { NEARBY_EQUIPMENT } from "@/lib/exercises";
 interface NearbyPickerProps {
   selected: string[];
   onToggle: (id: string) => void;
+  inUse?: string[];
 }
 
 export default function NearbyPicker({
   selected,
   onToggle,
+  inUse = [],
 }: NearbyPickerProps) {
   return (
     <div>
@@ -19,27 +21,40 @@ export default function NearbyPicker({
       </div>
       <div className="flex flex-wrap gap-2">
         {NEARBY_EQUIPMENT.map((item) => {
-          const isSelected = selected.includes(item.id);
+          const isInUse = inUse.includes(item.id);
+          const isSelected = isInUse || selected.includes(item.id);
           return (
             <button
               key={item.id}
-              onClick={() => onToggle(item.id)}
+              onClick={() => {
+                if (!isInUse) onToggle(item.id);
+              }}
               className="rounded-lg cursor-pointer font-[inherit] transition-colors duration-150 min-h-[44px] min-w-[44px]"
               style={{
                 padding: "8px 14px",
-                background: isSelected
-                  ? "var(--color-accent-dim)"
-                  : "var(--color-card)",
-                border: isSelected
-                  ? "2px solid var(--color-accent)"
-                  : "2px solid var(--color-border)",
-                color: isSelected
-                  ? "var(--color-accent)"
-                  : "var(--color-text-muted)",
+                background: isInUse
+                  ? "#14b8a615"
+                  : isSelected
+                    ? "var(--color-accent-dim)"
+                    : "var(--color-card)",
+                border: isInUse
+                  ? "2px solid #14b8a6"
+                  : isSelected
+                    ? "2px solid var(--color-accent)"
+                    : "2px solid var(--color-border)",
+                color: isInUse
+                  ? "#14b8a6"
+                  : isSelected
+                    ? "var(--color-accent)"
+                    : "var(--color-text-muted)",
+                opacity: isInUse ? 1 : undefined,
               }}
             >
               <span className="text-base mr-1.5">{item.icon}</span>
-              <span className="text-xs font-semibold">{item.label}</span>
+              <span className="text-xs font-semibold">
+                {item.label}
+                {isInUse ? " (in use)" : ""}
+              </span>
             </button>
           );
         })}
