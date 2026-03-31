@@ -1,8 +1,8 @@
-# CLAUDE.md
+# CLAUDE.md — NWB Training Plan (Femur Fracture Fitness)
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## What Is This
 
-## Project Overview
+A PWA for non-weight-bearing (NWB) Push/Pull/Legs training protocol after a left femur stress fracture. Tracks workouts, supplements (left leg rehab + core), nutrition, and equipment availability.
 
 NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Deployed on Vercel at nwb-plan.vercel.app / nfit.93.fyi.
 

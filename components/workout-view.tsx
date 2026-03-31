@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { loadState, saveState } from "@/lib/storage";
 import {
   EX,
@@ -10,6 +10,13 @@ import {
   SCHED,
   PHASES,
 } from "@/lib/exercises";
+import {
+  SUPPLEMENT_LEFT_LEG,
+  SUPPLEMENT_CORE,
+  EQ_VARIANTS,
+  CABLE_SUPERSET,
+  type SupersetInfo,
+} from "@/lib/supplements";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
@@ -329,6 +336,13 @@ export default function WorkoutView() {
   const [nearbySelections, setNearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
+  const [supplementToggles, setSupplementToggles] = useState<{
+    leftLeg: boolean;
+    core: boolean;
+  }>(() => loadState("nwb_supplements", { leftLeg: true, core: true }));
+  const [variantSelections, setVariantSelections] = useState<
+    Record<string, string>
+  >(() => loadState("nwb_eq_variants", {}));
   const [aboutOpen, setAboutOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
@@ -360,6 +374,12 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_nearby", nearbySelections);
   }, [nearbySelections]);
+  useEffect(() => {
+    saveState("nwb_supplements", supplementToggles);
+  }, [supplementToggles]);
+  useEffect(() => {
+    saveState("nwb_eq_variants", variantSelections);
+  }, [variantSelections]);
   useEffect(() => {
     document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("nwb_theme", theme);
@@ -416,6 +436,10 @@ export default function WorkoutView() {
     },
     [swaps],
   );
+
+  const toggleSupplement = useCallback((key: "leftLeg" | "core") => {
+    setSupplementToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
 
   const resetSwap = useCallback(
     (workoutKey: string, origName: string) => {
@@ -490,6 +514,70 @@ export default function WorkoutView() {
     const w = WORKOUTS[workoutKey];
     if (!w) return null;
     const hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
+    const isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
+    const isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
+
+    // Find first cable exercise for cable superset
+    const firstCableEx = w.exercises.find((orig) => {
+      const en = getExName(workoutKey, orig);
+      return EQ_VARIANTS[en]?.isCable;
+    });
+    const firstCableName = firstCableEx
+      ? getExName(workoutKey, firstCableEx)
+      : null;
+
+    // Build supplement pairings — interleave left leg + core across main exercises
+    const suppMap: Record<
+      string,
+      { type: "leftleg" | "core"; name: string; region?: string }[]
+    > = {};
+    let coreSubtitle = "";
+    if (isTrainingDay) {
+      const llExercises = [...SUPPLEMENT_LEFT_LEG.base];
+      if (isLegsDay) llExercises.push(...SUPPLEMENT_LEFT_LEG.legsExtra);
+      const coreExData = SUPPLEMENT_CORE[workoutKey].exercises;
+      coreSubtitle = SUPPLEMENT_CORE[workoutKey].subtitle;
+
+      const allSupps: {
+        type: "leftleg" | "core";
+        name: string;
+        region?: string;
+      }[] = [];
+      const maxSL = Math.max(llExercises.length, coreExData.length);
+      for (let si = 0; si < maxSL; si++) {
+        if (si < llExercises.length)
+          allSupps.push({ type: "leftleg", name: llExercises[si] });
+        if (si < coreExData.length)
+          allSupps.push({
+            type: "core",
+            name: coreExData[si].name,
+            region: coreExData[si].region,
+          });
+      }
+
+      const activeEx = w.exercises.filter((orig) => {
+        const en = getExName(workoutKey, orig);
+        const exd = EX[en];
+        return exd && (exd.phase == null || phase >= exd.phase);
+      });
+
+      for (let sj = 0; sj < allSupps.length; sj++) {
+        const target = activeEx[sj % activeEx.length];
+        if (!suppMap[target]) suppMap[target] = [];
+        suppMap[target].push(allSupps[sj]);
+      }
+    }
+
+    const llExercises = isTrainingDay
+      ? [
+          ...SUPPLEMENT_LEFT_LEG.base,
+          ...(isLegsDay ? SUPPLEMENT_LEFT_LEG.legsExtra : []),
+        ]
+      : [];
+    const coreExData =
+      isTrainingDay && SUPPLEMENT_CORE[workoutKey]
+        ? SUPPLEMENT_CORE[workoutKey].exercises
+        : [];
 
     return (
       <Section
@@ -567,6 +655,55 @@ export default function WorkoutView() {
           </a>
         )}
 
+        {/* Supplement toggle controls */}
+        {isTrainingDay && (
+          <div className="flex gap-1.5 mb-2.5 flex-wrap">
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                toggleSupplement("leftLeg");
+              }}
+              className="text-[10px] rounded-[10px] cursor-pointer font-[inherit]"
+              style={{
+                padding: "4px 10px",
+                background: supplementToggles.leftLeg
+                  ? "#14b8a618"
+                  : "transparent",
+                border: `1px solid ${supplementToggles.leftLeg ? "#14b8a644" : "var(--color-border)"}`,
+                color: supplementToggles.leftLeg
+                  ? "#14b8a6"
+                  : "var(--color-text-muted)",
+                fontWeight: supplementToggles.leftLeg ? 600 : 400,
+              }}
+            >
+              {"\uD83E\uDDBF"} L-Leg Supersets{" "}
+              {supplementToggles.leftLeg ? "ON" : "OFF"}
+            </button>
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                toggleSupplement("core");
+              }}
+              className="text-[10px] rounded-[10px] cursor-pointer font-[inherit]"
+              style={{
+                padding: "4px 10px",
+                background: supplementToggles.core
+                  ? "#f9731618"
+                  : "transparent",
+                border: `1px solid ${supplementToggles.core ? "#f9731644" : "var(--color-border)"}`,
+                color: supplementToggles.core
+                  ? "#f97316"
+                  : "var(--color-text-muted)",
+                fontWeight: supplementToggles.core ? 600 : 400,
+              }}
+            >
+              {"\uD83C\uDFAF"} Core Supersets{" "}
+              {supplementToggles.core ? "ON" : "OFF"}
+              {coreSubtitle ? ` \u2014 ${coreSubtitle}` : ""}
+            </button>
+          </div>
+        )}
+
         {/* Exercise rows */}
         {w.exercises.map((origName) => {
           const exName = getExName(workoutKey, origName);
@@ -574,6 +711,54 @@ export default function WorkoutView() {
           if (!ex) return null;
           if (ex.phase != null && phase < ex.phase) return null;
           const unavail = !isAvailable(exName);
+          const isExp = !!expandedEx[exName];
+
+          // Equipment-specific superset
+          let ssInfo: SupersetInfo | null = null;
+          if (supplementToggles.leftLeg) {
+            const vData = EQ_VARIANTS[exName];
+            if (vData) {
+              if (vData.isCable) {
+                if (exName === firstCableName) {
+                  ssInfo = { ...CABLE_SUPERSET };
+                  const selV = variantSelections[exName];
+                  if (selV === "lat-machine") {
+                    ssInfo.note =
+                      "No low cable available on this machine \u2014 do ankle dorsiflexion at nearest cable column between sets or save for next cable exercise.";
+                  }
+                }
+              } else if (
+                vData.variantSuperset &&
+                vData.variantSuperset[
+                  variantSelections[exName] || vData.variants[0].id
+                ]
+              ) {
+                ssInfo =
+                  vData.variantSuperset[
+                    variantSelections[exName] || vData.variants[0].id
+                  ];
+              } else if (vData.superset) {
+                ssInfo = { ...vData.superset };
+                const selV =
+                  variantSelections[exName] || vData.variants[0].id;
+                if (
+                  vData.variantSupersetNotes &&
+                  vData.variantSupersetNotes[selV]
+                ) {
+                  ssInfo.note = vData.variantSupersetNotes[selV];
+                }
+              }
+            }
+          }
+
+          const suppCards = suppMap[origName] || [];
+          const activeSuppCards = suppCards.filter((supp) => {
+            const isLL = supp.type === "leftleg";
+            return (
+              (isLL && supplementToggles.leftLeg) ||
+              (!isLL && supplementToggles.core)
+            );
+          });
 
           return (
             <div key={origName}>
@@ -595,15 +780,65 @@ export default function WorkoutView() {
                 name={exName}
                 ex={ex}
                 phase={phase}
-                isExpanded={!!expandedEx[exName]}
+                isExpanded={isExp}
                 onToggle={() => toggleEx(exName)}
                 onSwap={(sw) => handleSwap(workoutKey, origName, sw)}
                 onDiagram={(d) => setDiagramOpen(d)}
                 unavailable={unavail}
                 equipment={equipment}
               />
+
+              {/* Equipment-specific superset card */}
+              {isExp && ssInfo && (
+                <div
+                  className="mx-3 mb-2 rounded-lg"
+                  style={{
+                    padding: "8px 10px",
+                    background: "#14b8a60d",
+                    border: "1px solid #14b8a633",
+                    borderLeft: "3px solid #14b8a6",
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span
+                      className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                      style={{
+                        background: "#14b8a622",
+                        border: "1px solid #14b8a644",
+                        color: "#14b8a6",
+                      }}
+                    >
+                      SUPERSET
+                    </span>
+                    <span
+                      className="text-xs font-semibold"
+                      style={{ color: "#14b8a6" }}
+                    >
+                      {ssInfo.title}
+                    </span>
+                    <span className="ml-auto text-[10px] text-text-dim">
+                      {ssInfo.sets}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-text-dim leading-relaxed">
+                    {ssInfo.instruction}
+                  </div>
+                  <div
+                    className="text-[10px] mt-1"
+                    style={{ color: "#14b8a6" }}
+                  >
+                    {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
+                  </div>
+                  {ssInfo.note && (
+                    <div className="text-[10px] mt-1 text-warning">
+                      {"\u26A0\uFE0F"} {ssInfo.note}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Machine selector */}
-              {expandedEx[exName] && ex.machineVariants && (
+              {isExp && ex.machineVariants && (
                 <div className="px-3 pb-2">
                   <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
                     Machine type at your station
@@ -621,7 +856,7 @@ export default function WorkoutView() {
                 </div>
               )}
               {/* Nearby picker */}
-              {expandedEx[exName] && (
+              {isExp && (
                 <div className="px-3 pb-3">
                   <NearbyPicker
                     selected={nearbySelections[exName] ?? []}
@@ -637,6 +872,317 @@ export default function WorkoutView() {
                   />
                 </div>
               )}
+
+              {/* Collapsed supplement indicator */}
+              {!isExp && activeSuppCards.length > 0 && (
+                <div
+                  onClick={() => toggleEx(exName)}
+                  className="cursor-pointer flex items-center gap-1.5"
+                  style={{
+                    margin: "-4px 0 4px",
+                    padding: "4px 12px 6px",
+                    background:
+                      "linear-gradient(90deg, #14b8a608, #f9731608)",
+                    borderRadius: "0 0 8px 8px",
+                    borderLeft: "3px solid transparent",
+                    borderImage:
+                      "linear-gradient(to bottom, #14b8a644, #f9731644) 1",
+                  }}
+                >
+                  {activeSuppCards.map((supp, si) => {
+                    const isLL = supp.type === "leftleg";
+                    const accent = isLL ? "#14b8a6" : "#f97316";
+                    const label = isLL ? "L" : "C";
+                    return (
+                      <span
+                        key={`ind-${si}`}
+                        className="inline-flex items-center gap-0.5"
+                      >
+                        <span
+                          className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
+                          style={{
+                            width: 14,
+                            height: 14,
+                            background: accent + "22",
+                            border: `1px solid ${accent}44`,
+                            color: accent,
+                          }}
+                        >
+                          {label}
+                        </span>
+                        <span
+                          className="text-[9px] font-semibold"
+                          style={{ color: accent, opacity: 0.8 }}
+                        >
+                          {supp.name.length > 20
+                            ? supp.name.substring(0, 18) + "..."
+                            : supp.name}
+                        </span>
+                      </span>
+                    );
+                  })}
+                  <span className="ml-auto text-[8px] text-text-muted">
+                    {"\u25BC"} tap to expand
+                  </span>
+                </div>
+              )}
+
+              {/* Inline supplement superset cards (expanded) */}
+              {isExp &&
+                suppCards.length > 0 &&
+                suppCards.map((supp) => {
+                  const isLL = supp.type === "leftleg";
+                  if (isLL && !supplementToggles.leftLeg) return null;
+                  if (!isLL && !supplementToggles.core) return null;
+                  const suppEx = EX[supp.name];
+                  if (!suppEx) return null;
+                  const accent = isLL ? "#14b8a6" : "#f97316";
+                  const suppSets = suppEx.sets[phase] || suppEx.sets[0];
+                  const suppExpKey = "supp_" + supp.name;
+                  const suppIsExp = !!expandedEx[suppExpKey];
+
+                  const groupTotal = isLL
+                    ? llExercises.length
+                    : coreExData.length;
+                  const groupIdx = isLL
+                    ? llExercises.indexOf(supp.name) + 1
+                    : coreExData.findIndex((c) => c.name === supp.name) + 1;
+                  const groupLabel = `${groupIdx}/${groupTotal}`;
+
+                  if (isLL) {
+                    return (
+                      <div
+                        key={`supp-${supp.name}`}
+                        className="mx-1 my-0.5 rounded-lg overflow-hidden"
+                        style={{
+                          background: "#14b8a609",
+                          border: "1px solid #14b8a628",
+                          borderLeft: "3px solid #14b8a6",
+                        }}
+                      >
+                        <div
+                          onClick={() => toggleEx(suppExpKey)}
+                          className="cursor-pointer flex items-center gap-1.5"
+                          style={{ padding: "8px 10px" }}
+                        >
+                          <span
+                            className="inline-flex items-center justify-center rounded text-[9px] font-extrabold shrink-0"
+                            style={{
+                              width: 18,
+                              height: 18,
+                              background: "#14b8a622",
+                              border: "1px solid #14b8a644",
+                              color: "#14b8a6",
+                            }}
+                          >
+                            L
+                          </span>
+                          <span
+                            className="text-[9px] font-bold"
+                            style={{ color: "#14b8a6", opacity: 0.7 }}
+                          >
+                            {groupLabel}
+                          </span>
+                          <span
+                            className="text-[10px] font-semibold uppercase tracking-wide"
+                            style={{ color: "#14b8a6" }}
+                          >
+                            Left Leg
+                          </span>
+                          <span className="font-semibold text-xs text-text flex-1">
+                            {supp.name}
+                          </span>
+                          <span className="text-[10px] text-text-dim">
+                            {suppSets[0]}&times;{suppSets[1]}
+                          </span>
+                          <span
+                            className="text-[9px] ml-1"
+                            style={{ color: "#14b8a6" }}
+                          >
+                            {suppIsExp ? "\u25B2" : "\u25BC"}
+                          </span>
+                        </div>
+                        {suppIsExp && (
+                          <div
+                            className="text-[11px] leading-relaxed"
+                            style={{ padding: "0 10px 10px" }}
+                          >
+                            <div className="mb-1.5">
+                              <span
+                                className="font-bold text-[10px]"
+                                style={{ color: "#14b8a6" }}
+                              >
+                                {"\uD83D\uDCCD"} Setup:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.setup}
+                              </span>
+                            </div>
+                            <div className="mb-1.5">
+                              <span className="font-bold text-[10px] text-safe">
+                                {"\uD83D\uDD04"} Execute:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.execution}
+                              </span>
+                            </div>
+                            <div>
+                              <span
+                                className="font-bold text-[10px]"
+                                style={{ color: "#14b8a6" }}
+                              >
+                                {"\uD83D\uDEE1\uFE0F"} Safety:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.nwbCues}
+                              </span>
+                            </div>
+                            {suppEx.rest > 0 && (
+                              <button
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  setTimer(suppEx.rest);
+                                }}
+                                className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]"
+                                style={{
+                                  padding: 7,
+                                  background: "#14b8a618",
+                                  border: "1px solid #14b8a633",
+                                  color: "#14b8a6",
+                                }}
+                              >
+                                {"\u23F1"} Start {suppEx.rest}s Rest
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  } else {
+                    // Core supplement card
+                    const regionColors: Record<string, string> = {
+                      "Upper Abs": "#f59e0b",
+                      "Lower Abs": "#ec4899",
+                      Obliques: "#a78bfa",
+                    };
+                    const regionColor =
+                      regionColors[supp.region || ""] || "#f97316";
+                    return (
+                      <div
+                        key={`supp-${supp.name}`}
+                        className="mx-1 my-0.5 rounded-lg overflow-hidden"
+                        style={{
+                          border: "1px dashed #f9731633",
+                          background:
+                            "linear-gradient(135deg, #f9731608 0%, #f9731603 100%)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: 3,
+                            background: `linear-gradient(90deg, ${regionColor}, ${regionColor}66)`,
+                          }}
+                        />
+                        <div
+                          onClick={() => toggleEx(suppExpKey)}
+                          className="cursor-pointer flex items-center gap-1.5"
+                          style={{ padding: "8px 10px" }}
+                        >
+                          <span
+                            className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold shrink-0"
+                            style={{
+                              minWidth: 20,
+                              height: 20,
+                              padding: "0 4px",
+                              background: "#f9731622",
+                              border: "1px solid #f9731644",
+                              color: "#f97316",
+                            }}
+                          >
+                            {groupLabel}
+                          </span>
+                          <span
+                            className="text-[8px] font-bold uppercase tracking-wider shrink-0 rounded-lg"
+                            style={{
+                              padding: "2px 6px",
+                              background: regionColor + "22",
+                              border: `1px solid ${regionColor}44`,
+                              color: regionColor,
+                            }}
+                          >
+                            {supp.region || "Core"}
+                          </span>
+                          <span className="font-semibold text-xs text-text flex-1">
+                            {supp.name}
+                          </span>
+                          <span className="text-[10px] text-text-dim">
+                            {suppSets[0]}&times;{suppSets[1]}
+                          </span>
+                          <span
+                            className="text-[9px] ml-1"
+                            style={{ color: "#f97316" }}
+                          >
+                            {suppIsExp ? "\u25B2" : "\u25BC"}
+                          </span>
+                        </div>
+                        {suppIsExp && (
+                          <div
+                            className="text-[11px] leading-relaxed"
+                            style={{ padding: "0 10px 10px" }}
+                          >
+                            <div className="mb-1.5">
+                              <span
+                                className="font-bold text-[10px]"
+                                style={{ color: "#f97316" }}
+                              >
+                                {"\uD83D\uDCCD"} Setup:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.setup}
+                              </span>
+                            </div>
+                            <div className="mb-1.5">
+                              <span className="font-bold text-[10px] text-safe">
+                                {"\uD83D\uDD04"} Execute:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.execution}
+                              </span>
+                            </div>
+                            <div>
+                              <span
+                                className="font-bold text-[10px]"
+                                style={{ color: "#f97316" }}
+                              >
+                                {"\uD83D\uDEE1\uFE0F"} Safety:{" "}
+                              </span>
+                              <span className="text-text-dim">
+                                {suppEx.nwbCues}
+                              </span>
+                            </div>
+                            {suppEx.rest > 0 && (
+                              <button
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  setTimer(suppEx.rest);
+                                }}
+                                className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]"
+                                style={{
+                                  padding: 7,
+                                  background: "#f9731618",
+                                  border: "1px solid #f9731633",
+                                  color: "#f97316",
+                                }}
+                              >
+                                {"\u23F1"} Start {suppEx.rest}s Rest
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
             </div>
           );
         })}
