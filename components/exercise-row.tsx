@@ -42,7 +42,7 @@ export default function ExerciseRow({
     <div
       className="mb-1.5 rounded-lg overflow-hidden"
       style={{
-        background: isExpanded ? "#0f1629" : "var(--color-bg)",
+        background: isExpanded ? "color-mix(in srgb, var(--color-card) 70%, var(--color-bg))" : "var(--color-bg)",
         borderLeft: `3px solid ${unavailable ? "var(--color-danger)" : safetyColor}`,
         opacity: unavailable ? 0.5 : 1,
       }}
@@ -155,7 +155,7 @@ export default function ExerciseRow({
                   }}
                   className="w-full p-3 rounded-lg border cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-xs font-bold text-accent min-h-[44px]"
                   style={{
-                    background: "#161616",
+                    background: "var(--color-bg)",
                     borderColor: "var(--color-accent)",
                     opacity: 0.7,
                   }}

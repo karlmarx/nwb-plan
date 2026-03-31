@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { loadState, saveState } from "@/lib/storage";
 import {
   EX,
@@ -329,6 +329,11 @@ export default function WorkoutView() {
   const [nearbySelections, setNearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
+  });
 
   // ----- Persistence -----
   useEffect(() => {
@@ -355,6 +360,14 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_nearby", nearbySelections);
   }, [nearbySelections]);
+  useEffect(() => {
+    document.documentElement.classList.toggle("light", theme === "light");
+    localStorage.setItem("nwb_theme", theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => (t === "dark" ? "light" : "dark"));
+  }, []);
 
   // ----- Helpers -----
   const realToday = getRealToday();
@@ -527,7 +540,7 @@ export default function WorkoutView() {
                 width={28}
                 height={28}
                 viewBox="0 0 24 24"
-                fill="#F5F0EB"
+                fill="currentColor"
               >
                 <circle cx="12" cy="4.5" r="2.5" />
                 <path
@@ -539,7 +552,7 @@ export default function WorkoutView() {
                 <path d="M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z" />
               </svg>
               <div>
-                <div className="text-[13px] font-semibold text-[#F5F0EB]">
+                <div className="text-[13px] font-semibold text-text">
                   NWB Yoga &mdash; Companion App
                 </div>
                 <div className="text-[11px] text-text-dim mt-0.5">
@@ -1422,22 +1435,60 @@ export default function WorkoutView() {
       {/* Header */}
       <div className="pt-6 pb-4 text-center">
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-[22px] font-extrabold tracking-tight text-white">
+          <h1 className="text-[22px] font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
-          {/* Auth button placeholder */}
-          {AuthButton && (
-            <React.Suspense
-              fallback={
-                <div
-                  className="w-8 h-8 rounded-full animate-pulse"
-                  style={{ background: "var(--color-border)" }}
-                />
-              }
+          {/* Header icons */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setAboutOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title="About"
             >
-              <AuthButton />
-            </React.Suspense>
-          )}
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? (
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            {AuthButton && (
+              <React.Suspense
+                fallback={
+                  <div
+                    className="w-8 h-8 rounded-full animate-pulse"
+                    style={{ background: "var(--color-border)" }}
+                  />
+                }
+              >
+                <AuthButton />
+              </React.Suspense>
+            )}
+          </div>
         </div>
         <div className="text-[11px] text-text-muted mt-1">
           NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 6 Weeks
@@ -1569,6 +1620,111 @@ export default function WorkoutView() {
       {/* Rest timer overlay */}
       {timer != null && (
         <RestTimer seconds={timer} onClose={() => setTimer(null)} />
+      )}
+
+      {/* About modal */}
+      {aboutOpen && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center p-3"
+          style={{ background: "rgba(0,0,0,0.85)" }}
+          onClick={() => setAboutOpen(false)}
+        >
+          <div
+            className="rounded-2xl w-full max-w-md overflow-y-auto max-h-[90vh]"
+            style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-extrabold text-text">About</h2>
+                <button
+                  onClick={() => setAboutOpen(false)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
+                  style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)" }}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="text-[13px] leading-relaxed text-text-dim space-y-3">
+                <p>
+                  <strong className="text-text">Femur Fracture Fitness</strong> is
+                  a personal PWA for tracking a non-weight-bearing Push/Pull/Legs
+                  training protocol during recovery from a left femoral neck stress
+                  fracture.
+                </p>
+                <p>
+                  Built with Next.js, TypeScript, and Tailwind CSS. All exercise
+                  data, safety constraints, and progression phases are baked into
+                  the app for offline use.
+                </p>
+                <div
+                  className="rounded-lg text-[11px] text-danger"
+                  style={{
+                    padding: 12,
+                    background: "var(--color-danger-bg)",
+                    border: "1px solid var(--color-danger-border)",
+                  }}
+                >
+                  <strong>Medical Disclaimer:</strong> This app is for personal use
+                  only and does not constitute medical advice. All exercises should
+                  be confirmed with your PT/Orthopedic Surgeon. Groin pain = Absolute Stop.
+                </div>
+                <p className="text-text-muted text-[11px]">
+                  <a
+                    href="https://github.com/karlmarx/nwb-plan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent"
+                  >
+                    Source on GitHub
+                  </a>
+                  {" "}&bull;{" "}
+                  <a
+                    href="https://nwb-yoga.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent"
+                  >
+                    NWB Yoga Companion
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Diagram modal */}
+      {diagramOpen && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center p-3"
+          style={{ background: "rgba(0,0,0,0.85)" }}
+          onClick={() => setDiagramOpen(null)}
+        >
+          <div
+            className="rounded-2xl w-full max-w-[760px] max-h-[92vh] overflow-y-auto"
+            style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-extrabold text-text capitalize">
+                  {diagramOpen} Diagram
+                </h2>
+                <button
+                  onClick={() => setDiagramOpen(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
+                  style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)" }}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="text-center text-text-dim text-sm py-8">
+                Diagram coming soon
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

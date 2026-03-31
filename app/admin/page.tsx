@@ -1,10 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-
-export const runtime = "nodejs";
 
 interface User {
   id: string;

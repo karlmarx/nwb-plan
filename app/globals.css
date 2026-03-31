@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Dark theme (default) */
   --color-bg: #0a0f1a;
   --color-card: #111827;
   --color-border: #1e293b;
@@ -32,6 +33,27 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Light theme overrides */
+html.light {
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-border: #e2e8f0;
+  --color-accent: #0284c7;
+  --color-accent-dim: #bae6fd;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-safe: #059669;
+  --color-safe-bg: #ecfdf5;
+  --color-safe-border: #a7f3d0;
+  --color-text: #1e293b;
+  --color-text-dim: #475569;
+  --color-text-muted: #94a3b8;
 }
 
 @keyframes pulse-glow {

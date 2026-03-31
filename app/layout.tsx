@@ -32,7 +32,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`try{if(localStorage.getItem('nwb_theme')==='light')document.documentElement.classList.add('light')}catch(e){}`}
+        </Script>
+      </head>
       <body className="min-h-screen overflow-y-auto font-sans">
         <Providers>{children}</Providers>
         <Script id="sw-register" strategy="afterInteractive">

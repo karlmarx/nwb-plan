@@ -1,4 +1,4 @@
-const CACHE = 'nwb-plan-v5';
+const CACHE = 'nwb-plan-v6';
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
