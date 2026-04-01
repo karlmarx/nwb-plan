@@ -23,6 +23,73 @@ A Progressive Web App for MRI-adjusted non-weight-bearing (NWB) Push/Pull/Legs t
 - **Offline-capable PWA** — installs to home screen, works without internet
 - **AI suggestions** — Claude-powered exercise suggestions (behind feature flag)
 
+## How to Use
+
+### First-Time Setup
+
+1. **Open the app** — visit the URL or install as a PWA from your browser's "Add to Home Screen"
+2. **Go to the Equip tab** — toggle OFF any equipment your gym doesn't have. Exercises that need unavailable gear will show swap alternatives automatically
+3. **Set your week start** — in the Equip tab, shift the PPL rotation to match when your training week begins (defaults to Monday)
+4. **Paste HEVY links** (optional) — if you use [Hevy](https://hevy.com), each workout has an "Open in HEVY" button. The default links are pre-configured
+
+### Daily Gym Workflow
+
+```
+Open app → Today tab shows your scheduled workout
+    │
+    ▼
+Tap workout to expand → see all exercises with sets/reps for current phase
+    │
+    ▼
+Tap an exercise to expand its detail panel:
+    ├── Setup instructions (how to get into position safely)
+    ├── Execution cues (how to perform the rep)
+    ├── NWB safety cues (what your left leg should be doing)
+    ├── Machine type picker (if multiple machine options exist)
+    ├── "What's within reach?" chips (mark nearby equipment)
+    └── Swap buttons (switch to an alternative exercise)
+    │
+    ▼
+Between sets:
+    ├── Tap "Start Rest Timer" → countdown with pulse alert
+    ├── Superset cards appear below (if L-Leg or Core toggles are ON):
+    │   ├── Teal cards = left leg rehab (quad sets, ankle pumps, etc.)
+    │   └── Orange cards = core supplement (region-tagged: upper/lower/obliques)
+    └── Equipment-specific supersets show automatically:
+        ├── On leg machines → "Same machine, switch legs" suggestions
+        ├── On cable stations → ankle dorsiflexion superset
+        └── Nearby equipment → context-aware rehab suggestions
+```
+
+### Superset Toggles
+
+Each workout has two toggle buttons at the top:
+
+- **L-Leg Supersets** (teal) — interleaves left leg rehabilitation exercises between your main sets. 3 base exercises on all days, 5 on leg days. Also activates equipment-specific supersets (e.g., "same machine, switch legs" on leg extension)
+- **Core Supersets** (orange) — interleaves core exercises between your main sets. Each training day has a unique 4-exercise core routine targeting upper abs, lower abs, and obliques
+
+Both are ON by default. Toggle OFF if you want to focus on the main workout only.
+
+### Phase Progression
+
+Tap the phase selector below the header to switch between:
+
+| Phase | Weeks | Focus |
+|-------|-------|-------|
+| **Foundation** | 1–2 | Higher reps, learn safe movement patterns |
+| **Build** | 3–4 | Increase load, 4-sec eccentrics, drop sets |
+| **Peak** | 5–6 | Maximum safe output, heavy singles |
+
+Sets and reps update automatically throughout the app when you change phases.
+
+### Exercise Diagrams
+
+Some exercises have a "View Movement Diagram" button that opens an animated SVG showing proper form. The Core tab has a "Core Movement Demos" button with 17 animated diagrams covering TRX Core, Supine Oblique, and Arm Balance Prep categories. All diagrams support tap-to-pause.
+
+### Offline Use
+
+The app works fully offline after the first load. All exercise data, equipment state, and UI preferences are stored locally. Only AI suggestions (if enabled) require an internet connection.
+
 ## Tabs
 
 | Tab | Purpose |
