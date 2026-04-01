@@ -27,6 +27,7 @@ import ProgressClock from "@/components/progress-clock";
 import MachineSelector from "@/components/machine-selector";
 import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
+import DiagramModal from "@/components/diagram-modal";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -1559,6 +1560,29 @@ export default function WorkoutView() {
           comfortably, move up an amp level.
         </Callout>
 
+        <button
+          onClick={() => setDiagramOpen("core-demos")}
+          className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
+          style={{
+            padding: "10px 14px",
+            background: "#a78bfa15",
+            border: "1px solid #a78bfa33",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{"\uD83C\uDFA8"}</span>
+            <div>
+              <div className="text-[13px] font-semibold" style={{ color: "#a78bfa" }}>
+                Core Movement Demos
+              </div>
+              <div className="text-[10px] text-text-dim">
+                17 animated diagrams &middot; TRX, Supine, Arm Balance
+              </div>
+            </div>
+            <span className="ml-auto text-text-muted text-xs">&rarr;</span>
+          </div>
+        </button>
+
         {CORE_BLOCKS.map((block) => (
           <Section
             key={block.key}
@@ -2279,35 +2303,10 @@ export default function WorkoutView() {
 
       {/* Diagram modal */}
       {diagramOpen && (
-        <div
-          className="fixed inset-0 z-[300] flex items-center justify-center p-3"
-          style={{ background: "rgba(0,0,0,0.85)" }}
-          onClick={() => setDiagramOpen(null)}
-        >
-          <div
-            className="rounded-2xl w-full max-w-[760px] max-h-[92vh] overflow-y-auto"
-            style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-extrabold text-text capitalize">
-                  {diagramOpen} Diagram
-                </h2>
-                <button
-                  onClick={() => setDiagramOpen(null)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
-                  style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)" }}
-                >
-                  &times;
-                </button>
-              </div>
-              <div className="text-center text-text-dim text-sm py-8">
-                Diagram coming soon
-              </div>
-            </div>
-          </div>
-        </div>
+        <DiagramModal
+          diagram={diagramOpen}
+          onClose={() => setDiagramOpen(null)}
+        />
       )}
     </div>
   );
