@@ -90,7 +90,7 @@ export default function ProgressClock() {
         onClick={handleClick}
         className="cursor-pointer mb-3 rounded-[10px] px-3 py-1.5 flex items-center justify-between min-h-[44px]"
         style={{
-          background: "#111827",
+          background: "var(--color-card)",
           border: `1px solid ${clrHex}33`,
         }}
       >
@@ -123,7 +123,7 @@ export default function ProgressClock() {
       style={{
         background: flash
           ? clrHex + "18"
-          : "linear-gradient(135deg, #111827 0%, #0d1424 100%)",
+          : "var(--color-card)",
         border: `1px solid ${clrHex}55`,
         boxShadow: `0 0 24px ${clrHex}18, inset 0 1px 0 ${clrHex}22`,
         transition: "background 0.25s, box-shadow 0.25s",
