@@ -371,15 +371,8 @@ export default function App() {
           style={{ color: C.textMuted }}
           title="NWB Yoga — Companion App"
         >
-          <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="4.5" r="2.5" />
-            <path
-              d="M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z"
-              opacity="0.6"
-            />
-            <path d="M10.5 7.5h3v4.5h-3z" />
-            <path d="M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z" />
-            <path d="M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z" />
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,20 C11,14 10,8 12,3 C14,8 13,14 12,20Z M12,20 C9,15 7,10 9,5 C12,9 12,14 12,20Z M12,20 C15,15 17,10 15,5 C12,9 12,14 12,20Z M12,20 C8,16 5,12 6,7 C9,11 11,15 12,20Z M12,20 C16,16 19,12 18,7 C15,11 13,15 12,20Z" />
           </svg>
         </a>
       </div>
