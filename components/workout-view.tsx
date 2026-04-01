@@ -47,12 +47,12 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Today", "Upper", "Lower", "Core", "Cardio", "Equip", "Safety"];
+const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "Equip", "Safety"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
-  "Push + Pull exercises",
-  "Legs + Recovery exercises",
+  "Push + Pull exercise library",
+  "Legs + Recovery exercise library",
   "Core exercises by body part",
   "NWB cardio options",
   "Toggle available equipment",
@@ -221,6 +221,135 @@ const POOL_TABLE = [
   ["Sun Chair", "Heavy chair at edge", "Easiest"],
   ["Steps + Rail", "Pool steps with rail", "Hard exit"],
   ["Wall Press", "Any pool edge", "Hardest"],
+];
+
+// ===== UPPER BODY MUSCLE GROUPS =====
+const UPPER_GROUPS = [
+  {
+    key: "chest",
+    label: "Chest",
+    icon: "\uD83D\uDCAA",
+    accent: "#38bdf8",
+    exercises: [
+      "Barbell Floor Press",
+      "DB Floor Press",
+      "Machine Chest Press",
+      "Incline DB Press + Lat Raises",
+      "Cable Chest Fly",
+      "Mechanical Drop Set (Press)",
+      "Dip Machine",
+    ],
+  },
+  {
+    key: "shoulders",
+    label: "Shoulders",
+    icon: "\uD83C\uDFCB\uFE0F",
+    accent: "#f97316",
+    exercises: [
+      "Seated DB OH Press",
+      "Seated Arnold Press",
+      "Landmine Press (seated)",
+      "Seated Face Pulls",
+      "Reverse Fly",
+    ],
+  },
+  {
+    key: "back",
+    label: "Back",
+    icon: "\uD83E\uDDBE",
+    accent: "#a78bfa",
+    exercises: [
+      "Lat Pulldown (Wide)",
+      "Neutral Grip Pulldown",
+      "Weighted Pull-Up",
+      "Finger-Assist One-Arm Pull-Up",
+      "Chest-Supported DB Row",
+      "Seated Cable Row",
+      "One-Arm Cable Row",
+      "Mechanical Drop Set (Pull)",
+    ],
+  },
+  {
+    key: "arms",
+    label: "Arms",
+    icon: "\uD83D\uDCAA",
+    accent: "#10b981",
+    exercises: [
+      "Lying Skull Crushers",
+      "OH Triceps Extension",
+      "Tricep Rope Pushdown",
+      "Preacher Curls",
+      "Hammer Curls",
+      "Incline DB Curl",
+    ],
+  },
+  {
+    key: "skill",
+    label: "Compound / Skill",
+    icon: "\uD83E\uDD38",
+    accent: "#eab308",
+    exercises: [
+      "Pseudo Planche Push-Up",
+      "Parallette L-Sit",
+    ],
+  },
+];
+
+// ===== LOWER BODY MUSCLE GROUPS =====
+const LOWER_GROUPS = [
+  {
+    key: "quads",
+    label: "Quads",
+    icon: "\uD83E\uDDB5",
+    accent: "#38bdf8",
+    exercises: [
+      "SL Leg Press (Right)",
+      "Hack Squat (Right)",
+      "SL Leg Extension (Right)",
+      "Low-Box Step-Up (Right)",
+    ],
+  },
+  {
+    key: "glutes",
+    label: "Glutes / Hips",
+    icon: "\uD83C\uDF51",
+    accent: "#ec4899",
+    exercises: [
+      "SL Glute Bridge (Right)",
+      "SL Hip Thrust (Right)",
+      "Banded Clamshells",
+    ],
+  },
+  {
+    key: "hamstrings",
+    label: "Hamstrings",
+    icon: "\uD83E\uDDBF",
+    accent: "#a78bfa",
+    exercises: [
+      "Prone Ham Curl (Right)",
+      "Stab Ball Ham Curl (Right)",
+      "Nordic Ham Curl",
+    ],
+  },
+  {
+    key: "calves",
+    label: "Calves",
+    icon: "\uD83E\uDDB6",
+    accent: "#f97316",
+    exercises: [
+      "Standing Calf Raise (R)",
+    ],
+  },
+  {
+    key: "rehab",
+    label: "Left Leg Rehab",
+    icon: "\uD83E\uDE7B",
+    accent: "#14b8a6",
+    exercises: [
+      "Isometric Quad Sets (Left)",
+      "Ankle Pumps (Left)",
+    ],
+  },
 ];
 
 // ===== CORE BLOCKS (organized by body part) =====
@@ -411,6 +540,8 @@ export default function WorkoutView() {
     leftLeg: boolean;
     core: boolean;
   }>(() => loadState("nwb_supplements", { leftLeg: true, core: true }));
+  const [upperFilter, setUpperFilter] = useState<string | null>(null);
+  const [lowerFilter, setLowerFilter] = useState<string | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
@@ -1473,67 +1604,129 @@ export default function WorkoutView() {
     );
   }
 
-  function renderUpperTab() {
+  function renderExerciseLibrary(
+    groups: typeof UPPER_GROUPS,
+    filter: string | null,
+    setFilter: (f: string | null) => void,
+    accentColor: string,
+    diagramLabel: string,
+    diagramDesc: string,
+  ) {
+    const visibleGroups = filter
+      ? groups.filter((g) => g.key === filter)
+      : groups;
+
+    const totalExercises = groups.reduce((n, g) => n + g.exercises.length, 0);
+    const availableCount = groups.reduce(
+      (n, g) => n + g.exercises.filter((name) => isAvailable(name)).length,
+      0,
+    );
+
     return (
       <div>
+        {/* Diagram gallery button */}
         <button
           onClick={() => setDiagramOpen("gallery")}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
             padding: "10px 14px",
-            background: "#a78bfa15",
-            border: "1px solid #a78bfa33",
+            background: accentColor + "15",
+            border: `1px solid ${accentColor}33`,
           }}
         >
           <div className="flex items-center gap-2">
             <span className="text-lg">{"\uD83C\uDFA8"}</span>
             <div>
-              <div className="text-[13px] font-semibold" style={{ color: "#a78bfa" }}>
-                Exercise Diagram Gallery
+              <div className="text-[13px] font-semibold" style={{ color: accentColor }}>
+                {diagramLabel}
               </div>
               <div className="text-[10px] text-text-dim">
-                35+ animated diagrams &middot; 8 categories
+                {diagramDesc}
               </div>
             </div>
             <span className="ml-auto text-text-muted text-xs">&rarr;</span>
           </div>
         </button>
-        {["Push A", "Push B", "Pull A", "Pull B"].map((k) => (
-          <div key={k}>{renderWorkout(k)}</div>
+
+        {/* Stats bar */}
+        <div className="text-[10px] text-text-muted mb-2 px-1">
+          {availableCount}/{totalExercises} exercises available with current equipment
+        </div>
+
+        {/* Filter pills */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          <button
+            onClick={() => setFilter(null)}
+            className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+            style={{
+              border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
+              background: filter === null ? accentColor + "18" : "var(--color-card)",
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+              fontWeight: filter === null ? 700 : 400,
+            }}
+          >
+            All
+          </button>
+          {groups.map((g) => {
+            const isActive = filter === g.key;
+            return (
+              <button
+                key={g.key}
+                onClick={() => setFilter(isActive ? null : g.key)}
+                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+                style={{
+                  border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
+                  background: isActive ? g.accent + "18" : "var(--color-card)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
+                  fontWeight: isActive ? 700 : 400,
+                }}
+              >
+                {g.icon} {g.label}
+                <span className="ml-1 text-[9px] opacity-60">
+                  {g.exercises.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Exercise groups */}
+        {visibleGroups.map((group) => (
+          <Section
+            key={group.key}
+            title={group.label}
+            icon={group.icon}
+            isOpen={!!openSections[`lib-${group.key}`]}
+            onToggle={() => toggleSection(`lib-${group.key}`)}
+            count={group.exercises.length}
+            accent={group.accent}
+          >
+            {group.exercises.map((name) => renderCoreExercise(name))}
+          </Section>
         ))}
       </div>
     );
   }
 
+  function renderUpperTab() {
+    return renderExerciseLibrary(
+      UPPER_GROUPS,
+      upperFilter,
+      setUpperFilter,
+      "#a78bfa",
+      "Exercise Diagram Gallery",
+      "35+ animated diagrams \u00B7 arm balance, TRX, equipment",
+    );
+  }
+
   function renderLowerTab() {
-    return (
-      <div>
-        <button
-          onClick={() => setDiagramOpen("gallery")}
-          className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
-          style={{
-            padding: "10px 14px",
-            background: "#10b98115",
-            border: "1px solid #10b98133",
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-lg">{"\uD83C\uDFA8"}</span>
-            <div>
-              <div className="text-[13px] font-semibold" style={{ color: "#10b981" }}>
-                Exercise Diagram Gallery
-              </div>
-              <div className="text-[10px] text-text-dim">
-                Glute bridges, clamshells, yoga &middot; animated diagrams
-              </div>
-            </div>
-            <span className="ml-auto text-text-muted text-xs">&rarr;</span>
-          </div>
-        </button>
-        {["Legs A", "Legs B", "Recovery"].map((k) => (
-          <div key={k}>{renderWorkout(k)}</div>
-        ))}
-      </div>
+    return renderExerciseLibrary(
+      LOWER_GROUPS,
+      lowerFilter,
+      setLowerFilter,
+      "#10b981",
+      "Exercise Diagram Gallery",
+      "Glute bridges, clamshells, yoga \u00B7 animated diagrams",
     );
   }
 

@@ -111,28 +111,26 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
           )}
         </div>
 
-        {/* Category tabs — horizontally scrollable */}
-        <div className="overflow-x-auto -mx-3 px-3 mb-3 scrollbar-hide">
-          <div className="flex gap-0 rounded-lg overflow-hidden border min-w-max" style={{ borderColor: "var(--color-border)" }}>
-            {CATEGORIES.map(c => {
-              const isActive = c.key === cat;
-              return (
-                <button
-                  key={c.key}
-                  onClick={() => setCat(c.key)}
-                  className="px-3 py-2 text-[11px] font-[inherit] border-none cursor-pointer transition-all min-h-[40px] whitespace-nowrap"
-                  style={{
-                    background: isActive ? accent + "18" : "var(--color-card)",
-                    color: isActive ? accent : "var(--color-text-muted)",
-                    fontWeight: isActive ? 700 : 400,
-                    borderBottom: isActive ? `2px solid ${accent}` : "2px solid transparent",
-                  }}
-                >
-                  {c.label}
-                </button>
-              );
-            })}
-          </div>
+        {/* Category tabs — wrapped pills */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {CATEGORIES.map(c => {
+            const isActive = c.key === cat;
+            return (
+              <button
+                key={c.key}
+                onClick={() => setCat(c.key)}
+                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer transition-all min-h-[36px]"
+                style={{
+                  border: isActive ? `1.5px solid ${c.accent}` : "1.5px solid var(--color-border)",
+                  background: isActive ? c.accent + "18" : "var(--color-card)",
+                  color: isActive ? c.accent : "var(--color-text-muted)",
+                  fontWeight: isActive ? 700 : 400,
+                }}
+              >
+                {c.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Exercise selector pills */}
