@@ -2235,7 +2235,7 @@ export default function WorkoutView() {
           target="_blank"
           rel="noopener noreferrer"
           className="text-text-muted"
-          title="NWB Yoga \u2014 Companion App"
+          title="NWB Yoga Companion App"
         >
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
             <circle cx="12" cy="4.5" r="2.5" />
