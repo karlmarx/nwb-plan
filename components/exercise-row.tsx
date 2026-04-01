@@ -15,6 +15,8 @@ interface ExerciseRowProps {
   unavailable: boolean;
   equipment: Record<string, boolean>;
   workoutExercises?: string[];
+  variantSetupCues?: string[];
+  variantLabel?: string;
 }
 
 export default function ExerciseRow({
@@ -28,6 +30,8 @@ export default function ExerciseRow({
   unavailable,
   equipment,
   workoutExercises = [],
+  variantSetupCues,
+  variantLabel,
 }: ExerciseRowProps) {
   if (!ex) return null;
 
@@ -77,6 +81,9 @@ export default function ExerciseRow({
             {unavailable && (
               <Badge color="var(--color-danger)">NO EQUIP</Badge>
             )}
+            {!isExpanded && variantLabel && (
+              <Badge color="var(--color-accent)">{variantLabel}</Badge>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {!isExpanded && (
@@ -121,6 +128,25 @@ export default function ExerciseRow({
                 {"\u{1F4CD}"} SETUP &amp; POSITION
               </div>
               <div className="text-text-dim">{ex.setup}</div>
+              {variantSetupCues && variantSetupCues.length > 0 && (
+                <div
+                  className="mt-2 rounded-md"
+                  style={{
+                    padding: "6px 8px",
+                    background: "var(--color-accent-dim)",
+                    border: "1px solid var(--color-accent)33",
+                  }}
+                >
+                  <div className="text-[9px] font-bold text-accent uppercase mb-1">
+                    {variantLabel ? `${variantLabel} Setup` : "Machine-Specific Setup"}
+                  </div>
+                  <ul className="m-0 pl-4 list-disc">
+                    {variantSetupCues.map((cue, i) => (
+                      <li key={i} className="text-text-dim mb-0.5">{cue}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* EXECUTE */}
