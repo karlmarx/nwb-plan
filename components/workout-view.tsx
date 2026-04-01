@@ -1744,7 +1744,7 @@ export default function WorkoutView() {
         </Callout>
 
         <Section
-          title="Tier 1 \u2014 Highest Output"
+          title="Tier 1 - Highest Output"
           icon={"\uD83D\uDD25"}
           isOpen={!!openSections["cardio-t1"]}
           onToggle={() => toggleSection("cardio-t1")}
@@ -1861,17 +1861,6 @@ export default function WorkoutView() {
   function renderCoreTab() {
     return (
       <div>
-        <Callout type="danger">
-          ZERO active left hip flexion. Protects femoral neck stress fracture.
-          Left leg passive in ALL exercises.
-        </Callout>
-        <Callout type="info">
-          Slow tempo protocol: 4-count movements, time-based sets, continuous
-          tension. BASE &rarr; AMP 1 &rarr; AMP 2. Target muscle failure in
-          the final 10-15 seconds of each set. If you finish the set
-          comfortably, move up an amp level.
-        </Callout>
-
         <button
           onClick={() => setDiagramOpen("gallery")}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
@@ -1974,6 +1963,17 @@ export default function WorkoutView() {
             {block.exercises.map((name) => renderCoreExercise(name))}
           </Section>
         ))}
+
+        <Callout type="danger">
+          ZERO active left hip flexion. Protects femoral neck stress fracture.
+          Left leg passive in ALL exercises.
+        </Callout>
+        <Callout type="info">
+          Slow tempo protocol: 4-count movements, time-based sets, continuous
+          tension. BASE &rarr; AMP 1 &rarr; AMP 2. Target muscle failure in
+          the final 10-15 seconds of each set. If you finish the set
+          comfortably, move up an amp level.
+        </Callout>
 
         <Section
           title="Removed Exercises"
