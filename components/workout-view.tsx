@@ -2456,21 +2456,6 @@ export default function WorkoutView() {
           {/* Header icons */}
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setTab(GEAR_TAB_INDEX)}
-              className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-              style={{
-                background: tab === GEAR_TAB_INDEX ? "var(--color-accent)22" : "var(--color-card)",
-                border: tab === GEAR_TAB_INDEX ? "1px solid var(--color-accent)" : "1px solid var(--color-border)",
-                color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
-              }}
-              title="Equipment & configuration"
-            >
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
-            <button
               onClick={() => setAboutOpen(true)}
               className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
               style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
@@ -2563,7 +2548,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-0.5 mb-4 overflow-x-auto pb-1">
+      <div className="flex gap-0.5 mb-4 items-stretch">
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
@@ -2573,7 +2558,7 @@ export default function WorkoutView() {
               key={t}
               title={TAB_TIPS[i]}
               onClick={() => setTab(i)}
-              className="flex-1 min-w-[60px] rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
+              className="flex-1 min-w-0 rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
               style={{
                 padding: "10px 4px",
                 background: isActive ? activeColor + "22" : "none",
@@ -2585,6 +2570,27 @@ export default function WorkoutView() {
             </button>
           );
         })}
+        {/* Divider */}
+        <div className="w-px mx-1 self-stretch" style={{ background: "var(--color-border)" }} />
+        {/* Gear / config */}
+        <button
+          title="Equipment & configuration"
+          onClick={() => setTab(GEAR_TAB_INDEX)}
+          className="rounded-lg cursor-pointer font-[inherit] flex items-center justify-center"
+          style={{
+            width: 40,
+            minWidth: 40,
+            padding: "10px 0",
+            background: tab === GEAR_TAB_INDEX ? "var(--color-accent)22" : "none",
+            border: `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-border)"}`,
+            color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
+          }}
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
       </div>
 
       {/* Tab content */}
