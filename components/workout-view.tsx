@@ -1428,7 +1428,7 @@ export default function WorkoutView() {
       <div>
         <Callout type="warning">
           VO2 max drops ~15% in just 2 weeks of inactivity. Aggressive
-          upper-body cardio is non-negotiable.
+          upper-body cardio is essential.
         </Callout>
 
         <Section

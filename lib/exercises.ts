@@ -873,7 +873,7 @@ export const EX: Record<string, Exercise> = {
     rest: 150,
     setup: "Sit in leg press. Place RIGHT foot HIGH on the plate. Left foot off the machine entirely.",
     execution: "Lower the sled until JUST before 90\u00B0 hip flexion \u2014 then press back up. In Weeks 3+: use 4-second eccentric (lowering). Start at ~50% bilateral 1RM.",
-    nwbCues: "HIGH foot placement = less hip flexion = protects FAI/labrum. 90\u00B0 limit is NON-NEGOTIABLE. Do NOT lock out knee. Left leg hangs free.",
+    nwbCues: "HIGH foot placement = less hip flexion = protects FAI/labrum. 90\u00B0 limit is absolute. Do NOT lock out knee. Left leg hangs free.",
     why: "MOST IMPORTANT exercise for cross-education effect. Eccentric emphasis drives up to 17.7% contralateral strength preservation (Manca et al. meta-analysis).",
     safety: "caution",
     swaps: ["Hack Squat (Right)"],
