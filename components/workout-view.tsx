@@ -718,26 +718,25 @@ export default function WorkoutView() {
           const unavail = !isAvailable(exName);
           const isExp = !!expandedEx[exName];
 
+          // Resolve selected machine variant (for setup cues + superset)
+          const selMachineId = machineSelections[exName];
+          const selectedVariant = ex.machineVariants?.find(
+            (v) => v.id === selMachineId
+          ) ?? null;
+
           // Equipment-specific superset (driven by machineVariants selection)
           let ssInfo: VariantSuperset | null = null;
           if (supplementToggles.leftLeg) {
             if (ex.cableSuperset && exName === firstCableName) {
               ssInfo = { ...CABLE_SUPERSET };
               // Check if selected machine variant is a lat pulldown machine (no low cable)
-              const selMachine = machineSelections[exName];
-              if (selMachine === "band_rack") {
+              if (selMachineId === "band_rack") {
                 ssInfo.note =
                   "No cable available with band setup \u2014 do ankle dorsiflexion at nearest cable column between sets.";
               }
-            } else if (ex.machineVariants) {
-              const selId =
-                machineSelections[exName] || ex.machineVariants[0]?.id;
-              const selectedVariant = ex.machineVariants.find(
-                (v) => v.id === selId
-              );
-              if (selectedVariant?.superset) {
-                ssInfo = { ...selectedVariant.superset };
-              }
+            } else if (selectedVariant?.superset) {
+              // Only show variant superset when user has explicitly selected a machine type
+              ssInfo = { ...selectedVariant.superset };
             }
           }
 
@@ -779,6 +778,8 @@ export default function WorkoutView() {
                 workoutExercises={w.exercises.map((o) =>
                   getExName(workoutKey, o)
                 )}
+                variantSetupCues={selectedVariant?.setupCues}
+                variantLabel={selectedVariant?.label}
               />
 
               {/* Equipment-specific superset card */}
