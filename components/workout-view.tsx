@@ -28,6 +28,7 @@ import MachineSelector from "@/components/machine-selector";
 import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
+import DiagramGallery from "@/components/diagrams/gallery";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -45,13 +46,14 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Today", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+const TABS = ["Today", "Workouts", "Cardio", "Core", "Diagrams", "Equip", "Safety"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
   "All push/pull/legs exercises",
   "NWB cardio options",
   "Core & ab routines",
+  "Animated exercise diagrams",
   "Toggle available equipment",
   "Injury cues & safety rules",
 ];
@@ -1562,7 +1564,7 @@ export default function WorkoutView() {
         </Callout>
 
         <button
-          onClick={() => setDiagramOpen("core-demos")}
+          onClick={() => setTab(4)}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
             padding: "10px 14px",
@@ -1574,10 +1576,10 @@ export default function WorkoutView() {
             <span className="text-lg">{"\uD83C\uDFA8"}</span>
             <div>
               <div className="text-[13px] font-semibold" style={{ color: "#a78bfa" }}>
-                Core Movement Demos
+                Exercise Diagram Gallery
               </div>
               <div className="text-[10px] text-text-dim">
-                17 animated diagrams &middot; TRX, Supine, Arm Balance
+                35+ animated diagrams &middot; 8 categories
               </div>
             </div>
             <span className="ml-auto text-text-muted text-xs">&rarr;</span>
@@ -1609,6 +1611,14 @@ export default function WorkoutView() {
           ))}
         </Section>
       </div>
+    );
+  }
+
+  function renderDiagramsTab() {
+    return (
+      <DiagramGallery
+        initialExercise={diagramOpen ?? undefined}
+      />
     );
   }
 
@@ -2053,9 +2063,12 @@ export default function WorkoutView() {
       content = renderCoreTab();
       break;
     case 4:
-      content = renderEquipTab();
+      content = renderDiagramsTab();
       break;
     case 5:
+      content = renderEquipTab();
+      break;
+    case 6:
       content = renderSafetyTab();
       break;
   }
