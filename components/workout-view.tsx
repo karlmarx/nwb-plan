@@ -7,6 +7,7 @@ import {
   EQUIPMENT,
   WORKOUTS,
   CORE_FINISHERS,
+  NEARBY_EQUIPMENT,
   SCHED,
   PHASES,
 } from "@/lib/exercises";
@@ -279,6 +280,69 @@ const CORE_BLOCKS = [
   },
 ];
 
+// Equipment-specific core blocks — shown when nearby equipment is selected
+const EQUIPMENT_CORE_BLOCKS: {
+  key: string;
+  title: string;
+  icon: string;
+  accent: string;
+  nearbyId: string;
+  exercises: string[];
+}[] = [
+  {
+    key: "core-captains-chair",
+    title: "Captain's Chair Core",
+    icon: "\uD83E\uDE91",
+    accent: "#FF6B35",
+    nearbyId: "captains_chair",
+    exercises: [
+      "Captain's Chair SLR (Right)",
+      "Captain's Chair Knee-to-Elbow (Right)",
+    ],
+  },
+  {
+    key: "core-parallel-bars",
+    title: "Parallel Bars Core",
+    icon: "\uD83E\uDD38",
+    accent: "#118AB2",
+    nearbyId: "parallel_bars",
+    exercises: [
+      "Support Hold (Parallel Bars)",
+      "Weight Shift Hold (Parallel Bars)",
+    ],
+  },
+  {
+    key: "core-barbell",
+    title: "Barbell Core",
+    icon: "\uD83C\uDFCB\uFE0F",
+    accent: "#f97316",
+    nearbyId: "barbell_rack",
+    exercises: [
+      "Dragon Flags",
+      "Barbell Rollout (R-Knee)",
+      "Body Saw (Barbell)",
+      "Human Flag Progressions",
+      "Eccentric Body Levers",
+      "Hollow Body Inverted Rows",
+    ],
+  },
+  {
+    key: "core-hanging",
+    title: "Hanging Core (Pull-Up Bar)",
+    icon: "\uD83D\uDD25",
+    accent: "#ef4444",
+    nearbyId: "pullup_bar",
+    exercises: [
+      "Front Lever",
+      "Windshield Wipers (R-Leg)",
+      "1-Arm Hang + R Knee Drive",
+      "Front Lever Raises",
+      "Typewriter R-Leg Raises",
+      "R-Leg Toes-to-Bar",
+    ],
+  },
+];
+
 const REMOVED_CORE = [
   {
     name: "Active Straight Leg Raises",
@@ -338,6 +402,9 @@ export default function WorkoutView() {
   const [nearbySelections, setNearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
+  const [coreNearby, setCoreNearby] = useState<string[]>(
+    () => loadState<string[]>("nwb_core_nearby", []),
+  );
   const [supplementToggles, setSupplementToggles] = useState<{
     leftLeg: boolean;
     core: boolean;
@@ -373,6 +440,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_nearby", nearbySelections);
   }, [nearbySelections]);
+  useEffect(() => {
+    saveState("nwb_core_nearby", coreNearby);
+  }, [coreNearby]);
   useEffect(() => {
     saveState("nwb_supplements", supplementToggles);
   }, [supplementToggles]);
@@ -1592,6 +1662,72 @@ export default function WorkoutView() {
             isOpen={!!openSections[block.key]}
             onToggle={() => toggleSection(block.key)}
             count={block.count}
+            accent={block.accent}
+          >
+            {block.exercises.map((name) => renderCoreExercise(name))}
+          </Section>
+        ))}
+
+        {/* Equipment-specific core: nearby picker */}
+        <div
+          className="rounded-lg mt-4 mb-3"
+          style={{
+            padding: "12px 14px",
+            background: "var(--color-card)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <div className="text-[11px] font-bold text-text-muted uppercase tracking-widest mb-2.5">
+            {"\uD83D\uDCCD"} What equipment is nearby?
+          </div>
+          <div className="text-[10px] text-text-dim mb-2.5">
+            Select equipment to see matching core exercises
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {NEARBY_EQUIPMENT.filter((item) =>
+              EQUIPMENT_CORE_BLOCKS.some((b) => b.nearbyId === item.id),
+            ).map((item) => {
+              const isSelected = coreNearby.includes(item.id);
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setCoreNearby((prev) =>
+                      prev.includes(item.id)
+                        ? prev.filter((x) => x !== item.id)
+                        : [...prev, item.id],
+                    )
+                  }
+                  className="rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit] min-h-[36px]"
+                  style={{
+                    padding: "6px 12px",
+                    background: isSelected
+                      ? "var(--color-accent)22"
+                      : "var(--color-bg)",
+                    border: `1.5px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
+                    color: isSelected
+                      ? "var(--color-accent)"
+                      : "var(--color-text-muted)",
+                  }}
+                >
+                  {item.icon} {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Equipment-specific core blocks */}
+        {EQUIPMENT_CORE_BLOCKS.filter((block) =>
+          coreNearby.includes(block.nearbyId),
+        ).map((block) => (
+          <Section
+            key={block.key}
+            title={block.title}
+            icon={block.icon}
+            isOpen={!!openSections[block.key]}
+            onToggle={() => toggleSection(block.key)}
+            count={block.exercises.length}
             accent={block.accent}
           >
             {block.exercises.map((name) => renderCoreExercise(name))}
