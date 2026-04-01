@@ -10,13 +10,17 @@ A Progressive Web App for MRI-adjusted non-weight-bearing (NWB) Push/Pull/Legs t
 ## Features
 
 - **Today tab** — shows today's scheduled workout in the PPL rotation, with a 42-day ProgressClock
-- **Push / Pull / Legs / Recovery** — 6-day PPL split with A/B variants
+- **Upper Body tab** — Push A/B + Pull A/B workouts with inline diagram gallery access
+- **Lower Body tab** — Legs A/B + Recovery workouts with inline diagram gallery access
+- **Core tab** — 35+ core exercises organized by body part (anterior, obliques, posterior, integrated) with equipment-aware nearby picker
+- **Cardio tab** — NWB cardio schedule (SkiErg, arm ergo, battle ropes, boxing) with weekly planner
 - **3 progression phases** — Foundation → Build → Peak (sets/reps auto-adjust per phase)
+- **35+ animated SVG exercise diagrams** — full gallery across 8 categories: rack core, supine, prone, glute, TRX, arm balance, yoga, and equipment
 - **Left leg & core supersets** — interleaved rehab exercises with toggle controls, equipment-aware suggestions
 - **Machine type picker** — visual card selector per exercise (e.g., plate-loaded vs selectorized)
-- **Nearby equipment chips** — "What's within reach?" drives context-aware superset suggestions
+- **Nearby equipment chips** — "What's within reach?" drives context-aware superset suggestions (11 equipment types including TRX)
+- **Equipment-specific core blocks** — captain's chair, parallel bars, barbell, and hanging exercises that appear when you select nearby equipment
 - **Equipment-aware swaps** — toggle gear on/off; exercises auto-route to available alternatives
-- **21 animated SVG diagrams** — TRX Core, Supine Oblique, Arm Balance, Glute Bridge, Clamshells, Planche, Side Plank
 - **HEVY deep-links** — one-tap "Open in HEVY" button on every workout
 - **Dark/light theme** — toggle in header, persisted to localStorage
 - **Rest timer** — per-exercise countdown with pulse animation
@@ -76,15 +80,28 @@ Tap the phase selector below the header to switch between:
 
 | Phase | Weeks | Focus |
 |-------|-------|-------|
-| **Foundation** | 1–2 | Higher reps, learn safe movement patterns |
-| **Build** | 3–4 | Increase load, 4-sec eccentrics, drop sets |
-| **Peak** | 5–6 | Maximum safe output, heavy singles |
+| **Foundation** | 1-2 | Higher reps, learn safe movement patterns |
+| **Build** | 3-4 | Increase load, 4-sec eccentrics, drop sets |
+| **Peak** | 5-6 | Maximum safe output, heavy singles |
 
 Sets and reps update automatically throughout the app when you change phases.
 
 ### Exercise Diagrams
 
-Some exercises have a "View Movement Diagram" button that opens an animated SVG showing proper form. The Core tab has a "Core Movement Demos" button with 17 animated diagrams covering TRX Core, Supine Oblique, and Arm Balance Prep categories. All diagrams support tap-to-pause.
+The app includes 35+ animated SVG exercise diagrams organized into 8 categories:
+
+| Category | Exercises | Examples |
+|----------|-----------|---------|
+| **Rack Core** | 5 | Landmine rotations, plate halos, barbell rollouts |
+| **Supine** | 4 | Cross-body reach, supine twist, modified navasana |
+| **Prone / Box** | 4 | Prone hip extension, prone Y-T-W, back extension |
+| **Glute** | 3 | Glute bridge, banded clamshell, cable kickback |
+| **TRX** | 7 | TRX pike, body saw, mountain climber, fallout |
+| **Arm Balance** | 6 | L-sit, crow, pseudo planche push-up |
+| **Yoga** | 4 | Dolphin pose, warrior III, chair pose |
+| **Equipment** | 2 | Pseudo planche push-up, side plank |
+
+Access the gallery from the diagram buttons on the Upper, Lower, and Core tabs. All diagrams support tap-to-pause animation.
 
 ### Offline Use
 
@@ -95,11 +112,12 @@ The app works fully offline after the first load. All exercise data, equipment s
 | Tab | Purpose |
 |-----|---------|
 | **Today** | Today's scheduled workout + 42-day ProgressClock |
-| **Workouts** | Full exercise library (Push / Pull / Legs), all phases |
-| **Cardio** | NWB cardio options (arm bike, battle rope, SkiErg, etc.) |
-| **Core** | 19 core exercises in 4 blocks + animated movement demos |
+| **Upper** | Push A/B + Pull A/B exercises with diagram gallery |
+| **Lower** | Legs A/B + Recovery exercises with diagram gallery |
+| **Core** | Core exercises by body part + equipment-aware nearby picker |
+| **Cardio** | NWB cardio options + weekly schedule |
 | **Equip** | Toggle available equipment; updates swaps throughout |
-| **Safety** | Injury cues, NWB rules, and red-flag checklist |
+| **Safety** | Injury cues, NWB rules, nutrition, and red-flag checklist |
 
 ## Protocol Constraints
 
@@ -108,7 +126,7 @@ Every exercise satisfies all of the following:
 | Constraint | Reason |
 |---|---|
 | Zero weight-bearing on left leg | Compression-sided medial femoral neck stress fracture |
-| No hip flexion past 90° | Bilateral FAI + anterosuperior labral tears |
+| No hip flexion past 90 degrees | Bilateral FAI + anterosuperior labral tears |
 | No spinal flexion/rotation under load | L4-L5 degenerative disc disease |
 | No active left hip flexor recruitment | Protect stress fracture site during healing |
 
@@ -147,10 +165,10 @@ Every exercise satisfies all of the following:
 │  │  │MachineSelector│ │NearbyPicker │ │  DiagramModal    │   │  │
 │  │  └──────────────┘ └─────────────┘ │  ├ PlancheDiagram │   │  │
 │  │  ┌──────────────┐ ┌─────────────┐ │  ├ SidePlankDiag  │   │  │
-│  │  │ProgressClock │ │SuggestionCard│ │  ├ GluteBridgeDiag│  │  │
-│  │  └──────────────┘ └─────────────┘ │  ├ ClamshellDiag  │   │  │
-│  │                                   │  └ CoreDemoGuide  │   │  │
-│  │                                   └──────────────────┘   │  │
+│  │  │ProgressClock │ │DiagramGallery│ │  ├ GluteBridgeDiag│  │  │
+│  │  └──────────────┘ │ 35+ animated│ │  ├ ClamshellDiag  │   │  │
+│  │                   │ SVG diagrams│ │  └ CoreDemoGuide  │   │  │
+│  │                   └─────────────┘ └──────────────────┘   │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                              │                                  │
 │                    ┌─────────┴─────────┐                        │
@@ -164,8 +182,8 @@ Every exercise satisfies all of the following:
 
 ```
 ┌──────────────────────┐
-│  lib/exercises.ts    │──── 67 exercises, typed, with safety constraints,
-│  (~96KB)             │     machine variants, swap chains, diagram keys
+│  lib/exercises.ts    │──── 80+ exercises, typed, with safety constraints,
+│  (~120KB)            │     machine variants, swap chains, diagram keys
 └────────┬─────────────┘
          │
          ▼
@@ -215,13 +233,26 @@ nwb-plan/
 │       └── saved-suggestions/    # Saved suggestions (stub)
 │
 ├── components/                   # React client components
-│   ├── workout-view.tsx          # Main app shell, all state, 6 tabs
+│   ├── workout-view.tsx          # Main app shell, all state, 7 tabs
 │   ├── exercise-row.tsx          # Exercise detail panel with safety cues
 │   ├── machine-selector.tsx      # Visual machine type picker cards
 │   ├── nearby-picker.tsx         # Multi-select nearby equipment chips
 │   ├── diagram-modal.tsx         # Diagram registry + modal wrapper
 │   ├── core-demo-guide.tsx       # 17 animated core exercise SVGs
 │   ├── exercise-diagrams.tsx     # Glute Bridge + Clamshells animated SVGs
+│   ├── diagrams/                 # Unified diagram gallery system
+│   │   ├── gallery.tsx           # Main gallery component with category tabs
+│   │   ├── data.ts              # Exercise diagram metadata (35 exercises, 8 categories)
+│   │   ├── helpers.tsx          # Shared SVG primitives and animation helpers
+│   │   ├── rack-core.tsx        # Rack core animations (5)
+│   │   ├── supine.tsx           # Supine animations (4)
+│   │   ├── prone.tsx            # Prone/box animations (4)
+│   │   ├── glute.tsx            # Glute animations (3)
+│   │   ├── trx.tsx              # TRX animations (7)
+│   │   ├── arm-balance.tsx      # Arm balance animations (6)
+│   │   ├── yoga.tsx             # Yoga animations (4)
+│   │   ├── equipment.tsx        # Equipment animations (2)
+│   │   └── index.ts             # Re-exports
 │   ├── suggestion-card.tsx       # AI suggestion display (feature-flagged)
 │   ├── progress-clock.tsx        # 6-week program timer
 │   ├── rest-timer.tsx            # Post-exercise countdown
@@ -233,7 +264,7 @@ nwb-plan/
 │   └── providers.tsx             # SessionProvider wrapper
 │
 ├── lib/                          # Data & configuration
-│   ├── exercises.ts              # 67 exercises, types, workouts, schedule
+│   ├── exercises.ts              # 80+ exercises, types, workouts, schedule
 │   ├── supplements.ts            # Left leg rehab, core routines, supersets
 │   ├── auth.ts                   # NextAuth v5 config (Google OAuth)
 │   ├── anthropic.ts              # Anthropic SDK client
@@ -312,6 +343,7 @@ Cache: nwb-plan-v6 (bumped on deploy, old caches auto-cleaned)
 | `nwb_startDay` | Day-of-week index the PPL rotation starts on |
 | `nwb_machines` | Exercise → selected machine variant id |
 | `nwb_nearby` | Exercise → selected nearby equipment ids |
+| `nwb_core_nearby` | Selected nearby equipment in Core tab |
 | `nwb_supplements` | `{ leftLeg: bool, core: bool }` toggle state |
 | `nwb_theme` | `"dark"` or `"light"` |
 

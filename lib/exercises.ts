@@ -121,6 +121,7 @@ export const NEARBY_EQUIPMENT = [
   { id: "barbell_rack", label: "Barbell + Rack", icon: "\u{1F3CB}\uFE0F" },
   { id: "bands", label: "Resistance Bands", icon: "\u{1F380}" },
   { id: "mat_floor", label: "Mat / Floor Space", icon: "\u{1F9D8}" },
+  { id: "trx", label: "TRX / Suspension", icon: "\u{1F3CB}\uFE0F" },
   { id: "captains_chair", label: "Captain's Chair / VKR", icon: "\u{1FA91}" },
   { id: "parallel_bars", label: "Parallel Bars / Dip Station", icon: "\u{1F938}" },
 ];
