@@ -47,7 +47,7 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "Equip", "Safety"];
+const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "\u2699", "Safety"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
@@ -55,7 +55,7 @@ const TAB_TIPS = [
   "Legs + Recovery exercise library",
   "Core exercises by body part",
   "NWB cardio options",
-  "Toggle available equipment",
+  "Equipment & configuration",
   "Injury cues & safety rules",
 ];
 
