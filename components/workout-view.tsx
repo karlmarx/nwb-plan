@@ -834,20 +834,16 @@ export default function WorkoutView() {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <svg
-                width={28}
-                height={28}
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <circle cx="12" cy="4.5" r="2.5" />
-                <path
-                  d="M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z"
-                  opacity="0.6"
-                />
-                <path d="M10.5 7.5h3v4.5h-3z" />
-                <path d="M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z" />
-                <path d="M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z" />
+              <svg width={28} height={28} viewBox="0 0 24 24" fill="currentColor">
+                <g transform="translate(12,18)">
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" opacity="0.5"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" opacity="0.7"/>
+                  <path d="M0,0 C-1,-3.2 -1.2,-8 0,-13 C1.2,-8 1,-3.2 0,0Z"/>
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(35)" opacity="0.5"/>
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(-35)" opacity="0.5"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(20)" opacity="0.6"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(-20)" opacity="0.6"/>
+                </g>
               </svg>
               <div>
                 <div className="text-[13px] font-semibold text-text">
@@ -2628,14 +2624,16 @@ export default function WorkoutView() {
           title="NWB Yoga Companion App"
         >
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="4.5" r="2.5" />
-            <path
-              d="M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z"
-              opacity="0.6"
-            />
-            <path d="M10.5 7.5h3v4.5h-3z" />
-            <path d="M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z" />
-            <path d="M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z" />
+            {/* Lotus flower matching nwb-yoga icon */}
+            <g transform="translate(12,18)">
+              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" opacity="0.5"/>
+              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" opacity="0.7"/>
+              <path d="M0,0 C-1,-3.2 -1.2,-8 0,-13 C1.2,-8 1,-3.2 0,0Z"/>
+              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(35)" opacity="0.5"/>
+              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(-35)" opacity="0.5"/>
+              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(20)" opacity="0.6"/>
+              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(-20)" opacity="0.6"/>
+            </g>
           </svg>
         </a>
       </div>
