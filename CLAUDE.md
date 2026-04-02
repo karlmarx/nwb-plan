@@ -11,7 +11,8 @@ NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearin
 - **Run locally:** `npm run dev` (uses Turbopack)
 - **Build:** `npm run build`
 - **Deploy:** Push to `main` — Vercel auto-deploys
-- **No tests configured yet**
+- **E2E tests:** `npm run test:e2e` — 97 Playwright tests via Python/pytest in `e2e/`
+- **CI:** GitHub Actions (`.github/workflows/playwright.yml`) runs on PRs to main; branch protection requires passing "Playwright Tests" check
 
 ## Architecture
 
