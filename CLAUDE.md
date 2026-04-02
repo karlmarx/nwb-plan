@@ -11,7 +11,8 @@ NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearin
 - **Run locally:** `npm run dev` (uses Turbopack)
 - **Build:** `npm run build`
 - **Deploy:** Push to `main` — Vercel auto-deploys
-- **No tests configured yet**
+- **E2E tests:** `npm run test:e2e` — 97 Playwright tests via Python/pytest in `e2e/`
+- **CI:** GitHub Actions (`.github/workflows/playwright.yml`) runs on PRs to main; branch protection requires passing "Playwright Tests" check
 
 ## Architecture
 
@@ -24,23 +25,25 @@ Next.js 16 App Router with TypeScript and Tailwind CSS v4.
 - `public/` — PWA assets (icons, manifest, service worker)
 
 ### Data flow
-- Exercise data in `lib/exercises.ts` (typed, ~96KB, 67 exercises)
+- Exercise data in `lib/exercises.ts` (typed, ~120KB, 80+ exercises)
 - Supplement/superset data in `lib/supplements.ts` (left leg rehab, core routines, nearby supersets)
+- Diagram animations in `components/diagrams/` (35+ animated SVGs, 8 categories)
 - All UI state in `components/workout-view.tsx` (localStorage persistence via `lib/storage.ts`)
 - Auth via NextAuth v5 (`lib/auth.ts`, Google OAuth)
 - AI suggestions via `/api/suggest` (Anthropic Claude, behind feature flag)
 
 ### Component tree
 ```
-WorkoutView (main shell, all state, 6 tabs)
+WorkoutView (main shell, all state, 7 tabs: Today/Upper/Lower/Core/Cardio/Equip/Safety)
 ├── Section (collapsible wrapper)
 ├── ExerciseRow (exercise detail + safety cues + swap buttons)
 │   └── filters swaps to prevent duplicates in same workout
 ├── MachineSelector (visual machine type picker cards)
 │   └── selected variant drives superset suggestions via machineVariants[].superset
-├── NearbyPicker (multi-select equipment chips)
+├── NearbyPicker (multi-select equipment chips, 11 types incl TRX)
 │   └── auto-highlights "in use" equipment, drives nearby superset suggestions
-├── DiagramModal (registry + modal wrapper)
+├── DiagramGallery (35+ animated SVGs, 8 categories, full-screen overlay)
+├── DiagramModal (registry + modal wrapper for individual exercise diagrams)
 │   ├── PlancheDiagram, SidePlankDiagram (static SVG)
 │   ├── GluteBridgeDiagram, ClamshellDiagram (CSS keyframe animated)
 │   └── CoreDemoGuide (17 JS-animated core exercise SVGs)
@@ -61,11 +64,14 @@ WorkoutView (main shell, all state, 6 tabs)
 - `NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS` — enables AI suggestion system (default: false)
 
 ### Key components
-- `workout-view.tsx` — Main app shell, all state, 6 tabs
+- `workout-view.tsx` — Main app shell, all state, 7 tabs (Today/Upper/Lower/Core/Cardio/Equip/Safety)
 - `exercise-row.tsx` — Exercise detail panel with safety cues, duplicate-aware swaps
 - `machine-selector.tsx` — Visual machine type picker cards
 - `nearby-picker.tsx` — Multi-select nearby equipment chips with "in use" auto-highlight
-- `diagram-modal.tsx` — 5 diagram components (Planche, SidePlank, GluteBridge, Clamshells, CoreDemos)
+- `diagrams/gallery.tsx` — Unified exercise diagram gallery (35+ animated SVGs, 8 categories)
+- `diagrams/data.ts` — Exercise diagram metadata and category definitions
+- `diagrams/helpers.tsx` — Shared SVG primitives and animation utilities
+- `diagram-modal.tsx` — Individual exercise diagram modal (Planche, SidePlank, GluteBridge, Clamshells, CoreDemos)
 - `core-demo-guide.tsx` — 17 animated core exercise SVG diagrams (TRX, Supine, Arm Balance)
 - `exercise-diagrams.tsx` — Animated GluteBridge + Clamshells diagrams (CSS keyframes)
 - `suggestion-card.tsx` — AI suggestion display (behind feature flag)

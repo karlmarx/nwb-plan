@@ -7,6 +7,7 @@ import {
   EQUIPMENT,
   WORKOUTS,
   CORE_FINISHERS,
+  NEARBY_EQUIPMENT,
   SCHED,
   PHASES,
 } from "@/lib/exercises";
@@ -28,6 +29,7 @@ import MachineSelector from "@/components/machine-selector";
 import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
+import DiagramGallery from "@/components/diagrams/gallery";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -45,16 +47,19 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Today", "Workouts", "Cardio", "Core", "Equip", "Safety"];
+const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "Safety"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
-  "All push/pull/legs exercises",
+  "Push + Pull exercise library",
+  "Legs + Recovery exercise library",
+  "Core exercises by body part",
   "NWB cardio options",
-  "Core & ab routines",
-  "Toggle available equipment",
   "Injury cues & safety rules",
 ];
+
+// Gear/config tab is accessed via header icon, not in the tab bar
+const GEAR_TAB_INDEX = 6;
 
 const DAY_NAMES = [
   "Monday",
@@ -90,13 +95,13 @@ const EQUIP_CATEGORIES: Record<string, string> = {
 
 // ===== CARDIO SCHEDULE DATA =====
 const CARDIO_SCHEDULE = [
-  ["Mon", "\u2014", "SkiErg HIIT 25m", "~300"],
+  ["Mon", "Rest", "SkiErg HIIT 25m", "~300"],
   ["Tue", "Arm Ergo 30m", "Battle Ropes 15m", "~400"],
-  ["Wed", "SkiErg Intervals", "\u2014", "~350"],
+  ["Wed", "SkiErg Intervals", "Rest", "~350"],
   ["Thu", "Boxing 20m", "SkiErg Steady 25m", "~450"],
   ["Fri", "Arm Ergo HIIT", "Ropes Tabata", "~400"],
   ["Sat", "SkiErg Long 40m", "Boxing 15m", "~500"],
-  ["Sun", "Light Arm Ergo 20m", "\u2014", "~100"],
+  ["Sun", "Light Arm Ergo 20m", "Rest", "~100"],
 ];
 
 // ===== INJURY DATA =====
@@ -220,61 +225,253 @@ const POOL_TABLE = [
   ["Wall Press", "Any pool edge", "Hardest"],
 ];
 
-// ===== CORE BLOCKS =====
+// ===== UPPER BODY MUSCLE GROUPS =====
+const UPPER_GROUPS = [
+  {
+    key: "chest",
+    label: "Chest",
+    icon: "\uD83D\uDCAA",
+    accent: "#38bdf8",
+    exercises: [
+      "Barbell Floor Press",
+      "DB Floor Press",
+      "Machine Chest Press",
+      "Incline DB Press + Lat Raises",
+      "Cable Chest Fly",
+      "Mechanical Drop Set (Press)",
+      "Dip Machine",
+    ],
+  },
+  {
+    key: "shoulders",
+    label: "Shoulders",
+    icon: "\uD83C\uDFCB\uFE0F",
+    accent: "#f97316",
+    exercises: [
+      "Seated DB OH Press",
+      "Seated Arnold Press",
+      "Landmine Press (seated)",
+      "Seated Face Pulls",
+      "Reverse Fly",
+    ],
+  },
+  {
+    key: "back",
+    label: "Back",
+    icon: "\uD83E\uDDBE",
+    accent: "#a78bfa",
+    exercises: [
+      "Lat Pulldown (Wide)",
+      "Neutral Grip Pulldown",
+      "Weighted Pull-Up",
+      "Finger-Assist One-Arm Pull-Up",
+      "Chest-Supported DB Row",
+      "Seated Cable Row",
+      "One-Arm Cable Row",
+      "Mechanical Drop Set (Pull)",
+    ],
+  },
+  {
+    key: "arms",
+    label: "Arms",
+    icon: "\uD83D\uDCAA",
+    accent: "#10b981",
+    exercises: [
+      "Lying Skull Crushers",
+      "OH Triceps Extension",
+      "Tricep Rope Pushdown",
+      "Preacher Curls",
+      "Hammer Curls",
+      "Incline DB Curl",
+    ],
+  },
+  {
+    key: "skill",
+    label: "Compound / Skill",
+    icon: "\uD83E\uDD38",
+    accent: "#eab308",
+    exercises: [
+      "Pseudo Planche Push-Up",
+      "Parallette L-Sit",
+    ],
+  },
+];
+
+// ===== LOWER BODY MUSCLE GROUPS =====
+const LOWER_GROUPS = [
+  {
+    key: "quads",
+    label: "Quads",
+    icon: "\uD83E\uDDB5",
+    accent: "#38bdf8",
+    exercises: [
+      "SL Leg Press (Right)",
+      "Hack Squat (Right)",
+      "SL Leg Extension (Right)",
+      "Low-Box Step-Up (Right)",
+    ],
+  },
+  {
+    key: "glutes",
+    label: "Glutes / Hips",
+    icon: "\uD83C\uDF51",
+    accent: "#ec4899",
+    exercises: [
+      "SL Glute Bridge (Right)",
+      "SL Hip Thrust (Right)",
+      "Banded Clamshells",
+    ],
+  },
+  {
+    key: "hamstrings",
+    label: "Hamstrings",
+    icon: "\uD83E\uDDBF",
+    accent: "#a78bfa",
+    exercises: [
+      "Prone Ham Curl (Right)",
+      "Stab Ball Ham Curl (Right)",
+      "Nordic Ham Curl",
+    ],
+  },
+  {
+    key: "calves",
+    label: "Calves",
+    icon: "\uD83E\uDDB6",
+    accent: "#f97316",
+    exercises: [
+      "Standing Calf Raise (R)",
+    ],
+  },
+  {
+    key: "rehab",
+    label: "Left Leg Rehab",
+    icon: "\uD83E\uDE7B",
+    accent: "#14b8a6",
+    exercises: [
+      "Isometric Quad Sets (Left)",
+      "Ankle Pumps (Left)",
+    ],
+  },
+];
+
+// ===== CORE BLOCKS (organized by body part) =====
 const CORE_BLOCKS = [
   {
-    key: "core-antiext",
-    title: "Block 1: Anti-Extension",
-    icon: "\uD83D\uDC80",
-    accent: "var(--color-danger)",
+    key: "core-anterior",
+    title: "Anterior Core (Front)",
+    icon: "\uD83D\uDD25",
+    accent: "#ef4444",
     count: 8,
     exercises: [
       "Forearm Plank Saw",
       "Plank Knee Tuck (R only)",
       "Wheelbarrow Hold",
-      "Spiderman Plank (R only)",
-      "Slow Mountain Climber (R)",
-      "Dead Bug (R Leg Only)",
       "Hollow Body Hold",
+      "Dead Bug (R Leg Only)",
       "Body Saw (Sliders)",
+      "McGill Curl-Up",
+      "Bicycle Crunch (R Leg Only)",
     ],
   },
   {
-    key: "core-antirot",
-    title: "Block 2: Anti-Rotation",
-    icon: "\uD83D\uDD04",
-    accent: "var(--color-accent)",
-    count: 3,
-    exercises: [
-      "Pallof Press (Seated)",
-      "Pallof Overhead Reach",
-      "Bird-Dog (Prone Bench)",
-    ],
-  },
-  {
-    key: "core-antilat",
-    title: "Block 3: Anti-Lateral-Flexion",
+    key: "core-obliques",
+    title: "Obliques & Lateral",
     icon: "\u2194\uFE0F",
-    accent: "var(--color-warning)",
-    count: 3,
+    accent: "#a78bfa",
+    count: 7,
     exercises: [
       "Side Plank (R Side Down)",
       "Side Plank (L Oblique Bias \u2014 R Side Down)",
       "Suitcase Hold (Seated)",
+      "Pallof Press (Seated)",
+      "Pallof Overhead Reach",
+      "Russian Twist (Seated Bench)",
+      "Cable Woodchop (Seated)",
     ],
   },
   {
-    key: "core-rotation",
-    title: "Block 4: Rotation + Integrated",
-    icon: "\uD83C\uDF00",
-    accent: "#a78bfa",
-    count: 5,
+    key: "core-posterior",
+    title: "Posterior Core (Back)",
+    icon: "\uD83E\uDDBF",
+    accent: "#10b981",
+    count: 3,
     exercises: [
-      "Russian Twist (Seated Bench)",
-      "Cable Woodchop (Seated)",
-      "Bicycle Crunch (R Leg Only)",
+      "Bird-Dog (Prone Bench)",
+      "Spiderman Plank (R only)",
+      "Slow Mountain Climber (R)",
+    ],
+  },
+  {
+    key: "core-integrated",
+    title: "Full Core & Integrated",
+    icon: "\uD83C\uDFAF",
+    accent: "#f97316",
+    count: 1,
+    exercises: [
       "Stir the Pot",
-      "McGill Curl-Up",
+    ],
+  },
+];
+
+// Equipment-specific core blocks — shown when nearby equipment is selected
+const EQUIPMENT_CORE_BLOCKS: {
+  key: string;
+  title: string;
+  icon: string;
+  accent: string;
+  nearbyId: string;
+  exercises: string[];
+}[] = [
+  {
+    key: "core-captains-chair",
+    title: "Captain's Chair Core",
+    icon: "\uD83E\uDE91",
+    accent: "#FF6B35",
+    nearbyId: "captains_chair",
+    exercises: [
+      "Captain's Chair SLR (Right)",
+      "Captain's Chair Knee-to-Elbow (Right)",
+    ],
+  },
+  {
+    key: "core-parallel-bars",
+    title: "Parallel Bars Core",
+    icon: "\uD83E\uDD38",
+    accent: "#118AB2",
+    nearbyId: "parallel_bars",
+    exercises: [
+      "Support Hold (Parallel Bars)",
+      "Weight Shift Hold (Parallel Bars)",
+    ],
+  },
+  {
+    key: "core-barbell",
+    title: "Barbell Core",
+    icon: "\uD83C\uDFCB\uFE0F",
+    accent: "#f97316",
+    nearbyId: "barbell_rack",
+    exercises: [
+      "Dragon Flags",
+      "Barbell Rollout (R-Knee)",
+      "Body Saw (Barbell)",
+      "Human Flag Progressions",
+      "Eccentric Body Levers",
+      "Hollow Body Inverted Rows",
+    ],
+  },
+  {
+    key: "core-hanging",
+    title: "Hanging Core (Pull-Up Bar)",
+    icon: "\uD83D\uDD25",
+    accent: "#ef4444",
+    nearbyId: "pullup_bar",
+    exercises: [
+      "Front Lever",
+      "Windshield Wipers (R-Leg)",
+      "1-Arm Hang + R Knee Drive",
+      "Front Lever Raises",
+      "Typewriter R-Leg Raises",
+      "R-Leg Toes-to-Bar",
     ],
   },
 ];
@@ -338,10 +535,15 @@ export default function WorkoutView() {
   const [nearbySelections, setNearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
+  const [coreNearby, setCoreNearby] = useState<string[]>(
+    () => loadState<string[]>("nwb_core_nearby", []),
+  );
   const [supplementToggles, setSupplementToggles] = useState<{
     leftLeg: boolean;
     core: boolean;
   }>(() => loadState("nwb_supplements", { leftLeg: true, core: true }));
+  const [upperFilter, setUpperFilter] = useState<string | null>(null);
+  const [lowerFilter, setLowerFilter] = useState<string | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
@@ -373,6 +575,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_nearby", nearbySelections);
   }, [nearbySelections]);
+  useEffect(() => {
+    saveState("nwb_core_nearby", coreNearby);
+  }, [coreNearby]);
   useEffect(() => {
     saveState("nwb_supplements", supplementToggles);
   }, [supplementToggles]);
@@ -629,24 +834,20 @@ export default function WorkoutView() {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <svg
-                width={28}
-                height={28}
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <circle cx="12" cy="4.5" r="2.5" />
-                <path
-                  d="M12 1.5c-2.5 0-4.5 1.5-5 3.5 0 .3.2.5.5.4C8.5 5 10.2 4.5 12 4.5s3.5.5 4.5.9c.3.1.5-.1.5-.4-.5-2-2.5-3.5-5-3.5z"
-                  opacity="0.6"
-                />
-                <path d="M10.5 7.5h3v4.5h-3z" />
-                <path d="M10.5 9L7 12h2l1.5-2zM13.5 9L17 12h-2l-1.5-2z" />
-                <path d="M5.5 17c0-2.8 2.9-5 6.5-5s6.5 2.2 6.5 5c0 1.5-1 2.8-2.5 3.5-1.2-.8-2.5-1.2-4-1.2s-2.8.4-4 1.2C6.5 19.8 5.5 18.5 5.5 17z" />
+              <svg width={28} height={28} viewBox="0 0 24 24" fill="currentColor">
+                <g transform="translate(12,18)">
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" opacity="0.5"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" opacity="0.7"/>
+                  <path d="M0,0 C-1,-3.2 -1.2,-8 0,-13 C1.2,-8 1,-3.2 0,0Z"/>
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(35)" opacity="0.5"/>
+                  <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(-35)" opacity="0.5"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(20)" opacity="0.6"/>
+                  <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(-20)" opacity="0.6"/>
+                </g>
               </svg>
               <div>
                 <div className="text-[13px] font-semibold text-text">
-                  NWB Yoga &mdash; Companion App
+                  NWB Yoga Companion App
                 </div>
                 <div className="text-[11px] text-text-dim mt-0.5">
                   3 guided tiers &middot; 14 animated poses &middot; built-in
@@ -1401,21 +1602,130 @@ export default function WorkoutView() {
     );
   }
 
-  function renderWorkoutsTab() {
+  function renderExerciseLibrary(
+    groups: typeof UPPER_GROUPS,
+    filter: string | null,
+    setFilter: (f: string | null) => void,
+    accentColor: string,
+    diagramLabel: string,
+    diagramDesc: string,
+  ) {
+    const visibleGroups = filter
+      ? groups.filter((g) => g.key === filter)
+      : groups;
+
+    const totalExercises = groups.reduce((n, g) => n + g.exercises.length, 0);
+    const availableCount = groups.reduce(
+      (n, g) => n + g.exercises.filter((name) => isAvailable(name)).length,
+      0,
+    );
+
     return (
       <div>
-        {[
-          "Push A",
-          "Push B",
-          "Pull A",
-          "Pull B",
-          "Legs A",
-          "Legs B",
-          "Recovery",
-        ].map((k) => (
-          <div key={k}>{renderWorkout(k)}</div>
+        {/* Diagram gallery button */}
+        <button
+          data-testid="open-diagram-gallery"
+          onClick={() => setDiagramOpen("gallery")}
+          className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
+          style={{
+            padding: "10px 14px",
+            background: accentColor + "15",
+            border: `1px solid ${accentColor}33`,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{"\uD83C\uDFA8"}</span>
+            <div>
+              <div className="text-[13px] font-semibold" style={{ color: accentColor }}>
+                {diagramLabel}
+              </div>
+              <div className="text-[10px] text-text-dim">
+                {diagramDesc}
+              </div>
+            </div>
+            <span className="ml-auto text-text-muted text-xs">&rarr;</span>
+          </div>
+        </button>
+
+        {/* Stats bar */}
+        <div className="text-[10px] text-text-muted mb-2 px-1">
+          {availableCount}/{totalExercises} exercises available with current equipment
+        </div>
+
+        {/* Filter pills */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          <button
+            onClick={() => setFilter(null)}
+            className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+            style={{
+              border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
+              background: filter === null ? accentColor + "18" : "var(--color-card)",
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+              fontWeight: filter === null ? 700 : 400,
+            }}
+          >
+            All
+          </button>
+          {groups.map((g) => {
+            const isActive = filter === g.key;
+            return (
+              <button
+                key={g.key}
+                onClick={() => setFilter(isActive ? null : g.key)}
+                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+                style={{
+                  border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
+                  background: isActive ? g.accent + "18" : "var(--color-card)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
+                  fontWeight: isActive ? 700 : 400,
+                }}
+              >
+                {g.icon} {g.label}
+                <span className="ml-1 text-[9px] opacity-60">
+                  {g.exercises.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Exercise groups */}
+        {visibleGroups.map((group) => (
+          <Section
+            key={group.key}
+            title={group.label}
+            icon={group.icon}
+            isOpen={!!openSections[`lib-${group.key}`]}
+            onToggle={() => toggleSection(`lib-${group.key}`)}
+            count={group.exercises.length}
+            accent={group.accent}
+          >
+            {group.exercises.map((name) => renderCoreExercise(name))}
+          </Section>
         ))}
       </div>
+    );
+  }
+
+  function renderUpperTab() {
+    return renderExerciseLibrary(
+      UPPER_GROUPS,
+      upperFilter,
+      setUpperFilter,
+      "#a78bfa",
+      "Exercise Diagram Gallery",
+      "35+ animated diagrams \u00B7 arm balance, TRX, equipment",
+    );
+  }
+
+  function renderLowerTab() {
+    return renderExerciseLibrary(
+      LOWER_GROUPS,
+      lowerFilter,
+      setLowerFilter,
+      "#10b981",
+      "Exercise Diagram Gallery",
+      "Glute bridges, clamshells, yoga \u00B7 animated diagrams",
     );
   }
 
@@ -1433,7 +1743,7 @@ export default function WorkoutView() {
         </Callout>
 
         <Section
-          title="Tier 1 \u2014 Highest Output"
+          title="Tier 1 - Highest Output"
           icon={"\uD83D\uDD25"}
           isOpen={!!openSections["cardio-t1"]}
           onToggle={() => toggleSection("cardio-t1")}
@@ -1550,34 +1860,24 @@ export default function WorkoutView() {
   function renderCoreTab() {
     return (
       <div>
-        <Callout type="danger">
-          ZERO active left hip flexion. Protects femoral neck stress fracture.
-          Left leg passive in ALL exercises.
-        </Callout>
-        <Callout type="info">
-          Slow tempo protocol: 4-count movements, time-based sets, continuous
-          tension. BASE &rarr; AMP 1 &rarr; AMP 2. Target muscle failure in
-          the final 10-15 seconds of each set. If you finish the set
-          comfortably, move up an amp level.
-        </Callout>
-
         <button
-          onClick={() => setDiagramOpen("core-demos")}
+          data-testid="open-core-gallery"
+          onClick={() => setDiagramOpen("gallery")}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
             padding: "10px 14px",
-            background: "#a78bfa15",
-            border: "1px solid #a78bfa33",
+            background: "#f9731615",
+            border: "1px solid #f9731633",
           }}
         >
           <div className="flex items-center gap-2">
             <span className="text-lg">{"\uD83C\uDFA8"}</span>
             <div>
-              <div className="text-[13px] font-semibold" style={{ color: "#a78bfa" }}>
-                Core Movement Demos
+              <div className="text-[13px] font-semibold" style={{ color: "#f97316" }}>
+                Core Diagram Gallery
               </div>
               <div className="text-[10px] text-text-dim">
-                17 animated diagrams &middot; TRX, Supine, Arm Balance
+                TRX, supine, prone, rack core &middot; animated diagrams
               </div>
             </div>
             <span className="ml-auto text-text-muted text-xs">&rarr;</span>
@@ -1597,6 +1897,83 @@ export default function WorkoutView() {
             {block.exercises.map((name) => renderCoreExercise(name))}
           </Section>
         ))}
+
+        {/* Equipment-specific core: nearby picker */}
+        <div
+          className="rounded-lg mt-4 mb-3"
+          style={{
+            padding: "12px 14px",
+            background: "var(--color-card)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <div className="text-[11px] font-bold text-text-muted uppercase tracking-widest mb-2.5">
+            {"\uD83D\uDCCD"} What equipment is nearby?
+          </div>
+          <div className="text-[10px] text-text-dim mb-2.5">
+            Select equipment to see matching core exercises
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {NEARBY_EQUIPMENT.filter((item) =>
+              EQUIPMENT_CORE_BLOCKS.some((b) => b.nearbyId === item.id),
+            ).map((item) => {
+              const isSelected = coreNearby.includes(item.id);
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setCoreNearby((prev) =>
+                      prev.includes(item.id)
+                        ? prev.filter((x) => x !== item.id)
+                        : [...prev, item.id],
+                    )
+                  }
+                  className="rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit] min-h-[36px]"
+                  style={{
+                    padding: "6px 12px",
+                    background: isSelected
+                      ? "var(--color-accent)22"
+                      : "var(--color-bg)",
+                    border: `1.5px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
+                    color: isSelected
+                      ? "var(--color-accent)"
+                      : "var(--color-text-muted)",
+                  }}
+                >
+                  {item.icon} {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Equipment-specific core blocks */}
+        {EQUIPMENT_CORE_BLOCKS.filter((block) =>
+          coreNearby.includes(block.nearbyId),
+        ).map((block) => (
+          <Section
+            key={block.key}
+            title={block.title}
+            icon={block.icon}
+            isOpen={!!openSections[block.key]}
+            onToggle={() => toggleSection(block.key)}
+            count={block.exercises.length}
+            accent={block.accent}
+          >
+            {block.exercises.map((name) => renderCoreExercise(name))}
+          </Section>
+        ))}
+
+        <Callout type="danger">
+          ZERO active left hip flexion. Protects femoral neck stress fracture.
+          Left leg passive in ALL exercises.
+        </Callout>
+        <Callout type="info">
+          Slow tempo protocol: 4-count movements, time-based sets, continuous
+          tension. BASE &rarr; AMP 1 &rarr; AMP 2. Target muscle failure in
+          the final 10-15 seconds of each set. If you finish the set
+          comfortably, move up an amp level.
+        </Callout>
 
         <Section
           title="Removed Exercises"
@@ -2044,19 +2421,22 @@ export default function WorkoutView() {
       content = renderTodayTab();
       break;
     case 1:
-      content = renderWorkoutsTab();
+      content = renderUpperTab();
       break;
     case 2:
-      content = renderCardioTab();
+      content = renderLowerTab();
       break;
     case 3:
       content = renderCoreTab();
       break;
     case 4:
-      content = renderEquipTab();
+      content = renderCardioTab();
       break;
     case 5:
       content = renderSafetyTab();
+      break;
+    case GEAR_TAB_INDEX:
+      content = renderEquipTab();
       break;
   }
 
@@ -2064,17 +2444,18 @@ export default function WorkoutView() {
 
   // ===== MAIN LAYOUT =====
   return (
-    <div className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
+    <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
       {/* Header */}
       <div className="pt-6 pb-4 text-center">
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-[22px] font-extrabold tracking-tight text-text">
+          <h1 data-testid="app-title" className="text-[22px] font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
           {/* Header icons */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setAboutOpen(true)}
+              data-testid="about-button"
               className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
               style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
               title="About"
@@ -2087,6 +2468,7 @@ export default function WorkoutView() {
             </button>
             <button
               onClick={toggleTheme}
+              data-testid="theme-toggle"
               className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
               style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -2166,7 +2548,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-0.5 mb-4 overflow-x-auto pb-1">
+      <div data-testid="tab-bar" className="flex gap-0.5 mb-4 items-stretch">
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
@@ -2174,9 +2556,10 @@ export default function WorkoutView() {
           return (
             <button
               key={t}
+              data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               onClick={() => setTab(i)}
-              className="flex-1 min-w-[60px] rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
+              className="flex-1 min-w-0 rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
               style={{
                 padding: "10px 4px",
                 background: isActive ? activeColor + "22" : "none",
@@ -2188,10 +2571,32 @@ export default function WorkoutView() {
             </button>
           );
         })}
+        {/* Divider */}
+        <div className="w-px mx-1 self-stretch" style={{ background: "var(--color-border)" }} />
+        {/* Gear / config */}
+        <button
+          data-testid="tab-gear"
+          title="Equipment & configuration"
+          onClick={() => setTab(GEAR_TAB_INDEX)}
+          className="rounded-lg cursor-pointer font-[inherit] flex items-center justify-center"
+          style={{
+            width: 40,
+            minWidth: 40,
+            padding: "10px 0",
+            background: tab === GEAR_TAB_INDEX ? "var(--color-accent)22" : "none",
+            border: `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-border)"}`,
+            color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
+          }}
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
       </div>
 
       {/* Tab content */}
-      {content}
+      <div data-testid="tab-content">{content}</div>
 
       {/* Footer links */}
       <div className="mt-3 flex justify-center gap-3.5 items-center">
@@ -2222,7 +2627,7 @@ export default function WorkoutView() {
           target="_blank"
           rel="noopener noreferrer"
           className="text-text-muted"
-          title="NWB Yoga \u2014 Companion App"
+          title="NWB Yoga Companion App"
         >
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
             <path d="M12,20 C11,14 10,8 12,3 C14,8 13,14 12,20Z M12,20 C9,15 7,10 9,5 C12,9 12,14 12,20Z M12,20 C15,15 17,10 15,5 C12,9 12,14 12,20Z M12,20 C8,16 5,12 6,7 C9,11 11,15 12,20Z M12,20 C16,16 19,12 18,7 C15,11 13,15 12,20Z"/>
@@ -2238,6 +2643,7 @@ export default function WorkoutView() {
       {/* About modal */}
       {aboutOpen && (
         <div
+          data-testid="about-modal"
           className="fixed inset-0 z-[300] flex items-center justify-center p-3"
           style={{ background: "rgba(0,0,0,0.85)" }}
           onClick={() => setAboutOpen(false)}
@@ -2295,8 +2701,19 @@ export default function WorkoutView() {
         </div>
       )}
 
-      {/* Diagram modal */}
-      {diagramOpen && (
+      {/* Diagram gallery overlay */}
+      {diagramOpen === "gallery" && (
+        <div
+          data-testid="diagram-gallery-overlay"
+          className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
+          style={{ background: "var(--color-bg)" }}
+        >
+          <DiagramGallery onClose={() => setDiagramOpen(null)} />
+        </div>
+      )}
+
+      {/* Diagram modal (individual exercises) */}
+      {diagramOpen && diagramOpen !== "gallery" && (
         <DiagramModal
           diagram={diagramOpen}
           onClose={() => setDiagramOpen(null)}

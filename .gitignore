@@ -33,6 +33,13 @@ yarn-error.log*
 
 # playwright
 .playwright-mcp/
+/test-results/
+/playwright-report/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # screenshots
 screenshot-*.png

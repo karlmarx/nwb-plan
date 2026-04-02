@@ -38,6 +38,7 @@ export default function RestTimer({ seconds, onClose }: RestTimerProps) {
 
   return (
     <div
+      data-testid="rest-timer"
       className="fixed bottom-[70px] left-1/2 z-[100] flex items-center gap-3 rounded-2xl px-6 py-3"
       style={{
         transform: "translateX(-50%)",
@@ -47,6 +48,7 @@ export default function RestTimer({ seconds, onClose }: RestTimerProps) {
       }}
     >
       <div
+        data-testid="timer-display"
         className="text-[28px] font-extrabold min-w-[60px] text-center"
         style={{
           fontVariantNumeric: "tabular-nums",
@@ -58,6 +60,7 @@ export default function RestTimer({ seconds, onClose }: RestTimerProps) {
         {display}
       </div>
       <button
+        data-testid="timer-close"
         onClick={onClose}
         className="border rounded-lg px-3 py-1.5 text-xs cursor-pointer font-[inherit] min-h-[44px] min-w-[44px]"
         style={{

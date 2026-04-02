@@ -25,6 +25,7 @@ export default function Section({
 
   return (
     <div
+      data-testid="section"
       className="mb-2.5 rounded-[10px] bg-card overflow-hidden"
       style={{
         border: `1px solid ${isOpen ? ac + "44" : "var(--color-border)"}`,

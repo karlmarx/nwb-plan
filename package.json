@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "uv run --python 3.14 --with pytest --with pytest-playwright --with playwright pytest e2e/ -v",
+    "test:e2e:headed": "uv run --python 3.14 --with pytest --with pytest-playwright --with playwright pytest e2e/ -v --headed"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

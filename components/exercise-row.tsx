@@ -46,6 +46,7 @@ export default function ExerciseRow({
 
   return (
     <div
+      data-testid="exercise-row"
       className="mb-1.5 rounded-lg overflow-hidden"
       style={{
         background: isExpanded ? "color-mix(in srgb, var(--color-card) 70%, var(--color-bg))" : "var(--color-bg)",
@@ -61,6 +62,7 @@ export default function ExerciseRow({
         <div className="flex items-center justify-between gap-2 flex-wrap w-full">
           <div className="flex items-center gap-2 flex-wrap flex-1">
             <span
+              data-testid="exercise-name"
               className="font-semibold text-[13px]"
               style={{
                 color: unavailable
@@ -181,6 +183,7 @@ export default function ExerciseRow({
                     ev.stopPropagation();
                     onDiagram(ex.diagram!);
                   }}
+                  data-testid="view-diagram"
                   className="w-full p-3 rounded-lg border cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-xs font-bold text-accent min-h-[44px]"
                   style={{
                     background: "var(--color-bg)",
