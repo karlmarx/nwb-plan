@@ -38,17 +38,18 @@ jobs:
       - name: Install Playwright browsers
         run: uv run --python 3.14 --with pytest --with pytest-playwright --with playwright python -m playwright install chromium --with-deps
 
-      - name: Start Next.js server
-        run: npm run start &
-
-      - name: Wait for server
+      - name: Run Playwright tests
         run: |
-          uv run --python 3.14 --with playwright python -c "
+          npm run start &
+          SERVER_PID=$!
+
+          # Wait up to 60s for server to be ready
+          python3 -c "
           import urllib.request, time, sys
-          for i in range(30):
+          for i in range(60):
               try:
                   urllib.request.urlopen('http://localhost:3000')
-                  print('Server ready')
+                  print('Server ready after', i, 'seconds')
                   sys.exit(0)
               except:
                   time.sleep(1)
@@ -56,9 +57,9 @@ jobs:
           sys.exit(1)
           "
 
-      - name: Run Playwright tests
-        run: |
           uv run --python 3.14 --with pytest --with pytest-playwright --with playwright pytest e2e/ -v --tracing=retain-on-failure --output=test-results
+
+          kill $SERVER_PID || true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
