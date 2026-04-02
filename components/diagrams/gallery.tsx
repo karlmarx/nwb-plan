@@ -112,8 +112,12 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
           )}
         </div>
 
-        {/* Category tabs — wrapped pills */}
-        <div data-testid="diagram-categories" className="flex flex-wrap gap-1.5 mb-3">
+        {/* Category tabs — primary nav, full-width segmented style */}
+        <div
+          data-testid="diagram-categories"
+          className="flex flex-wrap gap-1 mb-1 p-1 rounded-xl"
+          style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+        >
           {CATEGORIES.map(c => {
             const isActive = c.key === cat;
             return (
@@ -121,12 +125,12 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
                 key={c.key}
                 data-testid={`diagram-cat-${c.key}`}
                 onClick={() => setCat(c.key)}
-                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer transition-all min-h-[36px]"
+                className="flex-1 min-w-fit px-2 py-2 text-[11px] font-[inherit] rounded-lg cursor-pointer transition-all min-h-[36px] font-semibold"
                 style={{
-                  border: isActive ? `1.5px solid ${c.accent}` : "1.5px solid var(--color-border)",
-                  background: isActive ? c.accent + "18" : "var(--color-card)",
+                  background: isActive ? c.accent + "22" : "transparent",
+                  border: isActive ? `1.5px solid ${c.accent}44` : "1.5px solid transparent",
                   color: isActive ? c.accent : "var(--color-text-muted)",
-                  fontWeight: isActive ? 700 : 400,
+                  fontWeight: isActive ? 700 : 500,
                 }}
               >
                 {c.label}
@@ -135,25 +139,31 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
           })}
         </div>
 
-        {/* Exercise selector pills */}
-        <div data-testid="diagram-exercises" className="flex gap-1.5 mb-3 flex-wrap">
-          {catExercises.map((e) => {
-            const isActive = e.id === active;
-            return (
-              <button
-                key={e.id}
-                onClick={() => setActive(e.id)}
-                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer transition-all min-h-[36px]"
-                style={{
-                  border: isActive ? `1.5px solid ${accent}` : "1.5px solid var(--color-border)",
-                  background: isActive ? accent + "15" : "var(--color-card)",
-                  color: isActive ? accent : "var(--color-text-muted)",
-                }}
-              >
-                {e.name}
-              </button>
-            );
-          })}
+        {/* Exercise selector — secondary, indented with label */}
+        <div className="mb-3 mt-2">
+          <div className="text-[9px] uppercase tracking-[2px] mb-1.5 pl-1" style={{ color: accent, opacity: 0.7 }}>
+            {CATEGORIES.find(c => c.key === cat)?.label} · Select Exercise
+          </div>
+          <div data-testid="diagram-exercises" className="flex gap-1.5 flex-wrap">
+            {catExercises.map((e) => {
+              const isActive = e.id === active;
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => setActive(e.id)}
+                  className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer transition-all min-h-[32px]"
+                  style={{
+                    border: isActive ? `1.5px solid ${accent}` : "1.5px solid var(--color-border)",
+                    background: isActive ? accent + "15" : "var(--color-bg)",
+                    color: isActive ? accent : "var(--color-text-muted)",
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {e.name}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Exercise title + target */}
