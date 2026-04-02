@@ -83,7 +83,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
   if (!ex) return null;
 
   return (
-    <div className="min-h-full" style={{ background: "var(--color-bg)", color: "var(--color-text)" }}>
+    <div className="min-h-full overflow-x-hidden" style={{ background: "var(--color-bg)", color: "var(--color-text)" }}>
       <div className="max-w-[500px] mx-auto px-3 py-4">
 
         {/* Header */}

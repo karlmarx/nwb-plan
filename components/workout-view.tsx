@@ -2708,22 +2708,10 @@ export default function WorkoutView() {
       {/* Diagram gallery overlay */}
       {diagramOpen === "gallery" && (
         <div
-          className="fixed inset-0 z-[200] flex flex-col"
+          className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
           style={{ background: "var(--color-bg)" }}
         >
-          <div className="flex items-center justify-between p-3 border-b border-border">
-            <h2 className="text-sm font-bold text-text">Exercise Diagram Gallery</h2>
-            <button
-              onClick={() => setDiagramOpen(null)}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
-              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
-            >
-              &times;
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2">
-            <DiagramGallery />
-          </div>
+          <DiagramGallery onClose={() => setDiagramOpen(null)} />
         </div>
       )}
 
