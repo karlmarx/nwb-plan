@@ -2630,16 +2630,7 @@ export default function WorkoutView() {
           title="NWB Yoga Companion App"
         >
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
-            {/* Lotus flower matching nwb-yoga icon */}
-            <g transform="translate(12,18)">
-              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" opacity="0.5"/>
-              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" opacity="0.7"/>
-              <path d="M0,0 C-1,-3.2 -1.2,-8 0,-13 C1.2,-8 1,-3.2 0,0Z"/>
-              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(35)" opacity="0.5"/>
-              <path d="M0,0 C-1.5,-1.8 -1.8,-5.2 0,-8 C1.8,-5.2 1.5,-1.8 0,0Z" transform="rotate(-35)" opacity="0.5"/>
-              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(20)" opacity="0.6"/>
-              <path d="M0,0 C-1.2,-2.5 -1.5,-7 0,-11 C1.5,-7 1.2,-2.5 0,0Z" transform="rotate(-20)" opacity="0.6"/>
-            </g>
+            <path d="M12,20 C11,14 10,8 12,3 C14,8 13,14 12,20Z M12,20 C9,15 7,10 9,5 C12,9 12,14 12,20Z M12,20 C15,15 17,10 15,5 C12,9 12,14 12,20Z M12,20 C8,16 5,12 6,7 C9,11 11,15 12,20Z M12,20 C16,16 19,12 18,7 C15,11 13,15 12,20Z"/>
           </svg>
         </a>
       </div>
