@@ -17,7 +17,7 @@ export default function NearbyPicker({
   const hasManualSelection = selected.length > 0;
   const noneActive = !hasManualSelection && inUse.length === 0;
   return (
-    <div>
+    <div data-testid="nearby-picker">
       <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-3">
         What&apos;s within reach?
       </div>

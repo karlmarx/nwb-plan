@@ -98,6 +98,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
           </div>
           {onClose && (
             <button
+              data-testid="diagram-gallery-close"
               onClick={onClose}
               className="rounded-lg px-3 py-1.5 text-xs cursor-pointer font-[inherit] min-h-[36px]"
               style={{
@@ -112,12 +113,13 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
         </div>
 
         {/* Category tabs — wrapped pills */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
+        <div data-testid="diagram-categories" className="flex flex-wrap gap-1.5 mb-3">
           {CATEGORIES.map(c => {
             const isActive = c.key === cat;
             return (
               <button
                 key={c.key}
+                data-testid={`diagram-cat-${c.key}`}
                 onClick={() => setCat(c.key)}
                 className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer transition-all min-h-[36px]"
                 style={{
@@ -134,7 +136,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
         </div>
 
         {/* Exercise selector pills */}
-        <div className="flex gap-1.5 mb-3 flex-wrap">
+        <div data-testid="diagram-exercises" className="flex gap-1.5 mb-3 flex-wrap">
           {catExercises.map((e) => {
             const isActive = e.id === active;
             return (
@@ -184,7 +186,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
             border: "1px solid var(--color-border)",
           }}
         >
-          <svg viewBox="0 0 400 240" width="100%" style={{ display: "block" }}>
+          <svg data-testid="diagram-animation" viewBox="0 0 400 240" width="100%" style={{ display: "block" }}>
             {AnimComponent && <AnimComponent t={t} />}
           </svg>
 
@@ -208,6 +210,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
 
           {/* Play/pause button */}
           <button
+            data-testid="diagram-playpause"
             onClick={(e) => { e.stopPropagation(); setPaused(!paused); }}
             className="absolute bottom-2 right-2 rounded px-2 py-0.5 text-[10px] cursor-pointer font-[inherit]"
             style={{

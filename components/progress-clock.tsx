@@ -87,6 +87,7 @@ export default function ProgressClock() {
   if (minimized) {
     return (
       <div
+        data-testid="progress-clock"
         onClick={handleClick}
         className="cursor-pointer mb-3 rounded-[10px] px-3 py-1.5 flex items-center justify-between min-h-[44px]"
         style={{
@@ -118,6 +119,7 @@ export default function ProgressClock() {
   // ===== EXPANDED STATE =====
   return (
     <div
+      data-testid="progress-clock"
       onClick={handleClick}
       className="cursor-pointer mb-4 rounded-[14px] overflow-hidden"
       style={{

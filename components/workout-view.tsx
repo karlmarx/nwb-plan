@@ -1624,6 +1624,7 @@ export default function WorkoutView() {
       <div>
         {/* Diagram gallery button */}
         <button
+          data-testid="open-diagram-gallery"
           onClick={() => setDiagramOpen("gallery")}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
@@ -1860,6 +1861,7 @@ export default function WorkoutView() {
     return (
       <div>
         <button
+          data-testid="open-core-gallery"
           onClick={() => setDiagramOpen("gallery")}
           className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
@@ -2442,17 +2444,18 @@ export default function WorkoutView() {
 
   // ===== MAIN LAYOUT =====
   return (
-    <div className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
+    <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
       {/* Header */}
       <div className="pt-6 pb-4 text-center">
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-[22px] font-extrabold tracking-tight text-text">
+          <h1 data-testid="app-title" className="text-[22px] font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
           {/* Header icons */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setAboutOpen(true)}
+              data-testid="about-button"
               className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
               style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
               title="About"
@@ -2465,6 +2468,7 @@ export default function WorkoutView() {
             </button>
             <button
               onClick={toggleTheme}
+              data-testid="theme-toggle"
               className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
               style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -2544,7 +2548,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-0.5 mb-4 items-stretch">
+      <div data-testid="tab-bar" className="flex gap-0.5 mb-4 items-stretch">
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
@@ -2552,6 +2556,7 @@ export default function WorkoutView() {
           return (
             <button
               key={t}
+              data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               onClick={() => setTab(i)}
               className="flex-1 min-w-0 rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
@@ -2570,6 +2575,7 @@ export default function WorkoutView() {
         <div className="w-px mx-1 self-stretch" style={{ background: "var(--color-border)" }} />
         {/* Gear / config */}
         <button
+          data-testid="tab-gear"
           title="Equipment & configuration"
           onClick={() => setTab(GEAR_TAB_INDEX)}
           className="rounded-lg cursor-pointer font-[inherit] flex items-center justify-center"
@@ -2590,7 +2596,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab content */}
-      {content}
+      <div data-testid="tab-content">{content}</div>
 
       {/* Footer links */}
       <div className="mt-3 flex justify-center gap-3.5 items-center">
@@ -2646,6 +2652,7 @@ export default function WorkoutView() {
       {/* About modal */}
       {aboutOpen && (
         <div
+          data-testid="about-modal"
           className="fixed inset-0 z-[300] flex items-center justify-center p-3"
           style={{ background: "rgba(0,0,0,0.85)" }}
           onClick={() => setAboutOpen(false)}
@@ -2706,6 +2713,7 @@ export default function WorkoutView() {
       {/* Diagram gallery overlay */}
       {diagramOpen === "gallery" && (
         <div
+          data-testid="diagram-gallery-overlay"
           className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
           style={{ background: "var(--color-bg)" }}
         >

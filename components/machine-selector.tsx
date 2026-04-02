@@ -15,12 +15,13 @@ export default function MachineSelector({
   onSelect,
 }: MachineSelectorProps) {
   return (
-    <div className="grid grid-cols-2 gap-2.5">
+    <div data-testid="machine-selector" className="grid grid-cols-2 gap-2.5">
       {variants.map((variant) => {
         const isSelected = selected === variant.id;
         return (
           <button
             key={variant.id}
+            data-testid={`machine-${variant.id}`}
             onClick={() => onSelect(variant.id)}
             className="rounded-xl p-4 text-left cursor-pointer font-[inherit] min-h-[80px] transition-colors duration-150"
             style={{

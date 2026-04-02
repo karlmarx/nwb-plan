@@ -1,0 +1,68 @@
+name: Playwright Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Playwright Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS: "false"
+
+      - name: Install Playwright browsers
+        run: uv run --python 3.14 --with pytest --with pytest-playwright --with playwright python -m playwright install chromium --with-deps
+
+      - name: Start Next.js server
+        run: npm run start &
+
+      - name: Wait for server
+        run: |
+          uv run --python 3.14 --with playwright python -c "
+          import urllib.request, time, sys
+          for i in range(30):
+              try:
+                  urllib.request.urlopen('http://localhost:3000')
+                  print('Server ready')
+                  sys.exit(0)
+              except:
+                  time.sleep(1)
+          print('Server did not start in time')
+          sys.exit(1)
+          "
+
+      - name: Run Playwright tests
+        run: |
+          uv run --python 3.14 --with pytest --with pytest-playwright --with playwright pytest e2e/ -v --tracing=retain-on-failure --output=test-results
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: test-results/
+          retention-days: 14
