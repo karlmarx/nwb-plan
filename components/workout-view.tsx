@@ -982,6 +982,74 @@ export default function WorkoutView() {
                 )}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                supplementSlot={
+                  suppCards.length > 0 ? (
+                    <div className="mb-3">
+                      {suppCards.map((supp) => {
+                        const isLL = supp.type === "leftleg";
+                        if (isLL && !supplementToggles.leftLeg) return null;
+                        if (!isLL && !supplementToggles.core) return null;
+                        if (isLL && ssInfo) return null;
+                        const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
+                        if (!suppEx) return null;
+                        const suppSets = suppEx.sets[phase] || suppEx.sets[0];
+                        const suppExpKey = "supp_" + supp.name;
+                        const suppIsExp = !!expandedEx[suppExpKey];
+                        const groupTotal = isLL ? llExercises.length : coreExData.length;
+                        const groupIdx = isLL
+                          ? llExercises.indexOf(supp.name) + 1
+                          : coreExData.findIndex((c) => c.name === supp.name) + 1;
+                        const groupLabel = `${groupIdx}/${groupTotal}`;
+
+                        if (isLL) {
+                          return (
+                            <div key={`supp-${supp.name}`} className="mx-1 my-0.5 rounded-lg overflow-hidden" style={{ background: "#14b8a609", border: "1px solid #14b8a628", borderLeft: "3px solid #14b8a6" }}>
+                              <div onClick={() => toggleEx(suppExpKey)} className="cursor-pointer flex items-center gap-1.5" style={{ padding: "8px 10px" }}>
+                                <span className="inline-flex items-center justify-center rounded text-[9px] font-extrabold shrink-0" style={{ width: 18, height: 18, background: "#14b8a622", border: "1px solid #14b8a644", color: "#14b8a6" }}>L</span>
+                                <span className="text-[9px] font-bold" style={{ color: "#14b8a6", opacity: 0.7 }}>{groupLabel}</span>
+                                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "#14b8a6" }}>Left Leg</span>
+                                <span className="font-semibold text-xs text-text flex-1">{supp.name}</span>
+                                <span className="text-[10px] text-text-dim">{suppSets[0]}&times;{suppSets[1]}</span>
+                                <span className="text-[9px] ml-1" style={{ color: "#14b8a6" }}>{suppIsExp ? "▲" : "▼"}</span>
+                              </div>
+                              {suppIsExp && (
+                                <div className="text-[11px] leading-relaxed" style={{ padding: "0 10px 10px" }}>
+                                  <div className="mb-1.5"><span className="font-bold text-[10px]" style={{ color: "#14b8a6" }}>📍 Setup: </span><span className="text-text-dim">{suppEx.setup}</span></div>
+                                  <div className="mb-1.5"><span className="font-bold text-[10px] text-safe">🔄 Execute: </span><span className="text-text-dim">{suppEx.execution}</span></div>
+                                  <div><span className="font-bold text-[10px]" style={{ color: "#14b8a6" }}>🛡️ Safety: </span><span className="text-text-dim">{suppEx.nwbCues}</span></div>
+                                  {suppEx.rest > 0 && <button onClick={(ev) => { ev.stopPropagation(); setTimer(suppEx.rest); }} className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]" style={{ padding: 7, background: "#14b8a618", border: "1px solid #14b8a633", color: "#14b8a6" }}>⏱ Start {suppEx.rest}s Rest</button>}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        } else {
+                          const regionColors: Record<string, string> = { "Upper Abs": "#f59e0b", "Lower Abs": "#ec4899", Obliques: "#a78bfa" };
+                          const regionColor = regionColors[supp.region || ""] || "#f97316";
+                          return (
+                            <div key={`supp-${supp.name}`} className="mx-1 my-0.5 rounded-lg overflow-hidden" style={{ border: "1px dashed #f9731633", background: "linear-gradient(135deg, #f9731608 0%, #f9731603 100%)" }}>
+                              <div style={{ height: 3, background: `linear-gradient(90deg, ${regionColor}, ${regionColor}66)` }} />
+                              <div onClick={() => toggleEx(suppExpKey)} className="cursor-pointer flex items-center gap-1.5" style={{ padding: "8px 10px" }}>
+                                <span className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold shrink-0" style={{ minWidth: 20, height: 20, padding: "0 4px", background: "#f9731622", border: "1px solid #f9731644", color: "#f97316" }}>{groupLabel}</span>
+                                <span className="text-[8px] font-bold uppercase tracking-wider shrink-0 rounded-lg" style={{ padding: "2px 6px", background: regionColor + "22", border: `1px solid ${regionColor}44`, color: regionColor }}>{supp.region || "Core"}</span>
+                                <span className="font-semibold text-xs text-text flex-1">{supp.name}</span>
+                                <span className="text-[10px] text-text-dim">{suppSets[0]}&times;{suppSets[1]}</span>
+                                <span className="text-[9px] ml-1" style={{ color: "#f97316" }}>{suppIsExp ? "▲" : "▼"}</span>
+                              </div>
+                              {suppIsExp && (
+                                <div className="text-[11px] leading-relaxed" style={{ padding: "0 10px 10px" }}>
+                                  <div className="mb-1.5"><span className="font-bold text-[10px]" style={{ color: "#f97316" }}>📍 Setup: </span><span className="text-text-dim">{suppEx.setup}</span></div>
+                                  <div className="mb-1.5"><span className="font-bold text-[10px] text-safe">🔄 Execute: </span><span className="text-text-dim">{suppEx.execution}</span></div>
+                                  <div><span className="font-bold text-[10px]" style={{ color: "#f97316" }}>🛡️ Safety: </span><span className="text-text-dim">{suppEx.nwbCues}</span></div>
+                                  {suppEx.rest > 0 && <button onClick={(ev) => { ev.stopPropagation(); setTimer(suppEx.rest); }} className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]" style={{ padding: 7, background: "#f9731618", border: "1px solid #f9731633", color: "#f97316" }}>⏱ Start {suppEx.rest}s Rest</button>}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  ) : undefined
+                }
               />
 
               {/* Supplement indicator — show in both collapsed and expanded states */}
@@ -1038,264 +1106,7 @@ export default function WorkoutView() {
                 </div>
               )}
 
-              {/* Inline supplement superset cards (expanded) */}
-              {isExp &&
-                suppCards.length > 0 &&
-                suppCards.map((supp) => {
-                  const isLL = supp.type === "leftleg";
-                  if (isLL && !supplementToggles.leftLeg) return null;
-                  if (!isLL && !supplementToggles.core) return null;
-                  // Deduplicate: skip left-leg card when a machine variant already covers it
-                  if (isLL && ssInfo) return null;
-                  const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
-                  if (!suppEx) return null;
-                  const accent = isLL ? "#14b8a6" : "#f97316";
-                  const suppSets = suppEx.sets[phase] || suppEx.sets[0];
-                  const suppExpKey = "supp_" + supp.name;
-                  const suppIsExp = !!expandedEx[suppExpKey];
-
-                  const groupTotal = isLL
-                    ? llExercises.length
-                    : coreExData.length;
-                  const groupIdx = isLL
-                    ? llExercises.indexOf(supp.name) + 1
-                    : coreExData.findIndex((c) => c.name === supp.name) + 1;
-                  const groupLabel = `${groupIdx}/${groupTotal}`;
-
-                  if (isLL) {
-                    return (
-                      <div
-                        key={`supp-${supp.name}`}
-                        className="mx-1 my-0.5 rounded-lg overflow-hidden"
-                        style={{
-                          background: "#14b8a609",
-                          border: "1px solid #14b8a628",
-                          borderLeft: "3px solid #14b8a6",
-                        }}
-                      >
-                        <div
-                          onClick={() => toggleEx(suppExpKey)}
-                          className="cursor-pointer flex items-center gap-1.5"
-                          style={{ padding: "8px 10px" }}
-                        >
-                          <span
-                            className="inline-flex items-center justify-center rounded text-[9px] font-extrabold shrink-0"
-                            style={{
-                              width: 18,
-                              height: 18,
-                              background: "#14b8a622",
-                              border: "1px solid #14b8a644",
-                              color: "#14b8a6",
-                            }}
-                          >
-                            L
-                          </span>
-                          <span
-                            className="text-[9px] font-bold"
-                            style={{ color: "#14b8a6", opacity: 0.7 }}
-                          >
-                            {groupLabel}
-                          </span>
-                          <span
-                            className="text-[10px] font-semibold uppercase tracking-wide"
-                            style={{ color: "#14b8a6" }}
-                          >
-                            Left Leg
-                          </span>
-                          <span className="font-semibold text-xs text-text flex-1">
-                            {supp.name}
-                          </span>
-                          <span className="text-[10px] text-text-dim">
-                            {suppSets[0]}&times;{suppSets[1]}
-                          </span>
-                          <span
-                            className="text-[9px] ml-1"
-                            style={{ color: "#14b8a6" }}
-                          >
-                            {suppIsExp ? "\u25B2" : "\u25BC"}
-                          </span>
-                        </div>
-                        {suppIsExp && (
-                          <div
-                            className="text-[11px] leading-relaxed"
-                            style={{ padding: "0 10px 10px" }}
-                          >
-                            <div className="mb-1.5">
-                              <span
-                                className="font-bold text-[10px]"
-                                style={{ color: "#14b8a6" }}
-                              >
-                                {"\uD83D\uDCCD"} Setup:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.setup}
-                              </span>
-                            </div>
-                            <div className="mb-1.5">
-                              <span className="font-bold text-[10px] text-safe">
-                                {"\uD83D\uDD04"} Execute:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.execution}
-                              </span>
-                            </div>
-                            <div>
-                              <span
-                                className="font-bold text-[10px]"
-                                style={{ color: "#14b8a6" }}
-                              >
-                                {"\uD83D\uDEE1\uFE0F"} Safety:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.nwbCues}
-                              </span>
-                            </div>
-                            {suppEx.rest > 0 && (
-                              <button
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setTimer(suppEx.rest);
-                                }}
-                                className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]"
-                                style={{
-                                  padding: 7,
-                                  background: "#14b8a618",
-                                  border: "1px solid #14b8a633",
-                                  color: "#14b8a6",
-                                }}
-                              >
-                                {"\u23F1"} Start {suppEx.rest}s Rest
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  } else {
-                    // Core supplement card
-                    const regionColors: Record<string, string> = {
-                      "Upper Abs": "#f59e0b",
-                      "Lower Abs": "#ec4899",
-                      Obliques: "#a78bfa",
-                    };
-                    const regionColor =
-                      regionColors[supp.region || ""] || "#f97316";
-                    return (
-                      <div
-                        key={`supp-${supp.name}`}
-                        className="mx-1 my-0.5 rounded-lg overflow-hidden"
-                        style={{
-                          border: "1px dashed #f9731633",
-                          background:
-                            "linear-gradient(135deg, #f9731608 0%, #f9731603 100%)",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: 3,
-                            background: `linear-gradient(90deg, ${regionColor}, ${regionColor}66)`,
-                          }}
-                        />
-                        <div
-                          onClick={() => toggleEx(suppExpKey)}
-                          className="cursor-pointer flex items-center gap-1.5"
-                          style={{ padding: "8px 10px" }}
-                        >
-                          <span
-                            className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold shrink-0"
-                            style={{
-                              minWidth: 20,
-                              height: 20,
-                              padding: "0 4px",
-                              background: "#f9731622",
-                              border: "1px solid #f9731644",
-                              color: "#f97316",
-                            }}
-                          >
-                            {groupLabel}
-                          </span>
-                          <span
-                            className="text-[8px] font-bold uppercase tracking-wider shrink-0 rounded-lg"
-                            style={{
-                              padding: "2px 6px",
-                              background: regionColor + "22",
-                              border: `1px solid ${regionColor}44`,
-                              color: regionColor,
-                            }}
-                          >
-                            {supp.region || "Core"}
-                          </span>
-                          <span className="font-semibold text-xs text-text flex-1">
-                            {supp.name}
-                          </span>
-                          <span className="text-[10px] text-text-dim">
-                            {suppSets[0]}&times;{suppSets[1]}
-                          </span>
-                          <span
-                            className="text-[9px] ml-1"
-                            style={{ color: "#f97316" }}
-                          >
-                            {suppIsExp ? "\u25B2" : "\u25BC"}
-                          </span>
-                        </div>
-                        {suppIsExp && (
-                          <div
-                            className="text-[11px] leading-relaxed"
-                            style={{ padding: "0 10px 10px" }}
-                          >
-                            <div className="mb-1.5">
-                              <span
-                                className="font-bold text-[10px]"
-                                style={{ color: "#f97316" }}
-                              >
-                                {"\uD83D\uDCCD"} Setup:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.setup}
-                              </span>
-                            </div>
-                            <div className="mb-1.5">
-                              <span className="font-bold text-[10px] text-safe">
-                                {"\uD83D\uDD04"} Execute:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.execution}
-                              </span>
-                            </div>
-                            <div>
-                              <span
-                                className="font-bold text-[10px]"
-                                style={{ color: "#f97316" }}
-                              >
-                                {"\uD83D\uDEE1\uFE0F"} Safety:{" "}
-                              </span>
-                              <span className="text-text-dim">
-                                {suppEx.nwbCues}
-                              </span>
-                            </div>
-                            {suppEx.rest > 0 && (
-                              <button
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setTimer(suppEx.rest);
-                                }}
-                                className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]"
-                                style={{
-                                  padding: 7,
-                                  background: "#f9731618",
-                                  border: "1px solid #f9731633",
-                                  color: "#f97316",
-                                }}
-                              >
-                                {"\u23F1"} Start {suppEx.rest}s Rest
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                })}
+              {/* Supplement cards now rendered inside ExerciseRow via supplementSlot prop */}
 
               {/* Equipment-specific superset card */}
               {isExp && ssInfo && (

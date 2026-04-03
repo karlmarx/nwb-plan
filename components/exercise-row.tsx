@@ -17,6 +17,7 @@ interface ExerciseRowProps {
   workoutExercises?: string[];
   variantSetupCues?: string[];
   variantLabel?: string;
+  supplementSlot?: React.ReactNode;
 }
 
 export default function ExerciseRow({
@@ -32,6 +33,7 @@ export default function ExerciseRow({
   workoutExercises = [],
   variantSetupCues,
   variantLabel,
+  supplementSlot,
 }: ExerciseRowProps) {
   if (!ex) return null;
 
@@ -103,6 +105,9 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="px-3 pb-3">
+          {/* Superset cards — rendered first so they're the first thing seen on expand */}
+          {supplementSlot}
+
           {/* Sets / Reps / Rest stats */}
           <div className="flex gap-3 mb-3 py-2 border-b border-border">
             <div>
