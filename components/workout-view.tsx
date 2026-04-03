@@ -14,6 +14,7 @@ import {
 import {
   SUPPLEMENT_LEFT_LEG,
   SUPPLEMENT_CORE,
+  SUPPLEMENT_EX,
   CABLE_SUPERSET,
   EQUIP_TO_NEARBY,
   NEARBY_SUPERSETS,
@@ -983,161 +984,6 @@ export default function WorkoutView() {
                 variantLabel={selectedVariant?.label}
               />
 
-              {/* Equipment-specific superset card */}
-              {isExp && ssInfo && (
-                <div
-                  className="mx-3 mb-2 rounded-lg"
-                  style={{
-                    padding: "8px 10px",
-                    background: "#14b8a60d",
-                    border: "1px solid #14b8a633",
-                    borderLeft: "3px solid #14b8a6",
-                  }}
-                >
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span
-                      className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                      style={{
-                        background: "#14b8a622",
-                        border: "1px solid #14b8a644",
-                        color: "#14b8a6",
-                      }}
-                    >
-                      SUPERSET
-                    </span>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: "#14b8a6" }}
-                    >
-                      {ssInfo.title}
-                    </span>
-                    <span className="ml-auto text-[10px] text-text-dim">
-                      {ssInfo.sets}
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-text-dim leading-relaxed">
-                    {ssInfo.instruction}
-                  </div>
-                  <div
-                    className="text-[10px] mt-1"
-                    style={{ color: "#14b8a6" }}
-                  >
-                    {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
-                  </div>
-                  {ssInfo.note && (
-                    <div className="text-[10px] mt-1 text-warning">
-                      {"\u26A0\uFE0F"} {ssInfo.note}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Machine selector */}
-              {isExp && ex.machineVariants && (
-                <div className="px-3 pb-2">
-                  <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
-                    Machine type at your station
-                  </div>
-                  <MachineSelector
-                    variants={ex.machineVariants}
-                    selected={machineSelections[exName] ?? null}
-                    onSelect={(id) =>
-                      setMachineSelections((prev) => ({
-                        ...prev,
-                        [exName]: id,
-                      }))
-                    }
-                  />
-                </div>
-              )}
-              {/* Nearby picker */}
-              {isExp && (() => {
-                const exData = EX[exName];
-                const inUseIds = exData
-                  ? exData.requires
-                      .map((r) => EQUIP_TO_NEARBY[r])
-                      .filter(Boolean)
-                  : [];
-                const allNearby = [
-                  ...new Set([
-                    ...inUseIds,
-                    ...(nearbySelections[exName] ?? []),
-                  ]),
-                ];
-                const nearbySupersets = supplementToggles.leftLeg
-                  ? NEARBY_SUPERSETS.filter(
-                      (ns) =>
-                        allNearby.includes(ns.nearbyId) &&
-                        !inUseIds.includes(ns.nearbyId) &&
-                        !ssInfo // don't duplicate if we already have an equipment-specific superset
-                    )
-                  : [];
-                return (
-                  <div className="px-3 pb-3">
-                    <NearbyPicker
-                      selected={nearbySelections[exName] ?? []}
-                      inUse={inUseIds}
-                      onToggle={(id) =>
-                        setNearbySelections((prev) => {
-                          const current = prev[exName] ?? [];
-                          const next = current.includes(id)
-                            ? current.filter((x) => x !== id)
-                            : [...current, id];
-                          return { ...prev, [exName]: next };
-                        })
-                      }
-                    />
-                    {nearbySupersets.length > 0 && (
-                      <div className="mt-2 space-y-1.5">
-                        {nearbySupersets.map((ns) => (
-                          <div
-                            key={ns.nearbyId}
-                            className="rounded-lg"
-                            style={{
-                              padding: "8px 10px",
-                              background: "#14b8a60d",
-                              border: "1px solid #14b8a633",
-                              borderLeft: "3px solid #14b8a6",
-                            }}
-                          >
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span
-                                className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                                style={{
-                                  background: "#14b8a622",
-                                  border: "1px solid #14b8a644",
-                                  color: "#14b8a6",
-                                }}
-                              >
-                                NEARBY
-                              </span>
-                              <span
-                                className="text-xs font-semibold"
-                                style={{ color: "#14b8a6" }}
-                              >
-                                {ns.title}
-                              </span>
-                              <span className="ml-auto text-[10px] text-text-dim">
-                                {ns.sets}
-                              </span>
-                            </div>
-                            <div className="text-[11px] text-text-dim leading-relaxed">
-                              {ns.instruction}
-                            </div>
-                            <div
-                              className="text-[10px] mt-1"
-                              style={{ color: "#14b8a6" }}
-                            >
-                              {"\uD83D\uDEE1\uFE0F"} {ns.safety}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
               {/* Supplement indicator — show in both collapsed and expanded states */}
               {activeSuppCards.length > 0 && (
                 <div
@@ -1199,7 +1045,9 @@ export default function WorkoutView() {
                   const isLL = supp.type === "leftleg";
                   if (isLL && !supplementToggles.leftLeg) return null;
                   if (!isLL && !supplementToggles.core) return null;
-                  const suppEx = EX[supp.name];
+                  // Deduplicate: skip left-leg card when a machine variant already covers it
+                  if (isLL && ssInfo) return null;
+                  const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
                   if (!suppEx) return null;
                   const accent = isLL ? "#14b8a6" : "#f97316";
                   const suppSets = suppEx.sets[phase] || suppEx.sets[0];
@@ -1448,6 +1296,161 @@ export default function WorkoutView() {
                     );
                   }
                 })}
+
+              {/* Equipment-specific superset card */}
+              {isExp && ssInfo && (
+                <div
+                  className="mx-3 mb-2 rounded-lg"
+                  style={{
+                    padding: "8px 10px",
+                    background: "#14b8a60d",
+                    border: "1px solid #14b8a633",
+                    borderLeft: "3px solid #14b8a6",
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span
+                      className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                      style={{
+                        background: "#14b8a622",
+                        border: "1px solid #14b8a644",
+                        color: "#14b8a6",
+                      }}
+                    >
+                      SUPERSET
+                    </span>
+                    <span
+                      className="text-xs font-semibold"
+                      style={{ color: "#14b8a6" }}
+                    >
+                      {ssInfo.title}
+                    </span>
+                    <span className="ml-auto text-[10px] text-text-dim">
+                      {ssInfo.sets}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-text-dim leading-relaxed">
+                    {ssInfo.instruction}
+                  </div>
+                  <div
+                    className="text-[10px] mt-1"
+                    style={{ color: "#14b8a6" }}
+                  >
+                    {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
+                  </div>
+                  {ssInfo.note && (
+                    <div className="text-[10px] mt-1 text-warning">
+                      {"\u26A0\uFE0F"} {ssInfo.note}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Machine selector */}
+              {isExp && ex.machineVariants && (
+                <div className="px-3 pb-2">
+                  <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
+                    Machine type at your station
+                  </div>
+                  <MachineSelector
+                    variants={ex.machineVariants}
+                    selected={machineSelections[exName] ?? null}
+                    onSelect={(id) =>
+                      setMachineSelections((prev) => ({
+                        ...prev,
+                        [exName]: id,
+                      }))
+                    }
+                  />
+                </div>
+              )}
+              {/* Nearby picker */}
+              {isExp && (() => {
+                const exData = EX[exName];
+                const inUseIds = exData
+                  ? exData.requires
+                      .map((r) => EQUIP_TO_NEARBY[r])
+                      .filter(Boolean)
+                  : [];
+                const allNearby = [
+                  ...new Set([
+                    ...inUseIds,
+                    ...(nearbySelections[exName] ?? []),
+                  ]),
+                ];
+                const nearbySupersets = supplementToggles.leftLeg
+                  ? NEARBY_SUPERSETS.filter(
+                      (ns) =>
+                        allNearby.includes(ns.nearbyId) &&
+                        !inUseIds.includes(ns.nearbyId) &&
+                        !ssInfo // don't duplicate if we already have an equipment-specific superset
+                    )
+                  : [];
+                return (
+                  <div className="px-3 pb-3">
+                    <NearbyPicker
+                      selected={nearbySelections[exName] ?? []}
+                      inUse={inUseIds}
+                      onToggle={(id) =>
+                        setNearbySelections((prev) => {
+                          const current = prev[exName] ?? [];
+                          const next = current.includes(id)
+                            ? current.filter((x) => x !== id)
+                            : [...current, id];
+                          return { ...prev, [exName]: next };
+                        })
+                      }
+                    />
+                    {nearbySupersets.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {nearbySupersets.map((ns) => (
+                          <div
+                            key={ns.nearbyId}
+                            className="rounded-lg"
+                            style={{
+                              padding: "8px 10px",
+                              background: "#14b8a60d",
+                              border: "1px solid #14b8a633",
+                              borderLeft: "3px solid #14b8a6",
+                            }}
+                          >
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span
+                                className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                                style={{
+                                  background: "#14b8a622",
+                                  border: "1px solid #14b8a644",
+                                  color: "#14b8a6",
+                                }}
+                              >
+                                NEARBY
+                              </span>
+                              <span
+                                className="text-xs font-semibold"
+                                style={{ color: "#14b8a6" }}
+                              >
+                                {ns.title}
+                              </span>
+                              <span className="ml-auto text-[10px] text-text-dim">
+                                {ns.sets}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-text-dim leading-relaxed">
+                              {ns.instruction}
+                            </div>
+                            <div
+                              className="text-[10px] mt-1"
+                              style={{ color: "#14b8a6" }}
+                            >
+                              {"\uD83D\uDEE1\uFE0F"} {ns.safety}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

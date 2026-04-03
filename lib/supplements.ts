@@ -186,3 +186,203 @@ export const GENERIC_SEATED_SUPERSET = {
     "Pure isometric, zero joint stress. Can be done between any seated exercise.",
 };
 
+// ===== SUPPLEMENT EXERCISE DATA =====
+// Exercise data for supplement exercises that aren't in the main EX database.
+// Used by expanded supplement cards in workout-view.tsx.
+
+export interface SupplementExData {
+  sets: [string, string][];
+  setup: string;
+  execution: string;
+  nwbCues: string;
+  rest: number;
+}
+
+export const SUPPLEMENT_EX: Record<string, SupplementExData> = {
+  // ── LEFT LEG ──────────────────────────────────────────────────────────────
+  "Quad Sets": {
+    sets: [["2", "10, 5s hold"]],
+    setup: "Sit or lie with left leg extended. Roll a small towel under left knee for comfort.",
+    execution: "Press back of left knee firmly into the surface. Hold 5 seconds, release completely. Repeat 10×.",
+    nwbCues: "Pure isometric — zero joint movement, zero fracture stress. Can be done anywhere seated.",
+    rest: 0,
+  },
+  "Short Arc Quads": {
+    sets: [["2", "12"]],
+    setup: "Sit with a rolled towel or foam roller under left knee creating ~30° of bend.",
+    execution: "Slowly straighten left knee from 30° to full extension. Hold 1s at top, lower over 3 seconds.",
+    nwbCues: "Last 30° of extension only — minimal hip involvement, pure quad activation.",
+    rest: 0,
+  },
+  "Ankle Pumps & Circles": {
+    sets: [["2", "20"]],
+    setup: "Sit or lie comfortably with left leg supported or slightly elevated.",
+    execution: "Slowly point and flex left foot (pumps), then circle ankle clockwise then counter-clockwise.",
+    nwbCues: "Zero load on fracture site. Maintains ankle ROM and promotes circulation.",
+    rest: 0,
+  },
+  "Banded Terminal Knee Extensions": {
+    sets: [["2", "15"]],
+    setup: "Sit with resistance band looped behind left knee and anchored at low height ahead of you.",
+    execution: "Starting with knee slightly bent, extend against band resistance. Squeeze quad at full extension, lower slowly.",
+    nwbCues: "Pure knee extension — zero hip flexion demand. Band provides gentle progressive resistance.",
+    rest: 0,
+  },
+  "Reclined Knee Extensions": {
+    sets: [["2", "12"]],
+    setup: "Sit reclined with left leg supported at ~45° of bend. No added weight.",
+    execution: "Slowly extend left knee to full extension. Hold 1s at top, lower over 3 seconds.",
+    nwbCues: "Bodyweight only. Zero hip flexion. Keep range within the last 45° of knee extension.",
+    rest: 0,
+  },
+
+  // ── CORE ──────────────────────────────────────────────────────────────────
+  "Seated Cable Crunch": {
+    sets: [["3", "12"]],
+    setup: "Rope on high cable. Sit on a bench facing the stack. Hold rope ends at temples.",
+    execution: "Flex spine forward, pulling elbows toward knees. Contract abs hard at bottom. Return with control.",
+    nwbCues: "Seated throughout — no standing. Left foot rests on floor, zero weight through it.",
+    rest: 60,
+  },
+  "Modified Hollow Body Hold": {
+    sets: [["3", "20s"]],
+    setup: "Lie flat on mat. Right leg straight, left leg extended passively on the floor.",
+    execution: "Press lower back into mat firmly. Lift right leg ~6 inches. Hold and breathe steadily.",
+    nwbCues: "Left leg stays on the floor the entire time. No bilateral leg raise.",
+    rest: 45,
+  },
+  "Pallof Press with Overhead Reach": {
+    sets: [["3", "10/side"]],
+    setup: "Seated sideways to a cable or band anchored at chest height. Hold handle at chest with both hands.",
+    execution: "Press handle straight out, then reach overhead with arms extended. Return to chest. Resist rotation throughout.",
+    nwbCues: "Seated only. Move deliberately — the overhead reach increases anti-rotation demand.",
+    rest: 60,
+  },
+  "Modified Side Plank Hip Dips": {
+    sets: [["3", "10/side"]],
+    setup: "Side-lying on right forearm. Left leg rests passively on right leg. Lift right hip into modified side plank.",
+    execution: "Lower right hip toward floor then lift back up. Full controlled range.",
+    nwbCues: "Left leg is a passive rider. Core controls the dip — not hip momentum.",
+    rest: 45,
+  },
+  "Modified Plank": {
+    sets: [["3", "20s"]],
+    setup: "Forearm plank with both knees on the floor. Left knee passive, right knee bearing weight.",
+    execution: "Hold position with core braced, hips level. Don't let hips sag or bridge up.",
+    nwbCues: "Knee-supported version only — no full plank. Left leg contributes no force.",
+    rest: 45,
+  },
+  "Reverse Crunch (R Leg Only)": {
+    sets: [["3", "12"]],
+    setup: "Lie on mat. Left leg flat on floor (passive). Right leg bent at 90°, foot off floor.",
+    execution: "Using abs, curl pelvis up — lift tailbone off mat. Lower with control. No hip flexor momentum.",
+    nwbCues: "Left leg stays flat and passive throughout. Right leg is the only one assisting.",
+    rest: 60,
+  },
+  "Single-Arm Seated Cable Row": {
+    sets: [["3", "12/side"]],
+    setup: "Sit at low cable row with single D-handle. Sit upright with slight forward lean, feet on platform.",
+    execution: "Row handle to side of torso with controlled rotation. Full stretch at start, elbow past body at finish.",
+    nwbCues: "Seated throughout, hips stable. Left foot rests on platform — no weight bearing.",
+    rest: 60,
+  },
+  "Seated Oblique Cable Crunch": {
+    sets: [["3", "12/side"]],
+    setup: "Sit sideways on a bench next to high cable. Hold rope or D-handle at opposite ear with both hands.",
+    execution: "Crunch sideways toward cable side. Obliques on far side stretch then contract. Return with control.",
+    nwbCues: "Seated. Keep hips stable — only torso flexes laterally. Left leg passive.",
+    rest: 60,
+  },
+  "Weighted Crunch (Seated)": {
+    sets: [["3", "12"]],
+    setup: "Sit upright on a bench or machine. Hold a plate or dumbbell at chest.",
+    execution: "Flex spine forward — shoulders curl toward hips. Squeeze at top, lower slowly.",
+    nwbCues: "Seated throughout. No left leg ground pressure. Use a support rail if balance is uncertain.",
+    rest: 60,
+  },
+  "Modified Hollow Body Flutter": {
+    sets: [["3", "15/side"]],
+    setup: "Lie on mat. Left leg extended on floor (passive). Lower back pressed firmly to mat.",
+    execution: "Flutter kick with right leg only — small rapid up-down movements. Maintain hollow position.",
+    nwbCues: "Left leg stays on the floor. Do not bridge. Lower back contact is mandatory.",
+    rest: 45,
+  },
+  "Seated Landmine Rotation": {
+    sets: [["3", "10/side"]],
+    setup: "Sit straddling a bench end. Hold loaded landmine bar end with both hands extended.",
+    execution: "Rotate torso side-to-side, controlling the arc of the bar. Hips stay square.",
+    nwbCues: "Hips face forward — only the torso rotates. Seated throughout.",
+    rest: 60,
+  },
+  "Modified Side Plank with Band Row": {
+    sets: [["3", "8/side"]],
+    setup: "Modified side plank on knee and forearm. Resistance band anchored at low height ahead. Free hand holds band.",
+    execution: "Hold the side plank while rowing band to ribcage with free hand. Don't rotate.",
+    nwbCues: "Left knee is passive support. Hip flexion stays below 90°.",
+    rest: 60,
+  },
+  "Modified Plank Shoulder Taps": {
+    sets: [["3", "10 pairs"]],
+    setup: "Knee-supported plank (both knees on floor). Core braced, hips level.",
+    execution: "Lift one hand and tap opposite shoulder. Alternate sides without rotating hips.",
+    nwbCues: "Knees on floor only — no full plank. Brace hard before each tap to prevent rotation.",
+    rest: 45,
+  },
+  "Slow Dead Bugs (Modified)": {
+    sets: [["3", "8/side"]],
+    setup: "Lie on mat. Arms pointing to ceiling. Right knee bent at 90° (foot off floor). Left leg extended on floor.",
+    execution: "Slowly lower right arm overhead while keeping right knee bent. Press lower back to mat. Return.",
+    nwbCues: "Left leg stays on floor — one-limb version only. Lower back contact is the non-negotiable cue.",
+    rest: 45,
+  },
+  "High-to-Low Woodchop": {
+    sets: [["3", "12/side"]],
+    setup: "Seated at cable station. High cable with rope or D-handle. Sit tall with core braced.",
+    execution: "Pull cable diagonally from high-to-low across body, rotating torso. Control the eccentric return.",
+    nwbCues: "Seated only. Hip flexion minimal — rotation drives the movement.",
+    rest: 60,
+  },
+  "Right Leg Lowers": {
+    sets: [["3", "10"]],
+    setup: "Lie on mat. Left leg extended on floor (passive). Right leg straight up toward ceiling.",
+    execution: "Slowly lower right leg toward floor, keeping lower back pressed down. Stop before back arches. Return slowly.",
+    nwbCues: "Left leg is passive and flat. Only right leg moves. Strict lower-back contact throughout.",
+    rest: 45,
+  },
+  "Pallof Alphabet": {
+    sets: [["2", "A\u2013J/side"]],
+    setup: "Seated sideways to cable or band. Hold handle at chest with both hands, arms extended.",
+    execution: "Trace letters A through J with the handle, keeping arms extended. Resist rotation throughout.",
+    nwbCues: "Seated. Small controlled movements. Core braced — the alphabet is the anti-rotation challenge.",
+    rest: 60,
+  },
+  "Modified Side Plank Hold": {
+    sets: [["3", "20s/side"]],
+    setup: "Side-lying on right forearm and right knee. Left knee stacked passively on right.",
+    execution: "Lift right hip off floor. Hold position with core braced. Breathe steadily.",
+    nwbCues: "Knee-supported version. Left leg is a passive rider — do not push off with it.",
+    rest: 45,
+  },
+  "Low-to-High Woodchop": {
+    sets: [["3", "12/side"]],
+    setup: "Seated at cable station. Low cable with rope or D-handle. Sit tall.",
+    execution: "Pull cable diagonally from low-to-high across body, rotating torso. Follow movement with eyes. Control return.",
+    nwbCues: "Seated only. Hip flexion minimal — rotation drives movement.",
+    rest: 60,
+  },
+  "Pallof ISO Hold": {
+    sets: [["3", "20s/side"]],
+    setup: "Seated sideways to cable or band at chest height. Hold handle at chest with both hands.",
+    execution: "Press handle straight out and HOLD. Resist any rotation. Breathe steadily through the hold.",
+    nwbCues: "Seated. Start with lighter resistance to learn the anti-rotation demand.",
+    rest: 45,
+  },
+  "Suitcase Hold (Seated)": {
+    sets: [["3", "30s/side"]],
+    setup: "Sit upright on a bench. Hold a dumbbell at your side (like a briefcase) in one hand.",
+    execution: "Resist lateral lean — keep spine perfectly vertical while holding the weight. Switch sides.",
+    nwbCues: "Seated. Core keeps you upright. No lateral hip shift.",
+    rest: 45,
+  },
+};
+
