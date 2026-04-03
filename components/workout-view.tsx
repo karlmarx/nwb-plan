@@ -1138,8 +1138,8 @@ export default function WorkoutView() {
                 );
               })()}
 
-              {/* Collapsed supplement indicator */}
-              {!isExp && activeSuppCards.length > 0 && (
+              {/* Supplement indicator — show in both collapsed and expanded states */}
+              {activeSuppCards.length > 0 && (
                 <div
                   onClick={() => toggleEx(exName)}
                   className="cursor-pointer flex items-center gap-1.5"
