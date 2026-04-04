@@ -10,6 +10,7 @@ interface SectionProps {
   onToggle: () => void;
   accent?: string;
   count?: number;
+  coloredBorder?: boolean;
 }
 
 export default function Section({
@@ -20,6 +21,7 @@ export default function Section({
   onToggle,
   accent,
   count,
+  coloredBorder,
 }: SectionProps) {
   const ac = accent ?? "#38bdf8";
 
@@ -29,6 +31,7 @@ export default function Section({
       className="mb-3 rounded-xl bg-card overflow-hidden transition-all duration-200"
       style={{
         border: `1px solid ${isOpen ? ac + "55" : "var(--color-border)"}`,
+        borderLeft: coloredBorder ? `3px solid ${ac}` : undefined,
         boxShadow: isOpen ? `0 0 20px ${ac}08` : "none",
       }}
     >
