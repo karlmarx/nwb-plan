@@ -49,23 +49,24 @@ export default function ExerciseRow({
   return (
     <div
       data-testid="exercise-row"
-      className="mb-1.5 rounded-lg overflow-hidden"
+      className="mb-2 rounded-xl overflow-hidden transition-all duration-150"
       style={{
-        background: isExpanded ? "color-mix(in srgb, var(--color-card) 70%, var(--color-bg))" : "var(--color-bg)",
+        background: isExpanded ? "var(--color-card)" : "var(--color-bg)",
         borderLeft: `3px solid ${unavailable ? "var(--color-danger)" : safetyColor}`,
         opacity: unavailable ? 0.5 : 1,
+        boxShadow: isExpanded ? "0 2px 12px rgba(0,0,0,0.15)" : "none",
       }}
     >
       {/* Collapsed header - tappable */}
       <div
         onClick={onToggle}
-        className="px-3 py-2.5 cursor-pointer min-h-[44px] flex items-center"
+        className="px-3.5 py-3 cursor-pointer min-h-[48px] flex items-center"
       >
         <div className="flex items-center justify-between gap-2 flex-wrap w-full">
           <div className="flex items-center gap-2 flex-wrap flex-1">
             <span
               data-testid="exercise-name"
-              className="font-semibold text-[13px]"
+              className="font-semibold text-sm"
               style={{
                 color: unavailable
                   ? "var(--color-danger)"
@@ -89,14 +90,19 @@ export default function ExerciseRow({
               <Badge color="var(--color-accent)">{variantLabel}</Badge>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {!isExpanded && (
-              <span className="text-[11px] text-text-dim">
+              <span className="text-xs text-text-dim font-medium tabular-nums">
                 {s[0]}&times;{s[1]}
               </span>
             )}
-            <span className="text-[10px] text-accent">
-              {isExpanded ? "\u25B2" : "\u24D8"}
+            <span
+              className="text-xs transition-transform duration-200"
+              style={{
+                color: isExpanded ? "var(--color-accent)" : "var(--color-text-muted)",
+              }}
+            >
+              {isExpanded ? "\u25B2" : "\u25BC"}
             </span>
           </div>
         </div>
@@ -104,47 +110,47 @@ export default function ExerciseRow({
 
       {/* Expanded details */}
       {isExpanded && (
-        <div className="px-3 pb-3">
+        <div className="section-content px-3.5 pb-4">
           {/* Superset cards — rendered first so they're the first thing seen on expand */}
           {supplementSlot}
 
           {/* Sets / Reps / Rest stats */}
-          <div className="flex gap-3 mb-3 py-2 border-b border-border">
+          <div className="flex gap-4 mb-4 py-2.5 border-b border-border">
             <div>
-              <div className="text-[9px] text-text-muted uppercase">
+              <div className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
                 Sets &times; Reps
               </div>
-              <div className="text-sm font-bold text-accent">
+              <div className="text-base font-bold text-accent tabular-nums mt-0.5">
                 {s[0]} &times; {s[1]}
               </div>
             </div>
             {ex.rest > 0 && (
               <div>
-                <div className="text-[9px] text-text-muted uppercase">
+                <div className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
                   Rest
                 </div>
-                <div className="text-sm font-bold text-text">{ex.rest}s</div>
+                <div className="text-base font-bold text-text tabular-nums mt-0.5">{ex.rest}s</div>
               </div>
             )}
           </div>
 
-          <div className="text-[11px] leading-[1.7]">
+          <div className="text-[13px] leading-relaxed space-y-3">
             {/* SETUP */}
-            <div className="mb-2.5">
-              <div className="font-bold text-accent mb-1 text-[10px]">
-                {"\u{1F4CD}"} SETUP &amp; POSITION
+            <div>
+              <div className="font-bold text-accent mb-1 text-[11px] uppercase tracking-wide">
+                {"\u{1F4CD}"} Setup &amp; Position
               </div>
               <div className="text-text-dim">{ex.setup}</div>
               {variantSetupCues && variantSetupCues.length > 0 && (
                 <div
-                  className="mt-2 rounded-md"
+                  className="mt-2 rounded-lg"
                   style={{
-                    padding: "6px 8px",
+                    padding: "8px 10px",
                     background: "var(--color-accent-dim)",
                     border: "1px solid var(--color-accent)33",
                   }}
                 >
-                  <div className="text-[9px] font-bold text-accent uppercase mb-1">
+                  <div className="text-[10px] font-bold text-accent uppercase mb-1">
                     {variantLabel ? `${variantLabel} Setup` : "Machine-Specific Setup"}
                   </div>
                   <ul className="m-0 pl-4 list-disc">
@@ -157,57 +163,54 @@ export default function ExerciseRow({
             </div>
 
             {/* EXECUTE */}
-            <div className="mb-2.5">
-              <div className="font-bold text-safe mb-1 text-[10px]">
-                {"\u{1F504}"} HOW TO EXECUTE
+            <div>
+              <div className="font-bold text-safe mb-1 text-[11px] uppercase tracking-wide">
+                {"\u{1F504}"} How to Execute
               </div>
               <div className="text-text-dim">{ex.execution}</div>
             </div>
 
             {/* NWB SAFETY */}
-            <div className="mb-2.5">
-              <div className="font-bold text-warning mb-1 text-[10px]">
-                {"\u{1F6E1}\uFE0F"} NWB SAFETY CUES
+            <div>
+              <div className="font-bold text-warning mb-1 text-[11px] uppercase tracking-wide">
+                {"\u{1F6E1}\uFE0F"} NWB Safety Cues
               </div>
               <div className="text-text-dim">{ex.nwbCues}</div>
             </div>
 
             {/* WHY THIS EXERCISE */}
-            <div className="mb-2.5">
-              <div className="font-bold text-text mb-1 text-[10px]">
-                {"\u{1F3AF}"} WHY THIS EXERCISE
+            <div>
+              <div className="font-bold text-text mb-1 text-[11px] uppercase tracking-wide">
+                {"\u{1F3AF}"} Why This Exercise
               </div>
               <div className="text-text-dim">{ex.why}</div>
             </div>
 
             {/* Diagram button */}
             {ex.diagram && (
-              <div className="mb-2.5">
-                <button
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    onDiagram(ex.diagram!);
-                  }}
-                  data-testid="view-diagram"
-                  className="w-full p-3 rounded-lg border cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-xs font-bold text-accent min-h-[44px]"
-                  style={{
-                    background: "var(--color-bg)",
-                    borderColor: "var(--color-accent)",
-                    opacity: 0.7,
-                  }}
-                >
-                  {"\u{1F4D0}"} View Movement Diagram
-                </button>
-              </div>
+              <button
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onDiagram(ex.diagram!);
+                }}
+                data-testid="view-diagram"
+                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150"
+                style={{
+                  background: "var(--color-accent)11",
+                  border: "1px solid var(--color-accent)33",
+                }}
+              >
+                {"\u{1F4D0}"} View Movement Diagram
+              </button>
             )}
 
             {/* Visual guide (pre block) */}
             {ex.visual && !ex.diagram && (
-              <div className="mb-2.5">
-                <div className="font-bold text-accent mb-1 text-[10px]">
-                  {"\u{1F4D0}"} VISUAL GUIDE
+              <div>
+                <div className="font-bold text-accent mb-1 text-[11px] uppercase tracking-wide">
+                  {"\u{1F4D0}"} Visual Guide
                 </div>
-                <pre className="font-mono text-[11px] whitespace-pre overflow-x-auto rounded-lg p-2.5 m-0 text-text-dim bg-bg border border-border">
+                <pre className="font-mono text-[12px] whitespace-pre overflow-x-auto rounded-xl p-3 m-0 text-text-dim bg-bg border border-border">
                   {ex.visual}
                 </pre>
               </div>
@@ -215,11 +218,11 @@ export default function ExerciseRow({
 
             {/* Tempo */}
             {ex.tempo && (
-              <div className="flex gap-2 mb-2.5 items-center">
-                <span className="text-[9px] text-text-muted uppercase font-bold">
-                  TEMPO
+              <div className="flex gap-2.5 items-center">
+                <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider">
+                  Tempo
                 </span>
-                <span className="text-xs text-accent font-semibold font-mono">
+                <span className="text-sm text-accent font-semibold font-mono">
                   {ex.tempo}
                 </span>
               </div>
@@ -227,9 +230,9 @@ export default function ExerciseRow({
 
             {/* Amplification tiers */}
             {ex.amp && (
-              <div className="mb-2.5">
-                <div className="text-[9px] text-text-muted uppercase font-bold mb-1.5">
-                  {"\u{1F525}"} AMPLIFICATION TIERS
+              <div>
+                <div className="text-[10px] text-text-muted uppercase font-bold mb-2 tracking-wider">
+                  {"\u{1F525}"} Amplification Tiers
                 </div>
                 {ex.amp.map((level, i) => {
                   const colors = [
@@ -240,7 +243,7 @@ export default function ExerciseRow({
                   return (
                     <div
                       key={`amp-${i}`}
-                      className="py-1.5 px-2 mb-0.5 rounded-md text-[11px] text-text-dim leading-relaxed"
+                      className="py-2 px-2.5 mb-1 rounded-lg text-[13px] text-text-dim leading-relaxed"
                       style={{
                         background: colors[i] + "11",
                         borderLeft: `3px solid ${colors[i]}66`,
@@ -256,16 +259,16 @@ export default function ExerciseRow({
 
           {/* Equipment chips */}
           {ex.requires.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2.5">
+            <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
               {ex.requires.map((eq) => {
                 const eqData = EQUIPMENT[eq];
                 const has = equipment[eq] !== false;
                 return (
                   <span
                     key={eq}
-                    className="text-[10px] rounded"
+                    className="text-[11px] rounded-md font-medium"
                     style={{
-                      padding: "2px 6px",
+                      padding: "3px 8px",
                       background: has
                         ? "var(--color-safe-bg)"
                         : "var(--color-danger-bg)",
@@ -290,11 +293,11 @@ export default function ExerciseRow({
             );
             if (availableSwaps.length === 0) return null;
             return (
-            <div>
-              <div className="text-[10px] font-bold text-text-muted mb-1.5 uppercase">
+            <div className="mt-3">
+              <div className="text-[11px] font-bold text-text-muted mb-2 uppercase tracking-wider">
                 Swap for:
               </div>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {availableSwaps.map((sw) => {
                   return (
                     <button
@@ -303,12 +306,12 @@ export default function ExerciseRow({
                         ev.stopPropagation();
                         onSwap(sw);
                       }}
-                      className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[44px]"
+                      className="text-[12px] rounded-lg cursor-pointer font-[inherit] min-h-[44px] transition-colors duration-150"
                       style={{
-                        padding: "6px 10px",
-                        background: "var(--color-accent)" + "22",
+                        padding: "8px 12px",
+                        background: "var(--color-accent)" + "15",
                         color: "var(--color-accent)",
-                        border: `1px solid var(--color-accent)44`,
+                        border: `1px solid var(--color-accent)33`,
                       }}
                     >
                       {sw}
@@ -327,10 +330,10 @@ export default function ExerciseRow({
                 ev.stopPropagation();
                 onSwap("__timer__" + ex.rest);
               }}
-              className="mt-2.5 w-full p-2.5 rounded-lg text-[13px] font-bold cursor-pointer font-[inherit] text-accent min-h-[44px]"
+              className="mt-3 w-full p-3 rounded-xl text-sm font-bold cursor-pointer font-[inherit] text-accent min-h-[48px] transition-colors duration-150"
               style={{
-                background: "var(--color-accent)" + "22",
-                border: `1px solid var(--color-accent)44`,
+                background: "var(--color-accent)" + "15",
+                border: `1px solid var(--color-accent)33`,
               }}
             >
               {"\u23F1"} Start {ex.rest}s Rest Timer

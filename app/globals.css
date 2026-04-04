@@ -4,6 +4,7 @@
   /* Dark theme (default) */
   --color-bg: #0a0f1a;
   --color-card: #111827;
+  --color-card-hover: #151e2e;
   --color-border: #1e293b;
   --color-accent: #38bdf8;
   --color-accent-dim: #0c4a6e;
@@ -19,6 +20,10 @@
   --color-text: #e2e8f0;
   --color-text-dim: #94a3b8;
   --color-text-muted: #64748b;
+
+  /* Supplement accent tokens */
+  --color-ll: #14b8a6;
+  --color-core-sup: #f97316;
 }
 
 * {
@@ -29,16 +34,23 @@
   width: 0;
 }
 
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+  font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 /* Light theme overrides */
 html.light {
   --color-bg: #f8fafc;
   --color-card: #ffffff;
+  --color-card-hover: #f1f5f9;
   --color-border: #e2e8f0;
   --color-accent: #0284c7;
   --color-accent-dim: #bae6fd;
@@ -56,20 +68,39 @@ html.light {
   --color-text-muted: #94a3b8;
 }
 
-/* Desktop: scale up the narrow mobile layout for readability */
-@media (min-width: 700px) {
-  .app-container {
-    zoom: 1.25;
-  }
-}
-
-@media (min-width: 900px) {
-  .app-container {
-    zoom: 1.4;
+/* Proper responsive scaling — no zoom hacks */
+@media (min-width: 768px) {
+  html {
+    font-size: 17px;
   }
 }
 
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* Smooth section open/close */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-content {
+  animation: slideDown 0.15s ease-out;
+}
+
+/* Tab active indicator */
+.tab-active {
+  position: relative;
+}
+.tab-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
 }

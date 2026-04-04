@@ -10,12 +10,12 @@ interface BadgeProps {
 export default function Badge({ color, children }: BadgeProps) {
   return (
     <span
-      className="inline-block rounded text-[10px] font-bold uppercase tracking-wide"
+      className="inline-block rounded-md text-[10px] font-bold uppercase tracking-wide leading-none"
       style={{
-        padding: "2px 7px",
-        background: color + "22",
+        padding: "3px 8px",
+        background: color + "18",
         color: color,
-        border: `1px solid ${color}44`,
+        border: `1px solid ${color}33`,
       }}
     >
       {children}

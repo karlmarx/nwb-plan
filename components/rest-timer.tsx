@@ -36,25 +36,26 @@ export default function RestTimer({ seconds, onClose }: RestTimerProps) {
         (secs < 10 && mins > 0 ? "0" : "") +
         secs;
 
+  const isDone = remaining === 0;
+
   return (
     <div
       data-testid="rest-timer"
-      className="fixed bottom-[70px] left-1/2 z-[100] flex items-center gap-3 rounded-2xl px-6 py-3"
+      className="fixed bottom-20 left-1/2 z-[100] flex items-center gap-4 rounded-2xl px-6 py-4"
       style={{
         transform: "translateX(-50%)",
-        background: "#111827",
-        border: "2px solid var(--color-accent)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+        background: "var(--color-card)",
+        border: `2px solid ${isDone ? "var(--color-safe)" : "var(--color-accent)"}`,
+        boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 20px ${isDone ? "var(--color-safe)" : "var(--color-accent)"}22`,
+        backdropFilter: "blur(12px)",
       }}
     >
       <div
         data-testid="timer-display"
-        className="text-[28px] font-extrabold min-w-[60px] text-center"
+        className="text-3xl font-extrabold min-w-[70px] text-center tabular-nums"
         style={{
-          fontVariantNumeric: "tabular-nums",
-          color:
-            remaining === 0 ? "var(--color-safe)" : "var(--color-accent)",
-          animation: remaining === 0 ? "pulse-glow 1s infinite" : "none",
+          color: isDone ? "var(--color-safe)" : "var(--color-accent)",
+          animation: isDone ? "pulse-glow 1s infinite" : "none",
         }}
       >
         {display}
@@ -62,7 +63,7 @@ export default function RestTimer({ seconds, onClose }: RestTimerProps) {
       <button
         data-testid="timer-close"
         onClick={onClose}
-        className="border rounded-lg px-3 py-1.5 text-xs cursor-pointer font-[inherit] min-h-[44px] min-w-[44px]"
+        className="border rounded-xl px-4 py-2 text-sm cursor-pointer font-[inherit] min-h-[44px] min-w-[44px] transition-colors duration-150"
         style={{
           background: "none",
           borderColor: "var(--color-border)",

@@ -89,29 +89,28 @@ export default function ProgressClock() {
       <div
         data-testid="progress-clock"
         onClick={handleClick}
-        className="cursor-pointer mb-3 rounded-[10px] px-3 py-1.5 flex items-center justify-between min-h-[44px]"
+        className="cursor-pointer mb-4 rounded-xl px-4 py-2.5 flex items-center justify-between min-h-[44px] transition-all duration-200"
         style={{
           background: "var(--color-card)",
           border: `1px solid ${clrHex}33`,
         }}
       >
         <span
-          className="text-[10px] font-bold"
+          className="text-[11px] font-bold"
           style={{ color: clr }}
         >
-          W{weekNum}&middot;D{totalDayNum}
+          W{weekNum} &middot; D{totalDayNum}
         </span>
         <span
-          className="text-[10px] text-text-muted"
-          style={{ fontVariantNumeric: "tabular-nums" }}
+          className="text-[11px] text-text-muted tabular-nums"
         >
           {t.d > 0
             ? t.d + "d " + pad(t.h) + "h " + pad(t.m) + "m"
             : pad(t.h) + ":" + pad(t.m) + ":" + pad(t.s)}
           {" \u00B7 "}
-          {pctDisplay} {countdown ? "\u2193" : "\u2191"}
+          {pctDisplay}
         </span>
-        <span className="text-[9px] text-text-muted">tap to expand</span>
+        <span className="text-[10px] text-text-muted">{countdown ? "\u2193" : "\u2191"}</span>
       </div>
     );
   }
@@ -121,7 +120,7 @@ export default function ProgressClock() {
     <div
       data-testid="progress-clock"
       onClick={handleClick}
-      className="cursor-pointer mb-4 rounded-[14px] overflow-hidden"
+      className="cursor-pointer mb-5 rounded-2xl overflow-hidden transition-all duration-200"
       style={{
         background: flash
           ? clrHex + "18"

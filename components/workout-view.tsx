@@ -801,17 +801,17 @@ export default function WorkoutView() {
       >
         {/* Hevy link */}
         {hevyId && (
-          <div className="mb-2.5">
+          <div className="mb-3">
             <a
               href={`https://hevy.com/routine/${hevyId}`}
               target="_blank"
               rel="noopener"
               onClick={(ev) => ev.stopPropagation()}
-              className="block text-center rounded-lg text-[13px] font-semibold no-underline min-h-[44px] leading-[44px]"
+              className="block text-center rounded-xl text-sm font-semibold no-underline min-h-[48px] leading-[48px] transition-colors duration-150"
               style={{
-                padding: "0 8px",
-                background: "#a78bfa22",
-                border: "1px solid #a78bfa44",
+                padding: "0 12px",
+                background: "#a78bfa15",
+                border: "1px solid #a78bfa33",
                 color: "#a78bfa",
               }}
             >
@@ -864,21 +864,21 @@ export default function WorkoutView() {
 
         {/* Supplement toggle controls */}
         {isTrainingDay && (
-          <div className="flex gap-1.5 mb-2.5 flex-wrap">
+          <div className="flex gap-2 mb-3 flex-wrap">
             <button
               onClick={(ev) => {
                 ev.stopPropagation();
                 toggleSupplement("leftLeg");
               }}
-              className="text-[10px] rounded-[10px] cursor-pointer font-[inherit]"
+              className="text-[11px] rounded-xl cursor-pointer font-[inherit] min-h-[36px] transition-all duration-150"
               style={{
-                padding: "4px 10px",
+                padding: "6px 12px",
                 background: supplementToggles.leftLeg
-                  ? "#14b8a618"
+                  ? "var(--color-ll)15"
                   : "transparent",
-                border: `1px solid ${supplementToggles.leftLeg ? "#14b8a644" : "var(--color-border)"}`,
+                border: `1.5px solid ${supplementToggles.leftLeg ? "var(--color-ll)" : "var(--color-border)"}`,
                 color: supplementToggles.leftLeg
-                  ? "#14b8a6"
+                  ? "var(--color-ll)"
                   : "var(--color-text-muted)",
                 fontWeight: supplementToggles.leftLeg ? 600 : 400,
               }}
@@ -891,15 +891,15 @@ export default function WorkoutView() {
                 ev.stopPropagation();
                 toggleSupplement("core");
               }}
-              className="text-[10px] rounded-[10px] cursor-pointer font-[inherit]"
+              className="text-[11px] rounded-xl cursor-pointer font-[inherit] min-h-[36px] transition-all duration-150"
               style={{
-                padding: "4px 10px",
+                padding: "6px 12px",
                 background: supplementToggles.core
-                  ? "#f9731618"
+                  ? "var(--color-core-sup)15"
                   : "transparent",
-                border: `1px solid ${supplementToggles.core ? "#f9731644" : "var(--color-border)"}`,
+                border: `1.5px solid ${supplementToggles.core ? "var(--color-core-sup)" : "var(--color-border)"}`,
                 color: supplementToggles.core
-                  ? "#f97316"
+                  ? "var(--color-core-sup)"
                   : "var(--color-text-muted)",
                 fontWeight: supplementToggles.core ? 600 : 400,
               }}
@@ -1278,16 +1278,14 @@ export default function WorkoutView() {
         {/* Core finishers */}
         {CORE_FINISHERS[workoutKey] && (
           <div
-            className="mt-3 rounded-lg"
+            className="mt-4 rounded-xl"
             style={{
-              padding: 10,
-              paddingTop: 10,
-              borderTop: "1px dashed #334155",
-              background: "#0d131f",
-              border: "1px solid var(--color-border)",
+              padding: "14px",
+              background: "var(--color-bg)",
+              border: "1px dashed var(--color-warning)33",
             }}
           >
-            <div className="text-xs font-bold text-warning mb-2 tracking-wide">
+            <div className="text-[13px] font-bold text-warning mb-3 tracking-wide">
               {"\uD83D\uDD25"} Core Finisher &mdash; pick 1&ndash;2
             </div>
             {CORE_FINISHERS[workoutKey].map((name) => {
@@ -1326,13 +1324,13 @@ export default function WorkoutView() {
     return (
       <div>
         {/* Day header */}
-        <div className="text-center mb-4">
-          <div className="text-[11px] text-text-muted uppercase tracking-widest">
+        <div className="text-center mb-5">
+          <div className="text-xs text-text-muted uppercase tracking-[0.15em] font-medium">
             {isToday ? "Today \u2014 " : ""}
             {DAY_NAMES[selectedDay]}
           </div>
           <div
-            className="text-[22px] font-extrabold mt-1"
+            className="text-2xl font-extrabold mt-1.5 tracking-tight"
             style={{ color: selSched.c }}
           >
             {selSched.i} {selSched.t}
@@ -1340,7 +1338,7 @@ export default function WorkoutView() {
         </div>
 
         {/* Day picker grid */}
-        <div className="grid grid-cols-7 gap-[3px] mb-4">
+        <div className="grid grid-cols-7 gap-1.5 mb-5">
           {DAY_ABBR.map((d, i) => {
             const dayWorkout = getWorkoutForDay(i);
             const isSel = i === selectedDay;
@@ -1353,26 +1351,27 @@ export default function WorkoutView() {
                   if (!openSections[dayWorkout.t])
                     toggleSection(dayWorkout.t);
                 }}
-                className="rounded-[7px] text-center cursor-pointer"
+                className="rounded-xl text-center cursor-pointer transition-all duration-150"
                 style={{
-                  padding: "7px 3px",
+                  padding: "8px 3px",
                   background: isSel
-                    ? dayWorkout.c + "22"
+                    ? dayWorkout.c + "18"
                     : "var(--color-card)",
-                  border: `1px solid ${isSel ? dayWorkout.c : isReal ? dayWorkout.c + "44" : "var(--color-border)66"}`,
+                  border: `1.5px solid ${isSel ? dayWorkout.c : isReal ? dayWorkout.c + "44" : "var(--color-border)"}`,
+                  boxShadow: isSel ? `0 0 10px ${dayWorkout.c}15` : "none",
                 }}
               >
                 <div
-                  className="text-[9px] font-bold uppercase"
+                  className="text-[10px] font-bold uppercase"
                   style={{
                     color: isSel ? dayWorkout.c : "var(--color-text-muted)",
                   }}
                 >
                   {isReal ? "\u2022 " + d : d}
                 </div>
-                <div className="text-sm my-0.5">{dayWorkout.i}</div>
+                <div className="text-base my-0.5">{dayWorkout.i}</div>
                 <div
-                  className="text-[8px] font-semibold"
+                  className="text-[9px] font-semibold"
                   style={{
                     color: isSel
                       ? "var(--color-text)"
@@ -2258,15 +2257,15 @@ export default function WorkoutView() {
 
   // ===== MAIN LAYOUT =====
   return (
-    <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-2.5 pb-20 min-h-screen bg-bg">
+    <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-4 pb-24 min-h-screen bg-bg">
       {/* Header */}
-      <div className="pt-6 pb-4 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <h1 data-testid="app-title" className="text-[22px] font-extrabold tracking-tight text-text">
+      <div className="pt-8 pb-5 text-center">
+        <div className="flex items-center justify-center gap-2.5">
+          <h1 data-testid="app-title" className="text-2xl font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
           {/* Header icons */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setAboutOpen(true)}
               data-testid="about-button"
@@ -2319,7 +2318,7 @@ export default function WorkoutView() {
             )}
           </div>
         </div>
-        <div className="text-[11px] text-text-muted mt-1">
+        <div className="text-xs text-text-muted mt-1.5 tracking-wide">
           NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 6 Weeks
         </div>
       </div>
@@ -2328,26 +2327,27 @@ export default function WorkoutView() {
       <ProgressClock />
 
       {/* Phase selector */}
-      <div className="flex gap-1 mb-3">
+      <div className="flex gap-1.5 mb-4">
         {PHASES.map((p, i) => (
           <div
             key={i}
             onClick={() => setPhase(i)}
-            className="flex-1 rounded-lg text-center cursor-pointer transition-all duration-200"
+            className="flex-1 rounded-xl text-center cursor-pointer transition-all duration-200"
             style={{
-              padding: "8px 4px",
-              background: phase === i ? p.color + "22" : "var(--color-card)",
+              padding: "10px 4px",
+              background: phase === i ? p.color + "18" : "var(--color-card)",
               border: `2px solid ${phase === i ? p.color : "var(--color-border)"}`,
+              boxShadow: phase === i ? `0 0 12px ${p.color}15` : "none",
             }}
           >
             <div
-              className="text-[10px] font-extrabold"
+              className="text-[11px] font-extrabold"
               style={{ color: p.color }}
             >
               WK {p.weeks}
             </div>
             <div
-              className="text-[9px] mt-0.5"
+              className="text-[10px] mt-0.5 font-medium"
               style={{
                 color:
                   phase === i
@@ -2362,7 +2362,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab bar */}
-      <div data-testid="tab-bar" className="flex gap-0.5 mb-4 items-stretch">
+      <div data-testid="tab-bar" className="flex gap-1 mb-5 items-stretch">
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
@@ -2373,11 +2373,11 @@ export default function WorkoutView() {
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               onClick={() => setTab(i)}
-              className="flex-1 min-w-0 rounded-lg text-[11px] font-semibold cursor-pointer font-[inherit]"
+              className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
-                padding: "10px 4px",
-                background: isActive ? activeColor + "22" : "none",
-                border: `1px solid ${isActive ? activeColor : "var(--color-border)"}`,
+                padding: "12px 4px",
+                background: isActive ? activeColor + "15" : "none",
+                border: `1px solid ${isActive ? activeColor + "55" : "var(--color-border)"}`,
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
@@ -2386,23 +2386,23 @@ export default function WorkoutView() {
           );
         })}
         {/* Divider */}
-        <div className="w-px mx-1 self-stretch" style={{ background: "var(--color-border)" }} />
+        <div className="w-px mx-0.5 self-stretch rounded-full" style={{ background: "var(--color-border)" }} />
         {/* Gear / config */}
         <button
           data-testid="tab-gear"
           title="Equipment & configuration"
           onClick={() => setTab(GEAR_TAB_INDEX)}
-          className="rounded-lg cursor-pointer font-[inherit] flex items-center justify-center"
+          className={`rounded-xl cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${tab === GEAR_TAB_INDEX ? "tab-active" : ""}`}
           style={{
-            width: 40,
-            minWidth: 40,
-            padding: "10px 0",
-            background: tab === GEAR_TAB_INDEX ? "var(--color-accent)22" : "none",
-            border: `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-border)"}`,
+            width: 44,
+            minWidth: 44,
+            padding: "12px 0",
+            background: tab === GEAR_TAB_INDEX ? "var(--color-accent)15" : "none",
+            border: `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)55" : "var(--color-border)"}`,
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
-          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3" />
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
@@ -2413,7 +2413,7 @@ export default function WorkoutView() {
       <div data-testid="tab-content">{content}</div>
 
       {/* Footer links */}
-      <div className="mt-3 flex justify-center gap-3.5 items-center">
+      <div className="mt-6 mb-2 flex justify-center gap-4 items-center">
         <a
           href="https://github.com/karlmarx/nwb-plan"
           target="_blank"
@@ -2458,27 +2458,31 @@ export default function WorkoutView() {
       {aboutOpen && (
         <div
           data-testid="about-modal"
-          className="fixed inset-0 z-[300] flex items-center justify-center p-3"
-          style={{ background: "rgba(0,0,0,0.85)" }}
+          className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
           onClick={() => setAboutOpen(false)}
         >
           <div
-            className="rounded-2xl w-full max-w-md overflow-y-auto max-h-[90vh]"
+            className="rounded-t-2xl sm:rounded-2xl w-full max-w-md overflow-y-auto max-h-[85vh]"
             style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Drag handle for mobile */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 rounded-full" style={{ background: "var(--color-border)" }} />
+            </div>
             <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-extrabold text-text">About</h2>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl font-extrabold text-text">About</h2>
                 <button
                   onClick={() => setAboutOpen(false)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-text-muted cursor-pointer text-lg transition-colors duration-150"
                   style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)" }}
                 >
                   &times;
                 </button>
               </div>
-              <div className="text-[13px] leading-relaxed text-text-dim space-y-3">
+              <div className="text-sm leading-relaxed text-text-dim space-y-4">
                 <p>
                   <strong className="text-text">Femur Fracture Fitness</strong> is
                   a personal PWA for tracking a non-weight-bearing Push/Pull/Legs
@@ -2490,25 +2494,24 @@ export default function WorkoutView() {
                   data, safety constraints, and progression phases are baked into
                   the app for offline use.
                 </p>
-                <p className="text-text-muted text-[11px]">
+                <div className="flex gap-3 pt-2">
                   <a
                     href="https://github.com/karlmarx/nwb-plan"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent"
+                    className="text-accent text-xs font-medium"
                   >
-                    Source on GitHub
+                    Source on GitHub &rarr;
                   </a>
-                  {" "}&bull;{" "}
                   <a
                     href="https://nwb-yoga.vercel.app"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent"
+                    className="text-accent text-xs font-medium"
                   >
-                    NWB Yoga Companion
+                    NWB Yoga &rarr;
                   </a>
-                </p>
+                </div>
               </div>
             </div>
           </div>

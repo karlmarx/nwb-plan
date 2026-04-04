@@ -44,9 +44,10 @@ export default function Callout({ type, children }: CalloutProps) {
 
   return (
     <div
-      className={`rounded-lg border p-3 mb-2.5 text-xs leading-relaxed ${c.bg} ${c.border} ${c.text}`}
+      className={`rounded-xl border p-3.5 mb-3 text-[13px] leading-relaxed ${c.bg} ${c.border} ${c.text}`}
     >
-      {c.icon} {children}
+      <span className="mr-1.5">{c.icon}</span>
+      {children}
     </div>
   );
 }
