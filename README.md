@@ -2,8 +2,8 @@
 
 A Progressive Web App for MRI-adjusted non-weight-bearing (NWB) Push/Pull/Legs training. Built around a femoral neck stress fracture + L4-L5 DDD protocol — every exercise selected and modified to protect the injured hip, spine, and labrum while maximising upper body and unilateral leg development.
 
-**Live:** [nwb-plan.vercel.app](https://nwb-plan.vercel.app) / [nfit.93.fyi](https://nfit.93.fyi)
-**Companion yoga app:** [nwb-yoga.vercel.app](https://nwb-yoga.vercel.app)
+**Live:** [nfit.93.fyi](https://nfit.93.fyi)
+**Companion yoga app:** [nyoga.93.fyi](https://nyoga.93.fyi)
 
 ---
 

@@ -4,7 +4,7 @@
 
 A PWA for non-weight-bearing (NWB) Push/Pull/Legs training protocol after a left femur stress fracture. Tracks workouts, supplements (left leg rehab + core), nutrition, and equipment availability.
 
-NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Deployed on Vercel at nwb-plan.vercel.app / nfit.93.fyi.
+NWB Workout Plan — a Next.js App Router PWA for MRI-adjusted non-weight-bearing Push/Pull/Legs training protocol. Deployed on Vercel at nfit.93.fyi.
 
 ## Development
 
@@ -82,7 +82,7 @@ WorkoutView (main shell, all state, 7 tabs: Today/Upper/Lower/Core/Cardio/Equip/
 - `public/sw.js` — service worker with cache-first strategy (v6)
 - `public/manifest.json` — standalone mode, dark theme
 - Base workout fully offline; AI suggestions show offline indicator
-- Desktop scaling: zoom 1.25 at 700px+, 1.4 at 900px+
+- Desktop: responsive font-size scaling (no zoom hack)
 
 ## Key Constraints
 

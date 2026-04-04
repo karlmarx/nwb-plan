@@ -1,3 +1,23 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "nwbfit.vercel.app" }],
+      "destination": "https://nfit.93.fyi/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "nwb-plan-indol.vercel.app" }],
+      "destination": "https://nfit.93.fyi/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "nwb-plan-karlmarx-karlmarxs-projects.vercel.app" }],
+      "destination": "https://nfit.93.fyi/$1",
+      "permanent": true
+    }
+  ]
 }

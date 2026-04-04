@@ -823,7 +823,7 @@ export default function WorkoutView() {
         {/* NWB Yoga link (Recovery only) */}
         {workoutKey === "Recovery" && (
           <a
-            href="https://nwb-yoga.vercel.app"
+            href="https://nyoga.93.fyi"
             target="_blank"
             rel="noopener noreferrer"
             onClick={(ev) => ev.stopPropagation()}
@@ -2177,7 +2177,7 @@ export default function WorkoutView() {
             <br />
             <br />
             <span className="text-text-muted text-[11px]">
-              nwbfit.vercel.app
+              nfit.93.fyi
             </span>
           </div>
         </Section>
@@ -2437,7 +2437,7 @@ export default function WorkoutView() {
           </svg>
         </a>
         <a
-          href="https://nwb-yoga.vercel.app"
+          href="https://nyoga.93.fyi"
           target="_blank"
           rel="noopener noreferrer"
           className="text-text-muted"
@@ -2504,7 +2504,7 @@ export default function WorkoutView() {
                     Source on GitHub &rarr;
                   </a>
                   <a
-                    href="https://nwb-yoga.vercel.app"
+                    href="https://nyoga.93.fyi"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent text-xs font-medium"
