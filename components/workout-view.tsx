@@ -550,6 +550,7 @@ export default function WorkoutView() {
     if (typeof window === "undefined") return "dark";
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
+  const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
 
   // ----- Persistence -----
   useEffect(() => {
@@ -586,6 +587,9 @@ export default function WorkoutView() {
     document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("nwb_theme", theme);
   }, [theme]);
+  useEffect(() => {
+    saveState("nwb_ui_v2", uiV2);
+  }, [uiV2]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -951,8 +955,26 @@ export default function WorkoutView() {
             );
           });
 
+          const v2GroupAccent =
+            uiV2 && activeSuppCards.length > 0
+              ? activeSuppCards.some((s) => s.type === "leftleg")
+                ? "#14b8a6"
+                : "#f97316"
+              : null;
           return (
-            <div key={origName}>
+            <div
+              key={origName}
+              style={
+                v2GroupAccent
+                  ? {
+                      borderLeft: `2px solid ${v2GroupAccent}55`,
+                      paddingLeft: 3,
+                      marginLeft: 2,
+                      borderRadius: "0 0 0 6px",
+                    }
+                  : undefined
+              }
+            >
               {/* Swap indicator */}
               {exName !== origName && (
                 <div className="text-[10px] text-text-muted px-3 flex items-center gap-1">
@@ -1072,23 +1094,39 @@ export default function WorkoutView() {
                     const isLL = supp.type === "leftleg";
                     const accent = isLL ? "#14b8a6" : "#f97316";
                     const label = isLL ? "L" : "C";
+                    const chipLabel = isLL ? "L-LEG" : "CORE";
                     return (
                       <span
                         key={`ind-${si}`}
-                        className="inline-flex items-center gap-0.5"
+                        className="inline-flex items-center gap-1"
                       >
-                        <span
-                          className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
-                          style={{
-                            width: 14,
-                            height: 14,
-                            background: accent + "22",
-                            border: `1px solid ${accent}44`,
-                            color: accent,
-                          }}
-                        >
-                          {label}
-                        </span>
+                        {uiV2 ? (
+                          <span
+                            data-testid="v2-supp-chip"
+                            className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold tracking-wide"
+                            style={{
+                              padding: "1px 6px",
+                              background: accent + "22",
+                              border: `1px solid ${accent}44`,
+                              color: accent,
+                            }}
+                          >
+                            {chipLabel}
+                          </span>
+                        ) : (
+                          <span
+                            className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
+                            style={{
+                              width: 14,
+                              height: 14,
+                              background: accent + "22",
+                              border: `1px solid ${accent}44`,
+                              color: accent,
+                            }}
+                          >
+                            {label}
+                          </span>
+                        )}
                         <span
                           className="text-[9px] font-semibold"
                           style={{ color: accent, opacity: 0.8 }}
@@ -1468,39 +1506,92 @@ export default function WorkoutView() {
 
         {/* Filter pills */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          <button
-            onClick={() => setFilter(null)}
-            className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
-            style={{
-              border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
-              background: filter === null ? accentColor + "18" : "var(--color-card)",
-              color: filter === null ? accentColor : "var(--color-text-muted)",
-              fontWeight: filter === null ? 700 : 400,
-            }}
-          >
-            All
-          </button>
-          {groups.map((g) => {
-            const isActive = filter === g.key;
-            return (
+          {uiV2 ? (
+            // v2: centered flex pills with count badge
+            <>
               <button
-                key={g.key}
-                onClick={() => setFilter(isActive ? null : g.key)}
-                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+                onClick={() => setFilter(null)}
+                className="inline-flex items-center justify-content-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
                 style={{
-                  border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
-                  background: isActive ? g.accent + "18" : "var(--color-card)",
-                  color: isActive ? g.accent : "var(--color-text-muted)",
-                  fontWeight: isActive ? 700 : 400,
+                  padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: filter === null ? 700 : 500,
+                  border: `1.5px solid ${filter === null ? accentColor + "88" : "var(--color-border)"}`,
+                  background: filter === null ? accentColor + "18" : "var(--color-card)",
+                  color: filter === null ? accentColor : "var(--color-text-muted)",
                 }}
               >
-                {g.icon} {g.label}
-                <span className="ml-1 text-[9px] opacity-60">
-                  {g.exercises.length}
-                </span>
+                All
+                <span style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  background: filter === null ? accentColor + "33" : "var(--color-border)",
+                  borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
+                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  lineHeight: 1.4,
+                }}>{totalExercises}</span>
               </button>
-            );
-          })}
+              {groups.map((g) => {
+                const isActive = filter === g.key;
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setFilter(isActive ? null : g.key)}
+                    className="inline-flex items-center justify-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
+                    style={{
+                      padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: isActive ? 700 : 500,
+                      border: `1.5px solid ${isActive ? g.accent + "88" : "var(--color-border)"}`,
+                      background: isActive ? g.accent + "18" : "var(--color-card)",
+                      color: isActive ? g.accent : "var(--color-text-muted)",
+                    }}
+                  >
+                    {g.icon} {g.label}
+                    <span style={{
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      background: isActive ? g.accent + "33" : "var(--color-border)",
+                      borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
+                      color: isActive ? g.accent : "var(--color-text-muted)",
+                      lineHeight: 1.4,
+                    }}>{g.exercises.length}</span>
+                  </button>
+                );
+              })}
+            </>
+          ) : (
+            // classic: existing pills
+            <>
+              <button
+                onClick={() => setFilter(null)}
+                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+                style={{
+                  border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
+                  background: filter === null ? accentColor + "18" : "var(--color-card)",
+                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  fontWeight: filter === null ? 700 : 400,
+                }}
+              >
+                All
+              </button>
+              {groups.map((g) => {
+                const isActive = filter === g.key;
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setFilter(isActive ? null : g.key)}
+                    className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
+                    style={{
+                      border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
+                      background: isActive ? g.accent + "18" : "var(--color-card)",
+                      color: isActive ? g.accent : "var(--color-text-muted)",
+                      fontWeight: isActive ? 700 : 400,
+                    }}
+                  >
+                    {g.icon} {g.label}
+                    <span className="ml-1 text-[9px] opacity-60">
+                      {g.exercises.length}
+                    </span>
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
 
         {/* Exercise groups */}
@@ -1513,6 +1604,7 @@ export default function WorkoutView() {
             onToggle={() => toggleSection(`lib-${group.key}`)}
             count={group.exercises.length}
             accent={group.accent}
+            coloredBorder={uiV2}
           >
             {group.exercises.map((name) => renderCoreExercise(name))}
           </Section>
@@ -1806,6 +1898,47 @@ export default function WorkoutView() {
   function renderEquipTab() {
     return (
       <div>
+        {/* UI v2 preview toggle */}
+        <div
+          className="flex items-center justify-between rounded-lg mb-4"
+          style={{
+            padding: "12px 14px",
+            background: uiV2 ? "#22d3ee11" : "var(--color-card)",
+            border: `1px solid ${uiV2 ? "#22d3ee44" : "var(--color-border)"}`,
+          }}
+        >
+          <div>
+            <div className="text-[13px] font-semibold text-text">New UI Preview</div>
+            <div className="text-[11px] text-text-muted mt-0.5">
+              {uiV2 ? "Active — section color borders + pill badges" : "Off — using classic UI"}
+            </div>
+          </div>
+          <button
+            onClick={() => setUiV2((v) => !v)}
+            className="relative cursor-pointer border-none font-[inherit]"
+            style={{
+              width: 44, height: 24, borderRadius: 12,
+              background: uiV2 ? "#22d3ee" : "var(--color-border)",
+              transition: "background 0.2s",
+              padding: 0,
+              position: "relative",
+            }}
+            title="Toggle new UI preview"
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: 3, left: uiV2 ? 23 : 3,
+                width: 18, height: 18,
+                borderRadius: "50%",
+                background: "#fff",
+                transition: "left 0.2s",
+                display: "block",
+              }}
+            />
+          </button>
+        </div>
+
         {/* Week start day picker */}
         <Section
           title="Week Start Day"
