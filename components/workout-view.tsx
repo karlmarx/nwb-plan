@@ -1362,7 +1362,15 @@ export default function WorkoutView() {
     return (
       <div>
         {/* Day header */}
-        <div className="text-center mb-5">
+        <div
+          data-testid="day-header"
+          className="text-center mb-5 rounded-xl"
+          style={uiV2 ? {
+            padding: "16px 12px 14px",
+            background: `linear-gradient(135deg, ${selSched.c}15 0%, ${selSched.c}08 50%, transparent 100%)`,
+            border: `1px solid ${selSched.c}22`,
+          } : undefined}
+        >
           <div className="text-xs text-text-muted uppercase tracking-[0.15em] font-medium">
             {isToday ? "Today \u2014 " : ""}
             {DAY_NAMES[selectedDay]}
@@ -1477,11 +1485,14 @@ export default function WorkoutView() {
         <button
           data-testid="open-diagram-gallery"
           onClick={() => setDiagramOpen("gallery")}
-          className="w-full mb-3 rounded-lg cursor-pointer font-[inherit] text-left min-h-[44px]"
+          className="w-full mb-3 rounded-xl cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
-            padding: "10px 14px",
-            background: accentColor + "15",
+            padding: "12px 14px",
+            background: uiV2
+              ? `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 60%, transparent 100%)`
+              : accentColor + "15",
             border: `1px solid ${accentColor}33`,
+            boxShadow: uiV2 ? `0 0 16px ${accentColor}08` : "none",
           }}
         >
           <div className="flex items-center gap-2">
@@ -1909,7 +1920,7 @@ export default function WorkoutView() {
           <div>
             <div className="text-[13px] font-semibold text-text">New UI Preview</div>
             <div className="text-[11px] text-text-muted mt-0.5">
-              {uiV2 ? "Active — section color borders + pill badges" : "Off — using classic UI"}
+              {uiV2 ? "Active — gradient cards, color borders, pill badges" : "Off — using classic UI"}
             </div>
           </div>
           <button

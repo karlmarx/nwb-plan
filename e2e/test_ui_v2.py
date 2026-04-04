@@ -35,7 +35,7 @@ def test_toggle_label_starts_off(app_page: Page):
 def test_toggle_click_changes_label(app_page: Page):
     """Clicking toggle changes label to Active."""
     _enable_ui_v2(app_page)
-    label_text = app_page.locator("text=Active — section color borders + pill badges")
+    label_text = app_page.locator("text=Active — gradient cards, color borders, pill badges")
     expect(label_text).to_be_visible()
 
 
@@ -53,7 +53,7 @@ def test_toggle_persists_across_reload(app_page: Page, base_url: str):
     app_page.wait_for_selector("[data-testid='app-container']")
     click_tab(app_page, "gear")
     app_page.wait_for_timeout(300)
-    label = app_page.locator("text=Active — section color borders + pill badges")
+    label = app_page.locator("text=Active — gradient cards, color borders, pill badges")
     expect(label).to_be_visible()
 
 
@@ -143,3 +143,35 @@ def test_classic_workout_tab_no_chip_badges(app_page: Page):
     # v2 chips must not appear in classic mode
     chips = app_page.get_by_test_id("v2-supp-chip")
     assert chips.count() == 0, "Classic mode should not show v2-supp-chip badges"
+
+
+def test_v2_today_header_has_gradient(app_page: Page):
+    """With v2 on, today's workout header has a gradient background."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(400)
+
+    header = app_page.get_by_test_id("day-header")
+    bg = header.evaluate("el => getComputedStyle(el).backgroundImage")
+    assert "gradient" in bg, f"v2 today header should have gradient background, got: {bg}"
+
+
+def test_classic_today_header_no_gradient(app_page: Page):
+    """With v2 off, today's header has no gradient."""
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(400)
+
+    header = app_page.get_by_test_id("day-header")
+    bg = header.evaluate("el => getComputedStyle(el).backgroundImage")
+    assert bg == "none", f"Classic today header should have no gradient, got: {bg}"
+
+
+def test_v2_gallery_button_has_gradient(app_page: Page):
+    """With v2 on, diagram gallery button has gradient background."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "upper")
+    app_page.wait_for_timeout(400)
+
+    btn = app_page.get_by_test_id("open-diagram-gallery")
+    bg = btn.evaluate("el => getComputedStyle(el).backgroundImage")
+    assert "gradient" in bg, f"v2 gallery button should have gradient, got: {bg}"
