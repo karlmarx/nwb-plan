@@ -35,7 +35,7 @@ def test_toggle_label_starts_off(app_page: Page):
 def test_toggle_click_changes_label(app_page: Page):
     """Clicking toggle changes label to Active."""
     _enable_ui_v2(app_page)
-    label_text = app_page.locator("text=Active — gradient cards, color borders, pill badges")
+    label_text = app_page.locator("text=Active — gradient cards, color borders, sliding tabs")
     expect(label_text).to_be_visible()
 
 
@@ -53,7 +53,7 @@ def test_toggle_persists_across_reload(app_page: Page, base_url: str):
     app_page.wait_for_selector("[data-testid='app-container']")
     click_tab(app_page, "gear")
     app_page.wait_for_timeout(300)
-    label = app_page.locator("text=Active — gradient cards, color borders, pill badges")
+    label = app_page.locator("text=Active — gradient cards, color borders, sliding tabs")
     expect(label).to_be_visible()
 
 
@@ -175,3 +175,64 @@ def test_v2_gallery_button_has_gradient(app_page: Page):
     btn = app_page.get_by_test_id("open-diagram-gallery")
     bg = btn.evaluate("el => getComputedStyle(el).backgroundImage")
     assert "gradient" in bg, f"v2 gallery button should have gradient, got: {bg}"
+
+
+def test_v2_sliding_tab_pill_exists(app_page: Page):
+    """With v2 on, a sliding tab pill indicator is rendered."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(300)
+    pill = app_page.get_by_test_id("tab-pill")
+    expect(pill).to_be_visible()
+
+
+def test_v2_sliding_tab_pill_moves(app_page: Page):
+    """With v2 on, clicking a different tab moves the sliding pill."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(300)
+
+    pill = app_page.get_by_test_id("tab-pill")
+    pos1 = pill.evaluate("el => el.getBoundingClientRect().left")
+
+    click_tab(app_page, "upper")
+    app_page.wait_for_timeout(400)
+
+    pos2 = pill.evaluate("el => el.getBoundingClientRect().left")
+    assert pos2 != pos1, f"Pill should move when switching tabs, stayed at {pos1}"
+
+
+def test_v2_tab_buttons_have_transparent_bg(app_page: Page):
+    """With v2 on, individual tab buttons have transparent background (pill handles it)."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "upper")
+    app_page.wait_for_timeout(300)
+
+    # The active tab button should have transparent background (pill is behind it)
+    btn = app_page.get_by_test_id("tab-upper")
+    bg = btn.evaluate("el => getComputedStyle(el).backgroundColor")
+    assert bg in ("rgba(0, 0, 0, 0)", "transparent"), f"v2 tab button bg should be transparent, got: {bg}"
+
+
+def test_classic_no_sliding_pill(app_page: Page):
+    """With v2 off, no sliding tab pill is rendered."""
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(300)
+    pill = app_page.get_by_test_id("tab-pill")
+    assert pill.count() == 0, "Classic mode should not show sliding tab pill"
+
+
+def test_v2_sliding_pill_follows_gear_tab(app_page: Page):
+    """With v2 on, the sliding pill also follows to the gear tab."""
+    _enable_ui_v2(app_page)
+    click_tab(app_page, "workout")
+    app_page.wait_for_timeout(300)
+
+    pill = app_page.get_by_test_id("tab-pill")
+    pos_workout = pill.evaluate("el => el.getBoundingClientRect().left")
+
+    click_tab(app_page, "gear")
+    app_page.wait_for_timeout(400)
+
+    pos_gear = pill.evaluate("el => el.getBoundingClientRect().left")
+    assert pos_gear > pos_workout, f"Gear pill should be rightmost, got gear={pos_gear} vs workout={pos_workout}"

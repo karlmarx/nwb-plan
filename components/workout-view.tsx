@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from "react";
 import { loadState, saveState } from "@/lib/storage";
 import {
   EX,
@@ -563,6 +563,27 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
+
+  // ----- Sliding tab pill (v2) -----
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pillPos, setPillPos] = useState({ left: 0, width: 0 });
+  const pillInitialized = useRef(false);
+
+  useLayoutEffect(() => {
+    if (!uiV2) { pillInitialized.current = false; return; }
+    const activeIdx = tab <= 5 ? tab : 6; // 6 = gear
+    const btn = tabRefs.current[activeIdx];
+    const bar = tabBarRef.current;
+    if (!btn || !bar) return;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    setPillPos({ left: btnRect.left - barRect.left, width: btnRect.width });
+    // Enable transitions after first measurement
+    if (!pillInitialized.current) {
+      requestAnimationFrame(() => { pillInitialized.current = true; });
+    }
+  }, [tab, uiV2]);
 
   // ----- Persistence -----
   useEffect(() => {
@@ -1951,7 +1972,7 @@ export default function WorkoutView() {
           <div>
             <div className="text-[13px] font-semibold text-text">New UI Preview</div>
             <div className="text-[11px] text-text-muted mt-0.5">
-              {uiV2 ? "Active — gradient cards, color borders, pill badges" : "Off — using classic UI"}
+              {uiV2 ? "Active — gradient cards, color borders, sliding tabs" : "Off — using classic UI"}
             </div>
           </div>
           <button
@@ -2609,7 +2630,21 @@ export default function WorkoutView() {
       </div>
 
       {/* Tab bar */}
-      <div data-testid="tab-bar" className="flex gap-1 mb-5 items-stretch">
+      <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
+        {/* v2: sliding pill indicator */}
+        {uiV2 && pillPos.width > 0 && (
+          <div
+            data-testid="tab-pill"
+            className="absolute top-0 bottom-0 rounded-xl pointer-events-none"
+            style={{
+              left: pillPos.left,
+              width: pillPos.width,
+              background: (tab === 0 ? todayColor : "var(--color-accent)") + "15",
+              border: `1px solid ${(tab === 0 ? todayColor : "var(--color-accent)")}55`,
+              transition: pillInitialized.current ? "left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1)" : "none",
+            }}
+          />
+        )}
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
@@ -2617,14 +2652,15 @@ export default function WorkoutView() {
           return (
             <button
               key={t}
+              ref={(el) => { tabRefs.current[i] = el; }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               onClick={() => setTab(i)}
               className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
-                background: isActive ? activeColor + "15" : "none",
-                border: `1px solid ${isActive ? activeColor + "55" : "var(--color-border)"}`,
+                background: uiV2 ? "transparent" : (isActive ? activeColor + "15" : "none"),
+                border: uiV2 ? "1px solid transparent" : `1px solid ${isActive ? activeColor + "55" : "var(--color-border)"}`,
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
@@ -2636,6 +2672,7 @@ export default function WorkoutView() {
         <div className="w-px mx-0.5 self-stretch rounded-full" style={{ background: "var(--color-border)" }} />
         {/* Gear / config */}
         <button
+          ref={(el) => { tabRefs.current[6] = el; }}
           data-testid="tab-gear"
           title="Equipment & configuration"
           onClick={() => setTab(GEAR_TAB_INDEX)}
@@ -2644,8 +2681,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: tab === GEAR_TAB_INDEX ? "var(--color-accent)15" : "none",
-            border: `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)55" : "var(--color-border)"}`,
+            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? "var(--color-accent)15" : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)55" : "var(--color-border)"}`,
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
