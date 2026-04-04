@@ -2529,6 +2529,8 @@ export default function WorkoutView() {
       {/* Header */}
       <div className="pt-8 pb-5 text-center">
         <div className="flex items-center justify-center gap-2.5">
+          {/* v2: compact progress ring in header */}
+          {uiV2 && <ProgressClock compact />}
           <h1 data-testid="app-title" className="text-2xl font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
@@ -2591,8 +2593,8 @@ export default function WorkoutView() {
         </div>
       </div>
 
-      {/* Progress clock */}
-      <ProgressClock />
+      {/* Progress clock (classic only — v2 uses compact ring in header) */}
+      {!uiV2 && <ProgressClock />}
 
       {/* Phase selector */}
       <div className="flex gap-1.5 mb-4">

@@ -177,6 +177,36 @@ def test_v2_gallery_button_has_gradient(app_page: Page):
     assert "gradient" in bg, f"v2 gallery button should have gradient, got: {bg}"
 
 
+def test_v2_compact_progress_ring_in_header(app_page: Page):
+    """With v2 on, compact progress ring is visible in the header."""
+    _enable_ui_v2(app_page)
+    ring = app_page.get_by_test_id("progress-ring")
+    expect(ring).to_be_visible()
+
+
+def test_v2_hides_full_progress_clock(app_page: Page):
+    """With v2 on, the large progress clock block is hidden."""
+    _enable_ui_v2(app_page)
+    clock = app_page.get_by_test_id("progress-clock")
+    assert clock.count() == 0, "v2 should hide the full progress clock"
+
+
+def test_classic_shows_full_progress_clock(app_page: Page):
+    """With v2 off, the full progress clock is shown (no compact ring)."""
+    clock = app_page.get_by_test_id("progress-clock")
+    expect(clock).to_be_visible()
+    ring = app_page.get_by_test_id("progress-ring")
+    assert ring.count() == 0, "Classic mode should not show compact progress ring"
+
+
+def test_v2_progress_ring_has_svg(app_page: Page):
+    """With v2 on, the progress ring contains an SVG circle."""
+    _enable_ui_v2(app_page)
+    ring = app_page.get_by_test_id("progress-ring")
+    svg = ring.locator("svg circle")
+    assert svg.count() >= 2, f"Progress ring should have 2 circles (bg + progress), got {svg.count()}"
+
+
 def test_v2_sliding_tab_pill_exists(app_page: Page):
     """With v2 on, a sliding tab pill indicator is rendered."""
     _enable_ui_v2(app_page)
