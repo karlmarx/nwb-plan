@@ -955,8 +955,26 @@ export default function WorkoutView() {
             );
           });
 
+          const v2GroupAccent =
+            uiV2 && activeSuppCards.length > 0
+              ? activeSuppCards.some((s) => s.type === "leftleg")
+                ? "#14b8a6"
+                : "#f97316"
+              : null;
           return (
-            <div key={origName}>
+            <div
+              key={origName}
+              style={
+                v2GroupAccent
+                  ? {
+                      borderLeft: `2px solid ${v2GroupAccent}55`,
+                      paddingLeft: 3,
+                      marginLeft: 2,
+                      borderRadius: "0 0 0 6px",
+                    }
+                  : undefined
+              }
+            >
               {/* Swap indicator */}
               {exName !== origName && (
                 <div className="text-[10px] text-text-muted px-3 flex items-center gap-1">
@@ -1076,23 +1094,39 @@ export default function WorkoutView() {
                     const isLL = supp.type === "leftleg";
                     const accent = isLL ? "#14b8a6" : "#f97316";
                     const label = isLL ? "L" : "C";
+                    const chipLabel = isLL ? "L-LEG" : "CORE";
                     return (
                       <span
                         key={`ind-${si}`}
-                        className="inline-flex items-center gap-0.5"
+                        className="inline-flex items-center gap-1"
                       >
-                        <span
-                          className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
-                          style={{
-                            width: 14,
-                            height: 14,
-                            background: accent + "22",
-                            border: `1px solid ${accent}44`,
-                            color: accent,
-                          }}
-                        >
-                          {label}
-                        </span>
+                        {uiV2 ? (
+                          <span
+                            data-testid="v2-supp-chip"
+                            className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold tracking-wide"
+                            style={{
+                              padding: "1px 6px",
+                              background: accent + "22",
+                              border: `1px solid ${accent}44`,
+                              color: accent,
+                            }}
+                          >
+                            {chipLabel}
+                          </span>
+                        ) : (
+                          <span
+                            className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
+                            style={{
+                              width: 14,
+                              height: 14,
+                              background: accent + "22",
+                              border: `1px solid ${accent}44`,
+                              color: accent,
+                            }}
+                          >
+                            {label}
+                          </span>
+                        )}
                         <span
                           className="text-[9px] font-semibold"
                           style={{ color: accent, opacity: 0.8 }}
@@ -1887,6 +1921,7 @@ export default function WorkoutView() {
               background: uiV2 ? "#22d3ee" : "var(--color-border)",
               transition: "background 0.2s",
               padding: 0,
+              position: "relative",
             }}
             title="Toggle new UI preview"
           >
