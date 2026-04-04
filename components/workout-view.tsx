@@ -509,9 +509,18 @@ export default function WorkoutView() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     () => {
       const sd = loadState<number>("nwb_startDay", 0);
+      const rd = loadState<number | null>("nwb_restDay", null);
       const rt = getRealToday();
-      const rotIdx = (rt - sd + 7) % 7;
-      return { [SCHED[rotIdx].t]: true };
+      const defaultRest = (sd + 6) % 7;
+      const effectiveRest = rd ?? defaultRest;
+      if (rt === effectiveRest) return { [SCHED[6].t]: true };
+      let ti = 0;
+      for (let d = sd; ; d = (d + 1) % 7) {
+        if (d === effectiveRest) continue;
+        if (d === rt) break;
+        ti++;
+      }
+      return { [SCHED[ti].t]: true };
     },
   );
   const [expandedEx, setExpandedEx] = useState<Record<string, boolean>>({});
@@ -528,6 +537,9 @@ export default function WorkoutView() {
   );
   const [startDay, setStartDay] = useState(() =>
     loadState<number>("nwb_startDay", 0),
+  );
+  const [restDay, setRestDay] = useState<number | null>(() =>
+    loadState<number | null>("nwb_restDay", null),
   );
   const [selectedDay, setSelectedDay] = useState(getRealToday);
   const [machineSelections, setMachineSelections] = useState<
@@ -572,6 +584,13 @@ export default function WorkoutView() {
     saveState("nwb_startDay", startDay);
   }, [startDay]);
   useEffect(() => {
+    if (restDay === null) {
+      localStorage.removeItem("nwb_restDay");
+    } else {
+      saveState("nwb_restDay", restDay);
+    }
+  }, [restDay]);
+  useEffect(() => {
     saveState("nwb_machines", machineSelections);
   }, [machineSelections]);
   useEffect(() => {
@@ -600,10 +619,22 @@ export default function WorkoutView() {
 
   const getWorkoutForDay = useCallback(
     (dayIdx: number) => {
-      const rotIdx = (dayIdx - startDay + 7) % 7;
-      return SCHED[rotIdx];
+      const defaultRestDay = (startDay + 6) % 7;
+      const effectiveRestDay = restDay ?? defaultRestDay;
+
+      // If this day is the rest day, return Recovery
+      if (dayIdx === effectiveRestDay) return SCHED[6];
+
+      // Count training slots from startDay up to dayIdx, skipping rest day
+      let trainingIdx = 0;
+      for (let d = startDay; ; d = (d + 1) % 7) {
+        if (d === effectiveRestDay) continue;
+        if (d === dayIdx) break;
+        trainingIdx++;
+      }
+      return SCHED[trainingIdx];
     },
-    [startDay],
+    [startDay, restDay],
   );
 
   const toggleSection = useCallback((key: string) => {
@@ -1985,7 +2016,7 @@ export default function WorkoutView() {
               );
             })}
           </div>
-          {startDay !== 0 && (
+          {(startDay !== 0 || restDay !== null) && (
             <div className="mt-2.5 text-[11px] text-text-dim leading-relaxed">
               <div className="font-semibold text-accent mb-1">
                 Current rotation:
@@ -2003,6 +2034,78 @@ export default function WorkoutView() {
                 );
               })}
             </div>
+          )}
+        </Section>
+
+        {/* Rest Day This Week */}
+        <Section
+          title="Rest Day This Week"
+          icon={"\uD83D\uDECF\uFE0F"}
+          isOpen={!!openSections["rest-day"]}
+          onToggle={() => toggleSection("rest-day")}
+        >
+          <div className="text-[11px] text-text-dim mb-2.5">
+            Move your rest day to a different day this week. Training
+            workouts shift around it, keeping their order.
+          </div>
+          <div data-testid="rest-day-picker" className="grid grid-cols-7 gap-1">
+            {DAY_ABBR.map((d, i) => {
+              const defaultRestDay = (startDay + 6) % 7;
+              const isDefault = i === defaultRestDay;
+              const isActive = restDay === null ? isDefault : i === restDay;
+              return (
+                <button
+                  key={`rd-${i}`}
+                  data-testid={`rest-day-${i}`}
+                  onClick={() => {
+                    if (i === defaultRestDay) {
+                      setRestDay(null); // clicking default clears override
+                    } else {
+                      setRestDay(i);
+                    }
+                  }}
+                  className="rounded-lg text-[11px] cursor-pointer font-[inherit] min-h-[44px]"
+                  style={{
+                    padding: "10px 2px",
+                    background: isActive ? "#64748b22" : "var(--color-bg)",
+                    border: `1px solid ${isActive ? "#64748b" : "var(--color-border)"}`,
+                    color: isActive ? "#94a3b8" : "var(--color-text-muted)",
+                    fontWeight: isActive ? 700 : 500,
+                  }}
+                >
+                  {d}
+                </button>
+              );
+            })}
+          </div>
+          {restDay !== null && (
+            <>
+              <div className="mt-2.5 text-[11px] text-text-dim leading-relaxed">
+                <div className="font-semibold mb-1" style={{ color: "#64748b" }}>
+                  Adjusted rotation:
+                </div>
+                {DAY_ABBR.map((d, i) => {
+                  const workout = getWorkoutForDay(i);
+                  return (
+                    <span key={`rdrot-${i}`} className="inline-block mr-1.5 mb-0.5">
+                      {d}={workout.t}{i < 6 ? " \u2192" : ""}
+                    </span>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setRestDay(null)}
+                className="mt-2 text-[11px] cursor-pointer font-[inherit] rounded-lg"
+                style={{
+                  padding: "6px 12px",
+                  background: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                Reset to default
+              </button>
+            </>
           )}
         </Section>
 
