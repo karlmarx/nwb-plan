@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { NEARBY_EQUIPMENT } from "@/lib/exercises";
 
 interface NearbyPickerProps {
@@ -16,11 +16,37 @@ export default function NearbyPicker({
 }: NearbyPickerProps) {
   const hasManualSelection = selected.length > 0;
   const noneActive = !hasManualSelection && inUse.length === 0;
+  // Auto-expand if user already has selections for this exercise
+  const [open, setOpen] = useState(hasManualSelection);
+
+  if (!open) {
+    return (
+      <div data-testid="nearby-picker">
+        <button
+          data-testid="nearby-expand"
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 text-[11px] font-semibold cursor-pointer bg-transparent border-none font-[inherit] transition-colors duration-150"
+          style={{ color: "var(--color-text-muted)", padding: 0 }}
+        >
+          <span style={{ fontSize: 13 }}>{"\u{1F4CD}"}</span>
+          Nearby equipment supersets…
+          <span className="text-[10px]">{"\u25B6"}</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div data-testid="nearby-picker">
-      <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-3">
+      <button
+        onClick={() => { if (!hasManualSelection) setOpen(false); }}
+        className="flex items-center gap-1.5 text-xs font-bold text-text-muted uppercase tracking-wide mb-3 bg-transparent border-none cursor-pointer font-[inherit]"
+        style={{ padding: 0 }}
+        title={hasManualSelection ? "Clear selections to collapse" : "Collapse nearby picker"}
+      >
         What&apos;s within reach?
-      </div>
+        {!hasManualSelection && <span className="text-[10px] normal-case font-normal">{"\u25BC"}</span>}
+      </button>
       <div className="flex flex-wrap gap-2">
         {/* None chip — clears all manual selections */}
         <button
