@@ -568,6 +568,22 @@ export default function WorkoutView() {
   type FocusItem = { name: string; ex: Exercise };
   const [focusState, setFocusState] = useState<{ items: FocusItem[]; index: number } | null>(null);
 
+  // Keyboard navigation for focus mode
+  useEffect(() => {
+    if (!focusState) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFocusState(null);
+      if (e.key === "ArrowRight" || e.key === "ArrowDown")
+        setFocusState((prev) => prev && prev.index < prev.items.length - 1
+          ? { ...prev, index: prev.index + 1 } : prev);
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+        setFocusState((prev) => prev && prev.index > 0
+          ? { ...prev, index: prev.index - 1 } : prev);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [focusState]);
+
   // ----- Completed supersets tracking (per day) -----
   const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
   const [completedSupersets, setCompletedSupersets] = useState<string[]>(
