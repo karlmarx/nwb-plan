@@ -2,6 +2,7 @@
 
 import React from "react";
 import Badge from "@/components/badge";
+import EquipmentSwapPanel from "@/components/equipment-swap-panel";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
 
 interface ExerciseRowProps {
@@ -286,42 +287,18 @@ export default function ExerciseRow({
             </div>
           )}
 
-          {/* Swap buttons */}
-          {ex.swaps && ex.swaps.length > 0 && (() => {
-            const availableSwaps = ex.swaps.filter(
-              (sw) => !workoutExercises.includes(sw) || sw === name
-            );
-            if (availableSwaps.length === 0) return null;
-            return (
-            <div className="mt-3">
-              <div className="text-[11px] font-bold text-text-muted mb-2 uppercase tracking-wider">
-                Swap for:
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {availableSwaps.map((sw) => {
-                  return (
-                    <button
-                      key={sw}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        onSwap(sw);
-                      }}
-                      className="text-[12px] rounded-lg cursor-pointer font-[inherit] min-h-[44px] transition-colors duration-150"
-                      style={{
-                        padding: "8px 12px",
-                        background: "var(--color-accent)" + "15",
-                        color: "var(--color-accent)",
-                        border: `1px solid var(--color-accent)33`,
-                      }}
-                    >
-                      {sw}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            );
-          })()}
+          {/* Equipment-grouped swap panel */}
+          {ex.swaps && ex.swaps.length > 0 && (
+            <EquipmentSwapPanel
+              currentName={name}
+              currentExercise={ex}
+              onSwap={(sw) => {
+                onSwap(sw);
+              }}
+              equipment={equipment}
+              workoutExercises={workoutExercises}
+            />
+          )}
 
           {/* Rest timer button */}
           {ex.rest > 0 && (
