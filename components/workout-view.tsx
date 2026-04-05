@@ -564,6 +564,12 @@ export default function WorkoutView() {
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
 
+  // ----- Completed supersets tracking (per day) -----
+  const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
+  const [completedSupersets, setCompletedSupersets] = useState<string[]>(
+    () => loadState<string[]>(todayKey, []),
+  );
+
   // ----- Sliding tab pill (v2) -----
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -630,6 +636,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_ui_v2", uiV2);
   }, [uiV2]);
+  useEffect(() => {
+    saveState(todayKey, completedSupersets);
+  }, [completedSupersets, todayKey]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -1199,53 +1208,81 @@ export default function WorkoutView() {
               {/* Supplement cards now rendered inside ExerciseRow via supplementSlot prop */}
 
               {/* Equipment-specific superset card */}
-              {isExp && ssInfo && (
+              {isExp && ssInfo && (() => {
+                const ssDone = completedSupersets.includes(ssInfo.title);
+                return (
                 <div
                   className="mx-3 mb-2 rounded-lg"
                   style={{
                     padding: "8px 10px",
-                    background: "#14b8a60d",
-                    border: "1px solid #14b8a633",
-                    borderLeft: "3px solid #14b8a6",
+                    background: ssDone ? "#14b8a605" : "#14b8a60d",
+                    border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
+                    borderLeft: `3px solid ${ssDone ? "var(--color-border)" : "#14b8a6"}`,
+                    opacity: ssDone ? 0.55 : 1,
                   }}
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <span
                       className="text-[8px] font-extrabold rounded px-1 py-0.5"
                       style={{
-                        background: "#14b8a622",
-                        border: "1px solid #14b8a644",
-                        color: "#14b8a6",
+                        background: ssDone ? "var(--color-bg)" : "#14b8a622",
+                        border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
+                        color: ssDone ? "var(--color-text-muted)" : "#14b8a6",
                       }}
                     >
-                      SUPERSET
+                      {ssDone ? "DONE" : "SUPERSET"}
                     </span>
                     <span
                       className="text-xs font-semibold"
-                      style={{ color: "#14b8a6" }}
+                      style={{ color: ssDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: ssDone ? "line-through" : "none" }}
                     >
                       {ssInfo.title}
                     </span>
                     <span className="ml-auto text-[10px] text-text-dim">
                       {ssInfo.sets}
                     </span>
+                    <button
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        setCompletedSupersets((prev) =>
+                          prev.includes(ssInfo.title)
+                            ? prev.filter((t) => t !== ssInfo.title)
+                            : [...prev, ssInfo.title]
+                        );
+                      }}
+                      className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
+                      style={{
+                        padding: "2px 8px",
+                        background: ssDone ? "var(--color-safe-bg)" : "var(--color-card)",
+                        border: ssDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
+                        color: ssDone ? "var(--color-safe)" : "var(--color-text-muted)",
+                      }}
+                      title={ssDone ? "Mark as not done" : "Mark as done today"}
+                    >
+                      {ssDone ? "✓" : "○"}
+                    </button>
                   </div>
-                  <div className="text-[11px] text-text-dim leading-relaxed">
-                    {ssInfo.instruction}
-                  </div>
-                  <div
-                    className="text-[10px] mt-1"
-                    style={{ color: "#14b8a6" }}
-                  >
-                    {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
-                  </div>
-                  {ssInfo.note && (
-                    <div className="text-[10px] mt-1 text-warning">
-                      {"\u26A0\uFE0F"} {ssInfo.note}
-                    </div>
+                  {!ssDone && (
+                    <>
+                      <div className="text-[11px] text-text-dim leading-relaxed">
+                        {ssInfo.instruction}
+                      </div>
+                      <div
+                        className="text-[10px] mt-1"
+                        style={{ color: "#14b8a6" }}
+                      >
+                        {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
+                      </div>
+                      {ssInfo.note && (
+                        <div className="text-[10px] mt-1 text-warning">
+                          {"\u26A0\uFE0F"} {ssInfo.note}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
-              )}
+                );
+              })()}
 
               {/* Machine selector */}
               {isExp && ex.machineVariants && (
@@ -1304,49 +1341,85 @@ export default function WorkoutView() {
                     />
                     {nearbySupersets.length > 0 && (
                       <div className="mt-2 space-y-1.5">
-                        {nearbySupersets.map((ns) => (
+                        {/* Sort: undone first, then done */}
+                        {[...nearbySupersets]
+                          .sort((a, b) => {
+                            const aDone = completedSupersets.includes(a.title);
+                            const bDone = completedSupersets.includes(b.title);
+                            if (aDone === bDone) return 0;
+                            return aDone ? 1 : -1;
+                          })
+                          .map((ns) => {
+                          const isDone = completedSupersets.includes(ns.title);
+                          return (
                           <div
-                            key={ns.nearbyId}
+                            key={`${ns.nearbyId}-${ns.title}`}
                             className="rounded-lg"
                             style={{
                               padding: "8px 10px",
-                              background: "#14b8a60d",
-                              border: "1px solid #14b8a633",
-                              borderLeft: "3px solid #14b8a6",
+                              background: isDone ? "#14b8a605" : "#14b8a60d",
+                              border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
+                              borderLeft: `3px solid ${isDone ? "var(--color-border)" : "#14b8a6"}`,
+                              opacity: isDone ? 0.55 : 1,
                             }}
                           >
                             <div className="flex items-center gap-1.5 mb-1">
                               <span
                                 className="text-[8px] font-extrabold rounded px-1 py-0.5"
                                 style={{
-                                  background: "#14b8a622",
-                                  border: "1px solid #14b8a644",
-                                  color: "#14b8a6",
+                                  background: isDone ? "var(--color-bg)" : "#14b8a622",
+                                  border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
+                                  color: isDone ? "var(--color-text-muted)" : "#14b8a6",
                                 }}
                               >
-                                NEARBY
+                                {isDone ? "DONE" : "NEARBY"}
                               </span>
                               <span
                                 className="text-xs font-semibold"
-                                style={{ color: "#14b8a6" }}
+                                style={{ color: isDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: isDone ? "line-through" : "none" }}
                               >
                                 {ns.title}
                               </span>
                               <span className="ml-auto text-[10px] text-text-dim">
                                 {ns.sets}
                               </span>
+                              <button
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  setCompletedSupersets((prev) =>
+                                    prev.includes(ns.title)
+                                      ? prev.filter((t) => t !== ns.title)
+                                      : [...prev, ns.title]
+                                  );
+                                }}
+                                className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
+                                style={{
+                                  padding: "2px 8px",
+                                  background: isDone ? "var(--color-safe-bg)" : "var(--color-card)",
+                                  border: isDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
+                                  color: isDone ? "var(--color-safe)" : "var(--color-text-muted)",
+                                }}
+                                title={isDone ? "Mark as not done" : "Mark as done today"}
+                              >
+                                {isDone ? "✓" : "○"}
+                              </button>
                             </div>
-                            <div className="text-[11px] text-text-dim leading-relaxed">
-                              {ns.instruction}
-                            </div>
-                            <div
-                              className="text-[10px] mt-1"
-                              style={{ color: "#14b8a6" }}
-                            >
-                              {"\uD83D\uDEE1\uFE0F"} {ns.safety}
-                            </div>
+                            {!isDone && (
+                              <>
+                                <div className="text-[11px] text-text-dim leading-relaxed">
+                                  {ns.instruction}
+                                </div>
+                                <div
+                                  className="text-[10px] mt-1"
+                                  style={{ color: "#14b8a6" }}
+                                >
+                                  {"\uD83D\uDEE1\uFE0F"} {ns.safety}
+                                </div>
+                              </>
+                            )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

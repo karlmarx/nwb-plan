@@ -95,6 +95,8 @@ export const EQUIP_TO_NEARBY: Record<string, string> = {
   bands: "bands",
   mat: "mat_floor",
   dumbbells: "adj_bench", // dumbbells are usually used at a bench
+  trx: "trx",
+  parallettes: "parallel_bars",
 };
 
 // ===== NEARBY-EQUIPMENT-DRIVEN SUPERSETS =====
@@ -161,6 +163,42 @@ export const NEARBY_SUPERSETS: NearbySuperset[] = [
       "Sit on the dip machine seat. Place a rolled towel under left knee. Press knee down into towel, straighten last 30\u00B0 of knee extension.",
     safety:
       "Minimal range, pure quad activation. Zero hip flexor involvement.",
+  },
+  {
+    nearbyId: "trx",
+    title: "TRX Left Knee Extension",
+    sets: "2\u00D712",
+    instruction:
+      "Sit on the floor facing the TRX anchor. Place left foot in foot cradle. Extend left knee against the strap resistance — last 30\u00B0 of extension only.",
+    safety:
+      "Pure knee extension, zero hip flexion. TRX provides gentle accommodating resistance.",
+  },
+  {
+    nearbyId: "trx",
+    title: "TRX Left Ankle Dorsiflexion",
+    sets: "2\u00D715",
+    instruction:
+      "Sit with left foot in the TRX foot cradle (heel in cradle, toes free). Pull toes toward shin against strap resistance.",
+    safety:
+      "Tibialis anterior maintenance for gait recovery. Fully seated.",
+  },
+  {
+    nearbyId: "pullup_bar",
+    title: "Dead Hang (Spinal Decompression)",
+    sets: "2\u00D730s",
+    instruction:
+      "Hang from the bar with both hands, shoulders packed. Let lower body hang fully relaxed — legs are dead weight.",
+    safety:
+      "Zero leg involvement. Passive hang decompresses spine and stretches lats. Use a box to get up safely.",
+  },
+  {
+    nearbyId: "parallel_bars",
+    title: "Quad Sets (Seated on Bars)",
+    sets: "2\u00D710, 5s hold",
+    instruction:
+      "Sit on one of the parallel bars or the dip station seat. Press back of left knee into the bar surface. Hold 5 seconds, release, repeat.",
+    safety:
+      "Pure isometric, zero joint stress. Seated position is fully NWB-safe.",
   },
 ];
 
