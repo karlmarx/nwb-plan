@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Badge from "@/components/badge";
 import EquipmentSwapPanel from "@/components/equipment-swap-panel";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
@@ -21,6 +21,7 @@ interface ExerciseRowProps {
   supplementSlot?: React.ReactNode;
   selectedVariantId?: string | null;
   onSelectVariant?: (id: string) => void;
+  editMode?: boolean;
 }
 
 export default function ExerciseRow({
@@ -39,8 +40,18 @@ export default function ExerciseRow({
   supplementSlot,
   selectedVariantId,
   onSelectVariant,
+  editMode = true,
 }: ExerciseRowProps) {
+  const [swapOpen, setSwapOpen] = useState(false);
+  useEffect(() => { if (!editMode) setSwapOpen(false); }, [editMode]);
+
   if (!ex) return null;
+
+  const showInstructions = editMode && !swapOpen;
+  const showSwap = editMode && swapOpen;
+  const hasSwapOptions =
+    (ex.swaps && ex.swaps.length > 0) ||
+    (ex.machineVariants && ex.machineVariants.length > 0);
 
   const safetyColor =
     ex.safety === "caution"
@@ -139,7 +150,7 @@ export default function ExerciseRow({
             )}
           </div>
 
-          <div className="text-[13px] leading-relaxed space-y-3">
+          {showInstructions && <div className="text-[13px] leading-relaxed space-y-3">
             {/* SETUP */}
             <div>
               <div className="font-bold text-accent mb-1 text-[11px] uppercase tracking-wide">
@@ -260,10 +271,10 @@ export default function ExerciseRow({
                 })}
               </div>
             )}
-          </div>
+          </div>}
 
           {/* Equipment chips */}
-          {ex.requires.length > 0 && (
+          {showInstructions && ex.requires.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
               {ex.requires.map((eq) => {
                 const eqData = EQUIPMENT[eq];
@@ -291,19 +302,36 @@ export default function ExerciseRow({
             </div>
           )}
 
-          {/* Equipment-grouped swap panel with integrated machine selector */}
-          {((ex.swaps && ex.swaps.length > 0) || (ex.machineVariants && ex.machineVariants.length > 0)) && (
-            <EquipmentSwapPanel
-              currentName={name}
-              currentExercise={ex}
-              onSwap={(sw) => {
-                onSwap(sw);
-              }}
-              equipment={equipment}
-              workoutExercises={workoutExercises}
-              selectedVariantId={selectedVariantId}
-              onSelectVariant={onSelectVariant}
-            />
+          {/* Equipment toggle + swap panel (edit mode only) */}
+          {hasSwapOptions && editMode && (
+            <>
+              <button
+                onClick={(ev) => { ev.stopPropagation(); setSwapOpen((v) => !v); }}
+                className="mt-3 w-full p-2.5 rounded-xl cursor-pointer font-[inherit] flex items-center justify-between text-[12px] font-semibold min-h-[44px] transition-all duration-150"
+                style={{
+                  background: swapOpen ? "var(--color-accent)15" : "var(--color-bg)",
+                  border: `1px solid ${swapOpen ? "var(--color-accent)55" : "var(--color-border)"}`,
+                  color: swapOpen ? "var(--color-accent)" : "var(--color-text-muted)",
+                }}
+              >
+                <span>🔄 Equipment &amp; Alternatives</span>
+                <span
+                  className="text-[10px] transition-transform duration-200"
+                  style={{ transform: swapOpen ? "rotate(180deg)" : "none" }}
+                >▼</span>
+              </button>
+              {showSwap && (
+                <EquipmentSwapPanel
+                  currentName={name}
+                  currentExercise={ex}
+                  onSwap={onSwap}
+                  equipment={equipment}
+                  workoutExercises={workoutExercises}
+                  selectedVariantId={selectedVariantId}
+                  onSelectVariant={onSelectVariant}
+                />
+              )}
+            </>
           )}
 
           {/* Rest timer button */}

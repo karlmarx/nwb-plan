@@ -19,7 +19,7 @@ import {
   EQUIP_TO_NEARBY,
   NEARBY_SUPERSETS,
 } from "@/lib/supplements";
-import type { VariantSuperset } from "@/lib/exercises";
+import type { VariantSuperset, Exercise } from "@/lib/exercises";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
@@ -562,6 +562,11 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
+  const [editMode, setEditMode] = useState(false);
+
+  // Focus mode: fullscreen exercise walkthrough
+  type FocusItem = { name: string; ex: Exercise };
+  const [focusState, setFocusState] = useState<{ items: FocusItem[]; index: number } | null>(null);
 
   // ----- Completed supersets tracking (per day) -----
   const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
@@ -744,8 +749,9 @@ export default function WorkoutView() {
           onSelectVariant={(id) =>
             setMachineSelections((prev) => ({ ...prev, [name]: id }))
           }
+          editMode={editMode}
         />
-        {expandedEx[name] && (() => {
+        {editMode && expandedEx[name] && (() => {
           const exData = EX[name];
           const inUseIds = exData
             ? exData.requires
@@ -852,6 +858,16 @@ export default function WorkoutView() {
         isOpen={!!openSections[workoutKey]}
         onToggle={() => toggleSection(workoutKey)}
         count={w.exercises.length}
+        onFocus={() => {
+          const items = w.exercises
+            .map((orig) => {
+              const nm = getExName(workoutKey, orig);
+              const exItem = EX[nm];
+              return { name: nm, ex: exItem };
+            })
+            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase)) as FocusItem[];
+          if (items.length > 0) setFocusState({ items, index: 0 });
+        }}
       >
         {/* Hevy link */}
         {hevyId && (
@@ -916,8 +932,8 @@ export default function WorkoutView() {
           </a>
         )}
 
-        {/* Supplement toggle controls */}
-        {isTrainingDay && (
+        {/* Supplement toggle controls — edit mode only */}
+        {isTrainingDay && editMode && (
           <div className="flex gap-2 mb-3 flex-wrap">
             <button
               onClick={(ev) => {
@@ -1058,6 +1074,7 @@ export default function WorkoutView() {
                 onSelectVariant={(id) =>
                   setMachineSelections((prev) => ({ ...prev, [exName]: id }))
                 }
+                editMode={editMode}
                 supplementSlot={
                   suppCards.length > 0 ? (
                     <div className="mb-3">
@@ -1277,8 +1294,8 @@ export default function WorkoutView() {
                 );
               })()}
 
-              {/* Nearby picker */}
-              {isExp && (() => {
+              {/* Nearby picker — edit mode only */}
+              {editMode && isExp && (() => {
                 const exData = EX[exName];
                 const inUseIds = exData
                   ? exData.requires
@@ -1448,6 +1465,7 @@ export default function WorkoutView() {
                   onSelectVariant={(id) =>
                     setMachineSelections((prev) => ({ ...prev, [name]: id }))
                   }
+                  editMode={editMode}
                 />
               );
             })}
@@ -1787,6 +1805,7 @@ export default function WorkoutView() {
               onSelectVariant={(id) =>
                 setMachineSelections((prev) => ({ ...prev, [k]: id }))
               }
+              editMode={editMode}
             />
           ))}
         </Section>
@@ -2687,6 +2706,35 @@ export default function WorkoutView() {
         ))}
       </div>
 
+      {/* Edit / Do mode toggle pill */}
+      <div className="flex justify-center mb-4">
+        <div
+          className="flex rounded-full p-0.5"
+          style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+        >
+          <button
+            onClick={() => setEditMode(false)}
+            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
+            style={{
+              background: !editMode ? "var(--color-accent)" : "transparent",
+              color: !editMode ? "#000" : "var(--color-text-muted)",
+            }}
+          >
+            ▶ Do
+          </button>
+          <button
+            onClick={() => setEditMode(true)}
+            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
+            style={{
+              background: editMode ? "var(--color-accent)" : "transparent",
+              color: editMode ? "#000" : "var(--color-text-muted)",
+            }}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+      </div>
+
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
         {/* v2: sliding pill indicator */}
@@ -2859,6 +2907,142 @@ export default function WorkoutView() {
           </div>
         </div>
       )}
+
+      {/* Fullscreen focus overlay */}
+      {focusState && (() => {
+        const { items, index } = focusState;
+        const item = items[index];
+        if (!item) return null;
+        const s = item.ex.sets[phase] ?? item.ex.sets[0];
+        return (
+          <div
+            className="fixed inset-0 z-[250] flex flex-col"
+            style={{ background: "#0a0a0a" }}
+          >
+            {/* Top bar: position dots + close */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-white/40 text-[10px] font-medium uppercase tracking-wider">
+                  {index + 1} of {items.length}
+                </span>
+                <div className="flex gap-1.5 ml-1">
+                  {items.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setFocusState((prev) => prev ? { ...prev, index: i } : null)}
+                      className="rounded-full transition-all duration-300 border-none cursor-pointer p-0"
+                      style={{
+                        width: i === index ? 20 : 6,
+                        height: 6,
+                        background: i === index ? "#38bdf8" : "rgba(255,255,255,0.2)",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => setFocusState(null)}
+                className="w-11 h-11 flex items-center justify-center rounded-full cursor-pointer border-none text-base font-bold"
+                style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+              <div
+                className="text-[clamp(28px,8vw,40px)] font-extrabold text-white leading-tight mb-2 mt-1"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                {item.name}
+              </div>
+
+              <div className="flex items-baseline gap-4 mb-7">
+                <span className="text-2xl font-bold" style={{ color: "#38bdf8" }}>
+                  {s[0]} &times; {s[1]}
+                </span>
+                {item.ex.rest > 0 && (
+                  <span className="text-base font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
+                    {item.ex.rest}s rest
+                  </span>
+                )}
+              </div>
+
+              <div className="mb-6">
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#38bdf8" }}>
+                  {"\uD83D\uDCCD"} Setup &amp; Position
+                </div>
+                <div className="text-white/80 text-[15px] leading-relaxed">{item.ex.setup}</div>
+              </div>
+
+              <div className="mb-6">
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#4ade80" }}>
+                  {"\uD83D\uDD04"} How to Execute
+                </div>
+                <div className="text-white/80 text-[15px] leading-relaxed">{item.ex.execution}</div>
+              </div>
+
+              <div
+                className="mb-6 rounded-2xl p-4"
+                style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fbbf24" }}>
+                  {"\uD83D\uDEE1\uFE0F"} NWB Safety
+                </div>
+                <div className="text-white/75 text-[14px] leading-relaxed">{item.ex.nwbCues}</div>
+              </div>
+
+              <div
+                className="mb-4 rounded-2xl p-4"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  Breathing
+                </div>
+                <div className="text-[13px] leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  Exhale on effort &mdash; inhale on return. Brace core throughout.
+                </div>
+              </div>
+            </div>
+
+            {/* Nav buttons */}
+            <div
+              className="flex-shrink-0 flex items-center gap-3 px-5 pt-3 pb-8"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              <button
+                onClick={() => setFocusState((prev) => prev ? { ...prev, index: Math.max(0, prev.index - 1) } : null)}
+                disabled={index === 0}
+                className="flex-1 rounded-2xl text-base font-bold cursor-pointer font-[inherit] transition-all duration-150 border-none"
+                style={{
+                  minHeight: 62,
+                  background: index > 0 ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)",
+                  color: index > 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.2)",
+                }}
+              >
+                &#8249; Prev
+              </button>
+              <div className="text-center w-16 text-sm font-medium" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {index + 1}&thinsp;/&thinsp;{items.length}
+              </div>
+              <button
+                onClick={() => setFocusState((prev) => prev ? { ...prev, index: Math.min(prev.items.length - 1, prev.index + 1) } : null)}
+                disabled={index === items.length - 1}
+                className="flex-1 rounded-2xl text-base font-bold cursor-pointer font-[inherit] transition-all duration-150 border-none"
+                style={{
+                  minHeight: 62,
+                  background: index < items.length - 1 ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${index < items.length - 1 ? "rgba(56,189,248,0.3)" : "transparent"}`,
+                  color: index < items.length - 1 ? "#38bdf8" : "rgba(255,255,255,0.2)",
+                }}
+              >
+                Next &#8250;
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Diagram gallery overlay */}
       {diagramOpen === "gallery" && (
