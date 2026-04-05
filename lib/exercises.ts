@@ -144,7 +144,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive \u2014 like a log on the floor. If you need leg drive, the weight is too heavy.",
     why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
     safety: "safe",
-    swaps: ["DB Floor Press", "Machine Chest Press"],
+    swaps: ["DB Floor Press", "Machine Chest Press", "TRX Chest Press", "Band Chest Press (Seated)"],
     visual: "      O===+===O      (Barbell)\n      |       |\n  o__/|\\_    _|__   (Torso on floor)\n     / \\\n    L   R            (L straight, R bent)",
     constraints: {
       requiresIliopsoas: false,
@@ -243,7 +243,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Keep back pressed against bench. Do NOT arch your lower back. Right leg stable, left leg passive.",
     why: "Vertical press with full spine support. Seated position eliminates balance demands.",
     safety: "safe",
-    swaps: ["Seated Arnold Press", "Landmine Press (seated)"],
+    swaps: ["Seated Arnold Press", "Landmine Press (seated)", "Machine Shoulder Press", "Cable Lateral Raise (Seated)"],
     visual: "   [=]      [=]\n    |        |\n    \\  (oo)  /\n     \\--||--/\n       /  \\\n     _/__\\__",
     constraints: {
       requiresIliopsoas: false,
@@ -264,7 +264,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Keep core braced. Don't lean back. Controlled rotation \u2014 no jerking.",
     why: "The rotation pattern recruits anterior, lateral, and posterior deltoid heads in one movement.",
     safety: "safe",
-    swaps: ["Seated DB OH Press", "Landmine Press (seated)"],
+    swaps: ["Seated DB OH Press", "Landmine Press (seated)", "Machine Shoulder Press"],
     visual: "   Start      Finish\n              [=]  [=]\n                \\  /\n   (oo)         (oo)\n  [=]||[=]     / || \\\n   /  \\        /  \\",
     constraints: {
       requiresIliopsoas: false,
@@ -285,7 +285,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Keep spine neutral on bench. Minimize body swing on raises. Seated removes all momentum cheating.",
     why: "Superset for upper chest and medial delt volume with efficient time use.",
     safety: "safe",
-    swaps: ["Cable Chest Fly"],
+    swaps: ["Cable Chest Fly", "Cable Lateral Raise (Seated)"],
     machineVariants: [
       {
         id: "adj_bench_dbs",
@@ -329,7 +329,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Elbows stay tucked and pointed at ceiling. Upper arms don't move. Floor position is safest.",
     why: "Excellent triceps isolation targeting the long head. Minimal stress on rest of body.",
     safety: "safe",
-    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown", "TRX Tricep Extension"],
+    swaps: ["OH Triceps Extension", "Tricep Rope Pushdown", "TRX Tricep Extension", "DB Tricep Kickback"],
     visual: "      ==[ ]\n     /\n  O-< \n /| |\n[___|___]",
     constraints: {
       requiresIliopsoas: false,
@@ -438,7 +438,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "CAUTION: Anti-rotation demand can recruit left iliopsoas as a stabilizer. Go lighter than ego wants. Stop immediately if you feel hip crease pinch or left hip tightening.",
     why: "Functional unilateral pressing that doubles as elite anti-rotation core work at slow tempo.",
     safety: "caution",
-    swaps: ["Seated DB OH Press"],
+    swaps: ["Seated DB OH Press", "Machine Shoulder Press"],
     amp: [
       "BASE: Light weight, 4-4 tempo.",
       "AMP 1: Moderate weight + 3-second hold at top of press.",
@@ -506,6 +506,67 @@ export const EX: Record<string, Exercise> = {
     why: "Elite gymnastics isometric for scapular depression + tricep strength. Support Hold modification eliminates hip flexor activation.",
     safety: "caution",
     swaps: ["Pallof Press (Seated)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Machine Shoulder Press": {
+    id: "machine_shoulder_press",
+    name: "Machine Shoulder Press",
+    requires: ["cables"],
+    category: "push",
+    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
+    rest: 90,
+    setup: "Sit at the shoulder press machine. Adjust seat so handles are at ear level. Grip handles with palms forward.",
+    execution: "Press handles overhead until arms are fully extended. Lower slowly — 3 seconds eccentric. Final set: DROP SET ×2.",
+    nwbCues: "Machine provides full back support and stability. Zero balance demand. Left foot rests passively on the platform.",
+    why: "Vertical pressing with machine stability. Drop sets possible. Great when dumbbells feel unstable overhead.",
+    safety: "safe",
+    swaps: ["Seated DB OH Press", "Seated Arnold Press", "Landmine Press (seated)"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "Cable Lateral Raise (Seated)": {
+    id: "cable_lateral_raise_seated",
+    name: "Cable Lateral Raise (Seated)",
+    requires: ["cables", "bench"],
+    category: "push",
+    sets: [["3", "12-15"], ["3", "12-15"], ["3", "10-12"]],
+    rest: 60,
+    setup: "Sit on a bench sideways to a low cable. Grab D-handle with the far hand. Arm hangs at your side.",
+    execution: "Raise arm out to the side until parallel with the floor. Pause 1 second at top. Lower slowly. Complete all reps, switch sides.",
+    nwbCues: "Fully seated. Cable provides constant tension through the full ROM — unlike dumbbells where the bottom is a dead zone. Left leg rests passively.",
+    why: "Medial delt isolation with cable tension. Superior to DB lateral raises because tension is constant through the entire range.",
+    safety: "safe",
+    cableSuperset: true,
+    swaps: ["Incline DB Press + Lat Raises", "Seated DB OH Press"],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 90,
+      requiresWeightBearing: false,
+    },
+  },
+
+  "DB Tricep Kickback": {
+    id: "db_tricep_kickback",
+    name: "DB Tricep Kickback",
+    requires: ["dumbbells", "bench"],
+    category: "push",
+    sets: [["3", "12-15"], ["3", "12-15"], ["3", "10-12"]],
+    rest: 60,
+    setup: "Chest-supported on incline bench (face down). Hold dumbbells with elbows bent at 90°, upper arms parallel to torso.",
+    execution: "Extend forearms backward until arms are straight. Squeeze triceps at full extension for 1 second. Lower slowly.",
+    nwbCues: "Chest support eliminates all spinal loading and balance demands. Light weight, strict form. Left leg hangs passively.",
+    why: "Tricep isolation at peak contraction — the lockout position is where kickbacks shine. Chest-supported version ensures strict form.",
+    safety: "safe",
+    swaps: ["Lying Skull Crushers", "OH Triceps Extension", "Tricep Rope Pushdown", "TRX Tricep Extension"],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
