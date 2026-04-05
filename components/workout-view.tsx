@@ -26,7 +26,6 @@ import RemovedRow from "@/components/removed-row";
 import Callout from "@/components/callout";
 import RestTimer from "@/components/rest-timer";
 import ProgressClock from "@/components/progress-clock";
-import MachineSelector from "@/components/machine-selector";
 import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
@@ -741,21 +740,11 @@ export default function WorkoutView() {
           onDiagram={(d) => setDiagramOpen(d)}
           unavailable={unavail}
           equipment={equipment}
+          selectedVariantId={machineSelections[name] ?? null}
+          onSelectVariant={(id) =>
+            setMachineSelections((prev) => ({ ...prev, [name]: id }))
+          }
         />
-        {expandedEx[name] && ex.machineVariants && (
-          <div className="px-3 pb-2">
-            <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
-              Machine type at your station
-            </div>
-            <MachineSelector
-              variants={ex.machineVariants}
-              selected={machineSelections[name] ?? null}
-              onSelect={(id) =>
-                setMachineSelections((prev) => ({ ...prev, [name]: id }))
-              }
-            />
-          </div>
-        )}
         {expandedEx[name] && (() => {
           const exData = EX[name];
           const inUseIds = exData
@@ -1065,6 +1054,10 @@ export default function WorkoutView() {
                 )}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                selectedVariantId={machineSelections[exName] ?? null}
+                onSelectVariant={(id) =>
+                  setMachineSelections((prev) => ({ ...prev, [exName]: id }))
+                }
                 supplementSlot={
                   suppCards.length > 0 ? (
                     <div className="mb-3">
@@ -1284,24 +1277,6 @@ export default function WorkoutView() {
                 );
               })()}
 
-              {/* Machine selector */}
-              {isExp && ex.machineVariants && (
-                <div className="px-3 pb-2">
-                  <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
-                    Machine type at your station
-                  </div>
-                  <MachineSelector
-                    variants={ex.machineVariants}
-                    selected={machineSelections[exName] ?? null}
-                    onSelect={(id) =>
-                      setMachineSelections((prev) => ({
-                        ...prev,
-                        [exName]: id,
-                      }))
-                    }
-                  />
-                </div>
-              )}
               {/* Nearby picker */}
               {isExp && (() => {
                 const exData = EX[exName];
@@ -1469,6 +1444,10 @@ export default function WorkoutView() {
                   onDiagram={(d) => setDiagramOpen(d)}
                   unavailable={!isAvailable(name)}
                   equipment={equipment}
+                  selectedVariantId={machineSelections[name] ?? null}
+                  onSelectVariant={(id) =>
+                    setMachineSelections((prev) => ({ ...prev, [name]: id }))
+                  }
                 />
               );
             })}
@@ -1804,6 +1783,10 @@ export default function WorkoutView() {
               onDiagram={(d) => setDiagramOpen(d)}
               unavailable={!isAvailable(k)}
               equipment={equipment}
+              selectedVariantId={machineSelections[k] ?? null}
+              onSelectVariant={(id) =>
+                setMachineSelections((prev) => ({ ...prev, [k]: id }))
+              }
             />
           ))}
         </Section>

@@ -19,6 +19,8 @@ interface ExerciseRowProps {
   variantSetupCues?: string[];
   variantLabel?: string;
   supplementSlot?: React.ReactNode;
+  selectedVariantId?: string | null;
+  onSelectVariant?: (id: string) => void;
 }
 
 export default function ExerciseRow({
@@ -35,6 +37,8 @@ export default function ExerciseRow({
   variantSetupCues,
   variantLabel,
   supplementSlot,
+  selectedVariantId,
+  onSelectVariant,
 }: ExerciseRowProps) {
   if (!ex) return null;
 
@@ -287,8 +291,8 @@ export default function ExerciseRow({
             </div>
           )}
 
-          {/* Equipment-grouped swap panel */}
-          {ex.swaps && ex.swaps.length > 0 && (
+          {/* Equipment-grouped swap panel with integrated machine selector */}
+          {((ex.swaps && ex.swaps.length > 0) || (ex.machineVariants && ex.machineVariants.length > 0)) && (
             <EquipmentSwapPanel
               currentName={name}
               currentExercise={ex}
@@ -297,6 +301,8 @@ export default function ExerciseRow({
               }}
               equipment={equipment}
               workoutExercises={workoutExercises}
+              selectedVariantId={selectedVariantId}
+              onSelectVariant={onSelectVariant}
             />
           )}
 

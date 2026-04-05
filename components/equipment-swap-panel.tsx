@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Exercise, EX, EQUIPMENT } from "@/lib/exercises";
+import type { Exercise, MachineVariant } from "@/lib/exercises";
+import { EX, EQUIPMENT } from "@/lib/exercises";
 
 // ── Equipment category mapping ──────────────────────────────────────────
 
@@ -35,7 +36,6 @@ const EQUIP_CATEGORIES: Record<string, EquipCategoryInfo> = {
 };
 
 function getPrimaryEquipKey(requires: string[]): string {
-  // Skip generic equipment to find the "real" primary equipment
   const generic = new Set(["mat", "bench"]);
   for (const key of requires) {
     if (!generic.has(key)) return key;
@@ -56,13 +56,13 @@ function getCategoryInfo(equipKey: string): EquipCategoryInfo {
 // ── Types ───────────────────────────────────────────────────────────────
 
 interface SwapOption {
-  name: string; // EX key
+  name: string;
   ex: Exercise;
   isCurrent: boolean;
 }
 
 interface EquipmentGroup {
-  key: string; // equipment key
+  key: string;
   label: string;
   icon: string;
   order: number;
@@ -78,6 +78,9 @@ interface EquipmentSwapPanelProps {
   onSwap: (exerciseName: string) => void;
   equipment: Record<string, boolean>;
   workoutExercises: string[];
+  // Machine variant props (optional — only present when exercise has machineVariants)
+  selectedVariantId?: string | null;
+  onSelectVariant?: (id: string) => void;
 }
 
 // ── Component ───────────────────────────────────────────────────────────
@@ -88,14 +91,14 @@ export default function EquipmentSwapPanel({
   onSwap,
   equipment,
   workoutExercises,
+  selectedVariantId,
+  onSelectVariant,
 }: EquipmentSwapPanelProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
-  // Build equipment-grouped alternatives from swaps
   const groups = useMemo(() => {
     const groupMap = new Map<string, EquipmentGroup>();
 
-    // Add current exercise to its own group
     const currentKey = getPrimaryEquipKey(currentExercise.requires);
     const currentCat = getCategoryInfo(currentKey);
     groupMap.set(currentKey, {
@@ -109,7 +112,6 @@ export default function EquipmentSwapPanel({
       hasCurrentExercise: true,
     });
 
-    // Add swap targets, grouped by their primary equipment
     const availableSwaps = (currentExercise.swaps ?? []).filter(
       (sw) => !workoutExercises.includes(sw) || sw === currentName,
     );
@@ -133,13 +135,11 @@ export default function EquipmentSwapPanel({
       }
 
       const group = groupMap.get(equipKey)!;
-      // Don't add duplicates
       if (!group.options.some((o) => o.name === swapName)) {
         group.options.push({ name: swapName, ex: swapEx, isCurrent: false });
       }
     }
 
-    // Sort groups: current equipment first, then by order
     return Array.from(groupMap.values()).sort((a, b) => {
       if (a.hasCurrentExercise) return -1;
       if (b.hasCurrentExercise) return 1;
@@ -147,9 +147,13 @@ export default function EquipmentSwapPanel({
     });
   }, [currentName, currentExercise, workoutExercises]);
 
-  if (groups.length <= 1 && groups[0]?.options.length <= 1) {
-    return null; // No alternatives available
-  }
+  const variants = currentExercise.machineVariants;
+  const hasVariantsOrSwaps =
+    (groups.length > 1) ||
+    (groups[0]?.options.length > 1) ||
+    (variants && variants.length > 0);
+
+  if (!hasVariantsOrSwaps) return null;
 
   return (
     <div className="mt-3" data-testid="equipment-swap-panel">
@@ -165,6 +169,11 @@ export default function EquipmentSwapPanel({
               o.ex.requires.length > 0 &&
               o.ex.requires.some((r) => equipment[r] === false),
           );
+
+          // Count includes variants for the current group
+          const totalCount =
+            group.options.length +
+            (group.hasCurrentExercise && variants ? variants.length : 0);
 
           return (
             <div
@@ -199,7 +208,7 @@ export default function EquipmentSwapPanel({
                   {group.label}
                 </span>
                 <span className="text-[11px] text-text-muted font-medium">
-                  {group.options.length}
+                  {totalCount}
                 </span>
                 {group.hasCurrentExercise && (
                   <span
@@ -225,6 +234,60 @@ export default function EquipmentSwapPanel({
               {/* Expanded options */}
               {isExpanded && (
                 <div className="px-3 pb-3 space-y-1.5">
+                  {/* Machine variants (only in the current equipment group) */}
+                  {group.hasCurrentExercise && variants && variants.length > 0 && (
+                    <div>
+                      <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1.5">
+                        Machine type at your station
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {variants.map((variant) => {
+                          const isSelected = selectedVariantId === variant.id;
+                          return (
+                            <button
+                              key={variant.id}
+                              data-testid={`machine-${variant.id}`}
+                              onClick={(ev) => {
+                                ev.stopPropagation();
+                                onSelectVariant?.(variant.id);
+                              }}
+                              className="rounded-lg p-3 text-left cursor-pointer font-[inherit] min-h-[64px] transition-colors duration-150"
+                              style={{
+                                background: isSelected
+                                  ? "var(--color-accent-dim)"
+                                  : "var(--color-bg)",
+                                border: isSelected
+                                  ? "2px solid var(--color-accent)"
+                                  : "1px solid var(--color-border)",
+                              }}
+                            >
+                              <div className="text-lg mb-1">{variant.icon}</div>
+                              <div
+                                className="text-[12px] font-semibold mb-0.5"
+                                style={{
+                                  color: isSelected
+                                    ? "var(--color-accent)"
+                                    : "var(--color-text)",
+                                }}
+                              >
+                                {variant.label}
+                              </div>
+                              <div className="text-[10px] text-text-dim leading-snug">
+                                {variant.description}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Separator if we have both variants and swap options */}
+                  {group.hasCurrentExercise && variants && variants.length > 0 && group.options.length > 0 && (
+                    <div className="border-t border-border my-1" />
+                  )}
+
+                  {/* Swap exercise options */}
                   {group.options.map((option) => {
                     const isUnavailable =
                       option.ex.requires.length > 0 &&
@@ -296,7 +359,6 @@ export default function EquipmentSwapPanel({
                             </span>
                           )}
                         </div>
-                        {/* Equipment chips */}
                         {option.ex.requires.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {option.ex.requires.map((eq) => {
@@ -322,7 +384,6 @@ export default function EquipmentSwapPanel({
                             })}
                           </div>
                         )}
-                        {/* Brief description of what this exercise targets differently */}
                         {!option.isCurrent && option.ex.why && (
                           <div className="text-[11px] text-text-dim mt-1 line-clamp-2 leading-snug">
                             {option.ex.why}
