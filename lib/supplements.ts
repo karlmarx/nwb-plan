@@ -239,9 +239,9 @@ export const SUPPLEMENT_EX: Record<string, SupplementExData> = {
   // ── CORE ──────────────────────────────────────────────────────────────────
   "Seated Cable Crunch": {
     sets: [["3", "12"]],
-    setup: "Rope on high cable. Sit on a bench facing the stack. Hold rope ends at temples.",
+    setup: "Rope on high cable. Sit on a bench facing the stack, left leg hanging off the side. Hold rope ends at temples.",
     execution: "Flex spine forward, pulling elbows toward knees. Contract abs hard at bottom. Return with control.",
-    nwbCues: "Seated throughout — no standing. Left foot rests on floor, zero weight through it.",
+    nwbCues: "Hang left leg off the bench — keeps hip angle open and avoids >90° flexion on the fracture side. Do not crunch past the point where you feel the left hip loading.",
     rest: 60,
   },
   "Modified Hollow Body Hold": {
@@ -295,9 +295,9 @@ export const SUPPLEMENT_EX: Record<string, SupplementExData> = {
   },
   "Weighted Crunch (Seated)": {
     sets: [["3", "12"]],
-    setup: "Sit upright on a bench or machine. Hold a plate or dumbbell at chest.",
+    setup: "Sit on a bench, left leg hanging off the side. Hold a plate or dumbbell at chest.",
     execution: "Flex spine forward — shoulders curl toward hips. Squeeze at top, lower slowly.",
-    nwbCues: "Seated throughout. No left leg ground pressure. Use a support rail if balance is uncertain.",
+    nwbCues: "Hang left leg off the bench to keep hip angle open on the fracture side. Don't crunch past the point of left hip loading. Use a support rail if balance is uncertain.",
     rest: 60,
   },
   "Modified Hollow Body Flutter": {
