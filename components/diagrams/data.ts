@@ -221,6 +221,31 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Cable Machine"],
   },
 
+  {
+    id: "g4", category: "glute", name: "Seated Hip Abduction \u2014 Band",
+    target: "Glute Medius / Lateral Hip",
+    cues: [
+      "Sit upright on a bench, hips at ~80\u00B0 (NEVER over 90\u00B0).",
+      "Loop band around both knees \u2014 use hands only to position.",
+      "Press knees outward, driving from the glutes \u2014 not the feet.",
+      "5\u201310s isometric holds, or 2-3 tempo reps. Light band only.",
+    ],
+    safetyNote: "\u26A0 Glute med likely deconditioned \u2014 start with lightest band. Stop if anterior hip pain. Left foot purely passive, zero push-off.",
+    equipment: ["Resistance Band", "Bench"],
+  },
+  {
+    id: "g5", category: "glute", name: "Seated Hip Adduction \u2014 Band",
+    target: "Adductors / Inner Thigh",
+    cues: [
+      "Sit upright, hips at ~80\u00B0. Place loop band around both knees with HANDS only.",
+      "Squeeze knees inward smoothly \u2014 no jerking.",
+      "5\u201310s isometric holds, or 2-3 tempo reps.",
+      "Left foot rests passively \u2014 zero push-off.",
+    ],
+    safetyNote: "\u26A0 LIGHT to MODERATE band ONLY. Heavy resistance recruits pectineus/iliopsoas \u2192 femoral neck loading. STOP if any sensation in left groin or hip crease.",
+    equipment: ["Resistance Band", "Bench"],
+  },
+
   // ── TRX ──
   {
     id: "t1", category: "trx", name: "TRX Pallof Press",

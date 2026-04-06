@@ -19,18 +19,18 @@ import {
   EQUIP_TO_NEARBY,
   NEARBY_SUPERSETS,
 } from "@/lib/supplements";
-import type { VariantSuperset } from "@/lib/exercises";
+import type { VariantSuperset, Exercise } from "@/lib/exercises";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
 import Callout from "@/components/callout";
 import RestTimer from "@/components/rest-timer";
 import ProgressClock from "@/components/progress-clock";
-import MachineSelector from "@/components/machine-selector";
 import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
+import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -563,6 +563,33 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
+  const [editMode, setEditMode] = useState(false);
+
+  // Focus mode: fullscreen exercise walkthrough
+  type FocusItem = { name: string; ex: Exercise };
+  const [focusState, setFocusState] = useState<{ items: FocusItem[]; index: number } | null>(null);
+
+  // Keyboard navigation for focus mode
+  useEffect(() => {
+    if (!focusState) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFocusState(null);
+      if (e.key === "ArrowRight" || e.key === "ArrowDown")
+        setFocusState((prev) => prev && prev.index < prev.items.length - 1
+          ? { ...prev, index: prev.index + 1 } : prev);
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+        setFocusState((prev) => prev && prev.index > 0
+          ? { ...prev, index: prev.index - 1 } : prev);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [focusState]);
+
+  // ----- Completed supersets tracking (per day) -----
+  const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
+  const [completedSupersets, setCompletedSupersets] = useState<string[]>(
+    () => loadState<string[]>(todayKey, []),
+  );
 
   // ----- Sliding tab pill (v2) -----
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -630,6 +657,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_ui_v2", uiV2);
   }, [uiV2]);
+  useEffect(() => {
+    saveState(todayKey, completedSupersets);
+  }, [completedSupersets, todayKey]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -717,6 +747,27 @@ export default function WorkoutView() {
     if (!ex) return null;
     const unavail =
       !ex || ex.requires.some((r) => equipment[r] === false);
+    const coreEditSlot = editMode ? (() => {
+      const exData = EX[name];
+      const inUseIds = exData
+        ? exData.requires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean)
+        : [];
+      return (
+        <NearbyPicker
+          selected={nearbySelections[name] ?? []}
+          inUse={inUseIds}
+          onToggle={(id) =>
+            setNearbySelections((prev) => {
+              const current = prev[name] ?? [];
+              const next = current.includes(id)
+                ? current.filter((x) => x !== id)
+                : [...current, id];
+              return { ...prev, [name]: next };
+            })
+          }
+        />
+      );
+    })() : undefined;
     return (
       <div key={name}>
         <ExerciseRow
@@ -730,48 +781,16 @@ export default function WorkoutView() {
               setTimer(parseInt(sw.replace("__timer__", "")));
           }}
           onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
           unavailable={unavail}
           equipment={equipment}
+          selectedVariantId={machineSelections[name] ?? null}
+          onSelectVariant={(id) =>
+            setMachineSelections((prev) => ({ ...prev, [name]: id }))
+          }
+          editMode={editMode}
+          editSlot={coreEditSlot}
         />
-        {expandedEx[name] && ex.machineVariants && (
-          <div className="px-3 pb-2">
-            <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
-              Machine type at your station
-            </div>
-            <MachineSelector
-              variants={ex.machineVariants}
-              selected={machineSelections[name] ?? null}
-              onSelect={(id) =>
-                setMachineSelections((prev) => ({ ...prev, [name]: id }))
-              }
-            />
-          </div>
-        )}
-        {expandedEx[name] && (() => {
-          const exData = EX[name];
-          const inUseIds = exData
-            ? exData.requires
-                .map((r) => EQUIP_TO_NEARBY[r])
-                .filter(Boolean)
-            : [];
-          return (
-            <div className="px-3 pb-3">
-              <NearbyPicker
-                selected={nearbySelections[name] ?? []}
-                inUse={inUseIds}
-                onToggle={(id) =>
-                  setNearbySelections((prev) => {
-                    const current = prev[name] ?? [];
-                    const next = current.includes(id)
-                      ? current.filter((x) => x !== id)
-                      : [...current, id];
-                    return { ...prev, [name]: next };
-                  })
-                }
-              />
-            </div>
-          );
-        })()}
       </div>
     );
   }
@@ -854,6 +873,16 @@ export default function WorkoutView() {
         isOpen={!!openSections[workoutKey]}
         onToggle={() => toggleSection(workoutKey)}
         count={w.exercises.length}
+        onFocus={() => {
+          const items = w.exercises
+            .map((orig) => {
+              const nm = getExName(workoutKey, orig);
+              const exItem = EX[nm];
+              return { name: nm, ex: exItem };
+            })
+            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase)) as FocusItem[];
+          if (items.length > 0) setFocusState({ items, index: 0 });
+        }}
       >
         {/* Hevy link */}
         {hevyId && (
@@ -918,8 +947,8 @@ export default function WorkoutView() {
           </a>
         )}
 
-        {/* Supplement toggle controls */}
-        {isTrainingDay && (
+        {/* Supplement toggle controls — edit mode only */}
+        {isTrainingDay && editMode && (
           <div className="flex gap-2 mb-3 flex-wrap">
             <button
               onClick={(ev) => {
@@ -1049,6 +1078,7 @@ export default function WorkoutView() {
                 onToggle={() => toggleEx(exName)}
                 onSwap={(sw) => handleSwap(workoutKey, origName, sw)}
                 onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
                 unavailable={unavail}
                 equipment={equipment}
                 workoutExercises={w.exercises.map((o) =>
@@ -1056,6 +1086,134 @@ export default function WorkoutView() {
                 )}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                selectedVariantId={machineSelections[exName] ?? null}
+                onSelectVariant={(id) =>
+                  setMachineSelections((prev) => ({ ...prev, [exName]: id }))
+                }
+                editMode={editMode}
+                editSlot={
+                  editMode ? (() => {
+                    const exData = EX[exName];
+                    const inUseIds = exData
+                      ? exData.requires
+                          .map((r) => EQUIP_TO_NEARBY[r])
+                          .filter(Boolean)
+                      : [];
+                    const allNearby = [
+                      ...new Set([
+                        ...inUseIds,
+                        ...(nearbySelections[exName] ?? []),
+                      ]),
+                    ];
+                    const nearbySupersets = supplementToggles.leftLeg
+                      ? NEARBY_SUPERSETS.filter(
+                          (ns) =>
+                            allNearby.includes(ns.nearbyId) &&
+                            !inUseIds.includes(ns.nearbyId) &&
+                            !ssInfo
+                        )
+                      : [];
+                    return (
+                      <div>
+                        <NearbyPicker
+                          selected={nearbySelections[exName] ?? []}
+                          inUse={inUseIds}
+                          onToggle={(id) =>
+                            setNearbySelections((prev) => {
+                              const current = prev[exName] ?? [];
+                              const next = current.includes(id)
+                                ? current.filter((x) => x !== id)
+                                : [...current, id];
+                              return { ...prev, [exName]: next };
+                            })
+                          }
+                        />
+                        {nearbySupersets.length > 0 && (
+                          <div className="mt-2 space-y-1.5">
+                            {[...nearbySupersets]
+                              .sort((a, b) => {
+                                const aDone = completedSupersets.includes(a.title);
+                                const bDone = completedSupersets.includes(b.title);
+                                if (aDone === bDone) return 0;
+                                return aDone ? 1 : -1;
+                              })
+                              .map((ns) => {
+                              const isDone = completedSupersets.includes(ns.title);
+                              return (
+                              <div
+                                key={`${ns.nearbyId}-${ns.title}`}
+                                className="rounded-lg"
+                                style={{
+                                  padding: "8px 10px",
+                                  background: isDone ? "#14b8a605" : "#14b8a60d",
+                                  border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
+                                  borderLeft: `3px solid ${isDone ? "var(--color-border)" : "#14b8a6"}`,
+                                  opacity: isDone ? 0.55 : 1,
+                                }}
+                              >
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <span
+                                    className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                                    style={{
+                                      background: isDone ? "var(--color-bg)" : "#14b8a622",
+                                      border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
+                                      color: isDone ? "var(--color-text-muted)" : "#14b8a6",
+                                    }}
+                                  >
+                                    {isDone ? "DONE" : "NEARBY"}
+                                  </span>
+                                  <span
+                                    className="text-xs font-semibold"
+                                    style={{ color: isDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: isDone ? "line-through" : "none" }}
+                                  >
+                                    {ns.title}
+                                  </span>
+                                  <span className="ml-auto text-[10px] text-text-dim">
+                                    {ns.sets}
+                                  </span>
+                                  <button
+                                    onClick={(ev) => {
+                                      ev.stopPropagation();
+                                      setCompletedSupersets((prev) =>
+                                        prev.includes(ns.title)
+                                          ? prev.filter((t) => t !== ns.title)
+                                          : [...prev, ns.title]
+                                      );
+                                    }}
+                                    className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
+                                    style={{
+                                      padding: "2px 8px",
+                                      background: isDone ? "var(--color-safe-bg)" : "var(--color-card)",
+                                      border: isDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
+                                      color: isDone ? "var(--color-safe)" : "var(--color-text-muted)",
+                                    }}
+                                    title={isDone ? "Mark as not done" : "Mark as done today"}
+                                  >
+                                    {isDone ? "✓" : "○"}
+                                  </button>
+                                </div>
+                                {!isDone && (
+                                  <>
+                                    <div className="text-[11px] text-text-dim leading-relaxed">
+                                      {ns.instruction}
+                                    </div>
+                                    <div
+                                      className="text-[10px] mt-1"
+                                      style={{ color: "#14b8a6" }}
+                                    >
+                                      {"\uD83D\uDEE1\uFE0F"} {ns.safety}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })() : undefined
+                }
                 supplementSlot={
                   suppCards.length > 0 ? (
                     <div className="mb-3">
@@ -1199,159 +1357,82 @@ export default function WorkoutView() {
               {/* Supplement cards now rendered inside ExerciseRow via supplementSlot prop */}
 
               {/* Equipment-specific superset card */}
-              {isExp && ssInfo && (
+              {isExp && ssInfo && (() => {
+                const ssDone = completedSupersets.includes(ssInfo.title);
+                return (
                 <div
                   className="mx-3 mb-2 rounded-lg"
                   style={{
                     padding: "8px 10px",
-                    background: "#14b8a60d",
-                    border: "1px solid #14b8a633",
-                    borderLeft: "3px solid #14b8a6",
+                    background: ssDone ? "#14b8a605" : "#14b8a60d",
+                    border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
+                    borderLeft: `3px solid ${ssDone ? "var(--color-border)" : "#14b8a6"}`,
+                    opacity: ssDone ? 0.55 : 1,
                   }}
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <span
                       className="text-[8px] font-extrabold rounded px-1 py-0.5"
                       style={{
-                        background: "#14b8a622",
-                        border: "1px solid #14b8a644",
-                        color: "#14b8a6",
+                        background: ssDone ? "var(--color-bg)" : "#14b8a622",
+                        border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
+                        color: ssDone ? "var(--color-text-muted)" : "#14b8a6",
                       }}
                     >
-                      SUPERSET
+                      {ssDone ? "DONE" : "SUPERSET"}
                     </span>
                     <span
                       className="text-xs font-semibold"
-                      style={{ color: "#14b8a6" }}
+                      style={{ color: ssDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: ssDone ? "line-through" : "none" }}
                     >
                       {ssInfo.title}
                     </span>
                     <span className="ml-auto text-[10px] text-text-dim">
                       {ssInfo.sets}
                     </span>
+                    <button
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        setCompletedSupersets((prev) =>
+                          prev.includes(ssInfo.title)
+                            ? prev.filter((t) => t !== ssInfo.title)
+                            : [...prev, ssInfo.title]
+                        );
+                      }}
+                      className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
+                      style={{
+                        padding: "2px 8px",
+                        background: ssDone ? "var(--color-safe-bg)" : "var(--color-card)",
+                        border: ssDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
+                        color: ssDone ? "var(--color-safe)" : "var(--color-text-muted)",
+                      }}
+                      title={ssDone ? "Mark as not done" : "Mark as done today"}
+                    >
+                      {ssDone ? "✓" : "○"}
+                    </button>
                   </div>
-                  <div className="text-[11px] text-text-dim leading-relaxed">
-                    {ssInfo.instruction}
-                  </div>
-                  <div
-                    className="text-[10px] mt-1"
-                    style={{ color: "#14b8a6" }}
-                  >
-                    {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
-                  </div>
-                  {ssInfo.note && (
-                    <div className="text-[10px] mt-1 text-warning">
-                      {"\u26A0\uFE0F"} {ssInfo.note}
-                    </div>
+                  {!ssDone && (
+                    <>
+                      <div className="text-[11px] text-text-dim leading-relaxed">
+                        {ssInfo.instruction}
+                      </div>
+                      <div
+                        className="text-[10px] mt-1"
+                        style={{ color: "#14b8a6" }}
+                      >
+                        {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
+                      </div>
+                      {ssInfo.note && (
+                        <div className="text-[10px] mt-1 text-warning">
+                          {"\u26A0\uFE0F"} {ssInfo.note}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
-              )}
-
-              {/* Machine selector */}
-              {isExp && ex.machineVariants && (
-                <div className="px-3 pb-2">
-                  <div className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">
-                    Machine type at your station
-                  </div>
-                  <MachineSelector
-                    variants={ex.machineVariants}
-                    selected={machineSelections[exName] ?? null}
-                    onSelect={(id) =>
-                      setMachineSelections((prev) => ({
-                        ...prev,
-                        [exName]: id,
-                      }))
-                    }
-                  />
-                </div>
-              )}
-              {/* Nearby picker */}
-              {isExp && (() => {
-                const exData = EX[exName];
-                const inUseIds = exData
-                  ? exData.requires
-                      .map((r) => EQUIP_TO_NEARBY[r])
-                      .filter(Boolean)
-                  : [];
-                const allNearby = [
-                  ...new Set([
-                    ...inUseIds,
-                    ...(nearbySelections[exName] ?? []),
-                  ]),
-                ];
-                const nearbySupersets = supplementToggles.leftLeg
-                  ? NEARBY_SUPERSETS.filter(
-                      (ns) =>
-                        allNearby.includes(ns.nearbyId) &&
-                        !inUseIds.includes(ns.nearbyId) &&
-                        !ssInfo // don't duplicate if we already have an equipment-specific superset
-                    )
-                  : [];
-                return (
-                  <div className="px-3 pb-3">
-                    <NearbyPicker
-                      selected={nearbySelections[exName] ?? []}
-                      inUse={inUseIds}
-                      onToggle={(id) =>
-                        setNearbySelections((prev) => {
-                          const current = prev[exName] ?? [];
-                          const next = current.includes(id)
-                            ? current.filter((x) => x !== id)
-                            : [...current, id];
-                          return { ...prev, [exName]: next };
-                        })
-                      }
-                    />
-                    {nearbySupersets.length > 0 && (
-                      <div className="mt-2 space-y-1.5">
-                        {nearbySupersets.map((ns) => (
-                          <div
-                            key={ns.nearbyId}
-                            className="rounded-lg"
-                            style={{
-                              padding: "8px 10px",
-                              background: "#14b8a60d",
-                              border: "1px solid #14b8a633",
-                              borderLeft: "3px solid #14b8a6",
-                            }}
-                          >
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span
-                                className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                                style={{
-                                  background: "#14b8a622",
-                                  border: "1px solid #14b8a644",
-                                  color: "#14b8a6",
-                                }}
-                              >
-                                NEARBY
-                              </span>
-                              <span
-                                className="text-xs font-semibold"
-                                style={{ color: "#14b8a6" }}
-                              >
-                                {ns.title}
-                              </span>
-                              <span className="ml-auto text-[10px] text-text-dim">
-                                {ns.sets}
-                              </span>
-                            </div>
-                            <div className="text-[11px] text-text-dim leading-relaxed">
-                              {ns.instruction}
-                            </div>
-                            <div
-                              className="text-[10px] mt-1"
-                              style={{ color: "#14b8a6" }}
-                            >
-                              {"\uD83D\uDEE1\uFE0F"} {ns.safety}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 );
               })()}
+
             </div>
           );
         })}
@@ -1394,8 +1475,14 @@ export default function WorkoutView() {
                       setTimer(parseInt(sw.replace("__timer__", "")));
                   }}
                   onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
                   unavailable={!isAvailable(name)}
                   equipment={equipment}
+                  selectedVariantId={machineSelections[name] ?? null}
+                  onSelectVariant={(id) =>
+                    setMachineSelections((prev) => ({ ...prev, [name]: id }))
+                  }
+                  editMode={editMode}
                 />
               );
             })}
@@ -1729,8 +1816,14 @@ export default function WorkoutView() {
                   setTimer(parseInt(sw.replace("__timer__", "")));
               }}
               onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
               unavailable={!isAvailable(k)}
               equipment={equipment}
+              selectedVariantId={machineSelections[k] ?? null}
+              onSelectVariant={(id) =>
+                setMachineSelections((prev) => ({ ...prev, [k]: id }))
+              }
+              editMode={editMode}
             />
           ))}
         </Section>
@@ -2631,6 +2724,35 @@ export default function WorkoutView() {
         ))}
       </div>
 
+      {/* Edit / Do mode toggle pill */}
+      <div className="flex justify-center mb-4">
+        <div
+          className="flex rounded-full p-0.5"
+          style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+        >
+          <button
+            onClick={() => setEditMode(false)}
+            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
+            style={{
+              background: !editMode ? "var(--color-accent)" : "transparent",
+              color: !editMode ? "#000" : "var(--color-text-muted)",
+            }}
+          >
+            ▶ Do
+          </button>
+          <button
+            onClick={() => setEditMode(true)}
+            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
+            style={{
+              background: editMode ? "var(--color-accent)" : "transparent",
+              color: editMode ? "#000" : "var(--color-text-muted)",
+            }}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+      </div>
+
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
         {/* v2: sliding pill indicator */}
@@ -2804,19 +2926,173 @@ export default function WorkoutView() {
         </div>
       )}
 
-      {/* Diagram gallery overlay */}
-      {diagramOpen === "gallery" && (
+      {/* Fullscreen focus overlay */}
+      {focusState && (() => {
+        const { items, index } = focusState;
+        const item = items[index];
+        if (!item) return null;
+        const s = item.ex.sets[phase] ?? item.ex.sets[0];
+        return (
+          <div
+            className="fixed inset-0 z-[250] flex flex-col"
+            style={{ background: "#0a0a0a" }}
+          >
+            {/* Top bar: position dots + close */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-white/40 text-[10px] font-medium uppercase tracking-wider">
+                  {index + 1} of {items.length}
+                </span>
+                <div className="flex gap-1.5 ml-1">
+                  {items.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setFocusState((prev) => prev ? { ...prev, index: i } : null)}
+                      className="rounded-full transition-all duration-300 border-none cursor-pointer p-0"
+                      style={{
+                        width: i === index ? 20 : 6,
+                        height: 6,
+                        background: i === index ? "#38bdf8" : "rgba(255,255,255,0.2)",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => setFocusState(null)}
+                className="w-11 h-11 flex items-center justify-center rounded-full cursor-pointer border-none text-base font-bold"
+                style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+              <div
+                className="text-[clamp(28px,8vw,40px)] font-extrabold text-white leading-tight mb-2 mt-1"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                {item.name}
+              </div>
+
+              <div className="flex items-baseline gap-4 mb-7">
+                <span className="text-2xl font-bold" style={{ color: "#38bdf8" }}>
+                  {s[0]} &times; {s[1]}
+                </span>
+                {item.ex.rest > 0 && (
+                  <span className="text-base font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
+                    {item.ex.rest}s rest
+                  </span>
+                )}
+              </div>
+
+              <div className="mb-6">
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#38bdf8" }}>
+                  {"\uD83D\uDCCD"} Setup &amp; Position
+                </div>
+                <div className="text-white/80 text-[15px] leading-relaxed">{item.ex.setup}</div>
+              </div>
+
+              <div className="mb-6">
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#4ade80" }}>
+                  {"\uD83D\uDD04"} How to Execute
+                </div>
+                <div className="text-white/80 text-[15px] leading-relaxed">{item.ex.execution}</div>
+              </div>
+
+              <div
+                className="mb-6 rounded-2xl p-4"
+                style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fbbf24" }}>
+                  {"\uD83D\uDEE1\uFE0F"} NWB Safety
+                </div>
+                <div className="text-white/75 text-[14px] leading-relaxed">{item.ex.nwbCues}</div>
+              </div>
+
+              <div
+                className="mb-4 rounded-2xl p-4"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  Breathing
+                </div>
+                <div className="text-[13px] leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  Exhale on effort &mdash; inhale on return. Brace core throughout.
+                </div>
+              </div>
+
+              {EXERCISE_TO_DIAGRAM[item.ex.id] && (
+                <button
+                  onClick={() => setDiagramOpen(EXERCISE_TO_DIAGRAM[item.ex.id])}
+                  className="w-full rounded-2xl text-[13px] font-bold cursor-pointer font-[inherit] flex items-center justify-center gap-2 mb-4"
+                  style={{
+                    minHeight: 48,
+                    background: "rgba(56,189,248,0.12)",
+                    border: "1px solid rgba(56,189,248,0.25)",
+                    color: "#38bdf8",
+                  }}
+                >
+                  {"\u{1F4D0}"} View Movement Diagram
+                </button>
+              )}
+            </div>
+
+            {/* Nav buttons */}
+            <div
+              className="flex-shrink-0 flex items-center gap-3 px-5 pt-3 pb-8"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              <button
+                onClick={() => setFocusState((prev) => prev ? { ...prev, index: Math.max(0, prev.index - 1) } : null)}
+                disabled={index === 0}
+                className="flex-1 rounded-2xl text-base font-bold cursor-pointer font-[inherit] transition-all duration-150 border-none"
+                style={{
+                  minHeight: 62,
+                  background: index > 0 ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)",
+                  color: index > 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.2)",
+                }}
+              >
+                &#8249; Prev
+              </button>
+              <div className="text-center w-16 text-sm font-medium" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {index + 1}&thinsp;/&thinsp;{items.length}
+              </div>
+              <button
+                onClick={() => setFocusState((prev) => prev ? { ...prev, index: Math.min(prev.items.length - 1, prev.index + 1) } : null)}
+                disabled={index === items.length - 1}
+                className="flex-1 rounded-2xl text-base font-bold cursor-pointer font-[inherit] transition-all duration-150 border-none"
+                style={{
+                  minHeight: 62,
+                  background: index < items.length - 1 ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${index < items.length - 1 ? "rgba(56,189,248,0.3)" : "transparent"}`,
+                  color: index < items.length - 1 ? "#38bdf8" : "rgba(255,255,255,0.2)",
+                }}
+              >
+                Next &#8250;
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Diagram gallery overlay — also handles deep-linked exercise IDs */}
+      {diagramOpen && (diagramOpen === "gallery" || DIAGRAM_EXERCISES.some(e => e.id === diagramOpen)) && (
         <div
           data-testid="diagram-gallery-overlay"
-          className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
+          className={`fixed inset-0 ${focusState ? "z-[300]" : "z-[200]"} overflow-y-auto overflow-x-hidden`}
           style={{ background: "var(--color-bg)" }}
         >
-          <DiagramGallery onClose={() => setDiagramOpen(null)} />
+          <DiagramGallery
+            initialExercise={diagramOpen !== "gallery" ? diagramOpen : undefined}
+            onClose={() => setDiagramOpen(null)}
+          />
         </div>
       )}
 
-      {/* Diagram modal (individual exercises) */}
-      {diagramOpen && diagramOpen !== "gallery" && (
+      {/* Diagram modal (individual exercises — legacy modal keys) */}
+      {diagramOpen && diagramOpen !== "gallery" && !DIAGRAM_EXERCISES.some(e => e.id === diagramOpen) && (
         <DiagramModal
           diagram={diagramOpen}
           onClose={() => setDiagramOpen(null)}

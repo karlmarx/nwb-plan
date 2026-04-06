@@ -11,6 +11,7 @@ interface SectionProps {
   accent?: string;
   count?: number;
   coloredBorder?: boolean;
+  onFocus?: () => void;
 }
 
 export default function Section({
@@ -22,6 +23,7 @@ export default function Section({
   accent,
   count,
   coloredBorder,
+  onFocus,
 }: SectionProps) {
   const ac = accent ?? "#38bdf8";
 
@@ -35,36 +37,50 @@ export default function Section({
         boxShadow: isOpen ? `0 0 20px ${ac}08` : "none",
       }}
     >
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3.5 bg-transparent border-none text-text cursor-pointer text-left font-[inherit] min-h-[52px] transition-colors duration-150"
+      <div
+        className="w-full flex items-center min-h-[52px] transition-colors duration-150"
         style={{
           background: isOpen ? ac + "08" : "transparent",
         }}
       >
-        <span className="text-lg leading-none">{icon}</span>
-        <span className="flex-1 font-semibold text-[15px] tracking-tight">{title}</span>
-        {count != null && (
+        <button
+          onClick={onToggle}
+          className="flex-1 flex items-center gap-3 px-4 py-3.5 bg-transparent border-none text-text cursor-pointer text-left font-[inherit] transition-colors duration-150"
+        >
+          <span className="text-lg leading-none">{icon}</span>
+          <span className="flex-1 font-semibold text-[15px] tracking-tight">{title}</span>
+          {count != null && (
+            <span
+              className="text-[11px] font-medium rounded-full px-2 py-0.5"
+              style={{
+                background: isOpen ? ac + "18" : "var(--color-bg)",
+                color: isOpen ? ac : "var(--color-text-muted)",
+                border: `1px solid ${isOpen ? ac + "33" : "var(--color-border)"}`,
+              }}
+            >
+              {count}
+            </span>
+          )}
           <span
-            className="text-[11px] font-medium rounded-full px-2 py-0.5"
+            className="text-xs text-text-muted transition-transform duration-200"
             style={{
-              background: isOpen ? ac + "18" : "var(--color-bg)",
-              color: isOpen ? ac : "var(--color-text-muted)",
-              border: `1px solid ${isOpen ? ac + "33" : "var(--color-border)"}`,
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
             }}
           >
-            {count}
+            &#9660;
           </span>
+        </button>
+        {onFocus && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onFocus(); }}
+            className="self-stretch pl-2 pr-4 flex items-center justify-center bg-transparent border-none cursor-pointer transition-colors duration-150"
+            style={{ color: ac, opacity: 0.7 }}
+            title="Focus mode — full screen exercise view"
+          >
+            <span className="text-sm leading-none">▶</span>
+          </button>
         )}
-        <span
-          className="text-xs text-text-muted transition-transform duration-200"
-          style={{
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-          }}
-        >
-          &#9660;
-        </span>
-      </button>
+      </div>
 
       {isOpen && (
         <div className="section-content px-4 pb-4 leading-relaxed">{children}</div>
