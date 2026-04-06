@@ -18,4 +18,6 @@ export const EXERCISE_TO_DIAGRAM: Record<string, string> = {
   parallette_l_sit:                    "a4",
   bird_dog_prone_bench:                "p4",
   support_hold_pbars:                  "a6",
+  seated_hip_abduction_band:           "g4",
+  seated_hip_adduction_band:           "g5",
 };
