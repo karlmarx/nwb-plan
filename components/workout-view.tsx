@@ -30,6 +30,7 @@ import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
+import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -759,6 +760,7 @@ export default function WorkoutView() {
               setTimer(parseInt(sw.replace("__timer__", "")));
           }}
           onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
           unavailable={unavail}
           equipment={equipment}
           selectedVariantId={machineSelections[name] ?? null}
@@ -1079,6 +1081,7 @@ export default function WorkoutView() {
                 onToggle={() => toggleEx(exName)}
                 onSwap={(sw) => handleSwap(workoutKey, origName, sw)}
                 onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
                 unavailable={unavail}
                 equipment={equipment}
                 workoutExercises={w.exercises.map((o) =>
@@ -1475,6 +1478,7 @@ export default function WorkoutView() {
                       setTimer(parseInt(sw.replace("__timer__", "")));
                   }}
                   onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
                   unavailable={!isAvailable(name)}
                   equipment={equipment}
                   selectedVariantId={machineSelections[name] ?? null}
@@ -1815,6 +1819,7 @@ export default function WorkoutView() {
                   setTimer(parseInt(sw.replace("__timer__", "")));
               }}
               onDiagram={(d) => setDiagramOpen(d)}
+          onOpenDiagram={(id) => setDiagramOpen(id)}
               unavailable={!isAvailable(k)}
               equipment={equipment}
               selectedVariantId={machineSelections[k] ?? null}
@@ -3020,6 +3025,21 @@ export default function WorkoutView() {
                   Exhale on effort &mdash; inhale on return. Brace core throughout.
                 </div>
               </div>
+
+              {EXERCISE_TO_DIAGRAM[item.ex.id] && (
+                <button
+                  onClick={() => setDiagramOpen(EXERCISE_TO_DIAGRAM[item.ex.id])}
+                  className="w-full rounded-2xl text-[13px] font-bold cursor-pointer font-[inherit] flex items-center justify-center gap-2 mb-4"
+                  style={{
+                    minHeight: 48,
+                    background: "rgba(56,189,248,0.12)",
+                    border: "1px solid rgba(56,189,248,0.25)",
+                    color: "#38bdf8",
+                  }}
+                >
+                  {"\u{1F4D0}"} View Movement Diagram
+                </button>
+              )}
             </div>
 
             {/* Nav buttons */}
@@ -3060,19 +3080,22 @@ export default function WorkoutView() {
         );
       })()}
 
-      {/* Diagram gallery overlay */}
-      {diagramOpen === "gallery" && (
+      {/* Diagram gallery overlay — also handles deep-linked exercise IDs */}
+      {diagramOpen && (diagramOpen === "gallery" || DIAGRAM_EXERCISES.some(e => e.id === diagramOpen)) && (
         <div
           data-testid="diagram-gallery-overlay"
-          className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
+          className={`fixed inset-0 ${focusState ? "z-[300]" : "z-[200]"} overflow-y-auto overflow-x-hidden`}
           style={{ background: "var(--color-bg)" }}
         >
-          <DiagramGallery onClose={() => setDiagramOpen(null)} />
+          <DiagramGallery
+            initialExercise={diagramOpen !== "gallery" ? diagramOpen : undefined}
+            onClose={() => setDiagramOpen(null)}
+          />
         </div>
       )}
 
-      {/* Diagram modal (individual exercises) */}
-      {diagramOpen && diagramOpen !== "gallery" && (
+      {/* Diagram modal (individual exercises — legacy modal keys) */}
+      {diagramOpen && diagramOpen !== "gallery" && !DIAGRAM_EXERCISES.some(e => e.id === diagramOpen) && (
         <DiagramModal
           diagram={diagramOpen}
           onClose={() => setDiagramOpen(null)}

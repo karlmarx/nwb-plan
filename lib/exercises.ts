@@ -1336,7 +1336,6 @@ export const EX: Record<string, Exercise> = {
     why: "Unilateral glute strength with zero hip flexion demand. Safe and effective NWB exercise.",
     safety: "safe",
     swaps: ["SL Hip Thrust (Right)", "TRX SL Glute Bridge (Right)"],
-    diagram: "gluteBridge",
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
@@ -1570,7 +1569,6 @@ export const EX: Record<string, Exercise> = {
     why: "Gluteus medius maintenance for both legs. Prevents hip drop gait pattern when you return to walking.",
     safety: "safe",
     swaps: [],
-    diagram: "clamshells",
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
