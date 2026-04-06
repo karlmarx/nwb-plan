@@ -21,6 +21,7 @@ interface ExerciseRowProps {
   variantSetupCues?: string[];
   variantLabel?: string;
   supplementSlot?: React.ReactNode;
+  editSlot?: React.ReactNode;
   selectedVariantId?: string | null;
   onSelectVariant?: (id: string) => void;
   editMode?: boolean;
@@ -41,6 +42,7 @@ export default function ExerciseRow({
   variantSetupCues,
   variantLabel,
   supplementSlot,
+  editSlot,
   selectedVariantId,
   onSelectVariant,
   editMode = true,
@@ -130,6 +132,8 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="section-content px-3.5 pb-4">
+          {/* Equipment picker — top of card in edit mode */}
+          {editSlot && <div className="mb-3">{editSlot}</div>}
           {/* Superset cards — rendered first so they're the first thing seen on expand */}
           {supplementSlot}
 

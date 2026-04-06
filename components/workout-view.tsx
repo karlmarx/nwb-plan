@@ -747,6 +747,27 @@ export default function WorkoutView() {
     if (!ex) return null;
     const unavail =
       !ex || ex.requires.some((r) => equipment[r] === false);
+    const coreEditSlot = editMode ? (() => {
+      const exData = EX[name];
+      const inUseIds = exData
+        ? exData.requires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean)
+        : [];
+      return (
+        <NearbyPicker
+          selected={nearbySelections[name] ?? []}
+          inUse={inUseIds}
+          onToggle={(id) =>
+            setNearbySelections((prev) => {
+              const current = prev[name] ?? [];
+              const next = current.includes(id)
+                ? current.filter((x) => x !== id)
+                : [...current, id];
+              return { ...prev, [name]: next };
+            })
+          }
+        />
+      );
+    })() : undefined;
     return (
       <div key={name}>
         <ExerciseRow
@@ -768,32 +789,8 @@ export default function WorkoutView() {
             setMachineSelections((prev) => ({ ...prev, [name]: id }))
           }
           editMode={editMode}
+          editSlot={coreEditSlot}
         />
-        {editMode && expandedEx[name] && (() => {
-          const exData = EX[name];
-          const inUseIds = exData
-            ? exData.requires
-                .map((r) => EQUIP_TO_NEARBY[r])
-                .filter(Boolean)
-            : [];
-          return (
-            <div className="px-3 pb-3">
-              <NearbyPicker
-                selected={nearbySelections[name] ?? []}
-                inUse={inUseIds}
-                onToggle={(id) =>
-                  setNearbySelections((prev) => {
-                    const current = prev[name] ?? [];
-                    const next = current.includes(id)
-                      ? current.filter((x) => x !== id)
-                      : [...current, id];
-                    return { ...prev, [name]: next };
-                  })
-                }
-              />
-            </div>
-          );
-        })()}
       </div>
     );
   }
@@ -1094,6 +1091,129 @@ export default function WorkoutView() {
                   setMachineSelections((prev) => ({ ...prev, [exName]: id }))
                 }
                 editMode={editMode}
+                editSlot={
+                  editMode ? (() => {
+                    const exData = EX[exName];
+                    const inUseIds = exData
+                      ? exData.requires
+                          .map((r) => EQUIP_TO_NEARBY[r])
+                          .filter(Boolean)
+                      : [];
+                    const allNearby = [
+                      ...new Set([
+                        ...inUseIds,
+                        ...(nearbySelections[exName] ?? []),
+                      ]),
+                    ];
+                    const nearbySupersets = supplementToggles.leftLeg
+                      ? NEARBY_SUPERSETS.filter(
+                          (ns) =>
+                            allNearby.includes(ns.nearbyId) &&
+                            !inUseIds.includes(ns.nearbyId) &&
+                            !ssInfo
+                        )
+                      : [];
+                    return (
+                      <div>
+                        <NearbyPicker
+                          selected={nearbySelections[exName] ?? []}
+                          inUse={inUseIds}
+                          onToggle={(id) =>
+                            setNearbySelections((prev) => {
+                              const current = prev[exName] ?? [];
+                              const next = current.includes(id)
+                                ? current.filter((x) => x !== id)
+                                : [...current, id];
+                              return { ...prev, [exName]: next };
+                            })
+                          }
+                        />
+                        {nearbySupersets.length > 0 && (
+                          <div className="mt-2 space-y-1.5">
+                            {[...nearbySupersets]
+                              .sort((a, b) => {
+                                const aDone = completedSupersets.includes(a.title);
+                                const bDone = completedSupersets.includes(b.title);
+                                if (aDone === bDone) return 0;
+                                return aDone ? 1 : -1;
+                              })
+                              .map((ns) => {
+                              const isDone = completedSupersets.includes(ns.title);
+                              return (
+                              <div
+                                key={`${ns.nearbyId}-${ns.title}`}
+                                className="rounded-lg"
+                                style={{
+                                  padding: "8px 10px",
+                                  background: isDone ? "#14b8a605" : "#14b8a60d",
+                                  border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
+                                  borderLeft: `3px solid ${isDone ? "var(--color-border)" : "#14b8a6"}`,
+                                  opacity: isDone ? 0.55 : 1,
+                                }}
+                              >
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <span
+                                    className="text-[8px] font-extrabold rounded px-1 py-0.5"
+                                    style={{
+                                      background: isDone ? "var(--color-bg)" : "#14b8a622",
+                                      border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
+                                      color: isDone ? "var(--color-text-muted)" : "#14b8a6",
+                                    }}
+                                  >
+                                    {isDone ? "DONE" : "NEARBY"}
+                                  </span>
+                                  <span
+                                    className="text-xs font-semibold"
+                                    style={{ color: isDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: isDone ? "line-through" : "none" }}
+                                  >
+                                    {ns.title}
+                                  </span>
+                                  <span className="ml-auto text-[10px] text-text-dim">
+                                    {ns.sets}
+                                  </span>
+                                  <button
+                                    onClick={(ev) => {
+                                      ev.stopPropagation();
+                                      setCompletedSupersets((prev) =>
+                                        prev.includes(ns.title)
+                                          ? prev.filter((t) => t !== ns.title)
+                                          : [...prev, ns.title]
+                                      );
+                                    }}
+                                    className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
+                                    style={{
+                                      padding: "2px 8px",
+                                      background: isDone ? "var(--color-safe-bg)" : "var(--color-card)",
+                                      border: isDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
+                                      color: isDone ? "var(--color-safe)" : "var(--color-text-muted)",
+                                    }}
+                                    title={isDone ? "Mark as not done" : "Mark as done today"}
+                                  >
+                                    {isDone ? "✓" : "○"}
+                                  </button>
+                                </div>
+                                {!isDone && (
+                                  <>
+                                    <div className="text-[11px] text-text-dim leading-relaxed">
+                                      {ns.instruction}
+                                    </div>
+                                    <div
+                                      className="text-[10px] mt-1"
+                                      style={{ color: "#14b8a6" }}
+                                    >
+                                      {"\uD83D\uDEE1\uFE0F"} {ns.safety}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })() : undefined
+                }
                 supplementSlot={
                   suppCards.length > 0 ? (
                     <div className="mb-3">
@@ -1313,129 +1433,6 @@ export default function WorkoutView() {
                 );
               })()}
 
-              {/* Nearby picker — edit mode only */}
-              {editMode && isExp && (() => {
-                const exData = EX[exName];
-                const inUseIds = exData
-                  ? exData.requires
-                      .map((r) => EQUIP_TO_NEARBY[r])
-                      .filter(Boolean)
-                  : [];
-                const allNearby = [
-                  ...new Set([
-                    ...inUseIds,
-                    ...(nearbySelections[exName] ?? []),
-                  ]),
-                ];
-                const nearbySupersets = supplementToggles.leftLeg
-                  ? NEARBY_SUPERSETS.filter(
-                      (ns) =>
-                        allNearby.includes(ns.nearbyId) &&
-                        !inUseIds.includes(ns.nearbyId) &&
-                        !ssInfo // don't duplicate if we already have an equipment-specific superset
-                    )
-                  : [];
-                return (
-                  <div className="px-3 pb-3">
-                    <NearbyPicker
-                      selected={nearbySelections[exName] ?? []}
-                      inUse={inUseIds}
-                      onToggle={(id) =>
-                        setNearbySelections((prev) => {
-                          const current = prev[exName] ?? [];
-                          const next = current.includes(id)
-                            ? current.filter((x) => x !== id)
-                            : [...current, id];
-                          return { ...prev, [exName]: next };
-                        })
-                      }
-                    />
-                    {nearbySupersets.length > 0 && (
-                      <div className="mt-2 space-y-1.5">
-                        {/* Sort: undone first, then done */}
-                        {[...nearbySupersets]
-                          .sort((a, b) => {
-                            const aDone = completedSupersets.includes(a.title);
-                            const bDone = completedSupersets.includes(b.title);
-                            if (aDone === bDone) return 0;
-                            return aDone ? 1 : -1;
-                          })
-                          .map((ns) => {
-                          const isDone = completedSupersets.includes(ns.title);
-                          return (
-                          <div
-                            key={`${ns.nearbyId}-${ns.title}`}
-                            className="rounded-lg"
-                            style={{
-                              padding: "8px 10px",
-                              background: isDone ? "#14b8a605" : "#14b8a60d",
-                              border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
-                              borderLeft: `3px solid ${isDone ? "var(--color-border)" : "#14b8a6"}`,
-                              opacity: isDone ? 0.55 : 1,
-                            }}
-                          >
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span
-                                className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                                style={{
-                                  background: isDone ? "var(--color-bg)" : "#14b8a622",
-                                  border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
-                                  color: isDone ? "var(--color-text-muted)" : "#14b8a6",
-                                }}
-                              >
-                                {isDone ? "DONE" : "NEARBY"}
-                              </span>
-                              <span
-                                className="text-xs font-semibold"
-                                style={{ color: isDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: isDone ? "line-through" : "none" }}
-                              >
-                                {ns.title}
-                              </span>
-                              <span className="ml-auto text-[10px] text-text-dim">
-                                {ns.sets}
-                              </span>
-                              <button
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setCompletedSupersets((prev) =>
-                                    prev.includes(ns.title)
-                                      ? prev.filter((t) => t !== ns.title)
-                                      : [...prev, ns.title]
-                                  );
-                                }}
-                                className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
-                                style={{
-                                  padding: "2px 8px",
-                                  background: isDone ? "var(--color-safe-bg)" : "var(--color-card)",
-                                  border: isDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
-                                  color: isDone ? "var(--color-safe)" : "var(--color-text-muted)",
-                                }}
-                                title={isDone ? "Mark as not done" : "Mark as done today"}
-                              >
-                                {isDone ? "✓" : "○"}
-                              </button>
-                            </div>
-                            {!isDone && (
-                              <>
-                                <div className="text-[11px] text-text-dim leading-relaxed">
-                                  {ns.instruction}
-                                </div>
-                                <div
-                                  className="text-[10px] mt-1"
-                                  style={{ color: "#14b8a6" }}
-                                >
-                                  {"\uD83D\uDEE1\uFE0F"} {ns.safety}
-                                </div>
-                              </>
-                            )}
-                          </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
             </div>
           );
         })}
