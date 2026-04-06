@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Badge from "@/components/badge";
+import EquipmentSwapPanel from "@/components/equipment-swap-panel";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
+import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
 
 interface ExerciseRowProps {
   name: string;
@@ -12,12 +14,17 @@ interface ExerciseRowProps {
   onToggle: () => void;
   onSwap: (name: string) => void;
   onDiagram: (diagram: string) => void;
+  onOpenDiagram?: (diagramId: string) => void;
   unavailable: boolean;
   equipment: Record<string, boolean>;
   workoutExercises?: string[];
   variantSetupCues?: string[];
   variantLabel?: string;
   supplementSlot?: React.ReactNode;
+  editSlot?: React.ReactNode;
+  selectedVariantId?: string | null;
+  onSelectVariant?: (id: string) => void;
+  editMode?: boolean;
 }
 
 export default function ExerciseRow({
@@ -28,14 +35,28 @@ export default function ExerciseRow({
   onToggle,
   onSwap,
   onDiagram,
+  onOpenDiagram,
   unavailable,
   equipment,
   workoutExercises = [],
   variantSetupCues,
   variantLabel,
   supplementSlot,
+  editSlot,
+  selectedVariantId,
+  onSelectVariant,
+  editMode = true,
 }: ExerciseRowProps) {
+  const [swapOpen, setSwapOpen] = useState(false);
+  useEffect(() => { if (!editMode) setSwapOpen(false); }, [editMode]);
+
   if (!ex) return null;
+
+  const showInstructions = editMode && !swapOpen;
+  const showSwap = editMode && swapOpen;
+  const hasSwapOptions =
+    (ex.swaps && ex.swaps.length > 0) ||
+    (ex.machineVariants && ex.machineVariants.length > 0);
 
   const safetyColor =
     ex.safety === "caution"
@@ -111,6 +132,8 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="section-content px-3.5 pb-4">
+          {/* Equipment picker — top of card in edit mode */}
+          {editSlot && <div className="mb-3">{editSlot}</div>}
           {/* Superset cards — rendered first so they're the first thing seen on expand */}
           {supplementSlot}
 
@@ -134,7 +157,7 @@ export default function ExerciseRow({
             )}
           </div>
 
-          <div className="text-[13px] leading-relaxed space-y-3">
+          {showInstructions && <div className="text-[13px] leading-relaxed space-y-3">
             {/* SETUP */}
             <div>
               <div className="font-bold text-accent mb-1 text-[11px] uppercase tracking-wide">
@@ -186,8 +209,23 @@ export default function ExerciseRow({
               <div className="text-text-dim">{ex.why}</div>
             </div>
 
-            {/* Diagram button */}
-            {ex.diagram && (
+            {/* Diagram button — gallery takes priority over legacy modal */}
+            {EXERCISE_TO_DIAGRAM[ex.id] ? (
+              <button
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onOpenDiagram?.(EXERCISE_TO_DIAGRAM[ex.id]);
+                }}
+                data-testid="view-diagram"
+                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150"
+                style={{
+                  background: "var(--color-accent)11",
+                  border: "1px solid var(--color-accent)33",
+                }}
+              >
+                {"\u{1F4D0}"} View Movement Diagram
+              </button>
+            ) : ex.diagram && (
               <button
                 onClick={(ev) => {
                   ev.stopPropagation();
@@ -255,10 +293,10 @@ export default function ExerciseRow({
                 })}
               </div>
             )}
-          </div>
+          </div>}
 
           {/* Equipment chips */}
-          {ex.requires.length > 0 && (
+          {showInstructions && ex.requires.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
               {ex.requires.map((eq) => {
                 const eqData = EQUIPMENT[eq];
@@ -286,42 +324,37 @@ export default function ExerciseRow({
             </div>
           )}
 
-          {/* Swap buttons */}
-          {ex.swaps && ex.swaps.length > 0 && (() => {
-            const availableSwaps = ex.swaps.filter(
-              (sw) => !workoutExercises.includes(sw) || sw === name
-            );
-            if (availableSwaps.length === 0) return null;
-            return (
-            <div className="mt-3">
-              <div className="text-[11px] font-bold text-text-muted mb-2 uppercase tracking-wider">
-                Swap for:
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {availableSwaps.map((sw) => {
-                  return (
-                    <button
-                      key={sw}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        onSwap(sw);
-                      }}
-                      className="text-[12px] rounded-lg cursor-pointer font-[inherit] min-h-[44px] transition-colors duration-150"
-                      style={{
-                        padding: "8px 12px",
-                        background: "var(--color-accent)" + "15",
-                        color: "var(--color-accent)",
-                        border: `1px solid var(--color-accent)33`,
-                      }}
-                    >
-                      {sw}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            );
-          })()}
+          {/* Equipment toggle + swap panel (edit mode only) */}
+          {hasSwapOptions && editMode && (
+            <>
+              <button
+                onClick={(ev) => { ev.stopPropagation(); setSwapOpen((v) => !v); }}
+                className="mt-3 w-full p-2.5 rounded-xl cursor-pointer font-[inherit] flex items-center justify-between text-[12px] font-semibold min-h-[44px] transition-all duration-150"
+                style={{
+                  background: swapOpen ? "var(--color-accent)15" : "var(--color-bg)",
+                  border: `1px solid ${swapOpen ? "var(--color-accent)55" : "var(--color-border)"}`,
+                  color: swapOpen ? "var(--color-accent)" : "var(--color-text-muted)",
+                }}
+              >
+                <span>🔄 Equipment &amp; Alternatives</span>
+                <span
+                  className="text-[10px] transition-transform duration-200"
+                  style={{ transform: swapOpen ? "rotate(180deg)" : "none" }}
+                >▼</span>
+              </button>
+              {showSwap && (
+                <EquipmentSwapPanel
+                  currentName={name}
+                  currentExercise={ex}
+                  onSwap={onSwap}
+                  equipment={equipment}
+                  workoutExercises={workoutExercises}
+                  selectedVariantId={selectedVariantId}
+                  onSelectVariant={onSelectVariant}
+                />
+              )}
+            </>
+          )}
 
           {/* Rest timer button */}
           {ex.rest > 0 && (

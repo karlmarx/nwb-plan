@@ -21,7 +21,7 @@ function pad(n: number): string {
   return n < 10 ? "0" + n : "" + n;
 }
 
-export default function ProgressClock() {
+export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
   const [now, setNow] = useState(() => new Date());
   const [countdown, setCountdown] = useState(false);
   const [flash, setFlash] = useState(false);
@@ -81,6 +81,51 @@ export default function ProgressClock() {
     setCountdown((v) => !v);
     setFlash(true);
     setTimeout(() => setFlash(false), 300);
+  }
+
+  // ===== COMPACT RING (v2) =====
+  if (compact) {
+    const size = 44;
+    const strokeW = 3.5;
+    const r = (size - strokeW) / 2;
+    const circ = 2 * Math.PI * r;
+    const offset = circ * (1 - progress);
+    return (
+      <div
+        data-testid="progress-ring"
+        onClick={handleClick}
+        className="relative cursor-pointer"
+        style={{ width: size, height: size }}
+        title={`${countdown ? "Remaining" : "Elapsed"}: ${t.d}d ${pad(t.h)}h ${pad(t.m)}m · ${pctDisplay}`}
+      >
+        <svg width={size} height={size} className="block" style={{ transform: "rotate(-90deg)" }}>
+          <circle
+            cx={size / 2} cy={size / 2} r={r}
+            fill="none"
+            stroke="var(--color-border)"
+            strokeWidth={strokeW}
+          />
+          <circle
+            cx={size / 2} cy={size / 2} r={r}
+            fill="none"
+            stroke={clrHex}
+            strokeWidth={strokeW}
+            strokeLinecap="round"
+            strokeDasharray={circ}
+            strokeDashoffset={offset}
+            style={{ transition: "stroke-dashoffset 1s linear" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-[10px] font-extrabold leading-none" style={{ color: clr }}>
+            W{weekNum}
+          </span>
+          <span className="text-[8px] font-bold text-text-muted leading-none mt-0.5">
+            D{totalDayNum}
+          </span>
+        </div>
+      </div>
+    );
   }
 
   // ===== MINIMIZED STATE =====

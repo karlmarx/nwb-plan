@@ -164,8 +164,157 @@ export function CableKickback({ t }: AnimProps) {
   );
 }
 
+// Seated front-view hip abduction with loop band around knees
+export function SeatedHipAbduction({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const open = Math.sin(phase * Math.PI * 0.5);
+  const floorY = 240;
+  // Bench
+  const benchX = 110, benchY = 175, benchW = 180, benchH = 12;
+  // Seated figure (front view)
+  const cx = 200;
+  const headY = 95;
+  const shY = 125;
+  const hipY = benchY; // sitting on bench
+  // Knees splay outward
+  const lKneeX = cx - 22 - open * 22;
+  const rKneeX = cx + 22 + open * 22;
+  const kneeY = 200;
+  // Feet stay roughly under knees (foot plant moves slightly with knee)
+  const lFootX = cx - 28 - open * 24;
+  const rFootX = cx + 28 + open * 24;
+  return (
+    <g>
+      <Floor y={floorY} />
+      {/* Bench */}
+      <rect x={benchX} y={benchY} width={benchW} height={benchH} rx="2" fill={C.equipment} />
+      <rect x={benchX + 10} y={benchY + benchH} width="6" height={floorY - benchY - benchH} fill={C.equipLight} />
+      <rect x={benchX + benchW - 16} y={benchY + benchH} width="6" height={floorY - benchY - benchH} fill={C.equipLight} />
+      {/* Head */}
+      <circle cx={cx} cy={headY} r="14" fill="none" stroke={C.body} strokeWidth="3" />
+      {/* Torso (slight lean OK, here upright) */}
+      <line x1={cx} y1={headY + 14} x2={cx} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={cx} y1={shY} x2={cx} y2={hipY - 5} stroke={C.body} strokeWidth="6" strokeLinecap="round" />
+      {/* Shoulders */}
+      <line x1={cx - 22} y1={shY} x2={cx + 22} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      {/* Arms hanging at sides (hands set band, then rest) */}
+      <line x1={cx - 22} y1={shY} x2={cx - 30} y2={shY + 35} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      <line x1={cx + 22} y1={shY} x2={cx + 30} y2={shY + 35} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      {/* Hip joint marker */}
+      <circle cx={cx} cy={hipY} r="4" fill={C.body} />
+      {/* RIGHT thigh (active) */}
+      <line x1={cx + 4} y1={hipY} x2={rKneeX} y2={kneeY} stroke={C.active} strokeWidth="7" strokeLinecap="round" />
+      {/* RIGHT shin */}
+      <line x1={rKneeX} y1={kneeY} x2={rFootX} y2={floorY - 4} stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx={rFootX + 3} cy={floorY - 2} rx="9" ry="3" fill={C.active} />
+      {/* LEFT thigh (passive — red dashed) */}
+      <line x1={cx - 4} y1={hipY} x2={lKneeX} y2={kneeY} stroke={C.leftLeg} strokeWidth="6" strokeLinecap="round" strokeDasharray="6,3" opacity="0.7" />
+      <line x1={lKneeX} y1={kneeY} x2={lFootX} y2={floorY - 4} stroke={C.leftLeg} strokeWidth="5" strokeLinecap="round" strokeDasharray="6,3" opacity="0.7" />
+      <ellipse cx={lFootX - 3} cy={floorY - 2} rx="9" ry="3" fill="none" stroke={C.leftLeg} strokeWidth="2" strokeDasharray="3,2" opacity="0.6" />
+      {/* Loop band around knees — stretches as knees open */}
+      <ellipse
+        cx={cx}
+        cy={kneeY - 3}
+        rx={26 + open * 22}
+        ry={6}
+        fill="none"
+        stroke={C.strap}
+        strokeWidth={3 + open * 1.5}
+        opacity={0.85}
+      />
+      {/* Glute med activation glow on RIGHT */}
+      <circle cx={cx + 14} cy={hipY - 4} r="11" fill={C.active} opacity={open * 0.35} />
+      {open > 0.4 && (
+        <text x={cx + 28} y={hipY - 6} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">glute med</text>
+      )}
+      {/* Direction arrows when pressing out */}
+      {open > 0.2 && (
+        <>
+          <text x={lKneeX - 18} y={kneeY + 4} fontSize="14" fill={C.active} fontWeight="bold">{"\u2190"}</text>
+          <text x={rKneeX + 6} y={kneeY + 4} fontSize="14" fill={C.active} fontWeight="bold">{"\u2192"}</text>
+        </>
+      )}
+      {/* Hip flexion angle label */}
+      <text x={cx - 60} y={hipY - 12} fontSize="9" fill={C.label} fontFamily="monospace">{"~80\u00B0 hip"}</text>
+      {/* Left leg passive label */}
+      <text x={lFootX - 25} y={floorY + 12} fontSize="8" fill={C.leftLeg} fontFamily="monospace">L passive</text>
+    </g>
+  );
+}
+
+// Seated front-view hip adduction — knees squeeze inward against band
+export function SeatedHipAdduction({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const squeeze = Math.sin(phase * Math.PI * 0.5);
+  const floorY = 240;
+  const benchX = 110, benchY = 175, benchW = 180, benchH = 12;
+  const cx = 200;
+  const headY = 95;
+  const shY = 125;
+  const hipY = benchY;
+  // Start wide (~44 apart), squeeze toward 6 apart
+  const startSpread = 36;
+  const endSpread = 8;
+  const spread = startSpread - squeeze * (startSpread - endSpread);
+  const lKneeX = cx - spread;
+  const rKneeX = cx + spread;
+  const kneeY = 200;
+  const lFootX = cx - spread - 6;
+  const rFootX = cx + spread + 6;
+  return (
+    <g>
+      <Floor y={floorY} />
+      <rect x={benchX} y={benchY} width={benchW} height={benchH} rx="2" fill={C.equipment} />
+      <rect x={benchX + 10} y={benchY + benchH} width="6" height={floorY - benchY - benchH} fill={C.equipLight} />
+      <rect x={benchX + benchW - 16} y={benchY + benchH} width="6" height={floorY - benchY - benchH} fill={C.equipLight} />
+      <circle cx={cx} cy={headY} r="14" fill="none" stroke={C.body} strokeWidth="3" />
+      <line x1={cx} y1={headY + 14} x2={cx} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={cx} y1={shY} x2={cx} y2={hipY - 5} stroke={C.body} strokeWidth="6" strokeLinecap="round" />
+      <line x1={cx - 22} y1={shY} x2={cx + 22} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={cx - 22} y1={shY} x2={cx - 30} y2={shY + 35} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      <line x1={cx + 22} y1={shY} x2={cx + 30} y2={shY + 35} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={cx} cy={hipY} r="4" fill={C.body} />
+      {/* RIGHT thigh active */}
+      <line x1={cx + 4} y1={hipY} x2={rKneeX} y2={kneeY} stroke={C.active} strokeWidth="7" strokeLinecap="round" />
+      <line x1={rKneeX} y1={kneeY} x2={rFootX} y2={floorY - 4} stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx={rFootX + 3} cy={floorY - 2} rx="9" ry="3" fill={C.active} />
+      {/* LEFT passive */}
+      <line x1={cx - 4} y1={hipY} x2={lKneeX} y2={kneeY} stroke={C.leftLeg} strokeWidth="6" strokeLinecap="round" strokeDasharray="6,3" opacity="0.7" />
+      <line x1={lKneeX} y1={kneeY} x2={lFootX} y2={floorY - 4} stroke={C.leftLeg} strokeWidth="5" strokeLinecap="round" strokeDasharray="6,3" opacity="0.7" />
+      <ellipse cx={lFootX - 3} cy={floorY - 2} rx="9" ry="3" fill="none" stroke={C.leftLeg} strokeWidth="2" strokeDasharray="3,2" opacity="0.6" />
+      {/* Loop band — taut even when squeezed */}
+      <ellipse
+        cx={cx}
+        cy={kneeY - 3}
+        rx={spread + 4}
+        ry={6}
+        fill="none"
+        stroke={C.strap}
+        strokeWidth={3 + (1 - squeeze) * 1.5}
+        opacity={0.85}
+      />
+      {/* Adductor activation glow between thighs */}
+      <ellipse cx={cx} cy={hipY + 18} rx={10 + squeeze * 4} ry={6} fill={C.active} opacity={squeeze * 0.35} />
+      {squeeze > 0.4 && (
+        <text x={cx + 16} y={hipY + 22} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">adductors</text>
+      )}
+      {/* Direction arrows when squeezing */}
+      {squeeze > 0.2 && (
+        <>
+          <text x={lKneeX - 14} y={kneeY + 4} fontSize="14" fill={C.active} fontWeight="bold">{"\u2192"}</text>
+          <text x={rKneeX + 4} y={kneeY + 4} fontSize="14" fill={C.active} fontWeight="bold">{"\u2190"}</text>
+        </>
+      )}
+      <text x={cx - 60} y={hipY - 12} fontSize="9" fill={C.label} fontFamily="monospace">{"~80\u00B0 hip"}</text>
+      <text x={lFootX - 25} y={floorY + 12} fontSize="8" fill={C.leftLeg} fontFamily="monospace">L passive</text>
+    </g>
+  );
+}
+
 export const GLUTE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   g1: GluteBridge,
   g2: BandedClamshell,
   g3: CableKickback,
+  g4: SeatedHipAbduction,
+  g5: SeatedHipAdduction,
 };
