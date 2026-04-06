@@ -437,12 +437,13 @@ export default function DiagramModal({ diagram, onClose }: DiagramModalProps) {
 
   return (
     <div
-      className="diagram-modal"
+      className="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden"
+      style={{ background: "var(--color-bg)" }}
       onClick={(ev: React.MouseEvent<HTMLDivElement>) => {
         if (ev.target === ev.currentTarget) onClose();
       }}
     >
-      <div className="diagram-sheet">
+      <div className="mx-auto max-w-3xl">
         <DiagramComponent onClose={onClose} />
       </div>
     </div>
