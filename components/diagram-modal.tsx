@@ -2,7 +2,6 @@
 
 import React from "react";
 import CoreDemoGuide from "@/components/core-demo-guide";
-import { GluteBridgeDiagram, ClamshellDiagram } from "@/components/exercise-diagrams";
 
 interface DiagramProps {
   onClose: () => void;
@@ -425,8 +424,6 @@ export const DIAGRAMS: Record<string, DiagramComponent> = {
   planche: PlancheDiagram,
   sideplank: SidePlankDiagram,
   "core-demos": CoreDemoGuide,
-  gluteBridge: GluteBridgeDiagram,
-  clamshells: ClamshellDiagram,
 };
 
 interface DiagramModalProps {

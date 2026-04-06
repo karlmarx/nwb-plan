@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Badge from "@/components/badge";
 import EquipmentSwapPanel from "@/components/equipment-swap-panel";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
+import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
 
 interface ExerciseRowProps {
   name: string;
@@ -13,12 +14,14 @@ interface ExerciseRowProps {
   onToggle: () => void;
   onSwap: (name: string) => void;
   onDiagram: (diagram: string) => void;
+  onOpenDiagram?: (diagramId: string) => void;
   unavailable: boolean;
   equipment: Record<string, boolean>;
   workoutExercises?: string[];
   variantSetupCues?: string[];
   variantLabel?: string;
   supplementSlot?: React.ReactNode;
+  editSlot?: React.ReactNode;
   selectedVariantId?: string | null;
   onSelectVariant?: (id: string) => void;
   editMode?: boolean;
@@ -32,12 +35,14 @@ export default function ExerciseRow({
   onToggle,
   onSwap,
   onDiagram,
+  onOpenDiagram,
   unavailable,
   equipment,
   workoutExercises = [],
   variantSetupCues,
   variantLabel,
   supplementSlot,
+  editSlot,
   selectedVariantId,
   onSelectVariant,
   editMode = true,
@@ -127,6 +132,8 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="section-content px-3.5 pb-4">
+          {/* Equipment picker — top of card in edit mode */}
+          {editSlot && <div className="mb-3">{editSlot}</div>}
           {/* Superset cards — rendered first so they're the first thing seen on expand */}
           {supplementSlot}
 
@@ -202,8 +209,23 @@ export default function ExerciseRow({
               <div className="text-text-dim">{ex.why}</div>
             </div>
 
-            {/* Diagram button */}
-            {ex.diagram && (
+            {/* Diagram button — gallery takes priority over legacy modal */}
+            {EXERCISE_TO_DIAGRAM[ex.id] ? (
+              <button
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onOpenDiagram?.(EXERCISE_TO_DIAGRAM[ex.id]);
+                }}
+                data-testid="view-diagram"
+                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150"
+                style={{
+                  background: "var(--color-accent)11",
+                  border: "1px solid var(--color-accent)33",
+                }}
+              >
+                {"\u{1F4D0}"} View Movement Diagram
+              </button>
+            ) : ex.diagram && (
               <button
                 onClick={(ev) => {
                   ev.stopPropagation();
