@@ -112,6 +112,24 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Admin Tools */}
+        <div className="bg-card border border-border rounded-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text mb-3">Admin Tools</h2>
+          <a
+            href="/admin/hevy"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-bg border border-border hover:border-accent transition-colors"
+          >
+            <span className="text-xl">🏋️</span>
+            <div>
+              <div className="text-sm font-semibold text-text">Hevy Sync</div>
+              <div className="text-xs text-text-muted">
+                Map exercises and sync routines to Hevy
+              </div>
+            </div>
+            <span className="ml-auto text-text-muted text-sm">→</span>
+          </a>
+        </div>
+
         {/* Error Display */}
         {error && (
           <div className="bg-danger-bg border border-danger-border rounded-lg p-4 mb-6">
