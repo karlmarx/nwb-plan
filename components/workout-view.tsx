@@ -1769,7 +1769,7 @@ export default function WorkoutView() {
       setUpperFilter,
       "#a78bfa",
       "Exercise Diagram Gallery",
-      "35+ animated diagrams \u00B7 arm balance, TRX, equipment",
+      "Push, pull, legs, core, recovery \u00B7 animated diagrams",
     );
   }
 
@@ -1780,7 +1780,7 @@ export default function WorkoutView() {
       setLowerFilter,
       "#10b981",
       "Exercise Diagram Gallery",
-      "Glute bridges, clamshells, yoga \u00B7 animated diagrams",
+      "Push, pull, legs, core, recovery \u00B7 animated diagrams",
     );
   }
 
@@ -1938,7 +1938,7 @@ export default function WorkoutView() {
                 Core Diagram Gallery
               </div>
               <div className="text-[10px] text-text-dim">
-                TRX, supine, prone, rack core &middot; animated diagrams
+                Push, pull, legs, core, recovery &middot; animated diagrams
               </div>
             </div>
             <span className="ml-auto text-text-muted text-xs">&rarr;</span>

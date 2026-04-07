@@ -15,20 +15,17 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { key: "rack", label: "Rack Core", accent: "#f39c12" },
-  { key: "supine", label: "Supine", accent: "#2ecc71" },
-  { key: "prone", label: "Prone / Box", accent: "#e67e22" },
-  { key: "glute", label: "Glute", accent: "#48c78e" },
-  { key: "trx", label: "TRX", accent: "#3498db" },
-  { key: "arm", label: "Arm Balance", accent: "#a78bfa" },
-  { key: "yoga", label: "Yoga", accent: "#1abc9c" },
-  { key: "equip", label: "Equipment", accent: "#95a5a6" },
+  { key: "push", label: "Push", accent: "#3498db" },
+  { key: "pull", label: "Pull", accent: "#a78bfa" },
+  { key: "legs", label: "Legs", accent: "#48c78e" },
+  { key: "core", label: "Core", accent: "#f39c12" },
+  { key: "recovery", label: "Recovery", accent: "#1abc9c" },
 ];
 
 export const EXERCISES: ExerciseDiagram[] = [
-  // ── RACK CORE ──
+  // ── RACK / FREE-WEIGHT CORE → core tab ──
   {
-    id: "r1", category: "rack", name: "Landmine Rotations",
+    id: "r1", category: "core", name: "Landmine Rotations",
     target: "Anti-Rotation / Obliques",
     cues: [
       "Insert barbell into landmine or corner. Stand on RIGHT leg, grip end with both hands.",
@@ -40,7 +37,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Barbell", "Landmine"],
   },
   {
-    id: "r2", category: "rack", name: "Plate Halos",
+    id: "r2", category: "core", name: "Plate Halos",
     target: "Shoulder Mobility / Core Stability",
     cues: [
       "Hold plate at chest height. Circle it around your head in a smooth orbit.",
@@ -52,7 +49,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plate"],
   },
   {
-    id: "r3", category: "rack", name: "Barbell Rollouts",
+    id: "r3", category: "core", name: "Barbell Rollouts",
     target: "Anti-Extension / Deep Core",
     cues: [
       "Kneel on RIGHT knee, grip barbell with plates that roll.",
@@ -64,7 +61,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Barbell"],
   },
   {
-    id: "r4", category: "rack", name: "Suitcase Hold",
+    id: "r4", category: "core", name: "Suitcase Hold",
     target: "Anti-Lateral Flexion / Obliques",
     cues: [
       "Hold heavy dumbbell/kettlebell in one hand at your side.",
@@ -76,7 +73,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Dumbbell"],
   },
   {
-    id: "r5", category: "rack", name: "Overhead Plate Hold",
+    id: "r5", category: "core", name: "Overhead Plate Hold",
     target: "Overhead Stability / Anti-Extension",
     cues: [
       "Press plate directly overhead with both arms locked out.",
@@ -88,7 +85,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plate"],
   },
   {
-    id: "r6", category: "rack", name: "McGill Curl-Up",
+    id: "r6", category: "core", name: "McGill Curl-Up",
     target: "Upper Abs / McGill Big 3",
     cues: [
       "Lie on back. Hands under lumbar curve as a monitoring system.",
@@ -99,7 +96,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Tiny range of motion. If the arch disappears into your hands, you went too high. Left leg stays straight and passive.",
   },
   {
-    id: "r7", category: "rack", name: "Stir the Pot",
+    id: "r7", category: "core", name: "Stir the Pot",
     target: "Anti-Rotation / Anti-Extension / Core",
     cues: [
       "Forearms on stability ball. RIGHT foot or knee on ground.",
@@ -111,9 +108,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Stability Ball"],
   },
 
-  // ── SUPINE ──
+  // ── SUPINE → core tab ──
   {
-    id: "s1", category: "supine", name: "Cross-Body Reach",
+    id: "s1", category: "core", name: "Cross-Body Reach",
     target: "Thoracic Rotation / Obliques",
     cues: [
       "Lie supine, arms at sides. Both legs flat.",
@@ -124,7 +121,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Left leg stays completely flat — zero hip flexor activation.",
   },
   {
-    id: "s2", category: "supine", name: "Supine Side Bend",
+    id: "s2", category: "core", name: "Supine Side Bend",
     target: "Lateral Flexion / Obliques",
     cues: [
       "Lie supine, arms at sides. Both legs flat.",
@@ -135,7 +132,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "No hip involvement. Pure trunk lateral flexion.",
   },
   {
-    id: "s3", category: "supine", name: "Knee Drop + Return",
+    id: "s3", category: "core", name: "Knee Drop + Return",
     target: "Oblique Control / Anti-Rotation",
     cues: [
       "Right knee bent, foot flat. Left leg flat and passive.",
@@ -146,7 +143,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Left leg flat & passive. Only RIGHT knee moves. Oblique work is pulling it BACK.",
   },
   {
-    id: "s5", category: "supine", name: "Dead Bug (R Only)",
+    id: "s5", category: "core", name: "Dead Bug (R Only)",
     target: "Anti-Extension / Contralateral Control",
     cues: [
       "Lie supine. Left arm and left leg are dead weight on the floor.",
@@ -157,9 +154,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Left arm & left leg are dead weight the entire time. Zero left hip flexion.",
   },
 
-  // ── PRONE / PLYO BOX ──
+  // ── PRONE / PLYO BOX → split: legs (p1, p6), pull (p2, p3, p4), core (p5) ──
   {
-    id: "p1", category: "prone", name: "Prone Hip Extension (R)",
+    id: "p1", category: "legs", name: "Prone Hip Extension (R)",
     target: "Glute Max / Hip Extension",
     cues: [
       "Lie prone on plyo box, hips at edge. Grip box sides.",
@@ -171,7 +168,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plyo Box"],
   },
   {
-    id: "p2", category: "prone", name: "Prone Y-T-W Raises",
+    id: "p2", category: "pull", name: "Prone Y-T-W Raises",
     target: "Posterior Shoulder / Scapular Stability",
     cues: [
       "Lie prone on box, arms hanging down. Thumbs up.",
@@ -183,7 +180,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plyo Box"],
   },
   {
-    id: "p3", category: "prone", name: "Prone Back Extension",
+    id: "p3", category: "pull", name: "Prone Back Extension",
     target: "Erector Spinae / Posterior Chain",
     cues: [
       "Lie prone on box, hips at edge, feet anchored or hanging.",
@@ -195,7 +192,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plyo Box"],
   },
   {
-    id: "p4", category: "prone", name: "Prone Single-Arm Reach",
+    id: "p4", category: "pull", name: "Prone Single-Arm Reach",
     target: "Anti-Rotation / Shoulder Stability",
     cues: [
       "Lie prone on box, both arms hanging. Core braced.",
@@ -207,7 +204,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plyo Box"],
   },
   {
-    id: "p5", category: "prone", name: "Bird-Dog (Prone Bench)",
+    id: "p5", category: "core", name: "Bird-Dog (Prone Bench)",
     target: "Glute / Core — Anti-Rotation",
     cues: [
       "Face-down on bench. Hips at bench edge so legs hang free.",
@@ -219,7 +216,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Bench"],
   },
   {
-    id: "p6", category: "prone", name: "Prone Ham Curl (R)",
+    id: "p6", category: "legs", name: "Prone Ham Curl (R)",
     target: "Hamstring — Eccentric Focus",
     cues: [
       "Lie face-down on prone ham curl machine. RIGHT leg only on the pad.",
@@ -231,9 +228,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Ham Curl Machine"],
   },
 
-  // ── GLUTE ──
+  // ── GLUTE / RIGHT-LEG STRENGTH → legs tab ──
   {
-    id: "g1", category: "glute", name: "SL Glute Bridge (R)",
+    id: "g1", category: "legs", name: "SL Glute Bridge (R)",
     target: "Glute Max / Hip Extension",
     cues: [
       "Lie supine. RIGHT knee bent, foot flat. Left knee bent, foot hovering.",
@@ -244,7 +241,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Left foot hovers — do NOT rest it on floor. Zero left hip flexor engagement.",
   },
   {
-    id: "g2", category: "glute", name: "Banded Clamshells",
+    id: "g2", category: "legs", name: "Banded Clamshells",
     target: "Glute Med / Hip Abduction",
     cues: [
       "Side-lying, knees bent ~45°. Band above knees.",
@@ -256,7 +253,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Resistance Band"],
   },
   {
-    id: "g3", category: "glute", name: "Cable Kickback (R)",
+    id: "g3", category: "legs", name: "Cable Kickback (R)",
     target: "Glute Max / Isolated Hip Extension",
     cues: [
       "Ankle strap on RIGHT ankle. Face the cable stack.",
@@ -269,7 +266,7 @@ export const EXERCISES: ExerciseDiagram[] = [
   },
 
   {
-    id: "g4", category: "glute", name: "Seated Hip Abduction \u2014 Band",
+    id: "g4", category: "legs", name: "Seated Hip Abduction \u2014 Band",
     target: "Glute Medius / Lateral Hip",
     cues: [
       "Sit upright on a bench, hips at ~80\u00B0 (NEVER over 90\u00B0).",
@@ -281,7 +278,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Resistance Band", "Bench"],
   },
   {
-    id: "g5", category: "glute", name: "Seated Hip Adduction \u2014 Band",
+    id: "g5", category: "legs", name: "Seated Hip Adduction \u2014 Band",
     target: "Adductors / Inner Thigh",
     cues: [
       "Sit upright, hips at ~80\u00B0. Place loop band around both knees with HANDS only.",
@@ -293,7 +290,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Resistance Band", "Bench"],
   },
   {
-    id: "g6", category: "glute", name: "SL Hip Thrust (R)",
+    id: "g6", category: "legs", name: "SL Hip Thrust (R)",
     target: "Glute Max / Hip Extension",
     cues: [
       "Shoulders on bench edge. RIGHT foot flat on floor. Left leg extended forward.",
@@ -305,7 +302,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Bench", "Barbell"],
   },
   {
-    id: "g7", category: "glute", name: "SL Leg Press (R)",
+    id: "g7", category: "legs", name: "SL Leg Press (R)",
     target: "Quad / Glute \u2014 Cross-Education",
     cues: [
       "Sit in leg press. RIGHT foot HIGH on plate. Left foot off the machine entirely.",
@@ -317,7 +314,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Leg Press"],
   },
   {
-    id: "g8", category: "glute", name: "Hack Squat (R)",
+    id: "g8", category: "legs", name: "Hack Squat (R)",
     target: "Quad / Glute \u2014 Squat Pattern",
     cues: [
       "Step into hack squat with RIGHT foot on platform. Left leg off to the side.",
@@ -329,7 +326,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Hack Squat Machine"],
   },
   {
-    id: "g9", category: "glute", name: "Low-Box Step-Up (R)",
+    id: "g9", category: "legs", name: "Low-Box Step-Up (R)",
     target: "Functional Strength / Balance",
     cues: [
       "Box BELOW knee height. RIGHT foot on top. Dumbbells at sides.",
@@ -341,7 +338,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Plyo Box", "Dumbbells"],
   },
   {
-    id: "g10", category: "glute", name: "Stab Ball Ham Curl (R)",
+    id: "g10", category: "legs", name: "Stab Ball Ham Curl (R)",
     target: "Hamstring / Glute Connection",
     cues: [
       "Lie on back. RIGHT heel on stability ball.",
@@ -353,9 +350,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Stability Ball"],
   },
 
-  // ── TRX ──
+  // ── TRX → split: pull (t3 row), core (others) ──
   {
-    id: "t1", category: "trx", name: "TRX Pallof Press",
+    id: "t1", category: "core", name: "TRX Pallof Press",
     target: "Anti-Rotation / Core Stability",
     cues: [
       "Stand sideways to anchor on RIGHT leg. Handles at chest.",
@@ -367,7 +364,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t2", category: "trx", name: "TRX Standing Rollout",
+    id: "t2", category: "core", name: "TRX Standing Rollout",
     target: "Anti-Extension / Core",
     cues: [
       "Face away from anchor on RIGHT leg.",
@@ -379,7 +376,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t3", category: "trx", name: "TRX Single-Arm Row",
+    id: "t3", category: "pull", name: "TRX Single-Arm Row",
     target: "Anti-Rotation / Unilateral Pull",
     cues: [
       "Face anchor on RIGHT leg. Row one arm at a time.",
@@ -391,7 +388,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t4", category: "trx", name: "TRX Kneeling Rollout",
+    id: "t4", category: "core", name: "TRX Kneeling Rollout",
     target: "Anti-Extension / Deep Core",
     cues: [
       "RIGHT knee on pad, hands in straps.",
@@ -403,7 +400,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t5", category: "trx", name: "TRX Kneeling Chop",
+    id: "t5", category: "core", name: "TRX Kneeling Chop",
     target: "Rotational Core / Obliques",
     cues: [
       "RIGHT knee on pad. Hold handles.",
@@ -415,7 +412,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t6", category: "trx", name: "TRX Body Saw",
+    id: "t6", category: "core", name: "TRX Body Saw",
     target: "Anti-Extension / Dynamic Plank",
     cues: [
       "RIGHT foot in strap, forearm plank.",
@@ -427,7 +424,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "t7", category: "trx", name: "TRX Side Plank",
+    id: "t7", category: "core", name: "TRX Side Plank",
     target: "Oblique Endurance / Lateral Core",
     cues: [
       "RIGHT foot in strap, right forearm down.",
@@ -439,9 +436,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
 
-  // ── ARM BALANCE PREP ──
+  // ── ARM BALANCE PREP → split: push (a5 lean, a6 protraction), core (others) ──
   {
-    id: "a1", category: "arm", name: "TRX Knee Tuck (Fig-4)",
+    id: "a1", category: "core", name: "TRX Knee Tuck (Fig-4)",
     target: "Lower Abs / Compression",
     cues: [
       "RIGHT foot in strap, left hooked fig-4 behind right calf.",
@@ -453,7 +450,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "a2", category: "arm", name: "TRX Body Saw (Fig-4)",
+    id: "a2", category: "core", name: "TRX Body Saw (Fig-4)",
     target: "Anti-Extension / Advanced Plank",
     cues: [
       "Same fig-4 hook setup as knee tuck.",
@@ -465,7 +462,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["TRX"],
   },
   {
-    id: "a3", category: "arm", name: "L-Sit Knee Tuck",
+    id: "a3", category: "core", name: "L-Sit Knee Tuck",
     target: "Compression Strength / Lower Abs",
     cues: [
       "Parallettes, support hold. Drive RIGHT knee up toward chest.",
@@ -477,7 +474,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Parallettes"],
   },
   {
-    id: "a4", category: "arm", name: "R-Leg L-Sit Hold",
+    id: "a4", category: "core", name: "R-Leg L-Sit Hold",
     target: "Compression / Hip Flexor Endurance",
     cues: [
       "Parallettes. Extend RIGHT leg to full L-sit.",
@@ -489,7 +486,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Parallettes"],
   },
   {
-    id: "a5", category: "arm", name: "Tuck Planche Lean",
+    id: "a5", category: "push", name: "Tuck Planche Lean",
     target: "Forward Lean / Shoulder Loading",
     cues: [
       "Parallettes. Right knee tucked, lean shoulders past hands.",
@@ -501,7 +498,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Parallettes"],
   },
   {
-    id: "a6", category: "arm", name: "Support Protraction",
+    id: "a6", category: "push", name: "Support Protraction",
     target: "Scapular Strength / Foundation",
     cues: [
       "Parallettes or rings. Straight arms, support hold.",
@@ -513,7 +510,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Parallettes"],
   },
   {
-    id: "a7", category: "arm", name: "Plank Knee Tuck (R only)",
+    id: "a7", category: "core", name: "Plank Knee Tuck (R only)",
     target: "Obliques / Right Hip Flexor",
     cues: [
       "Forearm plank on right knee. Left leg extended behind on mat, passive.",
@@ -524,9 +521,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Only the RIGHT knee moves. Left leg stays dead on the mat the entire time.",
   },
 
-  // ── YOGA ──
+  // ── YOGA → recovery tab ──
   {
-    id: "y1", category: "yoga", name: "Dolphin Pose",
+    id: "y1", category: "recovery", name: "Dolphin Pose",
     target: "Shoulder Flexion / Core",
     cues: [
       "Forearms on mat, shoulder width. Hips pike up like downward dog.",
@@ -537,7 +534,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Right foot bears weight. Left leg floats — zero ground contact.",
   },
   {
-    id: "y2", category: "yoga", name: "Warrior III (Modified)",
+    id: "y2", category: "recovery", name: "Warrior III (Modified)",
     target: "Balance / Posterior Chain",
     cues: [
       "Stand on RIGHT leg. Hinge forward at hip.",
@@ -548,7 +545,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "ALL weight on right leg. Left leg is passive counterweight — zero active extension.",
   },
   {
-    id: "y3", category: "yoga", name: "FeetUp Leg Lowers",
+    id: "y3", category: "recovery", name: "FeetUp Leg Lowers",
     target: "Core Control / Inversion Prep",
     cues: [
       "In FeetUp headstand trainer. Legs vertical.",
@@ -560,7 +557,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["FeetUp Trainer"],
   },
   {
-    id: "y4", category: "yoga", name: "Chair Pose (Wall)",
+    id: "y4", category: "recovery", name: "Chair Pose (Wall)",
     target: "Quad Endurance / Core Isometric",
     cues: [
       "Back against wall. Slide down to ~90° knee bend.",
@@ -571,9 +568,9 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Right leg only. Left foot hovers — zero weight bearing.",
   },
 
-  // ── EQUIPMENT ID ──
+  // ── EQUIPMENT-SPECIFIC → split: push (e1), core (e2), legs (e3, e4) ──
   {
-    id: "e1", category: "equip", name: "Pseudo Planche Push-Up",
+    id: "e1", category: "push", name: "Pseudo Planche Push-Up",
     target: "Anterior Delt / Chest / Forward Lean",
     cues: [
       "Parallettes near waist — much further back than normal push-up.",
@@ -585,7 +582,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Parallettes", "Box"],
   },
   {
-    id: "e2", category: "equip", name: "Side Plank Config",
+    id: "e2", category: "core", name: "Side Plank Config",
     target: "Right-Side-Down Only / Obliques",
     cues: [
       "Right side down ONLY — right elbow + right knee/foot bears weight.",
@@ -596,7 +593,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "NEVER go left-side-down. That loads the left femoral neck through elbow-hip-knee chain.",
   },
   {
-    id: "e3", category: "equip", name: "SL Leg Extension (R)",
+    id: "e3", category: "legs", name: "SL Leg Extension (R)",
     target: "Quad — Isolation",
     cues: [
       "Sit in leg extension machine. Pad against RIGHT shin. Left leg off the machine.",
@@ -608,7 +605,7 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Leg Extension Machine"],
   },
   {
-    id: "e4", category: "equip", name: "Nordic Ham Curl",
+    id: "e4", category: "legs", name: "Nordic Ham Curl",
     target: "Hamstring — Eccentric Gold Standard",
     cues: [
       "Kneel on a thick pad with feet anchored (heavy dumbbell, bench, or partner).",
