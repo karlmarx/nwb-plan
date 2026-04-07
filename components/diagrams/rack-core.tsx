@@ -185,10 +185,218 @@ export function OverheadPlateHold({ t }: AnimProps) {
   );
 }
 
+// r6 — Supine McGill curl-up. Tiny ROM — only head + shoulder blades lift.
+// RIGHT knee bent, foot flat. LEFT leg straight and passive on the floor.
+export function McGillCurlUp({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift  = Math.sin(phase * Math.PI * 0.5);
+  const hold  = phase > 0.4 && phase < 0.6 ? 1 : lift;
+
+  const floorY = 220;
+
+  // Supine: head at left, feet toward right
+  // Body lies mostly on the floor; only head/upper-shoulders animate up
+  const headX = 70;
+  const headY = floorY - 14 - hold * 4;   // lifts ~4px at peak (tiny ROM)
+
+  const neckX = headX + 12, neckY = floorY - 12 - hold * 3;
+  const shX   = headX + 30, shY   = floorY - 10 - hold * 2; // upper back lifts slightly
+  const midX  = headX + 70, midY  = floorY - 10;             // lower back stays flat
+  const hipX  = headX + 120, hipY = floorY - 10;
+
+  // Gap under lumbar arch (constant, represents natural arch)
+  const archY  = floorY - 5;   // floor reference
+  const lumbarX = midX + 20;   // centre of the arch indicator
+
+  // RIGHT knee bent — foot flat on floor
+  const rKneeX = hipX + 50, rKneeY = floorY - 40;
+  const rFootX = hipX + 80, rFootY = floorY;
+
+  // LEFT leg — straight, fully extended, flat on floor
+  const lFootX = hipX + 100, lFootY = floorY - 2;
+
+  // Hands under lumbar (monitoring position)
+  const hnd1X = lumbarX - 8, hnd1Y = floorY - 4;
+  const hnd2X = lumbarX + 8, hnd2Y = floorY - 4;
+
+  // Upper-ab activation glow
+  const glowCx = shX + 10, glowCy = shY - 5;
+
+  return (
+    <g>
+      {/* Floor */}
+      <line x1="30" y1={floorY} x2="370" y2={floorY} stroke={C.floor} strokeWidth="1" strokeDasharray="4,4" />
+      <rect x="30" y={floorY} width="340" height="4" fill={C.floorFill} opacity="0.5" />
+
+      {/* Hands under lumbar (draw before body so they look tucked under) */}
+      <circle cx={hnd1X} cy={hnd1Y} r="4" fill="none" stroke={C.body} strokeWidth="1.5" opacity="0.6" />
+      <circle cx={hnd2X} cy={hnd2Y} r="4" fill="none" stroke={C.body} strokeWidth="1.5" opacity="0.6" />
+
+      {/* Lumbar arch indicator */}
+      <path d={`M ${lumbarX - 15} ${floorY} Q ${lumbarX} ${archY - 5} ${lumbarX + 15} ${floorY}`}
+        fill="none" stroke={C.label} strokeWidth="1" strokeDasharray="3,2" opacity="0.6" />
+      <text x={lumbarX - 8} y={archY - 9} fontSize="8" fill={C.label} fontFamily="monospace" opacity="0.7">arch</text>
+
+      {/* Torso — lower back stays on floor, upper-back/head lifts */}
+      <line x1={hipX} y1={hipY} x2={midX} y2={midY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={midX} y1={midY} x2={shX} y2={shY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={shX} y1={shY} x2={neckX} y2={neckY}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Head */}
+      <circle cx={headX} cy={headY} r="12" fill="none" stroke={C.body} strokeWidth="2.5" />
+
+      {/* RIGHT leg — bent, foot flat (active/supporting side) */}
+      <line x1={hipX + 5} y1={hipY} x2={rKneeX} y2={rKneeY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY}
+        stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      <rect x={rFootX - 7} y={rFootY - 4} width="16" height="5" rx="2" fill={C.active} />
+      <text x={rKneeX + 6} y={rKneeY - 5} fontSize="11" fontWeight="bold"
+        fill={C.active} fontFamily="monospace">R</text>
+
+      {/* LEFT leg — straight, passive, flat on floor */}
+      <line x1={hipX - 4} y1={hipY + 2} x2={hipX + 55} y2={floorY - 2}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <line x1={hipX + 55} y1={floorY - 2} x2={lFootX} y2={lFootY}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <ellipse cx={lFootX + 4} cy={lFootY + 3} rx="7" ry="3"
+        fill="none" stroke={C.leftLeg} strokeWidth="1.5"
+        strokeDasharray="3,2" opacity="0.5" />
+      <text x={lFootX - 3} y={lFootY + 13} fontSize="10"
+        fill={C.leftLeg} fontFamily="monospace">L</text>
+
+      {/* Upper-ab activation glow */}
+      <circle cx={glowCx} cy={glowCy} r="13" fill={C.active} opacity={hold * 0.3} />
+
+      {/* Tiny ROM arrow (only visible when not at peak) */}
+      {hold < 0.35 && (
+        <text x={headX - 10} y={headY - 16} fontSize="9" fill={C.label}
+          fontFamily="monospace" opacity="0.7">tiny ROM</text>
+      )}
+
+      {/* HOLD at peak */}
+      {hold > 0.5 && (
+        <text x={shX - 5} y={shY - 16} fontSize="10" fontWeight="bold"
+          fill={C.active} fontFamily="monospace">HOLD</text>
+      )}
+    </g>
+  );
+}
+
+// r7 — Stir the Pot on stability ball. Continuous forearm circles.
+// RIGHT foot/knee grounded at back. LEFT leg extended behind, passive on mat.
+export function StirThePot({ t }: AnimProps) {
+  // Continuous circular motion — no ping-pong
+  const circX = Math.cos(t * Math.PI * 2);
+  const circY = Math.sin(t * Math.PI * 2);
+
+  const floorY = 220;
+
+  // Stability ball — centre of ball rests on floor
+  const ballCx = 155, ballCy = floorY - 28, ballR = 28;
+
+  // Forearms trace a small circle on top of the ball
+  const elbCx = ballCx + circX * 8;
+  const elbCy = ballCy - ballR + 4 + circY * 6;  // on top of ball surface, slightly moving
+
+  // Shoulder follows the forearm slightly (tiny wobble)
+  const shX = elbCx + 35, shY = elbCy - 25;
+  const hipX = shX + 60, hipY = shY + 8;
+  const hdX  = elbCx + 12, hdY = elbCy - 35;
+
+  // RIGHT foot/knee grounded — far right
+  const rKneeX = hipX + 40, rKneeY = floorY - 12;
+  const rFootX = hipX + 75, rFootY = floorY;
+
+  // LEFT leg — extended behind, flat on mat
+  const lThighX2 = hipX + 30, lThighY2 = floorY - 4;
+  const lFootX   = hipX + 90, lFootY   = floorY - 2;
+
+  // Rotation direction arrow near ball
+  const arrowAngle = t * 360; // full rotation label position
+  const arrowX = ballCx + 42, arrowY = ballCy - 10;
+  const isClockwise = circY > 0; // sin > 0 means going "down" side = CW in standard SVG coords
+
+  return (
+    <g>
+      {/* Floor / mat */}
+      <line x1="30" y1={floorY} x2="370" y2={floorY} stroke={C.floor} strokeWidth="1" strokeDasharray="4,4" />
+      <rect x="30" y={floorY} width="340" height="4" fill={C.floorFill} opacity="0.5" />
+
+      {/* Stability ball */}
+      <circle cx={ballCx} cy={ballCy} r={ballR}
+        fill={C.equipLight} stroke={C.equipment} strokeWidth="2" opacity="0.85" />
+      {/* Ball cross-hatch for texture */}
+      <ellipse cx={ballCx} cy={ballCy} rx={ballR * 0.9} ry={ballR * 0.5}
+        fill="none" stroke={C.equipment} strokeWidth="0.5" opacity="0.4" />
+      <line x1={ballCx} y1={ballCy - ballR + 2} x2={ballCx} y2={ballCy + ballR - 2}
+        stroke={C.equipment} strokeWidth="0.5" opacity="0.4" />
+
+      {/* Forearms on ball — trace the circle */}
+      {/* Left forearm */}
+      <line x1={elbCx - 8} y1={elbCy} x2={elbCx + 3} y2={elbCy - 2}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      {/* Right forearm */}
+      <line x1={elbCx + 3} y1={elbCy - 2} x2={elbCx + 16} y2={elbCy - 1}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Torso — plank line from elbows to hip */}
+      <line x1={elbCx + 10} y1={elbCy - 5} x2={shX} y2={shY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+
+      {/* Head */}
+      <circle cx={hdX} cy={hdY} r="10" fill="none" stroke={C.body} strokeWidth="2.5" />
+
+      {/* RIGHT foot/knee grounded (active side) */}
+      <line x1={hipX + 4} y1={hipY} x2={rKneeX} y2={rKneeY}
+        stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY}
+        stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      <rect x={rFootX - 7} y={rFootY - 4} width="16" height="5" rx="2" fill={C.active} />
+      <text x={rKneeX + 6} y={rKneeY - 5} fontSize="11" fontWeight="bold"
+        fill={C.active} fontFamily="monospace">R</text>
+
+      {/* LEFT leg — passive, flat on mat */}
+      <line x1={hipX - 4} y1={hipY + 2} x2={lThighX2} y2={lThighY2}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <line x1={lThighX2} y1={lThighY2} x2={lFootX} y2={lFootY}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <ellipse cx={lFootX + 4} cy={lFootY + 3} rx="7" ry="3"
+        fill="none" stroke={C.leftLeg} strokeWidth="1.5"
+        strokeDasharray="3,2" opacity="0.5" />
+      <text x={lFootX - 3} y={lFootY + 13} fontSize="10"
+        fill={C.leftLeg} fontFamily="monospace">L</text>
+
+      {/* Core anti-rotation / anti-extension glow on trunk */}
+      <ellipse cx={(shX + hipX) / 2} cy={(shY + hipY) / 2}
+        rx="10" ry="18" fill={C.active} opacity="0.22" />
+
+      {/* Rotation direction arrow near ball */}
+      <text x={arrowX} y={arrowY} fontSize="14" fontFamily="monospace"
+        fill={C.strap}>{isClockwise ? "↻" : "↺"}</text>
+
+      {/* "slow circles" label */}
+      <text x={ballCx - 24} y={ballCy + ballR + 16} fontSize="9"
+        fill={C.label} fontFamily="monospace">slow circles</text>
+    </g>
+  );
+}
+
 export const RACK_CORE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   r1: LandmineRotation,
   r2: PlateHalos,
   r3: BarbellRollout,
   r4: SuitcaseHold,
   r5: OverheadPlateHold,
+  r6: McGillCurlUp,
+  r7: StirThePot,
 };

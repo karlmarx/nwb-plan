@@ -87,6 +87,29 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Seated version eliminates all lower-body balance demand.",
     equipment: ["Plate"],
   },
+  {
+    id: "r6", category: "rack", name: "McGill Curl-Up",
+    target: "Upper Abs / McGill Big 3",
+    cues: [
+      "Lie on back. Hands under lumbar curve as a monitoring system.",
+      "RIGHT knee bent, left leg straight on floor.",
+      "Lift ONLY head and shoulder blades 2-3 inches off floor — 4s up, 5s HOLD, lower.",
+      "Lumbar spine stays in its natural arch throughout — NOT a crunch.",
+    ],
+    safetyNote: "Tiny range of motion. If the arch disappears into your hands, you went too high. Left leg stays straight and passive.",
+  },
+  {
+    id: "r7", category: "rack", name: "Stir the Pot",
+    target: "Anti-Rotation / Anti-Extension / Core",
+    cues: [
+      "Forearms on stability ball. RIGHT foot or knee on ground.",
+      "Left leg extended behind on mat, passive.",
+      "Slow forearm circles — clockwise, then counter-clockwise.",
+      "Make circles as large as you can control.",
+    ],
+    safetyNote: "Left leg rests on mat — if it tenses to stabilize, reposition. Ultimate integrated core challenge.",
+    equipment: ["Stability Ball"],
+  },
 
   // ── SUPINE ──
   {
@@ -183,6 +206,30 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Purely upper body anti-rotation. No leg activation needed.",
     equipment: ["Plyo Box"],
   },
+  {
+    id: "p5", category: "prone", name: "Bird-Dog (Prone Bench)",
+    target: "Glute / Core — Anti-Rotation",
+    cues: [
+      "Face-down on bench. Hips at bench edge so legs hang free.",
+      "Extend RIGHT leg straight back via glutes + LEFT arm straight forward.",
+      "4-count up, 5-second HOLD, 4-count lower. Hips stay level.",
+      "Left leg HANGS freely when not working — never pushes.",
+    ],
+    safetyNote: "Prone bench eliminates femoral neck loading. Quadruped version is UNSAFE (left knee at ~90° hip flexion = FAI limit).",
+    equipment: ["Bench"],
+  },
+  {
+    id: "p6", category: "prone", name: "Prone Ham Curl (R)",
+    target: "Hamstring — Eccentric Focus",
+    cues: [
+      "Lie face-down on prone ham curl machine. RIGHT leg only on the pad.",
+      "3 seconds up, 1 second hold, 3 seconds down.",
+      "Controlled eccentric for maximum muscle activation.",
+      "Left leg stays OFF the machine entirely.",
+    ],
+    safetyNote: "Prone position is preferred — no hip flexion involved. Left leg stays off the machine.",
+    equipment: ["Ham Curl Machine"],
+  },
 
   // ── GLUTE ──
   {
@@ -244,6 +291,66 @@ export const EXERCISES: ExerciseDiagram[] = [
     ],
     safetyNote: "\u26A0 LIGHT to MODERATE band ONLY. Heavy resistance recruits pectineus/iliopsoas \u2192 femoral neck loading. STOP if any sensation in left groin or hip crease.",
     equipment: ["Resistance Band", "Bench"],
+  },
+  {
+    id: "g6", category: "glute", name: "SL Hip Thrust (R)",
+    target: "Glute Max / Hip Extension",
+    cues: [
+      "Shoulders on bench edge. RIGHT foot flat on floor. Left leg extended forward.",
+      "Drive through R heel to lift hips to full extension.",
+      "Squeeze glutes hard at top. Chin tucked, ribs down.",
+      "Load with barbell or dumbbell across hips for progressive overload.",
+    ],
+    safetyNote: "Keep chin tucked and ribs down to prevent lumbar arching. Superior glute isolation with peak tension at the top.",
+    equipment: ["Bench", "Barbell"],
+  },
+  {
+    id: "g7", category: "glute", name: "SL Leg Press (R)",
+    target: "Quad / Glute \u2014 Cross-Education",
+    cues: [
+      "Sit in leg press. RIGHT foot HIGH on plate. Left foot off the machine entirely.",
+      "Lower the sled until JUST before 90\u00B0 hip flexion \u2014 then press back up.",
+      "Weeks 3+: 4-second eccentric for cross-education strength effect.",
+      "Do NOT lock out knee. Left leg hangs free.",
+    ],
+    safetyNote: "\u26A0 HIGH foot placement is MANDATORY \u2014 less hip flexion protects FAI/labrum. 90\u00B0 limit is absolute. MOST IMPORTANT exercise for contralateral strength preservation.",
+    equipment: ["Leg Press"],
+  },
+  {
+    id: "g8", category: "glute", name: "Hack Squat (R)",
+    target: "Quad / Glute \u2014 Squat Pattern",
+    cues: [
+      "Step into hack squat with RIGHT foot on platform. Left leg off to the side.",
+      "Lower until just before 90\u00B0 hip flexion.",
+      "Press back up through the heel.",
+      "Machine provides stability \u2014 focus on the right leg, no balance demand.",
+    ],
+    safetyNote: "Same 90\u00B0 hip flexion limit as leg press. Left leg off the machine entirely.",
+    equipment: ["Hack Squat Machine"],
+  },
+  {
+    id: "g9", category: "glute", name: "Low-Box Step-Up (R)",
+    target: "Functional Strength / Balance",
+    cues: [
+      "Box BELOW knee height. RIGHT foot on top. Dumbbells at sides.",
+      "Push through RIGHT heel to stand. Left leg dangles passively behind.",
+      "Slow controlled descent \u2014 right leg lowering you down.",
+      "Never let left foot touch down first. Pure right leg drive.",
+    ],
+    safetyNote: "\u26A0 TRANSITION RISK: single-leg standing balance. Hip flexion \u226490\u00B0 (low box ensures this). Left leg is passive dead weight throughout \u2014 never bracing. Support within arm's reach.",
+    equipment: ["Plyo Box", "Dumbbells"],
+  },
+  {
+    id: "g10", category: "glute", name: "Stab Ball Ham Curl (R)",
+    target: "Hamstring / Glute Connection",
+    cues: [
+      "Lie on back. RIGHT heel on stability ball.",
+      "Bridge hips up, then curl the ball toward glutes using right heel.",
+      "Extend back out smoothly. Slow and controlled.",
+      "Keep hips up throughout the entire set.",
+    ],
+    safetyNote: "Smoother contraction than heavy RDLs. Zero spinal load.",
+    equipment: ["Stability Ball"],
   },
 
   // ── TRX ──
@@ -405,6 +512,17 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Legs hang passive. Pure scapular strength.",
     equipment: ["Parallettes"],
   },
+  {
+    id: "a7", category: "arm", name: "Plank Knee Tuck (R only)",
+    target: "Obliques / Right Hip Flexor",
+    cues: [
+      "Forearm plank on right knee. Left leg extended behind on mat, passive.",
+      "Draw RIGHT knee toward right elbow — 4-count in, 5s HOLD at peak, 4-count return.",
+      "Never touch knee to ground between reps. Continuous tension.",
+      "Left hip flexor must NOT engage — reset position if it does.",
+    ],
+    safetyNote: "Only the RIGHT knee moves. Left leg stays dead on the mat the entire time.",
+  },
 
   // ── YOGA ──
   {
@@ -476,6 +594,29 @@ export const EXERCISES: ExerciseDiagram[] = [
       "For left oblique bias: reach LEFT arm overhead from right-side-down.",
     ],
     safetyNote: "NEVER go left-side-down. That loads the left femoral neck through elbow-hip-knee chain.",
+  },
+  {
+    id: "e3", category: "equip", name: "SL Leg Extension (R)",
+    target: "Quad — Isolation",
+    cues: [
+      "Sit in leg extension machine. Pad against RIGHT shin. Left leg off the machine.",
+      "Extend knee to full lockout.",
+      "2-second SQUEEZE at top. 3-second eccentric lowering.",
+      "Last set: drop set ×2 for metabolic exhaustion.",
+    ],
+    safetyNote: "Full lockout is safe here — open-chain, no hip compression. Go for the burn.",
+    equipment: ["Leg Extension Machine"],
+  },
+  {
+    id: "e4", category: "equip", name: "Nordic Ham Curl",
+    target: "Hamstring — Eccentric Gold Standard",
+    cues: [
+      "Kneel on a thick pad with feet anchored (heavy dumbbell, bench, or partner).",
+      "Slowly lower torso forward by extending at the knees.",
+      "Fight gravity all the way down. Catch yourself with hands.",
+      "Push off hands to return to start.",
+    ],
+    safetyNote: "Only 0-20° of hip flexion throughout. Gold standard for hamstring injury prevention.",
   },
 ];
 
