@@ -2669,7 +2669,6 @@ export const WORKOUTS: Record<string, Workout> = {
     color: "#a78bfa",
     hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
-      "Finger-Assist One-Arm Pull-Up",
       "Chest-Supported DB Row",
       "Lat Pulldown (Wide)",
       "Seated Face Pulls",
