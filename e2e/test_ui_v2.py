@@ -7,15 +7,29 @@ from conftest import click_tab, get_local_storage
 
 
 def _enable_ui_v2(page: Page):
-    """Navigate to gear tab and enable the New UI Preview toggle."""
+    """Navigate to gear tab and ensure New UI Preview is enabled."""
     click_tab(page, "gear")
     page.wait_for_timeout(300)
 
-    # Find the toggle button by its title attribute
     toggle = page.locator("button[title='Toggle new UI preview']")
     expect(toggle).to_be_visible()
-    toggle.click()
+    # Only click if currently off
+    if page.locator("text=Off — using classic UI").is_visible():
+        toggle.click()
+        page.wait_for_timeout(300)
+
+
+def _disable_ui_v2(page: Page):
+    """Navigate to gear tab and ensure New UI Preview is disabled."""
+    click_tab(page, "gear")
     page.wait_for_timeout(300)
+
+    toggle = page.locator("button[title='Toggle new UI preview']")
+    expect(toggle).to_be_visible()
+    # Only click if currently on
+    if page.locator("text=Active — gradient cards, color borders, sliding tabs").is_visible():
+        toggle.click()
+        page.wait_for_timeout(300)
 
 
 def test_toggle_is_visible_in_gear_tab(app_page: Page):
@@ -26,11 +40,11 @@ def test_toggle_is_visible_in_gear_tab(app_page: Page):
     expect(toggle).to_be_visible()
 
 
-def test_toggle_label_starts_off(app_page: Page):
-    """Toggle label says 'Off' by default."""
+def test_toggle_label_starts_active(app_page: Page):
+    """Toggle label shows 'Active' by default (v2 on by default)."""
     click_tab(app_page, "gear")
     app_page.wait_for_timeout(300)
-    label_text = app_page.locator("text=Off — using classic UI")
+    label_text = app_page.locator("text=Active — gradient cards, color borders, sliding tabs")
     expect(label_text).to_be_visible()
 
 
@@ -116,7 +130,8 @@ def test_v2_can_be_toggled_off(app_page: Page):
 
 
 def test_classic_sections_have_thin_border(app_page: Page):
-    """With v2 off (default), section cards have no thick colored left stripe."""
+    """With v2 off, section cards have no thick colored left stripe."""
+    _disable_ui_v2(app_page)
     click_tab(app_page, "upper")
     app_page.wait_for_timeout(400)
     sections = app_page.get_by_test_id("section")
@@ -140,6 +155,7 @@ def test_v2_workout_tab_shows_chip_badges(app_page: Page):
 
 def test_classic_workout_tab_no_chip_badges(app_page: Page):
     """With v2 off, supplement indicator uses single-letter badges, not full chips."""
+    _disable_ui_v2(app_page)
     click_tab(app_page, "workout")
     app_page.wait_for_timeout(500)
 
@@ -161,6 +177,7 @@ def test_v2_today_header_has_gradient(app_page: Page):
 
 def test_classic_today_header_no_gradient(app_page: Page):
     """With v2 off, today's header has no gradient."""
+    _disable_ui_v2(app_page)
     click_tab(app_page, "workout")
     app_page.wait_for_timeout(400)
 
@@ -196,6 +213,7 @@ def test_v2_hides_full_progress_clock(app_page: Page):
 
 def test_classic_shows_full_progress_clock(app_page: Page):
     """With v2 off, the full progress clock is shown (no compact ring)."""
+    _disable_ui_v2(app_page)
     clock = app_page.get_by_test_id("progress-clock")
     expect(clock).to_be_visible()
     ring = app_page.get_by_test_id("progress-ring")
@@ -249,6 +267,7 @@ def test_v2_tab_buttons_have_transparent_bg(app_page: Page):
 
 def test_classic_no_sliding_pill(app_page: Page):
     """With v2 off, no sliding tab pill is rendered."""
+    _disable_ui_v2(app_page)
     click_tab(app_page, "workout")
     app_page.wait_for_timeout(300)
     pill = app_page.get_by_test_id("tab-pill")
