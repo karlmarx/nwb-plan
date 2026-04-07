@@ -16,14 +16,14 @@ def test_all_tabs_clickable(app_page: Page):
 
 
 def test_active_tab_styling(app_page: Page):
-    """Active tab has different styling than inactive tabs."""
+    """Active tab has different text color than inactive tabs (works in both classic and v2)."""
     click_tab(app_page, "upper")
     upper_btn = app_page.get_by_test_id("tab-upper")
     workout_btn = app_page.get_by_test_id("tab-workout")
 
-    upper_border = upper_btn.evaluate("el => getComputedStyle(el).borderColor")
-    workout_border = workout_btn.evaluate("el => getComputedStyle(el).borderColor")
-    assert upper_border != workout_border, "Active and inactive tabs should have different border colors"
+    upper_color = upper_btn.evaluate("el => getComputedStyle(el).color")
+    workout_color = workout_btn.evaluate("el => getComputedStyle(el).color")
+    assert upper_color != workout_color, "Active and inactive tabs should have different text colors"
 
 
 def test_tab_content_changes(app_page: Page):
