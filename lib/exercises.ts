@@ -755,7 +755,7 @@ export const EX: Record<string, Exercise> = {
     setup: "Hang from pull-up bar with overhand grip outside shoulder width. Use a weight belt for added load if bodyweight is too easy. \u26A0\uFE0F GETTING UP: Use a tall box \u2014 step up with RIGHT foot only, grip bar, then step off. Do NOT jump up. Left leg hangs passive.",
     execution: "From dead hang, pull your chin over the bar by driving elbows down. Control the descent. Full extension at bottom.",
     nwbCues: "Lower body hangs completely passive \u2014 do NOT swing or kip. Step down carefully to a box, do NOT jump down.",
-    why: "King of vertical pulling. Directly trains dragon boat 'catch' phase. Decompresses spine naturally.",
+    why: "King of vertical pulling. Builds lat strength and decompresses spine naturally.",
     safety: "safe",
     swaps: ["Lat Pulldown (Wide)", "Neutral Grip Pulldown", "TRX Pulldown"],
     constraints: {
@@ -895,7 +895,7 @@ export const EX: Record<string, Exercise> = {
     setup: "Sit at cable machine with rope attachment set at face height. Grab rope with overhand grip.",
     execution: "Pull rope toward your face, pulling the ends apart at the end. Elbows HIGH, externally rotate at the end position. Squeeze rear delts.",
     nwbCues: "Focus on external rotation at end of movement. Essential for shoulder health with this much pressing volume.",
-    why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health and paddling resilience.",
+    why: "Rear delt and rotator cuff prehabilitation. Critical for shoulder health with high pressing volume.",
     safety: "safe",
     swaps: ["Reverse Fly", "TRX Face Pull", "Pec Deck Reverse Fly"],
     visual: "| (Pulley)\n|------_ []\n|     /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
@@ -2669,7 +2669,6 @@ export const WORKOUTS: Record<string, Workout> = {
     color: "#a78bfa",
     hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
-      "Finger-Assist One-Arm Pull-Up",
       "Chest-Supported DB Row",
       "Lat Pulldown (Wide)",
       "Seated Face Pulls",

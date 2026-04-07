@@ -1,5 +1,7 @@
 """UI v2 toggle tests — verify the New UI Preview toggle works end-to-end."""
 
+import re
+
 from playwright.sync_api import Page, expect
 from conftest import click_tab, get_local_storage
 
@@ -63,10 +65,11 @@ def test_v2_upper_tab_pills_have_count_badge(app_page: Page):
     click_tab(app_page, "upper")
     app_page.wait_for_timeout(400)
 
-    # The All pill should be a rounded-full pill
-    pills = app_page.locator(".filter-wrap button, [class*='rounded-full']")
-    # Check that the All button contains a count number
-    all_btn = app_page.locator("button", has_text="All").first
+    # Locate the "All" filter pill by accessible name. Anchor with ^All\b
+    # so we don't accidentally match the "Exercise Diagram Gallery" launcher
+    # button (Playwright's has_text is a case-insensitive substring match,
+    # which would otherwise match "Gallery" because it contains "all").
+    all_btn = app_page.get_by_role("button", name=re.compile(r"^All\b")).first
     expect(all_btn).to_be_visible()
     # Count badge should be inside it — look for the total count
     inner = all_btn.inner_text()

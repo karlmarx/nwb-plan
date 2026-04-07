@@ -31,8 +31,8 @@ interface DiagramGalleryProps {
 export default function DiagramGallery({ initialExercise, onClose }: DiagramGalleryProps) {
   // Find initial category from exercise ID
   const initialCat = initialExercise
-    ? EXERCISES.find(e => e.id === initialExercise)?.category ?? "rack"
-    : "rack";
+    ? EXERCISES.find(e => e.id === initialExercise)?.category ?? "core"
+    : "core";
 
   const [cat, setCat] = useState(initialCat);
   const [active, setActive] = useState(initialExercise ?? "r1");
@@ -210,7 +210,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
               <span className="w-2 h-2 rounded-full inline-block" style={{ background: "#2ecc71" }} />
               Active
             </span>
-            {(cat === "trx" || cat === "arm") && (
+            {(active.startsWith("t") || active === "a1" || active === "a2") && (
               <span className="flex items-center gap-1">
                 <span className="w-3 h-0.5 inline-block" style={{ background: "#f39c12" }} />
                 TRX/Strap
