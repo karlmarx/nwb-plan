@@ -195,6 +195,97 @@ export function SupportProtraction({ t }: AnimProps) {
   );
 }
 
+// a7 — Forearm plank on right knee, draw right knee toward right elbow.
+// Left leg stays flat and dead on the mat the entire time.
+export function PlankKneeTuckR({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const hold = phase > 0.4 && phase < 0.6 ? 1 : lift;
+
+  const floorY = 220;
+
+  // Forearms on mat — left side of canvas, head at far left
+  const headX = 60,  headY = 170;
+  const lElbX  = 90, lElbY = floorY - 8;   // left forearm (near head)
+  const rElbX  = 130, rElbY = floorY - 8;  // right forearm
+
+  // Shoulder sits above forearms
+  const shX = 125, shY = 180;
+
+  // Hip rises slightly in plank; stays roughly constant (it's plank position)
+  const hipX = 210, hipY = 175;
+
+  // RIGHT knee: starts extended (behind hip) → draws forward toward right elbow
+  const rKneeX = hipX - 10 - hold * 55; // pulls forward (toward left/shoulder side)
+  const rKneeY = hipY - 5  - hold * 25; // rises as it tucks
+  const rFootX = rKneeX + 18 + hold * 10;
+  const rFootY = rKneeY + 25 - hold * 10;
+
+  // LEFT leg: FLAT on the mat, straight back — never moves
+  const lThighX2 = 275, lThighY2 = floorY - 3;
+  const lFootX   = 345, lFootY   = floorY - 2;
+
+  // Hip flexor / oblique activation glow on right side of trunk
+  const glowCx = (shX + hipX) / 2 + 5;
+  const glowCy = (shY + hipY) / 2;
+
+  return (
+    <g>
+      {/* Mat / floor */}
+      <line x1="30" y1={floorY} x2="370" y2={floorY} stroke={C.floor} strokeWidth="1" strokeDasharray="4,4" />
+      <rect x="30" y={floorY} width="340" height="4" fill={C.floorFill} opacity="0.5" />
+
+      {/* ── Body (element order: floor → body → right leg → left leg → labels → glow) ── */}
+
+      {/* Head */}
+      <circle cx={headX} cy={headY} r="11" fill="none" stroke={C.body} strokeWidth="2.5" />
+
+      {/* Forearms on floor */}
+      <line x1={headX + 11} y1={headY + 5} x2={lElbX} y2={lElbY}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={lElbX} y1={lElbY} x2={shX - 6} y2={shY}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={rElbX} y1={rElbY} x2={shX + 6} y2={shY}
+        stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Torso — plank line */}
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY}
+        stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+
+      {/* RIGHT leg (active) — knee tucks forward */}
+      <line x1={hipX + 4} y1={hipY} x2={rKneeX} y2={rKneeY}
+        stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY}
+        stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      <rect x={rFootX - 6} y={rFootY - 3} width="14" height="5" rx="2" fill={C.active} />
+      <text x={rKneeX - 18} y={rKneeY - 6} fontSize="11" fontWeight="bold"
+        fill={C.active} fontFamily="monospace">R</text>
+
+      {/* LEFT leg — dead weight, flat on the mat */}
+      <line x1={hipX - 4} y1={hipY + 2} x2={lThighX2} y2={lThighY2}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <line x1={lThighX2} y1={lThighY2} x2={lFootX} y2={lFootY}
+        stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round"
+        strokeDasharray="6,3" opacity="0.6" />
+      <ellipse cx={lFootX + 4} cy={lFootY + 3} rx="7" ry="3"
+        fill="none" stroke={C.leftLeg} strokeWidth="1.5"
+        strokeDasharray="3,2" opacity="0.5" />
+      <text x={lFootX - 4} y={lFootY + 14} fontSize="10"
+        fill={C.leftLeg} fontFamily="monospace">L</text>
+
+      {/* Activation glow — right hip flexor / oblique */}
+      <circle cx={glowCx} cy={glowCy} r="14" fill={C.active} opacity={hold * 0.3} />
+
+      {/* HOLD label at peak */}
+      {hold > 0.5 && (
+        <text x={rKneeX - 10} y={rKneeY - 18} fontSize="10" fontWeight="bold"
+          fill={C.active} fontFamily="monospace">HOLD</text>
+      )}
+    </g>
+  );
+}
+
 export const ARM_BALANCE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   a1: TRXKneeTuckFig4,
   a2: TRXBodySawFig4,
@@ -202,4 +293,5 @@ export const ARM_BALANCE_ANIMS: Record<string, React.ComponentType<AnimProps>> =
   a4: LSitHold,
   a5: TuckPlancheLean,
   a6: SupportProtraction,
+  a7: PlankKneeTuckR,
 };
