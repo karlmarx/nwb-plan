@@ -562,7 +562,7 @@ export default function WorkoutView() {
     if (typeof window === "undefined") return "dark";
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
-  const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", false));
+  const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
   const [editMode, setEditMode] = useState(false);
 
   // Focus mode: fullscreen exercise walkthrough
