@@ -566,7 +566,16 @@ export default function WorkoutView() {
   const [editMode, setEditMode] = useState(false);
 
   // Focus mode: fullscreen exercise walkthrough
-  type FocusItem = { name: string; ex: Exercise };
+  type FocusSupplement = {
+    type: "leftleg" | "core" | "cable" | "variant" | "nearby";
+    name: string;
+    sets: string;
+    instruction: string;
+    safety: string;
+    region?: string;
+    rest?: number;
+  };
+  type FocusItem = { name: string; ex: Exercise; supplements?: FocusSupplement[] };
   const [focusState, setFocusState] = useState<{ items: FocusItem[]; index: number } | null>(null);
 
   // Keyboard navigation for focus mode
@@ -874,13 +883,93 @@ export default function WorkoutView() {
         onToggle={() => toggleSection(workoutKey)}
         count={w.exercises.length}
         onFocus={() => {
-          const items = w.exercises
+          const activeExercises = w.exercises
             .map((orig) => {
               const nm = getExName(workoutKey, orig);
               const exItem = EX[nm];
-              return { name: nm, ex: exItem };
+              return { orig, name: nm, ex: exItem };
             })
-            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase)) as FocusItem[];
+            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase));
+
+          // Build focus items with supplements attached
+          const items: FocusItem[] = activeExercises.map(({ orig, name: nm, ex: exItem }) => {
+            const supps: FocusSupplement[] = [];
+
+            // 1. Cable superset (first cable exercise only)
+            if (supplementToggles.leftLeg && exItem.cableSuperset && nm === firstCableName) {
+              supps.push({
+                type: "cable",
+                name: CABLE_SUPERSET.title,
+                sets: CABLE_SUPERSET.sets,
+                instruction: CABLE_SUPERSET.instruction,
+                safety: CABLE_SUPERSET.safety,
+              });
+            }
+
+            // 2. Machine variant superset
+            const selMachineId = machineSelections[nm];
+            const selectedVariant = exItem.machineVariants?.find((v) => v.id === selMachineId) ?? null;
+            if (supplementToggles.leftLeg && selectedVariant?.superset && !(exItem.cableSuperset && nm === firstCableName)) {
+              const vs = selectedVariant.superset;
+              supps.push({
+                type: "variant",
+                name: vs.title,
+                sets: vs.sets,
+                instruction: vs.instruction,
+                safety: vs.safety,
+              });
+            }
+
+            const hasCableOrVariant = supps.some((s) => s.type === "cable" || s.type === "variant");
+
+            // 3. Left leg + core supplements from suppMap
+            const suppCards = suppMap[orig] || [];
+            for (const supp of suppCards) {
+              const isLL = supp.type === "leftleg";
+              if (isLL && !supplementToggles.leftLeg) continue;
+              if (!isLL && !supplementToggles.core) continue;
+              if (isLL && hasCableOrVariant) continue; // cable/variant replaces left leg card
+              const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
+              if (!suppEx) continue;
+              const suppSets = suppEx.sets[phase] || suppEx.sets[0];
+              supps.push({
+                type: isLL ? "leftleg" : "core",
+                name: supp.name,
+                sets: `${suppSets[0]}\u00D7${suppSets[1]}`,
+                instruction: suppEx.execution,
+                safety: suppEx.nwbCues,
+                region: supp.region,
+                rest: suppEx.rest,
+              });
+            }
+
+            // 4. Nearby supersets
+            if (supplementToggles.leftLeg && !hasCableOrVariant) {
+              const inUseIds = exItem.requires
+                .map((r) => EQUIP_TO_NEARBY[r])
+                .filter(Boolean);
+              const allNearby = [
+                ...new Set([...inUseIds, ...(nearbySelections[nm] ?? [])]),
+              ];
+              const nearbySS = NEARBY_SUPERSETS.filter(
+                (ns) =>
+                  allNearby.includes(ns.nearbyId) &&
+                  !inUseIds.includes(ns.nearbyId)
+              );
+              for (const ns of nearbySS) {
+                supps.push({
+                  type: "nearby",
+                  name: ns.title,
+                  sets: ns.sets,
+                  instruction: ns.instruction,
+                  safety: ns.safety,
+                });
+              }
+            }
+
+            return { name: nm, ex: exItem, supplements: supps.length > 0 ? supps : undefined };
+          });
+
           if (items.length > 0) setFocusState({ items, index: 0 });
         }}
       >
@@ -3036,6 +3125,74 @@ export default function WorkoutView() {
                 >
                   {"\u{1F4D0}"} View Movement Diagram
                 </button>
+              )}
+
+              {/* Supersets / supplements */}
+              {item.supplements && item.supplements.length > 0 && (
+                <div className="mt-2 mb-4 space-y-2">
+                  <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    Supersets
+                  </div>
+                  {item.supplements.map((supp, si) => {
+                    const isLL = supp.type === "leftleg" || supp.type === "cable" || supp.type === "variant" || supp.type === "nearby";
+                    const accentColor = isLL ? "#14b8a6" : "#f97316";
+                    const regionColors: Record<string, string> = { "Upper Abs": "#f59e0b", "Lower Abs": "#ec4899", Obliques: "#a78bfa" };
+                    const labelColor = supp.region ? (regionColors[supp.region] || accentColor) : accentColor;
+                    const typeLabel = supp.type === "leftleg" ? "LEFT LEG"
+                      : supp.type === "cable" ? "CABLE SUPERSET"
+                      : supp.type === "variant" ? "MACHINE SUPERSET"
+                      : supp.type === "nearby" ? "NEARBY"
+                      : supp.region || "CORE";
+                    return (
+                      <div
+                        key={`focus-supp-${si}`}
+                        className="rounded-2xl p-4"
+                        style={{
+                          background: `${accentColor}0d`,
+                          border: `1px solid ${accentColor}33`,
+                          borderLeft: `3px solid ${accentColor}`,
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span
+                            className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                            style={{
+                              background: `${labelColor}22`,
+                              border: `1px solid ${labelColor}44`,
+                              color: labelColor,
+                            }}
+                          >
+                            {typeLabel}
+                          </span>
+                          <span className="text-sm font-semibold text-white">{supp.name}</span>
+                          <span className="ml-auto text-xs font-medium" style={{ color: accentColor }}>
+                            {supp.sets}
+                          </span>
+                        </div>
+                        <div className="text-white/70 text-[13px] leading-relaxed mb-1.5">
+                          {supp.instruction}
+                        </div>
+                        <div className="text-[12px]" style={{ color: accentColor }}>
+                          {"\uD83D\uDEE1\uFE0F"} {supp.safety}
+                        </div>
+                        {supp.rest != null && supp.rest > 0 && (
+                          <button
+                            onClick={() => setTimer(supp.rest!)}
+                            className="mt-2 w-full rounded-xl text-[12px] font-semibold cursor-pointer font-[inherit]"
+                            style={{
+                              padding: "8px",
+                              background: `${accentColor}18`,
+                              border: `1px solid ${accentColor}33`,
+                              color: accentColor,
+                            }}
+                          >
+                            {"\u23F1"} Start {supp.rest}s Rest
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
