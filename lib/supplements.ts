@@ -202,6 +202,214 @@ export const NEARBY_SUPERSETS: NearbySuperset[] = [
   },
 ];
 
+// ===== MOBILITY / STRETCH / BREATHING COMPLEMENTS =====
+// Always-available between-set fillers for when a left-leg or core superset
+// doesn't make sense (e.g. you're on a seated chest press and the nearest
+// cable is across the gym). These need ZERO equipment — can be done on
+// the bench you're already sitting on.
+
+export type MobilityKind = "mobility" | "stretch" | "breathing";
+
+export interface MobilitySupplement {
+  id: string;
+  name: string;
+  kind: MobilityKind;
+  sets: string; // "2×10", "20s/side", "5 breaths"
+  instruction: string;
+  safety: string;
+  /** Which workout categories it fits best. "all" means any workout. */
+  appliesTo: Array<"push" | "pull" | "legs" | "core" | "cardio" | "all">;
+}
+
+export const MOBILITY_SUPPLEMENTS: MobilitySupplement[] = [
+  // ── SPINAL MOBILITY ─────────────────────────────────────────────────────
+  {
+    id: "seated_cat_cow",
+    name: "Seated Cat-Cow",
+    kind: "mobility",
+    sets: "2×10",
+    instruction:
+      "Sit upright on the machine seat or bench. Inhale: arch back, lift chest, look up (cow). Exhale: round upper back, tuck chin (cat). Move slowly through each breath.",
+    safety:
+      "Pure spinal ROM. Zero leg involvement. Can be done on any seated machine between sets.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "seated_thoracic_rotations",
+    name: "Seated Thoracic Rotations",
+    kind: "mobility",
+    sets: "2×8/side",
+    instruction:
+      "Sit upright, arms crossed over chest. Rotate torso left and right, keeping hips square. Hold each end-range for a second.",
+    safety:
+      "T-spine mobility reset between pressing/pulling sets. Hips don't move — rotation is pure thoracic.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "neck_rolls",
+    name: "Gentle Neck Rolls",
+    kind: "mobility",
+    sets: "5/direction",
+    instruction:
+      "Drop chin to chest. Slowly roll head ear-to-shoulder, back, and around. Small range — no neck cranking.",
+    safety:
+      "Gentle ROM. Great after heavy pressing or pulling. Stop if any pinching.",
+    appliesTo: ["all"],
+  },
+
+  // ── UPPER BODY STRETCHES (PUSH FOCUS) ───────────────────────────────────
+  {
+    id: "seated_pec_stretch",
+    name: "Seated Pec Opener",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit tall. Clasp hands behind lower back. Lift chest and pull shoulders back and down. Breathe into the stretch.",
+    safety:
+      "Opens the anterior chest after pressing volume. Stop if shoulders pinch — don't force range.",
+    appliesTo: ["push", "pull"],
+  },
+  {
+    id: "overhead_tricep_stretch",
+    name: "Overhead Triceps Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Reach right arm overhead, drop hand behind neck toward opposite shoulder blade. Pull elbow gently with left hand. Switch sides.",
+    safety:
+      "Perfect between pressing sets. Keep ribs down so you don't arch lower back.",
+    appliesTo: ["push"],
+  },
+  {
+    id: "cross_body_shoulder",
+    name: "Cross-Body Shoulder Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Pull right arm across chest with left hand cradling the elbow. Hold, then switch.",
+    safety:
+      "Posterior capsule and rear delt stretch. Great after pushing or pulling volume.",
+    appliesTo: ["push", "pull"],
+  },
+
+  // ── UPPER BODY STRETCHES (PULL FOCUS) ───────────────────────────────────
+  {
+    id: "seated_lat_stretch",
+    name: "Seated Lat Side-Bend",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Sit tall. Raise right arm overhead, reach up and side-bend to the left. Feel the stretch along the right lat. Switch sides.",
+    safety:
+      "Opens the lats between pulling sets. Hips stay planted — only the torso bends.",
+    appliesTo: ["pull"],
+  },
+  {
+    id: "seated_rhomboid_stretch",
+    name: "Rhomboid Self-Hug",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Wrap arms around self (self-hug). Round upper back and reach hands toward opposite shoulder blades. Let upper back spread.",
+    safety:
+      "Upper back and rhomboid stretch. Good reset between rowing sets.",
+    appliesTo: ["pull"],
+  },
+
+  // ── FOREARM / WRIST / GRIP ──────────────────────────────────────────────
+  {
+    id: "wrist_flexor_stretch",
+    name: "Wrist Flexor Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Extend right arm, palm up. Gently pull fingers back toward you with left hand. Feel stretch in forearm. Switch.",
+    safety:
+      "Grip and wrist reset between heavy compound sets.",
+    appliesTo: ["push", "pull"],
+  },
+  {
+    id: "wrist_circles",
+    name: "Wrist Circles",
+    kind: "mobility",
+    sets: "10/direction",
+    instruction:
+      "Clasp hands together, rotate wrists in slow circles — clockwise then counter-clockwise.",
+    safety: "Wrist ROM for pressing and pulling days. Zero load.",
+    appliesTo: ["push", "pull"],
+  },
+
+  // ── RIGHT-LEG / CORE MOBILITY ───────────────────────────────────────────
+  {
+    id: "seated_hamstring_reach_r",
+    name: "Right Hamstring Reach",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit tall, extend right leg out in front (heel on floor). Hinge from hips and reach toward right toes. Left leg stays passive — hanging or supported.",
+    safety:
+      "Right side only. NO left-leg stretch (fracture side stays passive).",
+    appliesTo: ["legs", "core", "all"],
+  },
+  {
+    id: "seated_calf_stretch_r",
+    name: "Right Calf Towel Stretch",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit with right leg extended. Loop a towel (or hands) around right forefoot. Gently pull toes toward you. Hold.",
+    safety:
+      "Right calf only — gait prep. Left leg stays passive throughout.",
+    appliesTo: ["legs", "core", "all"],
+  },
+  {
+    id: "seated_hip_flexor_reset_r",
+    name: "Right Hip Flexor Reset",
+    kind: "mobility",
+    sets: "2×10",
+    instruction:
+      "Sit on edge of bench. Slide right foot slightly behind the knee line. Tuck pelvis under (posterior tilt) and feel the front of the right hip open. Release and repeat.",
+    safety:
+      "Right side ONLY. Left hip stays neutral. Do not stretch the left hip flexor.",
+    appliesTo: ["legs", "core", "all"],
+  },
+
+  // ── BREATHING / NERVOUS SYSTEM RESETS ───────────────────────────────────
+  {
+    id: "box_breathing",
+    name: "Box Breathing",
+    kind: "breathing",
+    sets: "4 rounds",
+    instruction:
+      "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 rounds.",
+    safety:
+      "Parasympathetic reset between heavy working sets. Lowers HR and sharpens focus.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "crocodile_breathing",
+    name: "Crocodile Breath (Seated)",
+    kind: "breathing",
+    sets: "5 breaths",
+    instruction:
+      "Sit tall. Hands on lower ribs. Inhale slowly through the nose — feel ribs expand outward into your hands. Exhale fully through pursed lips.",
+    safety:
+      "Diaphragmatic activation. Great between pressing sets to reset bracing pattern.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "scapular_packing",
+    name: "Scapular Packing Hold",
+    kind: "mobility",
+    sets: "2×10s",
+    instruction:
+      "Sit upright. Pull shoulder blades down and together (back pocket cue). Hold 10 seconds, release, repeat.",
+    safety:
+      "Scap positioning reset — great before pressing or pulling. Pure isometric.",
+    appliesTo: ["push", "pull", "all"],
+  },
+];
+
 // ===== CABLE SUPERSET (first cable exercise per workout) =====
 
 export const CABLE_SUPERSET = {
