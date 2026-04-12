@@ -927,8 +927,8 @@ export const EX: Record<string, Exercise> = {
         superset: {
           title: "R-Leg Calf Press + Pallof Hold",
           sets: "2\u00D712 calves + 2\u00D720s hold",
-          instruction: "Between row sets: (1) RIGHT foot only \u2014 press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. (2) Then grab the handle with both hands, extend arms straight in front of chest, and hold for 20s resisting rotation (Pallof isometric). Keep core braced, pelvis square.",
-          safety: "LEFT foot stays passive on the plate \u2014 zero push. During Pallof hold, if you feel ANY left hip crease engagement, drop the weight or skip.",
+          instruction: "Between row sets: (1) RIGHT foot only \u2014 press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. (2) Then grab the handle with both hands, extend arms straight in front of chest, and hold for 20s resisting rotation (Pallof isometric). Keep core braced, pelvis square. The chest pad absorbs the rotational force \u2014 your feet don\u2019t need to brace, so left foot stays completely passive.",
+          safety: "LEFT foot stays passive on the plate \u2014 zero push through the entire superset including Pallof hold. The chest pad does the bracing, not your legs. If you feel ANY left hip crease engagement, drop the weight or skip.",
         },
       },
     ],
