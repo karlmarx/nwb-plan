@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import type { Exercise } from "@/lib/exercises";
 import EquipmentSwapPanel from "@/components/equipment-swap-panel";
+import { cssAlpha } from "@/lib/css-utils";
 
 interface EditExerciseSheetProps {
   exerciseName: string;
@@ -124,9 +125,9 @@ export default function EditExerciseSheet({
                   style={{
                     padding: "8px 12px",
                     background: isActive
-                      ? "var(--color-accent)18"
+                      ? cssAlpha("var(--color-accent)", 9)
                       : "var(--color-bg)",
-                    border: `1px solid ${isActive ? "var(--color-accent)55" : "var(--color-border)"}`,
+                    border: `1px solid ${isActive ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
                     color: isActive
                       ? "var(--color-accent)"
                       : "var(--color-text-muted)",
@@ -238,3 +239,5 @@ export default function EditExerciseSheet({
     </div>
   );
 }
+
+EditExerciseSheet.displayName = "EditExerciseSheet";
