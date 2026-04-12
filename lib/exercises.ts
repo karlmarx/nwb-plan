@@ -901,6 +901,37 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
     visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    machineVariants: [
+      {
+        id: "cable_column",
+        label: "Cable Column",
+        icon: "\u2696\uFE0F",
+        description: "Standard cable column with D-handle, bench or standing",
+        setupCues: [
+          "Set pulley to chest height on a cable column",
+          "Sit on a bench or seat facing the column",
+          "Grab D-handle with one hand, keep other hand on thigh for stability",
+        ],
+      },
+      {
+        id: "integrated_row_machine",
+        label: "Integrated Row Machine",
+        icon: "\uD83E\uDDBE",
+        description: "Pin-loaded seated row machine with built-in foot plates and chest pad",
+        setupCues: [
+          "Sit on the integrated row machine, feet resting on foot plates (left foot passive, zero push)",
+          "Adjust chest pad so arms can reach full extension without rounding shoulders",
+          "Use the single-arm handle \u2014 row one arm at a time",
+          "Pin-loaded stack: easy to change weight between arms if needed",
+        ],
+        superset: {
+          title: "R-Leg Calf Press + Pallof Hold",
+          sets: "2\u00D712 calves + 2\u00D720s hold",
+          instruction: "Between row sets: (1) RIGHT foot only \u2014 press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. (2) Then grab the handle with both hands, extend arms straight in front of chest, and hold for 20s resisting rotation (Pallof isometric). Keep core braced, pelvis square.",
+          safety: "LEFT foot stays passive on the plate \u2014 zero push. During Pallof hold, if you feel ANY left hip crease engagement, drop the weight or skip.",
+        },
+      },
+    ],
     cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
