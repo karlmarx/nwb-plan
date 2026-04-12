@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Badge from "@/components/badge";
-import EquipmentSwapPanel from "@/components/equipment-swap-panel";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
 import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
+import { useLongPress } from "@/lib/use-long-press";
 
 interface ExerciseRowProps {
   name: string;
@@ -12,19 +12,20 @@ interface ExerciseRowProps {
   phase: number;
   isExpanded: boolean;
   onToggle: () => void;
-  onSwap: (name: string) => void;
+  onLongPress?: () => void;
+  onStartTimer?: (seconds: number) => void;
   onDiagram: (diagram: string) => void;
   onOpenDiagram?: (diagramId: string) => void;
   unavailable: boolean;
   equipment: Record<string, boolean>;
-  workoutExercises?: string[];
   variantSetupCues?: string[];
   variantLabel?: string;
-  supplementSlot?: React.ReactNode;
-  editSlot?: React.ReactNode;
-  selectedVariantId?: string | null;
-  onSelectVariant?: (id: string) => void;
-  editMode?: boolean;
+  /** Superset / complement cards rendered immediately under the header */
+  supersetSlot?: React.ReactNode;
+  /** Add-complement pill rendered below supersets */
+  addComplementSlot?: React.ReactNode;
+  /** Small top-right action button (opens edit sheet). Hidden if omitted. */
+  showActionButton?: boolean;
 }
 
 export default function ExerciseRow({
@@ -33,30 +34,25 @@ export default function ExerciseRow({
   phase,
   isExpanded,
   onToggle,
-  onSwap,
+  onLongPress,
+  onStartTimer,
   onDiagram,
   onOpenDiagram,
   unavailable,
   equipment,
-  workoutExercises = [],
   variantSetupCues,
   variantLabel,
-  supplementSlot,
-  editSlot,
-  selectedVariantId,
-  onSelectVariant,
-  editMode = true,
+  supersetSlot,
+  addComplementSlot,
+  showActionButton = true,
 }: ExerciseRowProps) {
-  const [swapOpen, setSwapOpen] = useState(false);
-  useEffect(() => { if (!editMode) setSwapOpen(false); }, [editMode]);
+  const longPressHandlers = useLongPress(
+    () => onLongPress?.(),
+    () => onToggle(),
+    { delay: 500 },
+  );
 
   if (!ex) return null;
-
-  const showInstructions = editMode && !swapOpen;
-  const showSwap = editMode && swapOpen;
-  const hasSwapOptions =
-    (ex.swaps && ex.swaps.length > 0) ||
-    (ex.machineVariants && ex.machineVariants.length > 0);
 
   const safetyColor =
     ex.safety === "caution"
@@ -78,13 +74,19 @@ export default function ExerciseRow({
         boxShadow: isExpanded ? "0 2px 12px rgba(0,0,0,0.15)" : "none",
       }}
     >
-      {/* Collapsed header - tappable */}
+      {/* Collapsed header — tappable (long-press aware) */}
       <div
-        onClick={onToggle}
-        className="px-3.5 py-3 cursor-pointer min-h-[48px] flex items-center"
+        data-testid="exercise-row-header"
+        className="px-3.5 py-3 cursor-pointer min-h-[48px] flex items-center select-none"
+        onTouchStart={longPressHandlers.onTouchStart}
+        onTouchMove={longPressHandlers.onTouchMove}
+        onTouchEnd={longPressHandlers.onTouchEnd}
+        onTouchCancel={longPressHandlers.onTouchCancel}
+        onContextMenu={longPressHandlers.onContextMenu}
+        onClick={longPressHandlers.onClick}
       >
         <div className="flex items-center justify-between gap-2 flex-wrap w-full">
-          <div className="flex items-center gap-2 flex-wrap flex-1">
+          <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
             <span
               data-testid="exercise-name"
               className="font-semibold text-sm"
@@ -111,7 +113,7 @@ export default function ExerciseRow({
               <Badge color="var(--color-accent)">{variantLabel}</Badge>
             )}
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {!isExpanded && (
               <span className="text-xs text-text-dim font-medium tabular-nums">
                 {s[0]}&times;{s[1]}
@@ -120,11 +122,33 @@ export default function ExerciseRow({
             <span
               className="text-xs transition-transform duration-200"
               style={{
-                color: isExpanded ? "var(--color-accent)" : "var(--color-text-muted)",
+                color: isExpanded
+                  ? "var(--color-accent)"
+                  : "var(--color-text-muted)",
               }}
             >
               {isExpanded ? "\u25B2" : "\u25BC"}
             </span>
+            {showActionButton && onLongPress && (
+              <button
+                data-testid="exercise-row-action"
+                aria-label="Edit exercise"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onLongPress();
+                }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer font-bold"
+                style={{
+                  background: "var(--color-card)",
+                  border: "1px solid var(--color-border)",
+                  fontSize: 14,
+                  lineHeight: 1,
+                }}
+                title="Swap, change machine, or reorder (long-press on mobile)"
+              >
+                {"\u22EE"}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -132,13 +156,8 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="section-content px-3.5 pb-4">
-          {/* Equipment picker — top of card in edit mode */}
-          {editSlot && <div className="mb-3">{editSlot}</div>}
-          {/* Superset cards — rendered first so they're the first thing seen on expand */}
-          {supplementSlot}
-
-          {/* Sets / Reps / Rest stats */}
-          <div className="flex gap-4 mb-4 py-2.5 border-b border-border">
+          {/* Sets / Reps / Rest stats — first so it's the action-focused header */}
+          <div className="flex gap-4 mb-3 py-2.5 border-b border-border">
             <div>
               <div className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
                 Sets &times; Reps
@@ -152,12 +171,56 @@ export default function ExerciseRow({
                 <div className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
                   Rest
                 </div>
-                <div className="text-base font-bold text-text tabular-nums mt-0.5">{ex.rest}s</div>
+                <div className="text-base font-bold text-text tabular-nums mt-0.5">
+                  {ex.rest}s
+                </div>
               </div>
             )}
           </div>
 
-          {showInstructions && <div className="text-[13px] leading-relaxed space-y-3">
+          {/* Diagram button — directly under sets/reps for fastest access */}
+          {EXERCISE_TO_DIAGRAM[ex.id] ? (
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                onOpenDiagram?.(EXERCISE_TO_DIAGRAM[ex.id]);
+              }}
+              data-testid="view-diagram"
+              className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
+              style={{
+                background: "var(--color-accent)11",
+                border: "1px solid var(--color-accent)33",
+              }}
+            >
+              {"\u{1F4D0}"} View Movement Diagram
+            </button>
+          ) : (
+            ex.diagram && (
+              <button
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onDiagram(ex.diagram!);
+                }}
+                data-testid="view-diagram"
+                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
+                style={{
+                  background: "var(--color-accent)11",
+                  border: "1px solid var(--color-accent)33",
+                }}
+              >
+                {"\u{1F4D0}"} View Movement Diagram
+              </button>
+            )
+          )}
+
+          {/* Superset / complement cards — right under the diagram button */}
+          {supersetSlot}
+
+          {/* Add-complement pill */}
+          {addComplementSlot}
+
+          {/* Instructions */}
+          <div className="text-[13px] leading-relaxed space-y-3 mt-3">
             {/* SETUP */}
             <div>
               <div className="font-bold text-accent mb-1 text-[11px] uppercase tracking-wide">
@@ -174,11 +237,15 @@ export default function ExerciseRow({
                   }}
                 >
                   <div className="text-[10px] font-bold text-accent uppercase mb-1">
-                    {variantLabel ? `${variantLabel} Setup` : "Machine-Specific Setup"}
+                    {variantLabel
+                      ? `${variantLabel} Setup`
+                      : "Machine-Specific Setup"}
                   </div>
                   <ul className="m-0 pl-4 list-disc">
                     {variantSetupCues.map((cue, i) => (
-                      <li key={i} className="text-text-dim mb-0.5">{cue}</li>
+                      <li key={i} className="text-text-dim mb-0.5">
+                        {cue}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -208,39 +275,6 @@ export default function ExerciseRow({
               </div>
               <div className="text-text-dim">{ex.why}</div>
             </div>
-
-            {/* Diagram button — gallery takes priority over legacy modal */}
-            {EXERCISE_TO_DIAGRAM[ex.id] ? (
-              <button
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onOpenDiagram?.(EXERCISE_TO_DIAGRAM[ex.id]);
-                }}
-                data-testid="view-diagram"
-                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150"
-                style={{
-                  background: "var(--color-accent)11",
-                  border: "1px solid var(--color-accent)33",
-                }}
-              >
-                {"\u{1F4D0}"} View Movement Diagram
-              </button>
-            ) : ex.diagram && (
-              <button
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onDiagram(ex.diagram!);
-                }}
-                data-testid="view-diagram"
-                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150"
-                style={{
-                  background: "var(--color-accent)11",
-                  border: "1px solid var(--color-accent)33",
-                }}
-              >
-                {"\u{1F4D0}"} View Movement Diagram
-              </button>
-            )}
 
             {/* Visual guide (pre block) */}
             {ex.visual && !ex.diagram && (
@@ -293,10 +327,10 @@ export default function ExerciseRow({
                 })}
               </div>
             )}
-          </div>}
+          </div>
 
           {/* Equipment chips */}
-          {showInstructions && ex.requires.length > 0 && (
+          {ex.requires.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
               {ex.requires.map((eq) => {
                 const eqData = EQUIPMENT[eq];
@@ -316,44 +350,11 @@ export default function ExerciseRow({
                       border: `1px solid ${has ? "var(--color-safe-border)" : "var(--color-danger-border)"}`,
                     }}
                   >
-                    {eqData ? eqData.icon : ""}{" "}
-                    {eqData ? eqData.name : eq}
+                    {eqData ? eqData.icon : ""} {eqData ? eqData.name : eq}
                   </span>
                 );
               })}
             </div>
-          )}
-
-          {/* Equipment toggle + swap panel (edit mode only) */}
-          {hasSwapOptions && editMode && (
-            <>
-              <button
-                onClick={(ev) => { ev.stopPropagation(); setSwapOpen((v) => !v); }}
-                className="mt-3 w-full p-2.5 rounded-xl cursor-pointer font-[inherit] flex items-center justify-between text-[12px] font-semibold min-h-[44px] transition-all duration-150"
-                style={{
-                  background: swapOpen ? "var(--color-accent)15" : "var(--color-bg)",
-                  border: `1px solid ${swapOpen ? "var(--color-accent)55" : "var(--color-border)"}`,
-                  color: swapOpen ? "var(--color-accent)" : "var(--color-text-muted)",
-                }}
-              >
-                <span>🔄 Equipment &amp; Alternatives</span>
-                <span
-                  className="text-[10px] transition-transform duration-200"
-                  style={{ transform: swapOpen ? "rotate(180deg)" : "none" }}
-                >▼</span>
-              </button>
-              {showSwap && (
-                <EquipmentSwapPanel
-                  currentName={name}
-                  currentExercise={ex}
-                  onSwap={onSwap}
-                  equipment={equipment}
-                  workoutExercises={workoutExercises}
-                  selectedVariantId={selectedVariantId}
-                  onSelectVariant={onSelectVariant}
-                />
-              )}
-            </>
           )}
 
           {/* Rest timer button */}
@@ -361,7 +362,7 @@ export default function ExerciseRow({
             <button
               onClick={(ev) => {
                 ev.stopPropagation();
-                onSwap("__timer__" + ex.rest);
+                onStartTimer?.(ex.rest);
               }}
               className="mt-3 w-full p-3 rounded-xl text-sm font-bold cursor-pointer font-[inherit] text-accent min-h-[48px] transition-colors duration-150"
               style={{

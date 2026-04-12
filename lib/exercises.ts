@@ -86,6 +86,7 @@ export const EQUIPMENT: Record<string, EquipmentItem> = {
   legpress: { name: "Leg Press", icon: "\u{1F9B5}", category: "machines" },
   hacksquat: { name: "Hack Squat", icon: "\u{1F9BF}", category: "machines" },
   latpulldown: { name: "Lat Pulldown", icon: "\u2B07\uFE0F", category: "machines" },
+  chestpress: { name: "Chest Press Machine", icon: "\u{1F4AA}", category: "machines" },
   pecdeck: { name: "Pec Deck / Fly", icon: "\u{1F98B}", category: "machines" },
   dipMachine: { name: "Dip Machine", icon: "\u2B07\uFE0F", category: "machines" },
   preacher: { name: "Preacher Bench", icon: "\u{1F4BA}", category: "machines" },
@@ -197,7 +198,7 @@ export const EX: Record<string, Exercise> = {
   "Machine Chest Press": {
     id: "machine_chest_press",
     name: "Machine Chest Press",
-    requires: ["cables"],
+    requires: ["chestpress"],
     category: "push",
     sets: [["3", "10-12"], ["3", "8-10"], ["3", "6-8"]],
     rest: 90,
@@ -229,18 +230,6 @@ export const EX: Record<string, Exercise> = {
           "Set pin to desired weight on the stack",
           "For drop sets: pre-plan your drops (e.g. 120 \u2192 100 \u2192 80)",
           "Adjust seat height so handles are at nipple line",
-        ],
-      },
-      {
-        id: "cable_crossover",
-        label: "Cable Crossover Station",
-        icon: "\u2696\uFE0F",
-        description: "Dual cable station with adjustable pulleys set at chest height",
-        setupCues: [
-          "Set both pulleys to chest height",
-          "Use D-handles or stirrup handles",
-          "Sit on a bench between the cables for NWB safety",
-          "Press handles forward and together in front of chest",
         ],
       },
     ],
@@ -485,6 +474,41 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Lying Skull Crushers"],
     visual: " |     |\n O-___-O\n | | | |\n |_|_|_|\n   | |\n  [_|_]",
+    machineVariants: [
+      {
+        id: "pin_loaded_dip",
+        label: "Pin-Loaded (Assisted)",
+        icon: "\u{1F4CC}",
+        description: "Selectorized assisted dip — pin sets assistance (more weight = more help)",
+        setupCues: [
+          "Set pin HIGHER for more assistance (inverse to free weights)",
+          "Knees or feet on the assist platform",
+          "Grip handles at shoulder width",
+        ],
+      },
+      {
+        id: "plate_loaded_dip",
+        label: "Plate-Loaded",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded dip machine with fixed handles",
+        setupCues: [
+          "Load plates evenly",
+          "Grip handles; keep torso upright for triceps emphasis",
+          "Control the negative \u2014 3 seconds down",
+        ],
+      },
+      {
+        id: "seated_dip",
+        label: "Seated Dip",
+        icon: "\u{1F4BA}",
+        description: "Seated pressing machine with dip-style handles (chest/tri emphasis)",
+        setupCues: [
+          "Sit fully seated \u2014 back against pad",
+          "Press handles down until elbows lock",
+          "Left foot rests on platform; no weight bearing",
+        ],
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -941,6 +965,41 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Hammer Curls", "Incline DB Curl", "Cable Curl", "TRX Curl"],
     visual: "     O\n   / | \\\n []\\ | /[]\n   +-+-+ (Seat)\n     |",
+    machineVariants: [
+      {
+        id: "preacher_ezbar",
+        label: "Preacher + EZ-Bar",
+        icon: "\u{1F529}",
+        description: "Standard preacher bench with EZ-curl bar — wrist-friendly angle",
+        setupCues: [
+          "EZ-bar in the angled grips for wrist comfort",
+          "Arms fully rested on pad — no elbows off the edge",
+          "Full stretch at bottom, controlled top squeeze",
+        ],
+      },
+      {
+        id: "preacher_dumbbell",
+        label: "Preacher + DB",
+        icon: "\u{1F4AA}",
+        description: "Single-arm preacher curl with a dumbbell — fix L/R asymmetry",
+        setupCues: [
+          "One arm at a time, opposite hand supports pad",
+          "Neutral or supinated grip",
+          "Great for weak-side work",
+        ],
+      },
+      {
+        id: "preacher_machine",
+        label: "Preacher Machine",
+        icon: "\u{1F4CC}",
+        description: "Pin-loaded preacher curl machine (if your gym has one)",
+        setupCues: [
+          "Adjust seat so armpit rests at top of pad",
+          "Set pin to working weight",
+          "Full ROM — stretch bottom, squeeze top",
+        ],
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -1163,6 +1222,41 @@ export const EX: Record<string, Exercise> = {
     why: "Machine provides constant resistance through the full ROM. Easier to isolate rear delts than with free weights — no body swing possible.",
     safety: "safe",
     swaps: ["Seated Face Pulls", "Reverse Fly"],
+    machineVariants: [
+      {
+        id: "pin_loaded_pecdeck",
+        label: "Pin-Loaded Stack",
+        icon: "\u{1F4CC}",
+        description: "Selectorized pec deck — fastest for drop sets and micro-loading",
+        setupCues: [
+          "Set pin to working weight",
+          "Adjust seat height so handles align with shoulder joint",
+          "Chest against pad, grip handles behind shoulders for reverse fly",
+        ],
+      },
+      {
+        id: "plate_loaded_pecdeck",
+        label: "Plate-Loaded",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Plate-loaded pec deck / rear delt machine with independent arms",
+        setupCues: [
+          "Load plates evenly on both sides",
+          "Sit facing pad for reverse fly variation",
+          "Grip handles so elbows align with shoulders at start",
+        ],
+      },
+      {
+        id: "iso_lateral_pecdeck",
+        label: "Iso-Lateral",
+        icon: "\u2696\uFE0F",
+        description: "Each arm moves independently — good for addressing L/R asymmetry",
+        setupCues: [
+          "Load each side to equal weight (or match per side)",
+          "Can train one arm at a time if fatigued",
+          "Squeeze scapulae together at end range",
+        ],
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
@@ -1260,6 +1354,42 @@ export const EX: Record<string, Exercise> = {
     why: "Squat-pattern stimulus without standing balance demands. Good complement to leg press.",
     safety: "caution",
     swaps: ["SL Leg Press (Right)"],
+    machineVariants: [
+      {
+        id: "plate_loaded_hack",
+        label: "Plate-Loaded",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Classic 45\u00B0 plate-loaded hack squat sled",
+        setupCues: [
+          "Load plates evenly — start light for single-leg balance",
+          "Right foot centered on platform, toes slightly out",
+          "Shoulder pads snug, back flat against pad",
+          "Stop just before 90\u00B0 hip flexion",
+        ],
+      },
+      {
+        id: "pin_loaded_hack",
+        label: "Pin-Loaded",
+        icon: "\u{1F4CC}",
+        description: "Selectorized hack squat machine \u2014 faster micro-loading",
+        setupCues: [
+          "Set pin to working weight",
+          "Right foot on platform; left leg rests off the side",
+          "Use safety stops set 1-2 inches below your stopping depth",
+        ],
+      },
+      {
+        id: "reverse_hack",
+        label: "Reverse Hack",
+        icon: "\u{1F9BF}",
+        description: "Facing the pad \u2014 even more hamstring/glute-dominant",
+        setupCues: [
+          "Face the pad, chest against it",
+          "Right foot on platform; brace core hard",
+          "Hip flexion still capped at 90\u00B0",
+        ],
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
