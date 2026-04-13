@@ -15,11 +15,11 @@ Zero cost: SQLite database, GitHub OAuth, deployable on any free tier.
 
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
 cp .env.example .env   # Edit with your GitHub OAuth credentials
-uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000
 ```
+
+`uv` auto-creates the venv and installs deps on first run.
 
 Then open http://localhost:8000/docs for the interactive API docs.
 
@@ -60,9 +60,10 @@ Then open http://localhost:8000/docs for the interactive API docs.
 
 **Render.com** (recommended):
 - New Web Service → connect repo → set root to `backend/`
-- Build: `pip install -r requirements.txt`
-- Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Build: `pip -m ensurepip && pip install uv && uv sync --no-dev`
+- Start: `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 - Add env vars from `.env.example`
+- Custom domain: `me.93.fyi` → CNAME to `<service>.onrender.com`
 - Free tier sleeps after 15min inactivity (fine for personal use)
 
 **fly.io**:
