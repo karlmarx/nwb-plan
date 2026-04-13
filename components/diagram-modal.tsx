@@ -420,10 +420,170 @@ function SidePlankDiagram({ onClose }: DiagramProps) {
   );
 }
 
+function HipThrustSupportDiagram({ onClose }: DiagramProps) {
+  return (
+    <div
+      style={{
+        padding: '24px 16px 32px',
+        color: '#f0ede6',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div>
+          <div style={{ fontSize: 'clamp(1.1rem,3.5vw,1.5rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
+            SL Hip Thrust — Support Height
+          </div>
+          <div style={{ fontSize: 10, color: '#666', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
+            Why left leg support surface height matters
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: '#222',
+            border: '1px solid #444',
+            color: '#aaa',
+            borderRadius: 8,
+            padding: '6px 12px',
+            fontSize: 12,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            flexShrink: 0
+          }}
+        >
+          ✕ Close
+        </button>
+      </div>
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" width="100%" style={{ display: 'block' }}>
+        <defs>
+          <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="#ff4444"/>
+          </marker>
+          <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="#44cc44"/>
+          </marker>
+        </defs>
+
+        <rect width="800" height="900" fill="#0d1117" rx="12"/>
+
+        <text x="400" y="40" textAnchor="middle" fill="#e6edf3" fontSize="20" fontWeight="bold">SL Hip Thrust (R) — Left Leg Support Height Matters</text>
+
+        {/* BAD - Bench height support, BOTTOM position */}
+        <text x="400" y="80" textAnchor="middle" fill="#ff6666" fontSize="16" fontWeight="bold">✗ LEFT CALF ON SECOND BENCH — BOTTOM OF REP</text>
+
+        <line x1="40" y1="280" x2="760" y2="280" stroke="#333" strokeWidth="1" strokeDasharray="6,4"/>
+        <text x="750" y="295" textAnchor="end" fill="#555" fontSize="11">floor</text>
+
+        <rect x="500" y="200" width="120" height="18" rx="3" fill="#4a5568" stroke="#718096" strokeWidth="1"/>
+        <text x="560" y="195" textAnchor="middle" fill="#718096" fontSize="10">BENCH ~17&quot;</text>
+
+        <rect x="120" y="200" width="120" height="18" rx="3" fill="#4a5568" stroke="#ff4444" strokeWidth="1.5" strokeDasharray="4,3"/>
+        <text x="180" y="195" textAnchor="middle" fill="#ff6666" fontSize="10">2ND BENCH ~17&quot;</text>
+
+        <circle cx="530" cy="193" r="16" fill="none" stroke="#e6edf3" strokeWidth="2.5"/>
+        <line x1="515" y1="200" x2="380" y2="260" stroke="#e6edf3" strokeWidth="3"/>
+        <circle cx="380" cy="260" r="6" fill="#e6edf3"/>
+        <text x="380" y="250" textAnchor="middle" fill="#aaa" fontSize="10">hips ~6&quot;</text>
+
+        <line x1="380" y1="260" x2="430" y2="275" stroke="#44cc88" strokeWidth="3"/>
+        <line x1="430" y1="275" x2="450" y2="278" stroke="#44cc88" strokeWidth="3"/>
+        <circle cx="450" cy="278" r="4" fill="#44cc88"/>
+        <text x="460" y="275" fill="#44cc88" fontSize="10">R foot</text>
+
+        <line x1="380" y1="260" x2="280" y2="230" stroke="#ff6666" strokeWidth="3"/>
+        <line x1="280" y1="230" x2="200" y2="210" stroke="#ff6666" strokeWidth="3"/>
+        <circle cx="200" cy="210" r="4" fill="#ff6666"/>
+
+        <path d="M 400,260 A 30,30 0 0,0 370,240" fill="none" stroke="#ff4444" strokeWidth="1.5"/>
+        <text x="415" y="238" fill="#ff4444" fontSize="13" fontWeight="bold">~70-90°</text>
+        <text x="415" y="252" fill="#ff4444" fontSize="11">FLEXION!</text>
+
+        <rect x="80" y="305" width="640" height="40" rx="6" fill="#331111" stroke="#ff4444" strokeWidth="1"/>
+        <text x="400" y="322" textAnchor="middle" fill="#ff6666" fontSize="13" fontWeight="bold">⚠ Hips drop to ~6&quot; but left calf stays at ~17&quot; → left thigh angles UP</text>
+        <text x="400" y="338" textAnchor="middle" fill="#ff8888" fontSize="12">Iliopsoas fires to stabilize + hip flexion approaches/exceeds 90° cap</text>
+
+        <line x1="60" y1="375" x2="740" y2="375" stroke="#2d333b" strokeWidth="1"/>
+
+        {/* GOOD - Floor level support */}
+        <text x="400" y="410" textAnchor="middle" fill="#44cc88" fontSize="16" fontWeight="bold">✓ LEFT HEEL ON FLOOR (or foam roller) — SAFE</text>
+        <text x="220" y="440" textAnchor="middle" fill="#8b949e" fontSize="13" fontWeight="bold">TOP OF REP</text>
+
+        <line x1="40" y1="610" x2="380" y2="610" stroke="#333" strokeWidth="1" strokeDasharray="6,4"/>
+        <text x="370" y="625" textAnchor="end" fill="#555" fontSize="11">floor</text>
+
+        <rect x="260" y="530" width="110" height="18" rx="3" fill="#4a5568" stroke="#718096" strokeWidth="1"/>
+
+        <circle cx="295" cy="523" r="14" fill="none" stroke="#e6edf3" strokeWidth="2.5"/>
+        <line x1="282" y1="530" x2="180" y2="535" stroke="#e6edf3" strokeWidth="3"/>
+        <circle cx="180" cy="535" r="5" fill="#e6edf3"/>
+
+        <line x1="180" y1="535" x2="210" y2="575" stroke="#44cc88" strokeWidth="3"/>
+        <line x1="210" y1="575" x2="220" y2="608" stroke="#44cc88" strokeWidth="3"/>
+        <circle cx="220" cy="608" r="4" fill="#44cc88"/>
+
+        <line x1="180" y1="535" x2="120" y2="565" stroke="#66aaff" strokeWidth="3"/>
+        <line x1="120" y1="565" x2="60" y2="607" stroke="#66aaff" strokeWidth="3"/>
+        <circle cx="60" cy="607" r="4" fill="#66aaff"/>
+        <text x="50" y="630" fill="#66aaff" fontSize="10">L heel</text>
+
+        <path d="M 160,535 A 25,25 0 0,0 168,555" fill="none" stroke="#44cc88" strokeWidth="1.5"/>
+        <text x="110" y="525" fill="#44cc88" fontSize="12" fontWeight="bold">slight extension ✓</text>
+
+        <text x="600" y="440" textAnchor="middle" fill="#8b949e" fontSize="13" fontWeight="bold">BOTTOM OF REP</text>
+
+        <line x1="420" y1="610" x2="760" y2="610" stroke="#333" strokeWidth="1" strokeDasharray="6,4"/>
+        <text x="750" y="625" textAnchor="end" fill="#555" fontSize="11">floor</text>
+
+        <rect x="620" y="530" width="110" height="18" rx="3" fill="#4a5568" stroke="#718096" strokeWidth="1"/>
+
+        <circle cx="655" cy="523" r="14" fill="none" stroke="#e6edf3" strokeWidth="2.5"/>
+        <line x1="640" y1="533" x2="555" y2="590" stroke="#e6edf3" strokeWidth="3"/>
+        <circle cx="555" cy="590" r="5" fill="#e6edf3"/>
+        <text x="555" y="580" textAnchor="middle" fill="#aaa" fontSize="10">hips ~6&quot;</text>
+
+        <line x1="555" y1="590" x2="580" y2="600" stroke="#44cc88" strokeWidth="3"/>
+        <line x1="580" y1="600" x2="595" y2="608" stroke="#44cc88" strokeWidth="3"/>
+        <circle cx="595" cy="608" r="4" fill="#44cc88"/>
+
+        <line x1="555" y1="590" x2="500" y2="598" stroke="#66aaff" strokeWidth="3"/>
+        <line x1="500" y1="598" x2="440" y2="607" stroke="#66aaff" strokeWidth="3"/>
+        <circle cx="440" cy="607" r="4" fill="#66aaff"/>
+        <text x="430" y="630" fill="#66aaff" fontSize="10">L heel</text>
+
+        <path d="M 535,590 A 25,25 0 0,0 540,600" fill="none" stroke="#44cc88" strokeWidth="1.5"/>
+        <text x="480" y="575" fill="#44cc88" fontSize="12" fontWeight="bold">~level / neutral ✓</text>
+
+        <rect x="80" y="650" width="640" height="55" rx="6" fill="#0a2211" stroke="#44cc88" strokeWidth="1"/>
+        <text x="400" y="670" textAnchor="middle" fill="#44cc88" fontSize="13" fontWeight="bold">✓ Both positions safe: left hip stays near neutral or slight extension</text>
+        <text x="400" y="688" textAnchor="middle" fill="#66dd99" fontSize="12">Heel on floor = support surface tracks with hip height through full ROM</text>
+        <text x="400" y="700" textAnchor="middle" fill="#66dd99" fontSize="12">Zero iliopsoas activation · Hip flexion never approaches 90°</text>
+
+        {/* Legend */}
+        <rect x="80" y="730" width="640" height="80" rx="6" fill="#161b22" stroke="#2d333b" strokeWidth="1"/>
+        <circle cx="120" cy="752" r="6" fill="#44cc88"/>
+        <text x="135" y="757" fill="#44cc88" fontSize="12">Right leg (working — heel drive)</text>
+        <circle cx="120" cy="777" r="6" fill="#66aaff"/>
+        <text x="135" y="782" fill="#66aaff" fontSize="12">Left leg (passive — resting on floor, zero activation)</text>
+        <circle cx="420" cy="752" r="6" fill="#e6edf3"/>
+        <text x="435" y="757" fill="#e6edf3" fontSize="12">Torso / hips</text>
+        <circle cx="420" cy="777" r="6" fill="#ff6666"/>
+        <text x="435" y="782" fill="#ff6666" fontSize="12">Danger — iliopsoas activation + flexion risk</text>
+
+        <text x="400" y="845" textAnchor="middle" fill="#e6edf3" fontSize="14" fontWeight="bold">KEY INSIGHT: Support surface must be AT OR BELOW hip height at the bottom.</text>
+        <text x="400" y="868" textAnchor="middle" fill="#8b949e" fontSize="13">Floor = lowest possible = safest. Foam roller (~6&quot;) also works.</text>
+        <text x="400" y="888" textAnchor="middle" fill="#8b949e" fontSize="13">Bench-height (~17&quot;) = left thigh forced upward = ✗ UNSAFE</text>
+      </svg>
+    </div>
+  );
+}
+
 export const DIAGRAMS: Record<string, DiagramComponent> = {
   planche: PlancheDiagram,
   sideplank: SidePlankDiagram,
   "core-demos": CoreDemoGuide,
+  "hip-thrust-support": HipThrustSupportDiagram,
 };
 
 interface DiagramModalProps {
