@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="nwb_blue">#FF38BDF8</color>
+    <color name="nwb_purple">#FFA78BFA</color>
+    <color name="nwb_green">#FF10B981</color>
+    <color name="nwb_slate">#FF64748B</color>
+    <color name="nwb_orange">#FFF97316</color>
+    <color name="nwb_dark_bg">#FF0F172A</color>
+    <color name="nwb_dark_surface">#FF1E293B</color>
+</resources>
