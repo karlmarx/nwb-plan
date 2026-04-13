@@ -94,6 +94,47 @@ fun SettingsScreen(
             }
         }
 
+        // Account section
+        item {
+            Spacer(modifier = Modifier.height(12.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "Account",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NwbSlate,
+                )
+                if (viewModel.isLoggedIn) {
+                    Text(
+                        text = "\u2713 ${viewModel.githubUsername ?: "GitHub"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = com.nwb.watch.ui.theme.NwbGreen,
+                    )
+                    Text(
+                        text = "Workouts sync to backend",
+                        fontSize = 10.sp,
+                        color = NwbSlate,
+                    )
+                } else {
+                    Text(
+                        text = "Not logged in",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = NwbSlate,
+                    )
+                    Text(
+                        text = "Login on phone to sync",
+                        fontSize = 10.sp,
+                        color = NwbSlate,
+                    )
+                }
+            }
+        }
+
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }

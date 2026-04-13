@@ -11,6 +11,7 @@ import com.nwb.watch.data.db.NwbDatabase
 import com.nwb.watch.data.db.PersonalRecordDao
 import com.nwb.watch.data.db.WorkoutLogDao
 import com.nwb.watch.data.db.WorkoutLogger
+import com.nwb.watch.data.sync.BackendSync
 import com.nwb.watch.data.sync.SyncManager
 import dagger.Module
 import dagger.Provides
@@ -89,4 +90,11 @@ object AppModule {
         @ApplicationContext context: Context,
         logger: WorkoutLogger,
     ): SyncManager = SyncManager(context, logger)
+
+    @Provides
+    @Singleton
+    fun provideBackendSync(
+        @ApplicationContext context: Context,
+        logger: WorkoutLogger,
+    ): BackendSync = BackendSync(context, logger)
 }

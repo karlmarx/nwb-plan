@@ -54,6 +54,7 @@ class WorkoutViewModel @Inject constructor(
     private val hapticEngine: HapticEngine,
     private val tempoTracker: TempoTracker,
     private val workoutLogger: WorkoutLogger,
+    private val backendSync: com.nwb.watch.data.sync.BackendSync,
 ) : ViewModel() {
 
     private val _restTimer = MutableStateFlow(0)
@@ -298,12 +299,39 @@ class WorkoutViewModel @Inject constructor(
             if (logId != null) {
                 workoutLogger.updateExercises(logId, activeExerciseLogs.toList())
                 workoutLogger.completeWorkout(logId)
+
+                // Push to backend if logged in (no-op if not)
+                val completedLog = workoutLogger.getLog(logId)
+                if (completedLog != null) {
+                    backendSync.pushIfLoggedIn(completedLog)
+                }
             }
             activeLogId = null
             activeExerciseLogs.clear()
         }
         voiceCoach.announceWorkoutComplete(state.workoutTitle)
         hapticEngine.workoutComplete()
+    }
+
+    /** Whether the user is logged in via GitHub. */
+    val isLoggedIn: Boolean get() = backendSync.isLoggedIn
+    val loginUrl: String get() = backendSync.getLoginUrl()
+    val githubUsername: String? get() = backendSync.apiClient.username
+
+    fun handleAuthCallback(token: String, username: String, avatarUrl: String?) {
+        backendSync.saveAuth(token, username, avatarUrl)
+    }
+
+    fun logout() {
+        backendSync.logout()
+    }
+
+    fun syncToBackend() {
+        viewModelScope.launch { backendSync.syncAll() }
+    }
+
+    fun syncToHevy() {
+        viewModelScope.launch { backendSync.syncToHevy() }
     }
 
     fun endWorkout() {
