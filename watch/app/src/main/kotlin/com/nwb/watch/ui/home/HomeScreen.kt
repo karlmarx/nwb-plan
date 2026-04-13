@@ -38,6 +38,7 @@ fun HomeScreen(
     viewModel: WorkoutViewModel,
     onStartWorkout: () -> Unit,
     onSettings: () -> Unit,
+    onSync: (() -> Unit)? = null,
 ) {
     val state by viewModel.uiState.collectAsState()
     val listState = rememberScalingLazyListState()
@@ -135,17 +136,28 @@ fun HomeScreen(
             }
         }
 
-        // Settings button
+        // Settings & Sync buttons
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            IconButton(
-                onClick = onSettings,
-                modifier = Modifier.size(36.dp),
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(
-                    text = "\u2699",
-                    fontSize = 20.sp,
-                )
+                IconButton(
+                    onClick = onSettings,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Text(text = "\u2699", fontSize = 20.sp)
+                }
+                if (onSync != null) {
+                    Spacer(modifier = Modifier.size(16.dp))
+                    IconButton(
+                        onClick = onSync,
+                        modifier = Modifier.size(36.dp),
+                    ) {
+                        Text(text = "\u21C5", fontSize = 20.sp)
+                    }
+                }
             }
         }
     }

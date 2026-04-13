@@ -8,7 +8,11 @@ import com.nwb.watch.coaching.VoiceCoach
 import com.nwb.watch.data.ExerciseRepository
 import com.nwb.watch.data.WorkoutScheduler
 import com.nwb.watch.data.WorkoutState
+import com.nwb.watch.data.db.WorkoutLogger
 import com.nwb.watch.data.model.Exercise
+import com.nwb.watch.data.model.ExerciseLog
+import com.nwb.watch.data.model.SetLog
+import com.nwb.watch.data.model.WorkoutLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -37,6 +41,8 @@ data class WorkoutUiState(
     val isRestTimerRunning: Boolean = false,
     val ttsEnabled: Boolean = true,
     val hapticsEnabled: Boolean = true,
+    val activeLogId: String? = null,
+    val totalCompletedWorkouts: Int = 0,
 )
 
 @HiltViewModel
@@ -47,11 +53,18 @@ class WorkoutViewModel @Inject constructor(
     private val voiceCoach: VoiceCoach,
     private val hapticEngine: HapticEngine,
     private val tempoTracker: TempoTracker,
+    private val workoutLogger: WorkoutLogger,
 ) : ViewModel() {
 
     private val _restTimer = MutableStateFlow(0)
     private val _isRestRunning = MutableStateFlow(false)
     private var restTimerJob: Job? = null
+
+    /** ID of the active WorkoutLog being recorded. */
+    private var activeLogId: String? = null
+
+    /** In-memory exercise logs for the active workout. */
+    private val activeExerciseLogs = mutableListOf<ExerciseLog>()
 
     val uiState: StateFlow<WorkoutUiState> = combine(
         workoutState.activeWorkoutKey,
@@ -80,8 +93,14 @@ class WorkoutViewModel @Inject constructor(
             isWorkoutActive = activeKey != null,
             ttsEnabled = ttsOn,
             hapticsEnabled = hapticsOn,
+            activeLogId = activeLogId,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), WorkoutUiState())
+
+    /** Stream of completed workout count for UI display. */
+    val completedWorkoutCount: StateFlow<Int> =
+        workoutLogger.completedCount()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     init {
         voiceCoach.initialize()
@@ -97,7 +116,29 @@ class WorkoutViewModel @Inject constructor(
         val state = uiState.value
         viewModelScope.launch {
             workoutState.startWorkout(state.workoutKey)
+
+            // Create a workout log
+            val log = workoutLogger.startWorkout(
+                workoutKey = state.workoutKey,
+                workoutTitle = state.workoutTitle,
+                phaseIndex = state.phaseIndex,
+                source = "watch",
+            )
+            activeLogId = log.id
+
+            // Initialize exercise logs for all exercises
+            activeExerciseLogs.clear()
+            state.exercises.forEach { exercise ->
+                activeExerciseLogs.add(
+                    ExerciseLog(
+                        exerciseId = exercise.id,
+                        exerciseName = exercise.name,
+                        sets = emptyList(),
+                    )
+                )
+            }
         }
+
         // Announce first exercise
         val firstExercise = state.exercises.firstOrNull()
         if (firstExercise != null) {
@@ -110,21 +151,47 @@ class WorkoutViewModel @Inject constructor(
         hapticEngine.doubleTap()
     }
 
-    fun completeSet() {
+    /**
+     * Log a completed set with weight/reps/duration data.
+     * Called from SetLoggerScreen or ExerciseTimerScreen.
+     */
+    fun logSet(exerciseIndex: Int, set: SetLog) {
         val state = uiState.value
-        val exercise = state.exercises.getOrNull(state.currentExerciseIndex) ?: return
-        val newSets = state.completedSets + 1
-        val totalSets = exercise.setsForPhase(state.phaseIndex).first.toIntOrNull() ?: 4
+        val exercise = state.exercises.getOrNull(exerciseIndex) ?: return
 
         viewModelScope.launch {
             workoutState.completeSet()
+
+            // Update in-memory log
+            if (exerciseIndex < activeExerciseLogs.size) {
+                val exerciseLog = activeExerciseLogs[exerciseIndex]
+                val sets = exerciseLog.sets.toMutableList()
+                sets.add(set)
+                activeExerciseLogs[exerciseIndex] = exerciseLog.copy(sets = sets)
+
+                // Persist to Room
+                val logId = activeLogId
+                if (logId != null) {
+                    workoutLogger.updateExercises(logId, activeExerciseLogs.toList())
+                }
+            }
         }
+
+        val newSets = state.completedSets + 1
+        val totalSets = exercise.setsForPhase(state.phaseIndex).first.toIntOrNull() ?: 4
 
         voiceCoach.announceSetDone(newSets, totalSets)
         hapticEngine.doubleTap()
 
+        // Check for PR
+        if (set.weightKg != null && set.weightKg > 0) {
+            voiceCoach.speak(
+                "${"%.1f".format(set.weightKg)} kg times ${set.reps}.",
+                com.nwb.watch.coaching.CoachPriority.LOW,
+            )
+        }
+
         if (newSets >= totalSets) {
-            // All sets done — move to next exercise or finish
             val nextIndex = state.currentExerciseIndex + 1
             if (nextIndex < state.exercises.size) {
                 val nextExercise = state.exercises[nextIndex]
@@ -133,9 +200,22 @@ class WorkoutViewModel @Inject constructor(
                 finishWorkout()
             }
         } else {
-            // More sets to go — start rest timer
             startRestTimer(exercise.rest, null)
         }
+    }
+
+    fun completeSet() {
+        val state = uiState.value
+        val exercise = state.exercises.getOrNull(state.currentExerciseIndex) ?: return
+        // Quick complete without weight/rep data (legacy path)
+        logSet(
+            state.currentExerciseIndex,
+            SetLog(
+                index = state.completedSets,
+                type = "bodyweight",
+                completed = true,
+            ),
+        )
     }
 
     private fun startRestTimer(seconds: Int, nextExercise: Exercise?) {
@@ -166,7 +246,6 @@ class WorkoutViewModel @Inject constructor(
             }
             _isRestRunning.value = false
 
-            // Auto-advance to next exercise if all sets were done
             if (nextExercise != null) {
                 advanceToNextExercise()
             }
@@ -213,6 +292,15 @@ class WorkoutViewModel @Inject constructor(
         val state = uiState.value
         viewModelScope.launch {
             workoutState.endWorkout()
+
+            // Complete the workout log
+            val logId = activeLogId
+            if (logId != null) {
+                workoutLogger.updateExercises(logId, activeExerciseLogs.toList())
+                workoutLogger.completeWorkout(logId)
+            }
+            activeLogId = null
+            activeExerciseLogs.clear()
         }
         voiceCoach.announceWorkoutComplete(state.workoutTitle)
         hapticEngine.workoutComplete()
@@ -224,6 +312,13 @@ class WorkoutViewModel @Inject constructor(
         voiceCoach.stop()
         viewModelScope.launch {
             workoutState.endWorkout()
+            val logId = activeLogId
+            if (logId != null) {
+                workoutLogger.updateExercises(logId, activeExerciseLogs.toList())
+                workoutLogger.completeWorkout(logId)
+            }
+            activeLogId = null
+            activeExerciseLogs.clear()
         }
     }
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="nwb_blue">#FF38BDF8</color>
+    <color name="nwb_dark_bg">#FF0F172A</color>
+    <color name="nwb_dark_surface">#FF1E293B</color>
+</resources>

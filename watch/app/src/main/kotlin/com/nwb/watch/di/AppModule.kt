@@ -7,6 +7,11 @@ import com.nwb.watch.coaching.VoiceCoach
 import com.nwb.watch.data.ExerciseRepository
 import com.nwb.watch.data.WorkoutScheduler
 import com.nwb.watch.data.WorkoutState
+import com.nwb.watch.data.db.NwbDatabase
+import com.nwb.watch.data.db.PersonalRecordDao
+import com.nwb.watch.data.db.WorkoutLogDao
+import com.nwb.watch.data.db.WorkoutLogger
+import com.nwb.watch.data.sync.SyncManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,4 +59,34 @@ object AppModule {
         hapticEngine: HapticEngine,
         voiceCoach: VoiceCoach,
     ): TempoTracker = TempoTracker(hapticEngine, voiceCoach)
+
+    // ── Database ──
+
+    @Provides
+    @Singleton
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+    ): NwbDatabase = NwbDatabase.create(context)
+
+    @Provides
+    fun provideWorkoutLogDao(db: NwbDatabase): WorkoutLogDao = db.workoutLogDao()
+
+    @Provides
+    fun providePersonalRecordDao(db: NwbDatabase): PersonalRecordDao = db.personalRecordDao()
+
+    @Provides
+    @Singleton
+    fun provideWorkoutLogger(
+        logDao: WorkoutLogDao,
+        prDao: PersonalRecordDao,
+    ): WorkoutLogger = WorkoutLogger(logDao, prDao)
+
+    // ── Sync ──
+
+    @Provides
+    @Singleton
+    fun provideSyncManager(
+        @ApplicationContext context: Context,
+        logger: WorkoutLogger,
+    ): SyncManager = SyncManager(context, logger)
 }

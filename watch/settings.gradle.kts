@@ -14,4 +14,5 @@ dependencyResolution {
 }
 
 rootProject.name = "nwb-watch"
-include(":app")
+include(":app")    // Wear OS watch app
+include(":phone")  // Phone companion app
