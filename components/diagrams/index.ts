@@ -32,4 +32,11 @@ export const EXERCISE_TO_DIAGRAM: Record<string, string> = {
   plank_knee_tuck_r_only:              "a7",
   mcgill_curl_up:                      "r6",
   stir_the_pot:                        "r7",
+  // ── Prone Ham Curl Machine Core ──
+  prone_y_raise:                       "p7",
+  prone_t_raise:                       "p8",
+  prone_w_raise:                       "p9",
+  prone_trunk_extension:               "p10",
+  prone_iso_hold:                      "p11",
+  prone_lateral_trunk_raise:           "p12",
 };
