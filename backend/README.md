@@ -1,27 +1,34 @@
 # NWB Workout API — Python Backend
 
 FastAPI backend for the NWB Watch/Phone workout tracker.
-Zero cost: SQLite database, GitHub OAuth, deployable on any free tier.
+Neon Postgres (free tier) + GitHub OAuth + Render.com deployment.
 
-## Features
+## Stack (all free)
 
-- **GitHub OAuth** via `me.93.fyi` — login on phone, token shared to watch
-- **Workout log CRUD** — create, read, update, delete workout sessions
-- **Personal records** — auto-detected on workout completion (max weight, max reps, max volume)
-- **Hevy sync** — push completed workouts to Hevy API (requires Hevy API key)
-- **SQLite** — zero-cost file database, no external service needed
+| Layer | Service | Cost |
+|-------|---------|------|
+| API | FastAPI on Render.com | Free |
+| Database | Neon Postgres (512MB) | Free |
+| Auth | GitHub OAuth | Free |
 
-## Setup
+## Local Dev
 
 ```bash
 cd backend
-cp .env.example .env   # Edit with your GitHub OAuth credentials
+cp .env.example .env   # Fill in DATABASE_URL + GitHub OAuth creds
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-`uv` auto-creates the venv and installs deps on first run.
+Open http://localhost:8000/docs for Swagger UI.
 
-Then open http://localhost:8000/docs for the interactive API docs.
+## Neon Setup
+
+1. Go to https://neon.tech → sign up (free)
+2. Create a project (any region)
+3. Copy the connection string from the dashboard
+4. Paste into `DATABASE_URL` in your `.env` / Render env vars
+
+Tables are created automatically on first startup.
 
 ## GitHub OAuth Setup
 
@@ -30,7 +37,29 @@ Then open http://localhost:8000/docs for the interactive API docs.
    - **Application name**: NWB Workout
    - **Homepage URL**: https://nfit.93.fyi
    - **Authorization callback URL**: https://me.93.fyi/auth/callback
-3. Copy Client ID and Client Secret to `.env`
+3. Copy Client ID and Client Secret to env vars
+
+## Render Deployment
+
+| Setting | Value |
+|---------|-------|
+| **Root Directory** | `backend` |
+| **Runtime** | Python |
+| **Build Command** | `pip install uv && uv sync --no-dev` |
+| **Start Command** | `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+| **Branch** | `claude/hevy-features-sync` |
+
+Environment variables:
+```
+DATABASE_URL=postgresql://...@ep-xxx.neon.tech/neondb?sslmode=require
+GITHUB_CLIENT_ID=xxx
+GITHUB_CLIENT_SECRET=xxx
+AUTH_CALLBACK_URL=https://me.93.fyi/auth/callback
+JWT_SECRET=<python -c "import secrets; print(secrets.token_hex(32))">
+FRONTEND_URL=https://nfit.93.fyi
+```
+
+Custom domain: add `me.93.fyi` in Render settings, CNAME to `<service>.onrender.com`.
 
 ## API Endpoints
 
@@ -47,32 +76,4 @@ Then open http://localhost:8000/docs for the interactive API docs.
 | DELETE | `/workouts/{id}` | Yes | Delete workout |
 | GET | `/workouts/prs` | Yes | List personal records |
 | POST | `/sync/hevy` | Yes | Push workouts to Hevy |
-
-## Auth Flow (Mobile)
-
-1. Phone app opens `https://me.93.fyi/auth/github?redirect=nwb://auth`
-2. User authorizes on GitHub
-3. Callback redirects to `nwb://auth?token=xxx`
-4. Phone app captures deep link, stores token
-5. Token shared to watch via Wear Data Layer
-
-## Deployment (Free)
-
-**Render.com** (recommended):
-- New Web Service → connect repo → set root to `backend/`
-- Build: `pip -m ensurepip && pip install uv && uv sync --no-dev`
-- Start: `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Add env vars from `.env.example`
-- Custom domain: `me.93.fyi` → CNAME to `<service>.onrender.com`
-- Free tier sleeps after 15min inactivity (fine for personal use)
-
-**fly.io**:
-```bash
-cd backend
-fly launch   # Uses the Dockerfile
-fly secrets set GITHUB_CLIENT_ID=xxx GITHUB_CLIENT_SECRET=xxx JWT_SECRET=xxx
-```
-
-## Cost
-
-$0. SQLite is a file. Python runs anywhere. GitHub OAuth is free.
+| GET | `/health` | No | Health check |

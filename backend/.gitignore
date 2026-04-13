@@ -1,6 +1,5 @@
 __pycache__/
 *.pyc
 .env
-nwb_workout.db
 .venv/
 uv.lock
