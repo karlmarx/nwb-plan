@@ -321,6 +321,244 @@ export function ProneHamCurlRight({ t }: AnimProps) {
   );
 }
 
+// ── Ham Curl Machine Core Exercises (p7–p12) ──
+// Person lies face-down on prone ham curl machine, ankles locked under pad.
+// Head at left, feet at right. Same machine as p6 but used for core work.
+
+function HamCurlMachine({ floorY = 220 }: { floorY?: number }) {
+  const machineX = 70, machineY = 130, machineW = 200, machineH = 16;
+  return (
+    <g>
+      <line x1="40" y1={floorY} x2="360" y2={floorY} stroke={C.floor} strokeWidth="1.5" />
+      {/* Bench surface */}
+      <rect x={machineX} y={machineY} width={machineW} height={machineH} rx="3" fill="#1e1e1e" stroke={C.equipment} strokeWidth="1.5" />
+      {/* Bench legs */}
+      <line x1={machineX + 20} y1={machineY + machineH} x2={machineX + 20} y2={floorY} stroke={C.equipLight} strokeWidth="3" />
+      <line x1={machineX + machineW - 20} y1={machineY + machineH} x2={machineX + machineW - 20} y2={floorY} stroke={C.equipLight} strokeWidth="3" />
+      {/* Ankle pad at foot end (right side) */}
+      <rect x={machineX + machineW} y={machineY + machineH - 20} width="12" height="30" rx="3" fill={C.equipment} stroke={C.equipLight} strokeWidth="1" />
+      <ellipse cx={machineX + machineW + 10} cy={machineY + machineH + 2} rx="7" ry="7" fill={C.equipLight} stroke={C.weight} strokeWidth="1.5" />
+      <text x={machineX + machineW + 20} y={machineY + machineH + 6} fontSize="8" fill={C.label} fontFamily="monospace">pad</text>
+    </g>
+  );
+}
+
+/** Prone person on ham curl machine. Head at left, ankles under pad at right. */
+function HamCurlPerson({ chestLift = 0, sideShift = 0 }: { chestLift?: number; sideShift?: number }) {
+  const machineX = 70, machineY = 130;
+  const hipX = machineX + 120, hipY = machineY + 2;
+  const shX = machineX + 35, shY = machineY - 3 - chestLift;
+  const hdX = machineX - 18, hdY = shY - 8 + sideShift * 0.3;
+  return (
+    <g>
+      {/* Legs on bench — shins locked under ankle pad */}
+      <line x1={hipX + 5} y1={hipY + 4} x2={machineX + 185} y2={machineY + 12} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={machineX + 185} y1={machineY + 12} x2={machineX + 200} y2={machineY + 14} stroke={C.body} strokeWidth="4.5" strokeLinecap="round" />
+      {/* Second leg slightly offset */}
+      <line x1={hipX - 3} y1={hipY + 8} x2={machineX + 182} y2={machineY + 14} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.5" />
+      {/* Torso */}
+      <line
+        x1={hipX}
+        y1={hipY}
+        x2={shX + sideShift}
+        y2={shY + sideShift * 0.3}
+        stroke={C.body}
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      {/* Head */}
+      <circle cx={hdX + sideShift} cy={hdY} r="10" fill="none" stroke={C.body} strokeWidth="2.5" />
+      <line x1={hdX + 8 + sideShift} y1={hdY + 4} x2={shX - 5 + sideShift} y2={shY + sideShift * 0.3} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+    </g>
+  );
+}
+
+export function ProneYRaise({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const machineX = 70, machineY = 130;
+  const shX = machineX + 35, shY = machineY - 3 - lift * 12;
+
+  // Y-raise: arms extend overhead at ~45° angle, thumbs up
+  const lArmX = shX - 30 - lift * 40, lArmY = shY - 10 - lift * 45;
+  const rArmX = shX + 10 + lift * 30, rArmY = shY - 10 - lift * 45;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      <HamCurlPerson chestLift={lift * 12} />
+      {/* Arms — Y shape */}
+      <line x1={shX - 5} y1={shY + 3} x2={lArmX} y2={lArmY} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx={lArmX} cy={lArmY} r="3.5" fill={C.active} />
+      <line x1={shX + 5} y1={shY + 3} x2={rArmX} y2={rArmY} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx={rArmX} cy={rArmY} r="3.5" fill={C.active} />
+      {/* Scapular activation glow */}
+      <ellipse cx={shX} cy={shY + 10} rx="14" ry="6" fill={C.active} opacity={lift * 0.3} />
+      {/* Letter label */}
+      <text x={330} y={60} fontSize="24" fontWeight="bold" fill={C.active} fontFamily="monospace" opacity="0.5">Y</text>
+      {lift > 0.3 && <text x={shX - 10} y={shY - 18} fill={C.active} fontSize="9" fontWeight="bold" fontFamily="monospace">lower traps</text>}
+    </g>
+  );
+}
+
+export function ProneTRaise({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const machineX = 70, machineY = 130;
+  const shX = machineX + 35, shY = machineY - 3 - lift * 8;
+
+  // T-raise: arms straight out to sides (perpendicular to torso)
+  const armUp = shY - lift * 35;
+  const armDown = shY + 15 + lift * 5;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      <HamCurlPerson chestLift={lift * 8} />
+      {/* Arms — T shape (top and bottom of person, since they're prone facing left) */}
+      <line x1={shX} y1={shY} x2={shX} y2={armUp} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx={shX} cy={armUp} r="3.5" fill={C.active} />
+      <line x1={shX} y1={shY + 5} x2={shX} y2={armDown} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx={shX} cy={armDown} r="3.5" fill={C.active} />
+      {/* Mid-trap activation glow */}
+      <ellipse cx={shX + 15} cy={shY + 8} rx="14" ry="6" fill={C.active} opacity={lift * 0.3} />
+      {/* Letter label */}
+      <text x={330} y={60} fontSize="24" fontWeight="bold" fill={C.active} fontFamily="monospace" opacity="0.5">T</text>
+      {lift > 0.3 && <text x={shX + 35} y={shY} fill={C.active} fontSize="9" fontWeight="bold" fontFamily="monospace">mid traps</text>}
+    </g>
+  );
+}
+
+export function ProneWRaise({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const machineX = 70, machineY = 130;
+  const shX = machineX + 35, shY = machineY - 3 - lift * 10;
+
+  // W-raise: elbows bent ~90°, externally rotated. Two-segment arms.
+  // Upper arm goes slightly out, forearm angles back (external rotation)
+  const elbowUpX = shX - 10, elbowUpY = shY - 12 - lift * 12;
+  const handUpX = shX - 25 - lift * 8, handUpY = elbowUpY - 5 - lift * 8;
+  const elbowDownX = shX - 5, elbowDownY = shY + 18 + lift * 5;
+  const handDownX = shX - 20 - lift * 8, handDownY = elbowDownY + 5 + lift * 8;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      <HamCurlPerson chestLift={lift * 10} />
+      {/* Arms — W shape (elbows bent, externally rotated) */}
+      <line x1={shX - 3} y1={shY - 2} x2={elbowUpX} y2={elbowUpY} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <line x1={elbowUpX} y1={elbowUpY} x2={handUpX} y2={handUpY} stroke={C.active} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={handUpX} cy={handUpY} r="3" fill={C.active} />
+      <line x1={shX - 3} y1={shY + 5} x2={elbowDownX} y2={elbowDownY} stroke={C.active} strokeWidth="3.5" strokeLinecap="round" />
+      <line x1={elbowDownX} y1={elbowDownY} x2={handDownX} y2={handDownY} stroke={C.active} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={handDownX} cy={handDownY} r="3" fill={C.active} />
+      {/* Rotator cuff glow */}
+      <ellipse cx={shX + 10} cy={shY + 6} rx="12" ry="8" fill={C.active} opacity={lift * 0.3} />
+      {/* Letter label */}
+      <text x={330} y={60} fontSize="24" fontWeight="bold" fill={C.active} fontFamily="monospace" opacity="0.5">W</text>
+      {lift > 0.3 && <text x={shX + 28} y={shY - 2} fill={C.active} fontSize="9" fontWeight="bold" fontFamily="monospace">ext rotate</text>}
+    </g>
+  );
+}
+
+export function ProneTrunkExtension({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const ext = Math.sin(phase * Math.PI * 0.5);
+  const machineX = 70, machineY = 130;
+  const hipX = machineX + 120, hipY = machineY + 2;
+  const shX = machineX + 35, shY = machineY - 3 - ext * 22;
+  const hdX = machineX - 18, hdY = shY - 12;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      {/* Legs on bench */}
+      <line x1={hipX + 5} y1={hipY + 4} x2={machineX + 185} y2={machineY + 12} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={machineX + 185} y1={machineY + 12} x2={machineX + 200} y2={machineY + 14} stroke={C.body} strokeWidth="4.5" strokeLinecap="round" />
+      <line x1={hipX - 3} y1={hipY + 8} x2={machineX + 182} y2={machineY + 14} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.5" />
+      {/* Ghost of start position (flat torso) */}
+      <line x1={hipX} y1={hipY} x2={shX} y2={machineY - 3} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.12" />
+      {/* Torso lifting */}
+      <line x1={hipX} y1={hipY} x2={shX} y2={shY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      {/* Head */}
+      <circle cx={hdX} cy={hdY} r="10" fill="none" stroke={C.body} strokeWidth="2.5" />
+      <line x1={hdX + 8} y1={hdY + 6} x2={shX - 5} y2={shY} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      {/* Hands behind head (plate optional) */}
+      <line x1={shX - 5} y1={shY + 3} x2={hdX + 12} y2={hdY + 5} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      <line x1={shX + 5} y1={shY + 6} x2={hdX + 10} y2={hdY + 8} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={hdX + 14} cy={hdY + 2} r="5" fill="none" stroke={C.label} strokeWidth="1.5" strokeDasharray="2,2" />
+      <text x={hdX + 22} y={hdY + 4} fill={C.label} fontSize="7" fontFamily="monospace">plate</text>
+      {/* Erector spinae glow */}
+      <ellipse cx={(hipX + shX) / 2} cy={(hipY + shY) / 2} rx="6" ry="18" fill={C.active} opacity={ext * 0.35} />
+      {ext > 0.3 && <text x={(hipX + shX) / 2 + 12} y={(hipY + shY) / 2 - 5} fill={C.active} fontSize="9" fontWeight="bold" fontFamily="monospace">erectors</text>}
+    </g>
+  );
+}
+
+export function ProneIsoHold({ t }: AnimProps) {
+  // Subtle breathing oscillation rather than big movement
+  const breath = Math.sin(t * Math.PI * 4) * 0.15; // gentle sway
+  const machineX = 70, machineY = 130;
+  const holdLift = 14; // constant slight lift
+  const shX = machineX + 35, shY = machineY - 3 - holdLift - breath;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      <HamCurlPerson chestLift={holdLift + breath} />
+      {/* Arms hanging down (relaxed) */}
+      <line x1={shX - 5} y1={shY + 5} x2={shX - 15} y2={shY + 25} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      <line x1={shX + 5} y1={shY + 7} x2={shX - 5} y2={shY + 27} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      {/* Erector glow (sustained) */}
+      <ellipse cx={(machineX + 120 + shX) / 2} cy={(machineY + 2 + shY) / 2} rx="6" ry="18" fill={C.active} opacity={0.3} />
+      {/* Timer indicator */}
+      <rect x={300} y={50} width="62" height="18" rx="4" fill="none" stroke={C.active} strokeWidth="1" strokeDasharray="3,2" />
+      <text x={331} y={62} textAnchor="middle" fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">20-45s</text>
+      {/* HOLD label */}
+      <text x={shX - 10} y={shY - 18} fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">HOLD</text>
+    </g>
+  );
+}
+
+export function ProneLateralTrunkRaise({ t }: AnimProps) {
+  // Alternate left-right side bend
+  const phase = t < 0.5 ? t / 0.5 : (t - 0.5) / 0.5;
+  const side = t < 0.5 ? -1 : 1; // -1 = shift up in SVG (one side), +1 = shift down (other side)
+  const bend = Math.sin(phase * Math.PI) * side;
+  const sideShift = bend * 12;
+  const lift = Math.abs(bend) * 10;
+
+  return (
+    <g>
+      <HamCurlMachine />
+      <HamCurlPerson chestLift={lift} sideShift={sideShift} />
+      {/* Arms hanging */}
+      {(() => {
+        const machineX = 70, machineY = 130;
+        const shX = machineX + 35 + sideShift, shY = machineY - 3 - lift + sideShift * 0.3;
+        return (
+          <>
+            <line x1={shX - 5} y1={shY + 5} x2={shX - 15} y2={shY + 25} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+            <line x1={shX + 5} y1={shY + 7} x2={shX - 5} y2={shY + 27} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+            {/* Oblique/QL glow */}
+            <ellipse cx={(machineX + 120 + shX) / 2} cy={(machineY + 2 + shY) / 2} rx="10" ry="12" fill={C.active} opacity={Math.abs(bend) * 0.3} />
+            {Math.abs(bend) > 0.3 && (
+              <text x={(machineX + 120 + shX) / 2 + 16} y={(machineY + 2 + shY) / 2 - 5} fill={C.active} fontSize="9" fontWeight="bold" fontFamily="monospace">
+                {side < 0 ? "L oblique" : "R oblique"}
+              </text>
+            )}
+          </>
+        );
+      })()}
+      {/* Direction label */}
+      <text x={330} y={60} fontSize="11" fill={C.active} fontFamily="monospace" opacity="0.6">
+        {t < 0.5 ? "← bend" : "bend →"}
+      </text>
+    </g>
+  );
+}
+
 export const PRONE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   p1: ProneHipExtension,
   p2: ProneYTW,
@@ -328,4 +566,10 @@ export const PRONE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   p4: ProneSingleArmReach,
   p5: BirdDogProneBench,
   p6: ProneHamCurlRight,
+  p7: ProneYRaise,
+  p8: ProneTRaise,
+  p9: ProneWRaise,
+  p10: ProneTrunkExtension,
+  p11: ProneIsoHold,
+  p12: ProneLateralTrunkRaise,
 };

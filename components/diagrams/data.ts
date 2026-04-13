@@ -228,6 +228,80 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Ham Curl Machine"],
   },
 
+  // ── PRONE HAM CURL MACHINE → core exercises (p7–p12) ──
+  {
+    id: "p7", category: "core", name: "Prone Y-Raise",
+    target: "Lower Traps / Serratus",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Thumbs up, lift arms into Y overhead at ~45°.",
+      "Squeeze lower traps at top for 2 seconds.",
+      "Lower with control. Bodyweight or light dumbbells.",
+    ],
+    safetyNote: "Zero lower-body demand — ankles stay locked. Pure scapular depression + retraction.",
+    equipment: ["Ham Curl Machine"],
+  },
+  {
+    id: "p8", category: "core", name: "Prone T-Raise",
+    target: "Mid Traps / Rhomboids",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Arms straight out to sides, palms down.",
+      "Pinch shoulder blades together at the top.",
+      "Hold 1-2 seconds. Lower with control.",
+    ],
+    safetyNote: "Zero lower-body demand. Scapular retraction focus — no momentum.",
+    equipment: ["Ham Curl Machine"],
+  },
+  {
+    id: "p9", category: "core", name: "Prone W-Raise",
+    target: "Rotator Cuff / Lower Traps",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Elbows bent 90°, externally rotate shoulders.",
+      "Squeeze shoulder blades down and back into W shape.",
+      "Hold 2 seconds at peak contraction. Lower with control.",
+    ],
+    safetyNote: "Rotator cuff prehab in a zero-WB position. Excellent shoulder health between sets.",
+    equipment: ["Ham Curl Machine"],
+  },
+  {
+    id: "p10", category: "core", name: "Prone Trunk Extension",
+    target: "Erectors / Glutes / Anti-Flexion Core",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Hands behind head (add plate to progress).",
+      "Lift chest 1-2 inches off the pad. Hold 1 second at top.",
+      "Lower with control. Keep chin tucked — neck neutral.",
+    ],
+    safetyNote: "Ankles locked = zero lower-body demand. Anti-flexion core in a completely NWB position.",
+    equipment: ["Ham Curl Machine"],
+  },
+  {
+    id: "p11", category: "core", name: "Prone Iso Hold",
+    target: "Erectors / Deep Core Stabilizers",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Lift chest slightly off the pad — small range.",
+      "Hold 20-45 seconds. Breathe into brace — don't hold breath.",
+      "Progress by adding time or holding a plate behind the head.",
+    ],
+    safetyNote: "Isometric erector endurance. Breathe through the brace — respiratory demand is the progression.",
+    equipment: ["Ham Curl Machine"],
+  },
+  {
+    id: "p12", category: "core", name: "Prone Lateral Trunk Raise",
+    target: "Obliques / QL",
+    cues: [
+      "Lie face-down on prone ham curl machine. Ankles locked under pad.",
+      "Small side bend — lift and rotate torso slightly left, then right.",
+      "Alternate sides each rep. Keep range small and controlled.",
+      "Feel the obliques and quadratus lumborum work through the lateral flexion.",
+    ],
+    safetyNote: "Controlled lateral flexion only. No twisting through the lumbar spine — thoracic rotation is fine.",
+    equipment: ["Ham Curl Machine"],
+  },
+
   // ── GLUTE / RIGHT-LEG STRENGTH → legs tab ──
   {
     id: "g1", category: "legs", name: "SL Glute Bridge (R)",
