@@ -10,6 +10,7 @@ import {
   type NearbySuperset,
   type MobilitySupplement,
 } from "@/lib/supplements";
+import { cssAlpha } from "@/lib/css-utils";
 
 /**
  * A complement the user can add to an exercise. There are three kinds:
@@ -19,14 +20,16 @@ import {
  */
 export type ComplementId = string;
 
+const SEP = "|";
+
 export function encodeNearbyId(ns: NearbySuperset): ComplementId {
-  return `nearby:${ns.nearbyId}:${ns.title}`;
+  return `nearby${SEP}${ns.nearbyId}${SEP}${ns.title}`;
 }
 export function encodeSuppId(name: string): ComplementId {
-  return `supp:${name}`;
+  return `supp${SEP}${name}`;
 }
 export function encodeMobilityId(m: MobilitySupplement): ComplementId {
-  return `mob:${m.id}`;
+  return `mob${SEP}${m.id}`;
 }
 
 export function decodeComplement(id: ComplementId): {
@@ -34,15 +37,82 @@ export function decodeComplement(id: ComplementId): {
   value: string;
   sub?: string;
 } {
-  const [kind, ...rest] = id.split(":");
+  // Backward compat: try pipe first, fall back to colon for legacy IDs
+  const sep = id.includes("|") ? "|" : ":";
+  const [kind, ...rest] = id.split(sep);
   if (kind === "nearby") {
-    return { kind: "nearby", value: rest[0], sub: rest.slice(1).join(":") };
+    return { kind: "nearby", value: rest[0], sub: rest.slice(1).join(sep) };
   }
   if (kind === "mob") {
-    return { kind: "mobility", value: rest.join(":") };
+    return { kind: "mobility", value: rest.join(sep) };
   }
-  return { kind: "supp", value: rest.join(":") };
+  return { kind: "supp", value: rest.join(sep) };
 }
+
+// ── Shared button for all complement types ──────────────────────────────
+
+interface ComplementButtonProps {
+  label: string;
+  color: string;
+  title: string;
+  sets: string;
+  description: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+function ComplementButton({
+  label,
+  color,
+  title,
+  sets,
+  description,
+  active,
+  onClick,
+}: ComplementButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left rounded-xl cursor-pointer font-[inherit] p-3 transition-colors duration-150"
+      style={{
+        background: active ? color + "18" : "var(--color-bg)",
+        border: active
+          ? `1px solid ${color}55`
+          : "1px solid var(--color-border)",
+        borderLeft: `3px solid ${color}`,
+      }}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <span
+          className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+          style={{
+            background: color + "22",
+            border: `1px solid ${color}44`,
+            color,
+          }}
+        >
+          {label}
+        </span>
+        <span className="text-sm font-semibold" style={{ color }}>
+          {title}
+        </span>
+        <span className="ml-auto text-[10px] text-text-dim">{sets}</span>
+        {active && (
+          <span className="text-[10px] font-bold" style={{ color }}>
+            ✓
+          </span>
+        )}
+      </div>
+      <div className="text-[11px] text-text-dim leading-snug">
+        {description}
+      </div>
+    </button>
+  );
+}
+
+ComplementButton.displayName = "ComplementButton";
+
+// ── Main picker ──────────────────────────────────────────────────────────
 
 interface ComplementPickerProps {
   exerciseRequires: string[];
@@ -70,16 +140,13 @@ export default function ComplementPicker({
   const activeSet = useMemo(() => new Set(activeIds), [activeIds]);
 
   const { nearbyAvail, suppAvail, mobilityAvail } = useMemo(() => {
-    // Collect all "near" equipment: what's in use + what's marked nearby
     const inUseIds = new Set(
       exerciseRequires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean),
     );
     const reach = new Set<string>([...inUseIds, ...nearbySelections]);
 
-    // Nearby supersets filtered to reachable equipment only
     const nearbyAvail = NEARBY_SUPERSETS.filter((ns) => reach.has(ns.nearbyId));
 
-    // Left-leg supplements are always available (they need no external equipment)
     const suppAvail = [...SUPPLEMENT_LEFT_LEG.base, ...SUPPLEMENT_LEFT_LEG.legsExtra]
       .map((name) => {
         const data = SUPPLEMENT_EX[name];
@@ -90,7 +157,6 @@ export default function ComplementPicker({
       data: (typeof SUPPLEMENT_EX)[string];
     }>;
 
-    // Mobility / stretch / breathing — always available, filtered by category
     const mobilityAvail = MOBILITY_SUPPLEMENTS.filter((m) =>
       m.appliesTo.includes("all") ||
       m.appliesTo.includes(exerciseCategory as "push" | "pull" | "legs" | "core" | "cardio"),
@@ -168,55 +234,17 @@ export default function ComplementPicker({
               <div className="space-y-1.5 mb-4">
                 {nearbyAvail.map((ns) => {
                   const id = encodeNearbyId(ns);
-                  const active = activeSet.has(id);
                   return (
-                    <button
+                    <ComplementButton
                       key={id}
+                      label="NEARBY"
+                      color="#14b8a6"
+                      title={ns.title}
+                      sets={ns.sets}
+                      description={ns.instruction}
+                      active={activeSet.has(id)}
                       onClick={() => onToggle(id)}
-                      className="w-full text-left rounded-xl cursor-pointer font-[inherit] p-3 transition-colors duration-150"
-                      style={{
-                        background: active
-                          ? "#14b8a618"
-                          : "var(--color-bg)",
-                        border: active
-                          ? "1px solid #14b8a655"
-                          : "1px solid var(--color-border)",
-                        borderLeft: "3px solid #14b8a6",
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
-                          style={{
-                            background: "#14b8a622",
-                            border: "1px solid #14b8a644",
-                            color: "#14b8a6",
-                          }}
-                        >
-                          NEARBY
-                        </span>
-                        <span
-                          className="text-sm font-semibold"
-                          style={{ color: "#14b8a6" }}
-                        >
-                          {ns.title}
-                        </span>
-                        <span className="ml-auto text-[10px] text-text-dim">
-                          {ns.sets}
-                        </span>
-                        {active && (
-                          <span
-                            className="text-[10px] font-bold"
-                            style={{ color: "#14b8a6" }}
-                          >
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-text-dim leading-snug">
-                        {ns.instruction}
-                      </div>
-                    </button>
+                    />
                   );
                 })}
               </div>
@@ -231,56 +259,18 @@ export default function ComplementPicker({
               <div className="space-y-1.5 mb-4">
                 {suppAvail.map(({ name, data }) => {
                   const id = encodeSuppId(name);
-                  const active = activeSet.has(id);
                   const sets = data.sets[0];
                   return (
-                    <button
+                    <ComplementButton
                       key={id}
+                      label="L-LEG"
+                      color="#14b8a6"
+                      title={name}
+                      sets={`${sets[0]}\u00D7${sets[1]}`}
+                      description={data.execution}
+                      active={activeSet.has(id)}
                       onClick={() => onToggle(id)}
-                      className="w-full text-left rounded-xl cursor-pointer font-[inherit] p-3 transition-colors duration-150"
-                      style={{
-                        background: active
-                          ? "#14b8a618"
-                          : "var(--color-bg)",
-                        border: active
-                          ? "1px solid #14b8a655"
-                          : "1px solid var(--color-border)",
-                        borderLeft: "3px solid #14b8a6",
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
-                          style={{
-                            background: "#14b8a622",
-                            border: "1px solid #14b8a644",
-                            color: "#14b8a6",
-                          }}
-                        >
-                          L-LEG
-                        </span>
-                        <span
-                          className="text-sm font-semibold"
-                          style={{ color: "#14b8a6" }}
-                        >
-                          {name}
-                        </span>
-                        <span className="ml-auto text-[10px] text-text-dim">
-                          {sets[0]}&times;{sets[1]}
-                        </span>
-                        {active && (
-                          <span
-                            className="text-[10px] font-bold"
-                            style={{ color: "#14b8a6" }}
-                          >
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-text-dim leading-snug">
-                        {data.execution}
-                      </div>
-                    </button>
+                    />
                   );
                 })}
               </div>
@@ -298,7 +288,6 @@ export default function ComplementPicker({
               <div className="space-y-1.5">
                 {mobilityAvail.map((m) => {
                   const id = encodeMobilityId(m);
-                  const active = activeSet.has(id);
                   const color =
                     m.kind === "breathing"
                       ? "#8b5cf6"
@@ -312,53 +301,16 @@ export default function ComplementPicker({
                         ? "STRETCH"
                         : "MOBILITY";
                   return (
-                    <button
+                    <ComplementButton
                       key={id}
+                      label={label}
+                      color={color}
+                      title={m.name}
+                      sets={m.sets}
+                      description={m.instruction}
+                      active={activeSet.has(id)}
                       onClick={() => onToggle(id)}
-                      className="w-full text-left rounded-xl cursor-pointer font-[inherit] p-3 transition-colors duration-150"
-                      style={{
-                        background: active
-                          ? color + "18"
-                          : "var(--color-bg)",
-                        border: active
-                          ? `1px solid ${color}55`
-                          : "1px solid var(--color-border)",
-                        borderLeft: `3px solid ${color}`,
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
-                          style={{
-                            background: color + "22",
-                            border: `1px solid ${color}44`,
-                            color,
-                          }}
-                        >
-                          {label}
-                        </span>
-                        <span
-                          className="text-sm font-semibold"
-                          style={{ color }}
-                        >
-                          {m.name}
-                        </span>
-                        <span className="ml-auto text-[10px] text-text-dim">
-                          {m.sets}
-                        </span>
-                        {active && (
-                          <span
-                            className="text-[10px] font-bold"
-                            style={{ color }}
-                          >
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-text-dim leading-snug">
-                        {m.instruction}
-                      </div>
-                    </button>
+                    />
                   );
                 })}
               </div>
@@ -375,8 +327,8 @@ export default function ComplementPicker({
             onClick={onClose}
             className="w-full rounded-xl text-sm font-bold cursor-pointer font-[inherit] min-h-[44px]"
             style={{
-              background: "var(--color-accent)18",
-              border: "1px solid var(--color-accent)55",
+              background: cssAlpha("var(--color-accent)", 9),
+              border: `1px solid ${cssAlpha("var(--color-accent)", 33)}`,
               color: "var(--color-accent)",
             }}
           >
@@ -387,3 +339,5 @@ export default function ComplementPicker({
     </div>
   );
 }
+
+ComplementPicker.displayName = "ComplementPicker";

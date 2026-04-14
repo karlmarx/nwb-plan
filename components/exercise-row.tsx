@@ -5,6 +5,7 @@ import Badge from "@/components/badge";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
 import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
 import { useLongPress } from "@/lib/use-long-press";
+import { cssAlpha } from "@/lib/css-utils";
 
 interface ExerciseRowProps {
   name: string;
@@ -188,8 +189,8 @@ export default function ExerciseRow({
               data-testid="view-diagram"
               className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
               style={{
-                background: "var(--color-accent)11",
-                border: "1px solid var(--color-accent)33",
+                background: cssAlpha("var(--color-accent)", 7),
+                border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
               }}
             >
               {"\u{1F4D0}"} View Movement Diagram
@@ -204,8 +205,8 @@ export default function ExerciseRow({
                 data-testid="view-diagram"
                 className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
                 style={{
-                  background: "var(--color-accent)11",
-                  border: "1px solid var(--color-accent)33",
+                  background: cssAlpha("var(--color-accent)", 7),
+                  border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
                 }}
               >
                 {"\u{1F4D0}"} View Movement Diagram
@@ -233,7 +234,7 @@ export default function ExerciseRow({
                   style={{
                     padding: "8px 10px",
                     background: "var(--color-accent-dim)",
-                    border: "1px solid var(--color-accent)33",
+                    border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
                   }}
                 >
                   <div className="text-[10px] font-bold text-accent uppercase mb-1">
@@ -366,8 +367,8 @@ export default function ExerciseRow({
               }}
               className="mt-3 w-full p-3 rounded-xl text-sm font-bold cursor-pointer font-[inherit] text-accent min-h-[48px] transition-colors duration-150"
               style={{
-                background: "var(--color-accent)" + "15",
-                border: `1px solid var(--color-accent)33`,
+                background: cssAlpha("var(--color-accent)", 8),
+                border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
               }}
             >
               {"\u23F1"} Start {ex.rest}s Rest Timer

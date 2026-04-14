@@ -37,6 +37,7 @@ import ComplementPicker, {
   type ComplementId,
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
+import { cssAlpha } from "@/lib/css-utils";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -551,7 +552,7 @@ export default function WorkoutView() {
   const [machineSelections, setMachineSelections] = useState<
     Record<string, string>
   >(() => loadState("nwb_machines", {}));
-  const [nearbySelections, setNearbySelections] = useState<
+  const [nearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
   const [coreNearby, setCoreNearby] = useState<string[]>(
@@ -580,17 +581,24 @@ export default function WorkoutView() {
     { exName: string; exerciseRequires: string[]; exerciseCategory: string } | null
   >(null);
 
-  // User-opted-in complements per exercise (date-scoped so they clear tomorrow)
-  const complementsKey = `nwb_complements_${new Date().toISOString().slice(0, 10)}`;
-  const [complementsToday, setComplementsToday] = useState<
-    Record<string, ComplementId[]>
-  >(() => loadState<Record<string, ComplementId[]>>(complementsKey, {}));
-
-  // Removed exercises (date-scoped — return tomorrow)
-  const removedKey = `nwb_removed_${new Date().toISOString().slice(0, 10)}`;
-  const [removedToday, setRemovedToday] = useState<Record<string, string[]>>(
-    () => loadState<Record<string, string[]>>(removedKey, {}),
-  );
+  // ----- Consolidated day state (date-scoped, clears daily) -----
+  type DayState = {
+    complements: Record<string, ComplementId[]>;
+    removed: Record<string, string[]>;
+    completedSupersets: string[];
+  };
+  const dayKey = `nwb_day_${new Date().toISOString().slice(0, 10)}`;
+  const [dayState, setDayState] = useState<DayState>(() => {
+    const stored = loadState<DayState | null>(dayKey, null);
+    if (stored) return stored;
+    // Migrate from legacy per-field keys
+    const dateStr = new Date().toISOString().slice(0, 10);
+    return {
+      complements: loadState<Record<string, ComplementId[]>>(`nwb_complements_${dateStr}`, {}),
+      removed: loadState<Record<string, string[]>>(`nwb_removed_${dateStr}`, {}),
+      completedSupersets: loadState<string[]>(`nwb_done_ss_${dateStr}`, []),
+    };
+  });
 
   // Per-workout exercise reorder (persistent)
   const [exerciseOrder, setExerciseOrder] = useState<Record<string, string[]>>(
@@ -625,12 +633,6 @@ export default function WorkoutView() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [focusState]);
-
-  // ----- Completed supersets tracking (per day) -----
-  const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
-  const [completedSupersets, setCompletedSupersets] = useState<string[]>(
-    () => loadState<string[]>(todayKey, []),
-  );
 
   // ----- Sliding tab pill (v2) -----
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -699,17 +701,11 @@ export default function WorkoutView() {
     saveState("nwb_ui_v2", uiV2);
   }, [uiV2]);
   useEffect(() => {
-    saveState(complementsKey, complementsToday);
-  }, [complementsToday, complementsKey]);
-  useEffect(() => {
-    saveState(removedKey, removedToday);
-  }, [removedToday, removedKey]);
+    saveState(dayKey, dayState);
+  }, [dayState, dayKey]);
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
-  useEffect(() => {
-    saveState(todayKey, completedSupersets);
-  }, [completedSupersets, todayKey]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -827,10 +823,10 @@ export default function WorkoutView() {
 
   const removeExerciseToday = useCallback(
     (workoutKey: string, origName: string) => {
-      setRemovedToday((prev) => {
-        const cur = prev[workoutKey] ?? [];
+      setDayState((prev) => {
+        const cur = prev.removed[workoutKey] ?? [];
         if (cur.includes(origName)) return prev;
-        return { ...prev, [workoutKey]: [...cur, origName] };
+        return { ...prev, removed: { ...prev.removed, [workoutKey]: [...cur, origName] } };
       });
     },
     [],
@@ -838,12 +834,12 @@ export default function WorkoutView() {
 
   const toggleComplement = useCallback(
     (exName: string, id: ComplementId) => {
-      setComplementsToday((prev) => {
-        const cur = prev[exName] ?? [];
+      setDayState((prev) => {
+        const cur = prev.complements[exName] ?? [];
         const next = cur.includes(id)
           ? cur.filter((x) => x !== id)
           : [...cur, id];
-        return { ...prev, [exName]: next };
+        return { ...prev, complements: { ...prev.complements, [exName]: next } };
       });
     },
     [],
@@ -851,7 +847,7 @@ export default function WorkoutView() {
 
   /**
    * Build superset cards for an exercise — combines auto supersets (cable,
-   * variant-specific) with user-opted-in complements from complementsToday.
+   * variant-specific) with user-opted-in complements from dayState.complements.
    */
   const buildSupersetCards = useCallback(
     (
@@ -915,7 +911,7 @@ export default function WorkoutView() {
       }
 
       // 3. User-opted-in complements
-      const userComps = complementsToday[exName] ?? [];
+      const userComps = dayState.complements[exName] ?? [];
       for (const id of userComps) {
         const decoded = decodeComplement(id);
         if (decoded.kind === "nearby") {
@@ -1056,7 +1052,7 @@ export default function WorkoutView() {
       );
     },
     [
-      complementsToday,
+      dayState.complements,
       machineSelections,
       supplementToggles.leftLeg,
       toggleComplement,
@@ -1139,7 +1135,7 @@ export default function WorkoutView() {
 
     // Effective exercise order with removals applied
     const orderedOrigs = getOrderedExercises(workoutKey).filter(
-      (o) => !(removedToday[workoutKey] ?? []).includes(o),
+      (o) => !(dayState.removed[workoutKey] ?? []).includes(o),
     );
 
     // Find first cable exercise for cable superset
@@ -1202,7 +1198,7 @@ export default function WorkoutView() {
             }
 
             // User-opted-in complements
-            const userComps = complementsToday[nm] ?? [];
+            const userComps = dayState.complements[nm] ?? [];
             for (const id of userComps) {
               const decoded = decodeComplement(id);
               if (decoded.kind === "nearby") {
@@ -1323,7 +1319,7 @@ export default function WorkoutView() {
               style={{
                 padding: "6px 12px",
                 background: supplementToggles.leftLeg
-                  ? "var(--color-ll)15"
+                  ? cssAlpha("var(--color-ll)", 8)
                   : "transparent",
                 border: `1.5px solid ${supplementToggles.leftLeg ? "var(--color-ll)" : "var(--color-border)"}`,
                 color: supplementToggles.leftLeg
@@ -1417,7 +1413,7 @@ export default function WorkoutView() {
             style={{
               padding: "14px",
               background: "var(--color-bg)",
-              border: "1px dashed var(--color-warning)33",
+              border: `1px dashed ${cssAlpha("var(--color-warning)", 20)}`,
             }}
           >
             <div className="text-[13px] font-bold text-warning mb-3 tracking-wide">
@@ -1818,7 +1814,7 @@ export default function WorkoutView() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid var(--color-accent)44",
+                    borderBottom: `2px solid ${cssAlpha("var(--color-accent)", 27)}`,
                   }}
                 >
                   {["Day", "AM", "PM", "~Cal"].map((h) => (
@@ -1972,7 +1968,7 @@ export default function WorkoutView() {
                   style={{
                     padding: "6px 12px",
                     background: isSelected
-                      ? "var(--color-accent)22"
+                      ? cssAlpha("var(--color-accent)", 13)
                       : "var(--color-bg)",
                     border: `1.5px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
                     color: isSelected
@@ -2095,7 +2091,7 @@ export default function WorkoutView() {
                   style={{
                     padding: "10px 2px",
                     background: isCurrent
-                      ? "var(--color-accent)22"
+                      ? cssAlpha("var(--color-accent)", 13)
                       : "var(--color-bg)",
                     border: `1px solid ${isCurrent ? "var(--color-accent)" : "var(--color-border)"}`,
                     color: isCurrent
@@ -2249,7 +2245,7 @@ export default function WorkoutView() {
                         height: 20,
                         background: isOn
                           ? "var(--color-safe)"
-                          : "var(--color-text-muted)44",
+                          : cssAlpha("var(--color-text-muted)", 27),
                       }}
                     >
                       <div
@@ -2447,7 +2443,7 @@ export default function WorkoutView() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid var(--color-accent)44",
+                    borderBottom: `2px solid ${cssAlpha("var(--color-accent)", 27)}`,
                   }}
                 >
                   {["Method", "Requires", "Difficulty"].map((h) => (
@@ -2755,8 +2751,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? "var(--color-accent)15" : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)55" : "var(--color-border)"}`,
+            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
@@ -3126,7 +3122,7 @@ export default function WorkoutView() {
         const w = WORKOUTS[wk];
         const siblingOrigs = w
           ? getOrderedExercises(wk).filter(
-              (o) => !(removedToday[wk] ?? []).includes(o),
+              (o) => !(dayState.removed[wk] ?? []).includes(o),
             )
           : [origName];
         const idx = siblingOrigs.indexOf(origName);
@@ -3166,7 +3162,7 @@ export default function WorkoutView() {
           exerciseRequires={complementPickerFor.exerciseRequires}
           exerciseCategory={complementPickerFor.exerciseCategory}
           nearbySelections={nearbySelections[complementPickerFor.exName] ?? []}
-          activeIds={complementsToday[complementPickerFor.exName] ?? []}
+          activeIds={dayState.complements[complementPickerFor.exName] ?? []}
           onToggle={(id) =>
             toggleComplement(complementPickerFor.exName, id)
           }
