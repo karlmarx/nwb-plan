@@ -1,0 +1,729 @@
+{
+  "leftLeg": {
+    "base": [
+      "Quad Sets",
+      "Short Arc Quads",
+      "Ankle Pumps & Circles"
+    ],
+    "legsExtra": [
+      "Banded Terminal Knee Extensions",
+      "Reclined Knee Extensions"
+    ]
+  },
+  "core": {
+    "Push A": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Seated Cable Crunch",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Modified Hollow Body Hold",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "Pallof Press with Overhead Reach",
+          "region": "Obliques"
+        },
+        {
+          "name": "Modified Side Plank Hip Dips",
+          "region": "Obliques"
+        }
+      ]
+    },
+    "Push B": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Modified Plank",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Reverse Crunch (R Leg Only)",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "Single-Arm Seated Cable Row",
+          "region": "Obliques"
+        },
+        {
+          "name": "Seated Oblique Cable Crunch",
+          "region": "Obliques"
+        }
+      ]
+    },
+    "Pull A": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Weighted Crunch (Seated)",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Modified Hollow Body Flutter",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "Seated Landmine Rotation",
+          "region": "Obliques"
+        },
+        {
+          "name": "Modified Side Plank with Band Row",
+          "region": "Obliques"
+        }
+      ]
+    },
+    "Pull B": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Modified Plank Shoulder Taps",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Slow Dead Bugs (Modified)",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "High-to-Low Woodchop",
+          "region": "Obliques"
+        },
+        {
+          "name": "Suitcase Hold (Seated)",
+          "region": "Obliques"
+        }
+      ]
+    },
+    "Legs A": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Seated Cable Crunch",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Right Leg Lowers",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "Pallof Alphabet",
+          "region": "Obliques"
+        },
+        {
+          "name": "Modified Side Plank Hold",
+          "region": "Obliques"
+        }
+      ]
+    },
+    "Legs B": {
+      "subtitle": "Upper + Lower + Obliques",
+      "exercises": [
+        {
+          "name": "Modified Plank",
+          "region": "Upper Abs"
+        },
+        {
+          "name": "Reverse Crunch (R Leg Only)",
+          "region": "Lower Abs"
+        },
+        {
+          "name": "Low-to-High Woodchop",
+          "region": "Obliques"
+        },
+        {
+          "name": "Pallof ISO Hold",
+          "region": "Obliques"
+        }
+      ]
+    }
+  },
+  "supplementExercises": {
+    "Quad Sets": {
+      "sets": [
+        [
+          "2",
+          "10, 5s hold"
+        ]
+      ],
+      "setup": "Sit or lie with left leg extended. Roll a small towel under left knee for comfort.",
+      "execution": "Press back of left knee firmly into the surface. Hold 5 seconds, release completely. Repeat 10×.",
+      "nwbCues": "Pure isometric — zero joint movement, zero fracture stress. Can be done anywhere seated.",
+      "rest": 0
+    },
+    "Short Arc Quads": {
+      "sets": [
+        [
+          "2",
+          "12"
+        ]
+      ],
+      "setup": "Sit with a rolled towel or foam roller under left knee creating ~30° of bend.",
+      "execution": "Slowly straighten left knee from 30° to full extension. Hold 1s at top, lower over 3 seconds.",
+      "nwbCues": "Last 30° of extension only — minimal hip involvement, pure quad activation.",
+      "rest": 0
+    },
+    "Ankle Pumps & Circles": {
+      "sets": [
+        [
+          "2",
+          "20"
+        ]
+      ],
+      "setup": "Sit or lie comfortably with left leg supported or slightly elevated.",
+      "execution": "Slowly point and flex left foot (pumps), then circle ankle clockwise then counter-clockwise.",
+      "nwbCues": "Zero load on fracture site. Maintains ankle ROM and promotes circulation.",
+      "rest": 0
+    },
+    "Banded Terminal Knee Extensions": {
+      "sets": [
+        [
+          "2",
+          "15"
+        ]
+      ],
+      "setup": "Sit with resistance band looped behind left knee and anchored at low height ahead of you.",
+      "execution": "Starting with knee slightly bent, extend against band resistance. Squeeze quad at full extension, lower slowly.",
+      "nwbCues": "Pure knee extension — zero hip flexion demand. Band provides gentle progressive resistance.",
+      "rest": 0
+    },
+    "Reclined Knee Extensions": {
+      "sets": [
+        [
+          "2",
+          "12"
+        ]
+      ],
+      "setup": "Sit reclined with left leg supported at ~45° of bend. No added weight.",
+      "execution": "Slowly extend left knee to full extension. Hold 1s at top, lower over 3 seconds.",
+      "nwbCues": "Bodyweight only. Zero hip flexion. Keep range within the last 45° of knee extension.",
+      "rest": 0
+    },
+    "Seated Cable Crunch": {
+      "sets": [
+        [
+          "3",
+          "12"
+        ]
+      ],
+      "setup": "Rope on high cable. Sit on a bench facing the stack, left leg hanging off the side. Hold rope ends at temples.",
+      "execution": "Flex spine forward, pulling elbows toward knees. Contract abs hard at bottom. Return with control.",
+      "nwbCues": "Hang left leg off the bench — keeps hip angle open and avoids >90° flexion on the fracture side. Do not crunch past the point where you feel the left hip loading.",
+      "rest": 60
+    },
+    "Modified Hollow Body Hold": {
+      "sets": [
+        [
+          "3",
+          "20s"
+        ]
+      ],
+      "setup": "Lie flat on mat. Right leg straight, left leg extended passively on the floor.",
+      "execution": "Press lower back into mat firmly. Lift right leg ~6 inches. Hold and breathe steadily.",
+      "nwbCues": "Left leg stays on the floor the entire time. No bilateral leg raise.",
+      "rest": 45
+    },
+    "Pallof Press with Overhead Reach": {
+      "sets": [
+        [
+          "3",
+          "10/side"
+        ]
+      ],
+      "setup": "Seated sideways to a cable or band anchored at chest height. Hold handle at chest with both hands.",
+      "execution": "Press handle straight out, then reach overhead with arms extended. Return to chest. Resist rotation throughout.",
+      "nwbCues": "Seated only. Move deliberately — the overhead reach increases anti-rotation demand.",
+      "rest": 60
+    },
+    "Modified Side Plank Hip Dips": {
+      "sets": [
+        [
+          "3",
+          "10/side"
+        ]
+      ],
+      "setup": "Side-lying on right forearm. Left leg rests passively on right leg. Lift right hip into modified side plank.",
+      "execution": "Lower right hip toward floor then lift back up. Full controlled range.",
+      "nwbCues": "Left leg is a passive rider. Core controls the dip — not hip momentum.",
+      "rest": 45
+    },
+    "Modified Plank": {
+      "sets": [
+        [
+          "3",
+          "20s"
+        ]
+      ],
+      "setup": "Forearm plank with both knees on the floor. Left knee passive, right knee bearing weight.",
+      "execution": "Hold position with core braced, hips level. Don't let hips sag or bridge up.",
+      "nwbCues": "Knee-supported version only — no full plank. Left leg contributes no force.",
+      "rest": 45
+    },
+    "Reverse Crunch (R Leg Only)": {
+      "sets": [
+        [
+          "3",
+          "12"
+        ]
+      ],
+      "setup": "Lie on mat. Left leg flat on floor (passive). Right leg bent at 90°, foot off floor.",
+      "execution": "Using abs, curl pelvis up — lift tailbone off mat. Lower with control. No hip flexor momentum.",
+      "nwbCues": "Left leg stays flat and passive throughout. Right leg is the only one assisting.",
+      "rest": 60
+    },
+    "Single-Arm Seated Cable Row": {
+      "sets": [
+        [
+          "3",
+          "12/side"
+        ]
+      ],
+      "setup": "Sit at low cable row with single D-handle. Sit upright with slight forward lean, feet on platform.",
+      "execution": "Row handle to side of torso with controlled rotation. Full stretch at start, elbow past body at finish.",
+      "nwbCues": "Seated throughout, hips stable. Left foot rests on platform — no weight bearing.",
+      "rest": 60
+    },
+    "Seated Oblique Cable Crunch": {
+      "sets": [
+        [
+          "3",
+          "12/side"
+        ]
+      ],
+      "setup": "Sit sideways on a bench next to high cable. Hold rope or D-handle at opposite ear with both hands.",
+      "execution": "Crunch sideways toward cable side. Obliques on far side stretch then contract. Return with control.",
+      "nwbCues": "Seated. Keep hips stable — only torso flexes laterally. Left leg passive.",
+      "rest": 60
+    },
+    "Weighted Crunch (Seated)": {
+      "sets": [
+        [
+          "3",
+          "12"
+        ]
+      ],
+      "setup": "Sit on a bench, left leg hanging off the side. Hold a plate or dumbbell at chest.",
+      "execution": "Flex spine forward — shoulders curl toward hips. Squeeze at top, lower slowly.",
+      "nwbCues": "Hang left leg off the bench to keep hip angle open on the fracture side. Don't crunch past the point of left hip loading. Use a support rail if balance is uncertain.",
+      "rest": 60
+    },
+    "Modified Hollow Body Flutter": {
+      "sets": [
+        [
+          "3",
+          "15/side"
+        ]
+      ],
+      "setup": "Lie on mat. Left leg extended on floor (passive). Lower back pressed firmly to mat.",
+      "execution": "Flutter kick with right leg only — small rapid up-down movements. Maintain hollow position.",
+      "nwbCues": "Left leg stays on the floor. Do not bridge. Lower back contact is mandatory.",
+      "rest": 45
+    },
+    "Seated Landmine Rotation": {
+      "sets": [
+        [
+          "3",
+          "10/side"
+        ]
+      ],
+      "setup": "Sit straddling a bench end. Hold loaded landmine bar end with both hands extended.",
+      "execution": "Rotate torso side-to-side, controlling the arc of the bar. Hips stay square.",
+      "nwbCues": "Hips face forward — only the torso rotates. Seated throughout.",
+      "rest": 60
+    },
+    "Modified Side Plank with Band Row": {
+      "sets": [
+        [
+          "3",
+          "8/side"
+        ]
+      ],
+      "setup": "Modified side plank on knee and forearm. Resistance band anchored at low height ahead. Free hand holds band.",
+      "execution": "Hold the side plank while rowing band to ribcage with free hand. Don't rotate.",
+      "nwbCues": "Left knee is passive support. Hip flexion stays below 90°.",
+      "rest": 60
+    },
+    "Modified Plank Shoulder Taps": {
+      "sets": [
+        [
+          "3",
+          "10 pairs"
+        ]
+      ],
+      "setup": "Knee-supported plank (both knees on floor). Core braced, hips level.",
+      "execution": "Lift one hand and tap opposite shoulder. Alternate sides without rotating hips.",
+      "nwbCues": "Knees on floor only — no full plank. Brace hard before each tap to prevent rotation.",
+      "rest": 45
+    },
+    "Slow Dead Bugs (Modified)": {
+      "sets": [
+        [
+          "3",
+          "8/side"
+        ]
+      ],
+      "setup": "Lie on mat. Arms pointing to ceiling. Right knee bent at 90° (foot off floor). Left leg extended on floor.",
+      "execution": "Slowly lower right arm overhead while keeping right knee bent. Press lower back to mat. Return.",
+      "nwbCues": "Left leg stays on floor — one-limb version only. Lower back contact is the non-negotiable cue.",
+      "rest": 45
+    },
+    "High-to-Low Woodchop": {
+      "sets": [
+        [
+          "3",
+          "12/side"
+        ]
+      ],
+      "setup": "Seated at cable station. High cable with rope or D-handle. Sit tall with core braced.",
+      "execution": "Pull cable diagonally from high-to-low across body, rotating torso. Control the eccentric return.",
+      "nwbCues": "Seated only. Hip flexion minimal — rotation drives the movement.",
+      "rest": 60
+    },
+    "Right Leg Lowers": {
+      "sets": [
+        [
+          "3",
+          "10"
+        ]
+      ],
+      "setup": "Lie on mat. Left leg extended on floor (passive). Right leg straight up toward ceiling.",
+      "execution": "Slowly lower right leg toward floor, keeping lower back pressed down. Stop before back arches. Return slowly.",
+      "nwbCues": "Left leg is passive and flat. Only right leg moves. Strict lower-back contact throughout.",
+      "rest": 45
+    },
+    "Pallof Alphabet": {
+      "sets": [
+        [
+          "2",
+          "A–J/side"
+        ]
+      ],
+      "setup": "Seated sideways to cable or band. Hold handle at chest with both hands, arms extended.",
+      "execution": "Trace letters A through J with the handle, keeping arms extended. Resist rotation throughout.",
+      "nwbCues": "Seated. Small controlled movements. Core braced — the alphabet is the anti-rotation challenge.",
+      "rest": 60
+    },
+    "Modified Side Plank Hold": {
+      "sets": [
+        [
+          "3",
+          "20s/side"
+        ]
+      ],
+      "setup": "Side-lying on right forearm and right knee. Left knee stacked passively on right.",
+      "execution": "Lift right hip off floor. Hold position with core braced. Breathe steadily.",
+      "nwbCues": "Knee-supported version. Left leg is a passive rider — do not push off with it.",
+      "rest": 45
+    },
+    "Low-to-High Woodchop": {
+      "sets": [
+        [
+          "3",
+          "12/side"
+        ]
+      ],
+      "setup": "Seated at cable station. Low cable with rope or D-handle. Sit tall.",
+      "execution": "Pull cable diagonally from low-to-high across body, rotating torso. Follow movement with eyes. Control return.",
+      "nwbCues": "Seated only. Hip flexion minimal — rotation drives movement.",
+      "rest": 60
+    },
+    "Pallof ISO Hold": {
+      "sets": [
+        [
+          "3",
+          "20s/side"
+        ]
+      ],
+      "setup": "Seated sideways to cable or band at chest height. Hold handle at chest with both hands.",
+      "execution": "Press handle straight out and HOLD. Resist any rotation. Breathe steadily through the hold.",
+      "nwbCues": "Seated. Start with lighter resistance to learn the anti-rotation demand.",
+      "rest": 45
+    },
+    "Suitcase Hold (Seated)": {
+      "sets": [
+        [
+          "3",
+          "30s/side"
+        ]
+      ],
+      "setup": "Sit upright on a bench. Hold a dumbbell at your side (like a briefcase) in one hand.",
+      "execution": "Resist lateral lean — keep spine perfectly vertical while holding the weight. Switch sides.",
+      "nwbCues": "Seated. Core keeps you upright. No lateral hip shift.",
+      "rest": 45
+    }
+  },
+  "nearbySupersets": [
+    {
+      "nearbyId": "cable_station",
+      "title": "Left Ankle Dorsiflexion",
+      "sets": "2×15",
+      "instruction": "Low cable, strap around top of left foot. Pull toes toward shin against cable resistance.",
+      "safety": "Tibialis anterior maintenance for gait recovery. Fully seated or reclined."
+    },
+    {
+      "nearbyId": "flat_bench",
+      "title": "Quad Sets (Bench)",
+      "sets": "2×10, 5s hold",
+      "instruction": "Sit on nearby bench. Press back of left knee into bench surface. Hold 5 seconds, release, repeat.",
+      "safety": "Pure isometric, zero joint stress."
+    },
+    {
+      "nearbyId": "adj_bench",
+      "title": "Quad Sets (Bench)",
+      "sets": "2×10, 5s hold",
+      "instruction": "Sit on nearby adjustable bench. Press back of left knee into bench surface. Hold 5 seconds, release, repeat.",
+      "safety": "Pure isometric, zero joint stress."
+    },
+    {
+      "nearbyId": "mat_floor",
+      "title": "Ankle Pumps & Circles",
+      "sets": "2×20",
+      "instruction": "Lie or sit on mat. Point and flex left foot, then circle ankle in both directions.",
+      "safety": "Zero load on fracture site. Maintains ankle ROM and promotes circulation."
+    },
+    {
+      "nearbyId": "bands",
+      "title": "Banded Terminal Knee Extensions",
+      "sets": "2×15",
+      "instruction": "Sit with band looped behind left knee and anchored ahead. Extend left knee against band resistance.",
+      "safety": "Pure knee extension — zero hip flexion demand. Band provides gentle progressive resistance."
+    },
+    {
+      "nearbyId": "dip_assist",
+      "title": "Short Arc Quads",
+      "sets": "2×12",
+      "instruction": "Sit on the dip machine seat. Place a rolled towel under left knee. Press knee down into towel, straighten last 30° of knee extension.",
+      "safety": "Minimal range, pure quad activation. Zero hip flexor involvement."
+    },
+    {
+      "nearbyId": "trx",
+      "title": "TRX Left Knee Extension",
+      "sets": "2×12",
+      "instruction": "Sit on the floor facing the TRX anchor. Place left foot in foot cradle. Extend left knee against the strap resistance — last 30° of extension only.",
+      "safety": "Pure knee extension, zero hip flexion. TRX provides gentle accommodating resistance."
+    },
+    {
+      "nearbyId": "trx",
+      "title": "TRX Left Ankle Dorsiflexion",
+      "sets": "2×15",
+      "instruction": "Sit with left foot in the TRX foot cradle (heel in cradle, toes free). Pull toes toward shin against strap resistance.",
+      "safety": "Tibialis anterior maintenance for gait recovery. Fully seated."
+    },
+    {
+      "nearbyId": "pullup_bar",
+      "title": "Dead Hang (Spinal Decompression)",
+      "sets": "2×30s",
+      "instruction": "Hang from the bar with both hands, shoulders packed. Let lower body hang fully relaxed — legs are dead weight.",
+      "safety": "Zero leg involvement. Passive hang decompresses spine and stretches lats. Use a box to get up safely."
+    },
+    {
+      "nearbyId": "parallel_bars",
+      "title": "Quad Sets (Seated on Bars)",
+      "sets": "2×10, 5s hold",
+      "instruction": "Sit on one of the parallel bars or the dip station seat. Press back of left knee into the bar surface. Hold 5 seconds, release, repeat.",
+      "safety": "Pure isometric, zero joint stress. Seated position is fully NWB-safe."
+    }
+  ],
+  "mobilitySupplement": [
+    {
+      "id": "seated_cat_cow",
+      "name": "Seated Cat-Cow",
+      "kind": "mobility",
+      "sets": "2×10",
+      "instruction": "Sit upright on the machine seat or bench. Inhale: arch back, lift chest, look up (cow). Exhale: round upper back, tuck chin (cat). Move slowly through each breath.",
+      "safety": "Pure spinal ROM. Zero leg involvement. Can be done on any seated machine between sets.",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "seated_thoracic_rotations",
+      "name": "Seated Thoracic Rotations",
+      "kind": "mobility",
+      "sets": "2×8/side",
+      "instruction": "Sit upright, arms crossed over chest. Rotate torso left and right, keeping hips square. Hold each end-range for a second.",
+      "safety": "T-spine mobility reset between pressing/pulling sets. Hips don't move — rotation is pure thoracic.",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "neck_rolls",
+      "name": "Gentle Neck Rolls",
+      "kind": "mobility",
+      "sets": "5/direction",
+      "instruction": "Drop chin to chest. Slowly roll head ear-to-shoulder, back, and around. Small range — no neck cranking.",
+      "safety": "Gentle ROM. Great after heavy pressing or pulling. Stop if any pinching.",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "seated_pec_stretch",
+      "name": "Seated Pec Opener",
+      "kind": "stretch",
+      "sets": "2×20s",
+      "instruction": "Sit tall. Clasp hands behind lower back. Lift chest and pull shoulders back and down. Breathe into the stretch.",
+      "safety": "Opens the anterior chest after pressing volume. Stop if shoulders pinch — don't force range.",
+      "appliesTo": [
+        "push",
+        "pull"
+      ]
+    },
+    {
+      "id": "overhead_tricep_stretch",
+      "name": "Overhead Triceps Stretch",
+      "kind": "stretch",
+      "sets": "20s/side",
+      "instruction": "Reach right arm overhead, drop hand behind neck toward opposite shoulder blade. Pull elbow gently with left hand. Switch sides.",
+      "safety": "Perfect between pressing sets. Keep ribs down so you don't arch lower back.",
+      "appliesTo": [
+        "push"
+      ]
+    },
+    {
+      "id": "cross_body_shoulder",
+      "name": "Cross-Body Shoulder Stretch",
+      "kind": "stretch",
+      "sets": "20s/side",
+      "instruction": "Pull right arm across chest with left hand cradling the elbow. Hold, then switch.",
+      "safety": "Posterior capsule and rear delt stretch. Great after pushing or pulling volume.",
+      "appliesTo": [
+        "push",
+        "pull"
+      ]
+    },
+    {
+      "id": "seated_lat_stretch",
+      "name": "Seated Lat Side-Bend",
+      "kind": "stretch",
+      "sets": "20s/side",
+      "instruction": "Sit tall. Raise right arm overhead, reach up and side-bend to the left. Feel the stretch along the right lat. Switch sides.",
+      "safety": "Opens the lats between pulling sets. Hips stay planted — only the torso bends.",
+      "appliesTo": [
+        "pull"
+      ]
+    },
+    {
+      "id": "seated_rhomboid_stretch",
+      "name": "Rhomboid Self-Hug",
+      "kind": "stretch",
+      "sets": "2×20s",
+      "instruction": "Wrap arms around self (self-hug). Round upper back and reach hands toward opposite shoulder blades. Let upper back spread.",
+      "safety": "Upper back and rhomboid stretch. Good reset between rowing sets.",
+      "appliesTo": [
+        "pull"
+      ]
+    },
+    {
+      "id": "wrist_flexor_stretch",
+      "name": "Wrist Flexor Stretch",
+      "kind": "stretch",
+      "sets": "20s/side",
+      "instruction": "Extend right arm, palm up. Gently pull fingers back toward you with left hand. Feel stretch in forearm. Switch.",
+      "safety": "Grip and wrist reset between heavy compound sets.",
+      "appliesTo": [
+        "push",
+        "pull"
+      ]
+    },
+    {
+      "id": "wrist_circles",
+      "name": "Wrist Circles",
+      "kind": "mobility",
+      "sets": "10/direction",
+      "instruction": "Clasp hands together, rotate wrists in slow circles — clockwise then counter-clockwise.",
+      "safety": "Wrist ROM for pressing and pulling days. Zero load.",
+      "appliesTo": [
+        "push",
+        "pull"
+      ]
+    },
+    {
+      "id": "seated_hamstring_reach_r",
+      "name": "Right Hamstring Reach",
+      "kind": "stretch",
+      "sets": "2×20s",
+      "instruction": "Sit tall, extend right leg out in front (heel on floor). Hinge from hips and reach toward right toes. Left leg stays passive — hanging or supported.",
+      "safety": "Right side only. NO left-leg stretch (fracture side stays passive).",
+      "appliesTo": [
+        "legs",
+        "core",
+        "all"
+      ]
+    },
+    {
+      "id": "seated_calf_stretch_r",
+      "name": "Right Calf Towel Stretch",
+      "kind": "stretch",
+      "sets": "2×20s",
+      "instruction": "Sit with right leg extended. Loop a towel (or hands) around right forefoot. Gently pull toes toward you. Hold.",
+      "safety": "Right calf only — gait prep. Left leg stays passive throughout.",
+      "appliesTo": [
+        "legs",
+        "core",
+        "all"
+      ]
+    },
+    {
+      "id": "seated_hip_flexor_reset_r",
+      "name": "Right Hip Flexor Reset",
+      "kind": "mobility",
+      "sets": "2×10",
+      "instruction": "Sit on edge of bench. Slide right foot slightly behind the knee line. Tuck pelvis under (posterior tilt) and feel the front of the right hip open. Release and repeat.",
+      "safety": "Right side ONLY. Left hip stays neutral. Do not stretch the left hip flexor.",
+      "appliesTo": [
+        "legs",
+        "core",
+        "all"
+      ]
+    },
+    {
+      "id": "box_breathing",
+      "name": "Box Breathing",
+      "kind": "breathing",
+      "sets": "4 rounds",
+      "instruction": "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 rounds.",
+      "safety": "Parasympathetic reset between heavy working sets. Lowers HR and sharpens focus.",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "crocodile_breathing",
+      "name": "Crocodile Breath (Seated)",
+      "kind": "breathing",
+      "sets": "5 breaths",
+      "instruction": "Sit tall. Hands on lower ribs. Inhale slowly through the nose — feel ribs expand outward into your hands. Exhale fully through pursed lips.",
+      "safety": "Diaphragmatic activation. Great between pressing sets to reset bracing pattern.",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "scapular_packing",
+      "name": "Scapular Packing Hold",
+      "kind": "mobility",
+      "sets": "2×10s",
+      "instruction": "Sit upright. Pull shoulder blades down and together (back pocket cue). Hold 10 seconds, release, repeat.",
+      "safety": "Scap positioning reset — great before pressing or pulling. Pure isometric.",
+      "appliesTo": [
+        "push",
+        "pull",
+        "all"
+      ]
+    }
+  ],
+  "cableSuperset": {
+    "title": "Left Ankle Dorsiflexion",
+    "sets": "2×15",
+    "instruction": "Low cable, strap around top of left foot. Pull toes toward shin against cable resistance.",
+    "safety": "Tibialis anterior maintenance for gait recovery. Fully seated or reclined."
+  },
+  "genericSeatedSuperset": {
+    "title": "Quad Sets",
+    "sets": "2×10, 5s hold",
+    "instruction": "Press back of left knee into seat surface. Hold 5 seconds, release, repeat.",
+    "safety": "Pure isometric, zero joint stress. Can be done between any seated exercise."
+  }
+}
