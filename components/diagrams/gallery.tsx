@@ -10,6 +10,7 @@ import { PRONE_ANIMS } from "./prone";
 import { GLUTE_ANIMS } from "./glute";
 import { YOGA_ANIMS } from "./yoga";
 import { EQUIPMENT_ANIMS } from "./equipment";
+import { cssAlpha } from "@/lib/css-utils";
 
 // Merge all animation maps
 const ALL_ANIMS: Record<string, ComponentType<{ t: number }>> = {
@@ -274,7 +275,7 @@ export default function DiagramGallery({ initialExercise, onClose }: DiagramGall
             className="rounded-lg p-3 mb-3"
             style={{
               background: "#1a130822",
-              border: "1px solid var(--color-warning)33",
+              border: `1px solid ${cssAlpha("var(--color-warning)", 20)}`,
             }}
           >
             <span className="text-[11px] font-bold mr-1.5" style={{ color: "var(--color-warning)" }}>

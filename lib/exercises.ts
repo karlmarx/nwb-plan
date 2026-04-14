@@ -901,6 +901,38 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
     visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    machineVariants: [
+      {
+        id: "cable_column",
+        label: "Cable Column",
+        icon: "\u2696\uFE0F",
+        description: "Standard cable column with D-handle, bench or standing",
+        setupCues: [
+          "Set pulley to chest height on a cable column",
+          "Sit on a bench or seat facing the column",
+          "Grab D-handle with one hand, keep other hand on thigh for stability",
+        ],
+      },
+      {
+        id: "nautilus_low_row",
+        label: "Nautilus Multi Station Low Row",
+        icon: "\uD83E\uDDBE",
+        description: "Nautilus Multi Station low row \u2014 pin-loaded, foot plates, no chest pad. Sit on the platform and row from below.",
+        setupCues: [
+          "Sit on the platform facing the cable attachment \u2014 NOT standing as the machine label shows",
+          "Right foot braced flat against the foot plate for stability",
+          "Left foot resting passively on the plate \u2014 zero push",
+          "Grab the handle with one hand, slight forward lean from the hips (stay under 90\u00B0)",
+          "Pin-loaded stack: easy to adjust weight between arms",
+        ],
+        superset: {
+          title: "R-Leg Calf Raise on Foot Plate",
+          sets: "2\u00D712",
+          instruction: "Between row sets: RIGHT foot only \u2014 press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. Keep left foot completely passive.",
+          safety: "LEFT foot stays passive on the plate \u2014 zero push. No Pallof holds on this station \u2014 without a chest pad the anti-rotation force goes through your hips, risking left iliopsoas engagement.",
+        },
+      },
+    ],
     cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
