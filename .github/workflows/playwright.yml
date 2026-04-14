@@ -34,11 +34,14 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS: "false"
+          AUTH_TRUST_HOST: "true"
 
       - name: Install Playwright browsers
         run: uv run --python 3.14 --with pytest --with pytest-playwright --with playwright python -m playwright install chromium --with-deps
 
       - name: Run Playwright tests
+        env:
+          AUTH_TRUST_HOST: "true"
         run: |
           npm run start &
           SERVER_PID=$!

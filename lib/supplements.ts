@@ -97,6 +97,7 @@ export const EQUIP_TO_NEARBY: Record<string, string> = {
   dumbbells: "adj_bench", // dumbbells are usually used at a bench
   trx: "trx",
   parallettes: "parallel_bars",
+  hamcurl: "hamcurl_machine",
 };
 
 // ===== NEARBY-EQUIPMENT-DRIVEN SUPERSETS =====
@@ -199,6 +200,269 @@ export const NEARBY_SUPERSETS: NearbySuperset[] = [
       "Sit on one of the parallel bars or the dip station seat. Press back of left knee into the bar surface. Hold 5 seconds, release, repeat.",
     safety:
       "Pure isometric, zero joint stress. Seated position is fully NWB-safe.",
+  },
+  // ── Prone Ham Curl Machine Core Supersets ──
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone Trunk Extension",
+    sets: "3\u00D710-12",
+    instruction:
+      "Stay face-down on the ham curl machine. Hands behind head (add plate to progress). Lift chest 1-2\" off pad. Hold 1s at top, lower with control.",
+    safety:
+      "Same machine, same position. Ankles locked under pad = zero lower-body demand. Full posterior chain superset with ham curls.",
+  },
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone Iso Hold",
+    sets: "20-45s",
+    instruction:
+      "Stay face-down on the ham curl machine. Lift chest slightly off pad. Hold 20-45 seconds. Breathe into brace \u2014 don't hold breath.",
+    safety:
+      "Isometric erector endurance. Same machine, zero transitions. Breathe through the hold.",
+  },
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone Y-Raise",
+    sets: "3\u00D712-15",
+    instruction:
+      "Stay face-down on the ham curl machine. Arms hang down, thumbs up. Lift arms into Y overhead at ~45\u00B0. Squeeze lower traps 2s at top.",
+    safety:
+      "Pure scapular work. Zero lower-body demand. Excellent shoulder health between ham curl sets.",
+  },
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone T-Raise",
+    sets: "3\u00D712-15",
+    instruction:
+      "Stay face-down on the ham curl machine. Raise arms straight out to sides, palms down. Pinch shoulder blades together. Hold 1-2s.",
+    safety:
+      "Mid-trap retraction. Same machine, zero transitions. Counterbalances pressing volume.",
+  },
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone W-Raise",
+    sets: "3\u00D712-15",
+    instruction:
+      "Stay face-down on the ham curl machine. Elbows bent 90\u00B0, externally rotate. Squeeze shoulder blades down & back into W. Hold 2s.",
+    safety:
+      "Rotator cuff prehab. Same machine, zero transitions. Critical for shoulder health.",
+  },
+  {
+    nearbyId: "hamcurl_machine",
+    title: "Prone Lateral Trunk Raise",
+    sets: "3\u00D710/side",
+    instruction:
+      "Stay face-down on the ham curl machine. Small side bend \u2014 lift & rotate torso slightly left/right. Alternate sides each rep.",
+    safety:
+      "Obliques and QL in a NWB-safe prone position. Keep range small and controlled.",
+  },
+];
+
+// ===== MOBILITY / STRETCH / BREATHING COMPLEMENTS =====
+// Always-available between-set fillers for when a left-leg or core superset
+// doesn't make sense (e.g. you're on a seated chest press and the nearest
+// cable is across the gym). These need ZERO equipment — can be done on
+// the bench you're already sitting on.
+
+export type MobilityKind = "mobility" | "stretch" | "breathing";
+
+export interface MobilitySupplement {
+  id: string;
+  name: string;
+  kind: MobilityKind;
+  sets: string; // "2×10", "20s/side", "5 breaths"
+  instruction: string;
+  safety: string;
+  /** Which workout categories it fits best. "all" means any workout. */
+  appliesTo: Array<"push" | "pull" | "legs" | "core" | "cardio" | "all">;
+}
+
+export const MOBILITY_SUPPLEMENTS: MobilitySupplement[] = [
+  // ── SPINAL MOBILITY ─────────────────────────────────────────────────────
+  {
+    id: "seated_cat_cow",
+    name: "Seated Cat-Cow",
+    kind: "mobility",
+    sets: "2×10",
+    instruction:
+      "Sit upright on the machine seat or bench. Inhale: arch back, lift chest, look up (cow). Exhale: round upper back, tuck chin (cat). Move slowly through each breath.",
+    safety:
+      "Pure spinal ROM. Zero leg involvement. Can be done on any seated machine between sets.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "seated_thoracic_rotations",
+    name: "Seated Thoracic Rotations",
+    kind: "mobility",
+    sets: "2×8/side",
+    instruction:
+      "Sit upright, arms crossed over chest. Rotate torso left and right, keeping hips square. Hold each end-range for a second.",
+    safety:
+      "T-spine mobility reset between pressing/pulling sets. Hips don't move — rotation is pure thoracic.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "neck_rolls",
+    name: "Gentle Neck Rolls",
+    kind: "mobility",
+    sets: "5/direction",
+    instruction:
+      "Drop chin to chest. Slowly roll head ear-to-shoulder, back, and around. Small range — no neck cranking.",
+    safety:
+      "Gentle ROM. Great after heavy pressing or pulling. Stop if any pinching.",
+    appliesTo: ["all"],
+  },
+
+  // ── UPPER BODY STRETCHES (PUSH FOCUS) ───────────────────────────────────
+  {
+    id: "seated_pec_stretch",
+    name: "Seated Pec Opener",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit tall. Clasp hands behind lower back. Lift chest and pull shoulders back and down. Breathe into the stretch.",
+    safety:
+      "Opens the anterior chest after pressing volume. Stop if shoulders pinch — don't force range.",
+    appliesTo: ["push", "pull"],
+  },
+  {
+    id: "overhead_tricep_stretch",
+    name: "Overhead Triceps Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Reach right arm overhead, drop hand behind neck toward opposite shoulder blade. Pull elbow gently with left hand. Switch sides.",
+    safety:
+      "Perfect between pressing sets. Keep ribs down so you don't arch lower back.",
+    appliesTo: ["push"],
+  },
+  {
+    id: "cross_body_shoulder",
+    name: "Cross-Body Shoulder Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Pull right arm across chest with left hand cradling the elbow. Hold, then switch.",
+    safety:
+      "Posterior capsule and rear delt stretch. Great after pushing or pulling volume.",
+    appliesTo: ["push", "pull"],
+  },
+
+  // ── UPPER BODY STRETCHES (PULL FOCUS) ───────────────────────────────────
+  {
+    id: "seated_lat_stretch",
+    name: "Seated Lat Side-Bend",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Sit tall. Raise right arm overhead, reach up and side-bend to the left. Feel the stretch along the right lat. Switch sides.",
+    safety:
+      "Opens the lats between pulling sets. Hips stay planted — only the torso bends.",
+    appliesTo: ["pull"],
+  },
+  {
+    id: "seated_rhomboid_stretch",
+    name: "Rhomboid Self-Hug",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Wrap arms around self (self-hug). Round upper back and reach hands toward opposite shoulder blades. Let upper back spread.",
+    safety:
+      "Upper back and rhomboid stretch. Good reset between rowing sets.",
+    appliesTo: ["pull"],
+  },
+
+  // ── FOREARM / WRIST / GRIP ──────────────────────────────────────────────
+  {
+    id: "wrist_flexor_stretch",
+    name: "Wrist Flexor Stretch",
+    kind: "stretch",
+    sets: "20s/side",
+    instruction:
+      "Extend right arm, palm up. Gently pull fingers back toward you with left hand. Feel stretch in forearm. Switch.",
+    safety:
+      "Grip and wrist reset between heavy compound sets.",
+    appliesTo: ["push", "pull"],
+  },
+  {
+    id: "wrist_circles",
+    name: "Wrist Circles",
+    kind: "mobility",
+    sets: "10/direction",
+    instruction:
+      "Clasp hands together, rotate wrists in slow circles — clockwise then counter-clockwise.",
+    safety: "Wrist ROM for pressing and pulling days. Zero load.",
+    appliesTo: ["push", "pull"],
+  },
+
+  // ── RIGHT-LEG / CORE MOBILITY ───────────────────────────────────────────
+  {
+    id: "seated_hamstring_reach_r",
+    name: "Right Hamstring Reach",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit tall, extend right leg out in front (heel on floor). Hinge from hips and reach toward right toes. Left leg stays passive — hanging or supported.",
+    safety:
+      "Right side only. NO left-leg stretch (fracture side stays passive).",
+    appliesTo: ["legs", "core", "all"],
+  },
+  {
+    id: "seated_calf_stretch_r",
+    name: "Right Calf Towel Stretch",
+    kind: "stretch",
+    sets: "2×20s",
+    instruction:
+      "Sit with right leg extended. Loop a towel (or hands) around right forefoot. Gently pull toes toward you. Hold.",
+    safety:
+      "Right calf only — gait prep. Left leg stays passive throughout.",
+    appliesTo: ["legs", "core", "all"],
+  },
+  {
+    id: "seated_hip_flexor_reset_r",
+    name: "Right Hip Flexor Reset",
+    kind: "mobility",
+    sets: "2×10",
+    instruction:
+      "Sit on edge of bench. Slide right foot slightly behind the knee line. Tuck pelvis under (posterior tilt) and feel the front of the right hip open. Release and repeat.",
+    safety:
+      "Right side ONLY. Left hip stays neutral. Do not stretch the left hip flexor.",
+    appliesTo: ["legs", "core", "all"],
+  },
+
+  // ── BREATHING / NERVOUS SYSTEM RESETS ───────────────────────────────────
+  {
+    id: "box_breathing",
+    name: "Box Breathing",
+    kind: "breathing",
+    sets: "4 rounds",
+    instruction:
+      "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 rounds.",
+    safety:
+      "Parasympathetic reset between heavy working sets. Lowers HR and sharpens focus.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "crocodile_breathing",
+    name: "Crocodile Breath (Seated)",
+    kind: "breathing",
+    sets: "5 breaths",
+    instruction:
+      "Sit tall. Hands on lower ribs. Inhale slowly through the nose — feel ribs expand outward into your hands. Exhale fully through pursed lips.",
+    safety:
+      "Diaphragmatic activation. Great between pressing sets to reset bracing pattern.",
+    appliesTo: ["all"],
+  },
+  {
+    id: "scapular_packing",
+    name: "Scapular Packing Hold",
+    kind: "mobility",
+    sets: "2×10s",
+    instruction:
+      "Sit upright. Pull shoulder blades down and together (back pocket cue). Hold 10 seconds, release, repeat.",
+    safety:
+      "Scap positioning reset — great before pressing or pulling. Pure isometric.",
+    appliesTo: ["push", "pull", "all"],
   },
 ];
 
@@ -421,6 +685,50 @@ export const SUPPLEMENT_EX: Record<string, SupplementExData> = {
     execution: "Resist lateral lean — keep spine perfectly vertical while holding the weight. Switch sides.",
     nwbCues: "Seated. Core keeps you upright. No lateral hip shift.",
     rest: 45,
+  },
+
+  // ── PRONE HAM CURL MACHINE CORE ──
+  "Prone Y-Raise": {
+    sets: [["3", "12-15"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms hang down, thumbs up.",
+    execution: "Lift arms into Y overhead at ~45°. Squeeze lower traps hard at top for 2 seconds. Lower with control.",
+    nwbCues: "Ankles locked = zero lower-body demand. Pure scapular depression + retraction.",
+    rest: 60,
+  },
+  "Prone T-Raise": {
+    sets: [["3", "12-15"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms hang down, palms down.",
+    execution: "Raise arms straight out to sides. Pinch shoulder blades together at top. Hold 1-2 seconds.",
+    nwbCues: "Ankles locked = zero lower-body demand. Mid-trap and rhomboid focus.",
+    rest: 60,
+  },
+  "Prone W-Raise": {
+    sets: [["3", "12-15"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Elbows bent 90°.",
+    execution: "Externally rotate shoulders, squeezing shoulder blades down and back into W shape. Hold 2 seconds.",
+    nwbCues: "Ankles locked = zero lower-body demand. Rotator cuff prehab.",
+    rest: 60,
+  },
+  "Prone Trunk Extension": {
+    sets: [["3", "10-12"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Hands behind head.",
+    execution: "Lift chest 1-2 inches off pad. Hold 1 second at top. Lower with control. Add plate to progress.",
+    nwbCues: "Ankles locked = zero lower-body demand. Anti-flexion core, fully NWB-safe.",
+    rest: 90,
+  },
+  "Prone Iso Hold": {
+    sets: [["3", "20-45s"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms at sides or behind head.",
+    execution: "Lift chest slightly off pad. Hold 20-45 seconds. Breathe into brace — don't hold breath.",
+    nwbCues: "Isometric erector hold. Ankles locked = zero lower-body demand. Respiratory demand is the progression.",
+    rest: 60,
+  },
+  "Prone Lateral Trunk Raise": {
+    sets: [["3", "10/side"]],
+    setup: "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms at sides.",
+    execution: "Small side bend — lift and rotate torso slightly left, then right. Alternate sides. Keep range small.",
+    nwbCues: "Ankles locked = zero lower-body demand. Controlled lateral flexion, thoracic spine only.",
+    rest: 60,
   },
 };
 

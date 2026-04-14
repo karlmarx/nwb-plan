@@ -12,25 +12,31 @@ import {
   PHASES,
 } from "@/lib/exercises";
 import {
-  SUPPLEMENT_LEFT_LEG,
   SUPPLEMENT_CORE,
   SUPPLEMENT_EX,
   CABLE_SUPERSET,
-  EQUIP_TO_NEARBY,
   NEARBY_SUPERSETS,
+  MOBILITY_SUPPLEMENTS,
 } from "@/lib/supplements";
-import type { VariantSuperset, Exercise } from "@/lib/exercises";
+import type { Exercise } from "@/lib/exercises";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
 import Callout from "@/components/callout";
 import RestTimer from "@/components/rest-timer";
 import ProgressClock from "@/components/progress-clock";
-import NearbyPicker from "@/components/nearby-picker";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
+import EditExerciseSheet from "@/components/edit-exercise-sheet";
+import ComplementPicker, {
+  decodeComplement,
+  encodeNearbyId,
+  encodeSuppId,
+  type ComplementId,
+} from "@/components/complement-picker";
+import { useLongPress } from "@/lib/use-long-press";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -563,7 +569,33 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
-  const [editMode, setEditMode] = useState(false);
+
+  // Edit sheet (swap / machine / move / remove) — opened via long-press or ⋮ button
+  const [editSheetFor, setEditSheetFor] = useState<
+    { workoutKey: string; origName: string; exName: string } | null
+  >(null);
+
+  // Complement picker (add equipment-aware supersets / mobility / stretches)
+  const [complementPickerFor, setComplementPickerFor] = useState<
+    { exName: string; exerciseRequires: string[]; exerciseCategory: string } | null
+  >(null);
+
+  // User-opted-in complements per exercise (date-scoped so they clear tomorrow)
+  const complementsKey = `nwb_complements_${new Date().toISOString().slice(0, 10)}`;
+  const [complementsToday, setComplementsToday] = useState<
+    Record<string, ComplementId[]>
+  >(() => loadState<Record<string, ComplementId[]>>(complementsKey, {}));
+
+  // Removed exercises (date-scoped — return tomorrow)
+  const removedKey = `nwb_removed_${new Date().toISOString().slice(0, 10)}`;
+  const [removedToday, setRemovedToday] = useState<Record<string, string[]>>(
+    () => loadState<Record<string, string[]>>(removedKey, {}),
+  );
+
+  // Per-workout exercise reorder (persistent)
+  const [exerciseOrder, setExerciseOrder] = useState<Record<string, string[]>>(
+    () => loadState<Record<string, string[]>>("nwb_order", {}),
+  );
 
   // Focus mode: fullscreen exercise walkthrough
   type FocusSupplement = {
@@ -667,6 +699,15 @@ export default function WorkoutView() {
     saveState("nwb_ui_v2", uiV2);
   }, [uiV2]);
   useEffect(() => {
+    saveState(complementsKey, complementsToday);
+  }, [complementsToday, complementsKey]);
+  useEffect(() => {
+    saveState(removedKey, removedToday);
+  }, [removedToday, removedKey]);
+  useEffect(() => {
+    saveState("nwb_order", exerciseOrder);
+  }, [exerciseOrder]);
+  useEffect(() => {
     saveState(todayKey, completedSupersets);
   }, [completedSupersets, todayKey]);
 
@@ -750,33 +791,316 @@ export default function WorkoutView() {
     [],
   );
 
+  // ----- New helpers for unified UI -----
+
+  /** Return the effective order of original exercise names for a workout. */
+  const getOrderedExercises = useCallback(
+    (workoutKey: string): string[] => {
+      const w = WORKOUTS[workoutKey];
+      if (!w) return [];
+      const base = w.exercises;
+      const saved = exerciseOrder[workoutKey];
+      if (!saved) return base;
+      // Merge saved order with base: saved first (if still in base), then any new exercises
+      const savedSet = new Set(saved);
+      const merged: string[] = [];
+      for (const n of saved) if (base.includes(n)) merged.push(n);
+      for (const n of base) if (!savedSet.has(n)) merged.push(n);
+      return merged;
+    },
+    [exerciseOrder],
+  );
+
+  const moveExercise = useCallback(
+    (workoutKey: string, origName: string, direction: -1 | 1) => {
+      const current = getOrderedExercises(workoutKey);
+      const idx = current.indexOf(origName);
+      if (idx === -1) return;
+      const target = idx + direction;
+      if (target < 0 || target >= current.length) return;
+      const next = [...current];
+      [next[idx], next[target]] = [next[target], next[idx]];
+      setExerciseOrder((prev) => ({ ...prev, [workoutKey]: next }));
+    },
+    [getOrderedExercises],
+  );
+
+  const removeExerciseToday = useCallback(
+    (workoutKey: string, origName: string) => {
+      setRemovedToday((prev) => {
+        const cur = prev[workoutKey] ?? [];
+        if (cur.includes(origName)) return prev;
+        return { ...prev, [workoutKey]: [...cur, origName] };
+      });
+    },
+    [],
+  );
+
+  const toggleComplement = useCallback(
+    (exName: string, id: ComplementId) => {
+      setComplementsToday((prev) => {
+        const cur = prev[exName] ?? [];
+        const next = cur.includes(id)
+          ? cur.filter((x) => x !== id)
+          : [...cur, id];
+        return { ...prev, [exName]: next };
+      });
+    },
+    [],
+  );
+
+  /**
+   * Build superset cards for an exercise — combines auto supersets (cable,
+   * variant-specific) with user-opted-in complements from complementsToday.
+   */
+  const buildSupersetCards = useCallback(
+    (
+      exName: string,
+      ex: Exercise,
+      workoutKey: string,
+      firstCableName: string | null,
+    ): React.ReactNode => {
+      type Card = {
+        key: string;
+        kind: "cable" | "variant" | "nearby" | "leftleg" | "mobility";
+        label: string;
+        color: string;
+        title: string;
+        sets: string;
+        instruction: string;
+        safety?: string;
+        note?: string;
+        removable?: boolean;
+        complementId?: ComplementId;
+      };
+      const cards: Card[] = [];
+
+      const selMachineId = machineSelections[exName];
+      const selectedVariant =
+        ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
+
+      // 1. Auto cable superset (first cable exercise)
+      const isFirstCable = ex.cableSuperset && exName === firstCableName;
+      if (isFirstCable && supplementToggles.leftLeg) {
+        cards.push({
+          key: "auto-cable",
+          kind: "cable",
+          label: "AUTO",
+          color: "#14b8a6",
+          title: CABLE_SUPERSET.title,
+          sets: CABLE_SUPERSET.sets,
+          instruction: CABLE_SUPERSET.instruction,
+          safety: CABLE_SUPERSET.safety,
+        });
+      }
+
+      // 2. Auto variant superset (only if no cable one already)
+      if (
+        !isFirstCable &&
+        supplementToggles.leftLeg &&
+        selectedVariant?.superset
+      ) {
+        const vs = selectedVariant.superset;
+        cards.push({
+          key: "auto-variant",
+          kind: "variant",
+          label: "AUTO",
+          color: "#14b8a6",
+          title: vs.title,
+          sets: vs.sets,
+          instruction: vs.instruction,
+          safety: vs.safety,
+          note: vs.note,
+        });
+      }
+
+      // 3. User-opted-in complements
+      const userComps = complementsToday[exName] ?? [];
+      for (const id of userComps) {
+        const decoded = decodeComplement(id);
+        if (decoded.kind === "nearby") {
+          const ns = NEARBY_SUPERSETS.find(
+            (n) => n.nearbyId === decoded.value && n.title === decoded.sub,
+          );
+          if (!ns) continue;
+          cards.push({
+            key: id,
+            kind: "nearby",
+            label: "NEARBY",
+            color: "#14b8a6",
+            title: ns.title,
+            sets: ns.sets,
+            instruction: ns.instruction,
+            safety: ns.safety,
+            removable: true,
+            complementId: id,
+          });
+        } else if (decoded.kind === "supp") {
+          const data = SUPPLEMENT_EX[decoded.value];
+          if (!data) continue;
+          const s = data.sets[0];
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "L-LEG",
+            color: "#14b8a6",
+            title: decoded.value,
+            sets: `${s[0]}\u00D7${s[1]}`,
+            instruction: data.execution,
+            safety: data.nwbCues,
+            removable: true,
+            complementId: id,
+          });
+        } else if (decoded.kind === "mobility") {
+          const m = MOBILITY_SUPPLEMENTS.find((mm) => mm.id === decoded.value);
+          if (!m) continue;
+          const color =
+            m.kind === "breathing"
+              ? "#8b5cf6"
+              : m.kind === "stretch"
+                ? "#f59e0b"
+                : "#0ea5e9";
+          const label =
+            m.kind === "breathing"
+              ? "BREATH"
+              : m.kind === "stretch"
+                ? "STRETCH"
+                : "MOBILITY";
+          cards.push({
+            key: id,
+            kind: "mobility",
+            label,
+            color,
+            title: m.name,
+            sets: m.sets,
+            instruction: m.instruction,
+            safety: m.safety,
+            removable: true,
+            complementId: id,
+          });
+        }
+      }
+
+      if (cards.length === 0) return null;
+
+      return (
+        <div className="mb-3 space-y-1.5">
+          {cards.map((c) => (
+            <div
+              key={c.key}
+              className="rounded-lg"
+              style={{
+                padding: "8px 10px",
+                background: c.color + "0d",
+                border: `1px solid ${c.color}33`,
+                borderLeft: `3px solid ${c.color}`,
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                <span
+                  className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                  style={{
+                    background: c.color + "22",
+                    border: `1px solid ${c.color}44`,
+                    color: c.color,
+                  }}
+                >
+                  {c.label}
+                </span>
+                <span
+                  className="text-[12px] font-semibold"
+                  style={{ color: c.color }}
+                >
+                  {c.title}
+                </span>
+                <span className="ml-auto text-[10px] text-text-dim">
+                  {c.sets}
+                </span>
+                {c.removable && c.complementId && (
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      toggleComplement(exName, c.complementId!);
+                    }}
+                    aria-label="Remove complement"
+                    className="text-[11px] rounded-md cursor-pointer font-[inherit] w-6 h-6 flex items-center justify-center"
+                    style={{
+                      background: "var(--color-bg)",
+                      border: "1px solid var(--color-border)",
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              <div className="text-[11px] text-text-dim leading-snug">
+                {c.instruction}
+              </div>
+              {c.safety && (
+                <div
+                  className="text-[10px] mt-1"
+                  style={{ color: c.color }}
+                >
+                  {"\u{1F6E1}\uFE0F"} {c.safety}
+                </div>
+              )}
+              {c.note && (
+                <div className="text-[10px] mt-1 text-warning">
+                  {"\u26A0\uFE0F"} {c.note}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    },
+    [
+      complementsToday,
+      machineSelections,
+      supplementToggles.leftLeg,
+      toggleComplement,
+    ],
+  );
+
+  /** Render the "+ Add complement" pill. */
+  const buildAddComplementPill = useCallback(
+    (exName: string, ex: Exercise): React.ReactNode => {
+      return (
+        <button
+          data-testid="add-complement"
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setComplementPickerFor({
+              exName,
+              exerciseRequires: ex.requires,
+              exerciseCategory: ex.category,
+            });
+          }}
+          className="w-full mb-3 rounded-xl text-[12px] font-semibold cursor-pointer font-[inherit] min-h-[40px] transition-colors duration-150 flex items-center justify-center gap-1.5"
+          style={{
+            background: "var(--color-bg)",
+            border: "1px dashed var(--color-border)",
+            color: "var(--color-text-muted)",
+          }}
+        >
+          <span className="text-base leading-none">+</span>
+          Add complement
+        </button>
+      );
+    },
+    [],
+  );
+
   // ----- Core exercise renderer (used in Core and workout tabs) -----
   function renderCoreExercise(name: string) {
     const ex = EX[name];
     if (!ex) return null;
     const unavail =
       !ex || ex.requires.some((r) => equipment[r] === false);
-    const coreEditSlot = editMode ? (() => {
-      const exData = EX[name];
-      const inUseIds = exData
-        ? exData.requires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean)
-        : [];
-      return (
-        <NearbyPicker
-          selected={nearbySelections[name] ?? []}
-          inUse={inUseIds}
-          onToggle={(id) =>
-            setNearbySelections((prev) => {
-              const current = prev[name] ?? [];
-              const next = current.includes(id)
-                ? current.filter((x) => x !== id)
-                : [...current, id];
-              return { ...prev, [name]: next };
-            })
-          }
-        />
-      );
-    })() : undefined;
+    const selMachineId = machineSelections[name];
+    const selectedVariant =
+      ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
     return (
       <div key={name}>
         <ExerciseRow
@@ -785,20 +1109,22 @@ export default function WorkoutView() {
           phase={phase}
           isExpanded={!!expandedEx[name]}
           onToggle={() => toggleEx(name)}
-          onSwap={(sw) => {
-            if (sw.startsWith("__timer__"))
-              setTimer(parseInt(sw.replace("__timer__", "")));
-          }}
+          onLongPress={() =>
+            setEditSheetFor({
+              workoutKey: "__core__",
+              origName: name,
+              exName: name,
+            })
+          }
+          onStartTimer={(sec) => setTimer(sec)}
           onDiagram={(d) => setDiagramOpen(d)}
           onOpenDiagram={(id) => setDiagramOpen(id)}
           unavailable={unavail}
           equipment={equipment}
-          selectedVariantId={machineSelections[name] ?? null}
-          onSelectVariant={(id) =>
-            setMachineSelections((prev) => ({ ...prev, [name]: id }))
-          }
-          editMode={editMode}
-          editSlot={coreEditSlot}
+          variantSetupCues={selectedVariant?.setupCues}
+          variantLabel={selectedVariant?.label}
+          supersetSlot={buildSupersetCards(name, ex, "__core__", null)}
+          addComplementSlot={buildAddComplementPill(name, ex)}
         />
       </div>
     );
@@ -810,10 +1136,14 @@ export default function WorkoutView() {
     if (!w) return null;
     const hevyId = parseHevyId(hevyIds[workoutKey] || w.hevy);
     const isTrainingDay = SUPPLEMENT_CORE[workoutKey] != null;
-    const isLegsDay = workoutKey === "Legs A" || workoutKey === "Legs B";
+
+    // Effective exercise order with removals applied
+    const orderedOrigs = getOrderedExercises(workoutKey).filter(
+      (o) => !(removedToday[workoutKey] ?? []).includes(o),
+    );
 
     // Find first cable exercise for cable superset
-    const firstCableEx = w.exercises.find((orig) => {
+    const firstCableEx = orderedOrigs.find((orig) => {
       const en = getExName(workoutKey, orig);
       return EX[en]?.cableSuperset;
     });
@@ -821,58 +1151,9 @@ export default function WorkoutView() {
       ? getExName(workoutKey, firstCableEx)
       : null;
 
-    // Build supplement pairings — interleave left leg + core across main exercises
-    const suppMap: Record<
-      string,
-      { type: "leftleg" | "core"; name: string; region?: string }[]
-    > = {};
-    let coreSubtitle = "";
-    if (isTrainingDay) {
-      const llExercises = [...SUPPLEMENT_LEFT_LEG.base];
-      if (isLegsDay) llExercises.push(...SUPPLEMENT_LEFT_LEG.legsExtra);
-      const coreExData = SUPPLEMENT_CORE[workoutKey].exercises;
-      coreSubtitle = SUPPLEMENT_CORE[workoutKey].subtitle;
-
-      const allSupps: {
-        type: "leftleg" | "core";
-        name: string;
-        region?: string;
-      }[] = [];
-      const maxSL = Math.max(llExercises.length, coreExData.length);
-      for (let si = 0; si < maxSL; si++) {
-        if (si < llExercises.length)
-          allSupps.push({ type: "leftleg", name: llExercises[si] });
-        if (si < coreExData.length)
-          allSupps.push({
-            type: "core",
-            name: coreExData[si].name,
-            region: coreExData[si].region,
-          });
-      }
-
-      const activeEx = w.exercises.filter((orig) => {
-        const en = getExName(workoutKey, orig);
-        const exd = EX[en];
-        return exd && (exd.phase == null || phase >= exd.phase);
-      });
-
-      for (let sj = 0; sj < allSupps.length; sj++) {
-        const target = activeEx[sj % activeEx.length];
-        if (!suppMap[target]) suppMap[target] = [];
-        suppMap[target].push(allSupps[sj]);
-      }
-    }
-
-    const llExercises = isTrainingDay
-      ? [
-          ...SUPPLEMENT_LEFT_LEG.base,
-          ...(isLegsDay ? SUPPLEMENT_LEFT_LEG.legsExtra : []),
-        ]
-      : [];
-    const coreExData =
-      isTrainingDay && SUPPLEMENT_CORE[workoutKey]
-        ? SUPPLEMENT_CORE[workoutKey].exercises
-        : [];
+    const coreSubtitle = isTrainingDay
+      ? SUPPLEMENT_CORE[workoutKey].subtitle
+      : "";
 
     return (
       <Section
@@ -883,7 +1164,7 @@ export default function WorkoutView() {
         onToggle={() => toggleSection(workoutKey)}
         count={w.exercises.length}
         onFocus={() => {
-          const activeExercises = w.exercises
+          const activeExercises = orderedOrigs
             .map((orig) => {
               const nm = getExName(workoutKey, orig);
               const exItem = EX[nm];
@@ -891,11 +1172,11 @@ export default function WorkoutView() {
             })
             .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase));
 
-          // Build focus items with supplements attached
-          const items: FocusItem[] = activeExercises.map(({ orig, name: nm, ex: exItem }) => {
+          // Build focus items with supplements attached (auto + user-opted-in only)
+          const items: FocusItem[] = activeExercises.map(({ name: nm, ex: exItem }) => {
             const supps: FocusSupplement[] = [];
 
-            // 1. Cable superset (first cable exercise only)
+            // Auto: cable superset (first cable exercise only)
             if (supplementToggles.leftLeg && exItem.cableSuperset && nm === firstCableName) {
               supps.push({
                 type: "cable",
@@ -906,7 +1187,7 @@ export default function WorkoutView() {
               });
             }
 
-            // 2. Machine variant superset
+            // Auto: machine variant superset
             const selMachineId = machineSelections[nm];
             const selectedVariant = exItem.machineVariants?.find((v) => v.id === selMachineId) ?? null;
             if (supplementToggles.leftLeg && selectedVariant?.superset && !(exItem.cableSuperset && nm === firstCableName)) {
@@ -920,49 +1201,43 @@ export default function WorkoutView() {
               });
             }
 
-            const hasCableOrVariant = supps.some((s) => s.type === "cable" || s.type === "variant");
-
-            // 3. Left leg + core supplements from suppMap
-            const suppCards = suppMap[orig] || [];
-            for (const supp of suppCards) {
-              const isLL = supp.type === "leftleg";
-              if (isLL && !supplementToggles.leftLeg) continue;
-              if (!isLL && !supplementToggles.core) continue;
-              if (isLL && hasCableOrVariant) continue; // cable/variant replaces left leg card
-              const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
-              if (!suppEx) continue;
-              const suppSets = suppEx.sets[phase] || suppEx.sets[0];
-              supps.push({
-                type: isLL ? "leftleg" : "core",
-                name: supp.name,
-                sets: `${suppSets[0]}\u00D7${suppSets[1]}`,
-                instruction: suppEx.execution,
-                safety: suppEx.nwbCues,
-                region: supp.region,
-                rest: suppEx.rest,
-              });
-            }
-
-            // 4. Nearby supersets
-            if (supplementToggles.leftLeg && !hasCableOrVariant) {
-              const inUseIds = exItem.requires
-                .map((r) => EQUIP_TO_NEARBY[r])
-                .filter(Boolean);
-              const allNearby = [
-                ...new Set([...inUseIds, ...(nearbySelections[nm] ?? [])]),
-              ];
-              const nearbySS = NEARBY_SUPERSETS.filter(
-                (ns) =>
-                  allNearby.includes(ns.nearbyId) &&
-                  !inUseIds.includes(ns.nearbyId)
-              );
-              for (const ns of nearbySS) {
+            // User-opted-in complements
+            const userComps = complementsToday[nm] ?? [];
+            for (const id of userComps) {
+              const decoded = decodeComplement(id);
+              if (decoded.kind === "nearby") {
+                const ns = NEARBY_SUPERSETS.find(
+                  (n) => n.nearbyId === decoded.value && n.title === decoded.sub,
+                );
+                if (!ns) continue;
                 supps.push({
                   type: "nearby",
                   name: ns.title,
                   sets: ns.sets,
                   instruction: ns.instruction,
                   safety: ns.safety,
+                });
+              } else if (decoded.kind === "supp") {
+                const data = SUPPLEMENT_EX[decoded.value];
+                if (!data) continue;
+                const s = data.sets[0];
+                supps.push({
+                  type: "leftleg",
+                  name: decoded.value,
+                  sets: `${s[0]}\u00D7${s[1]}`,
+                  instruction: data.execution,
+                  safety: data.nwbCues,
+                  rest: data.rest,
+                });
+              } else if (decoded.kind === "mobility") {
+                const m = MOBILITY_SUPPLEMENTS.find((mm) => mm.id === decoded.value);
+                if (!m) continue;
+                supps.push({
+                  type: "nearby",
+                  name: m.name,
+                  sets: m.sets,
+                  instruction: m.instruction,
+                  safety: m.safety,
                 });
               }
             }
@@ -1036,8 +1311,8 @@ export default function WorkoutView() {
           </a>
         )}
 
-        {/* Supplement toggle controls — edit mode only */}
-        {isTrainingDay && editMode && (
+        {/* Supplement toggle controls — always visible on training days */}
+        {isTrainingDay && (
           <div className="flex gap-2 mb-3 flex-wrap">
             <button
               onClick={(ev) => {
@@ -1057,36 +1332,19 @@ export default function WorkoutView() {
                 fontWeight: supplementToggles.leftLeg ? 600 : 400,
               }}
             >
-              {"\uD83E\uDDBF"} L-Leg Supersets{" "}
+              {"\uD83E\uDDBF"} Auto L-Leg Supersets{" "}
               {supplementToggles.leftLeg ? "ON" : "OFF"}
             </button>
-            <button
-              onClick={(ev) => {
-                ev.stopPropagation();
-                toggleSupplement("core");
-              }}
-              className="text-[11px] rounded-xl cursor-pointer font-[inherit] min-h-[36px] transition-all duration-150"
-              style={{
-                padding: "6px 12px",
-                background: supplementToggles.core
-                  ? "var(--color-core-sup)15"
-                  : "transparent",
-                border: `1.5px solid ${supplementToggles.core ? "var(--color-core-sup)" : "var(--color-border)"}`,
-                color: supplementToggles.core
-                  ? "var(--color-core-sup)"
-                  : "var(--color-text-muted)",
-                fontWeight: supplementToggles.core ? 600 : 400,
-              }}
-            >
-              {"\uD83C\uDFAF"} Core Supersets{" "}
-              {supplementToggles.core ? "ON" : "OFF"}
-              {coreSubtitle ? ` \u2014 ${coreSubtitle}` : ""}
-            </button>
+            {coreSubtitle && (
+              <span className="text-[10px] text-text-muted self-center">
+                Core focus: {coreSubtitle}
+              </span>
+            )}
           </div>
         )}
 
         {/* Exercise rows */}
-        {w.exercises.map((origName) => {
+        {orderedOrigs.map((origName) => {
           const exName = getExName(workoutKey, origName);
           const ex = EX[exName];
           if (!ex) return null;
@@ -1094,57 +1352,13 @@ export default function WorkoutView() {
           const unavail = !isAvailable(exName);
           const isExp = !!expandedEx[exName];
 
-          // Resolve selected machine variant (for setup cues + superset)
+          // Resolve selected machine variant (for setup cues)
           const selMachineId = machineSelections[exName];
-          const selectedVariant = ex.machineVariants?.find(
-            (v) => v.id === selMachineId
-          ) ?? null;
+          const selectedVariant =
+            ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
 
-          // Equipment-specific superset (driven by machineVariants selection)
-          let ssInfo: VariantSuperset | null = null;
-          if (supplementToggles.leftLeg) {
-            if (ex.cableSuperset && exName === firstCableName) {
-              ssInfo = { ...CABLE_SUPERSET };
-              // Check if selected machine variant is a lat pulldown machine (no low cable)
-              if (selMachineId === "band_rack") {
-                ssInfo.note =
-                  "No cable available with band setup \u2014 do ankle dorsiflexion at nearest cable column between sets.";
-              }
-            } else if (selectedVariant?.superset) {
-              // Only show variant superset when user has explicitly selected a machine type
-              ssInfo = { ...selectedVariant.superset };
-            }
-          }
-
-          const suppCards = suppMap[origName] || [];
-          const activeSuppCards = suppCards.filter((supp) => {
-            const isLL = supp.type === "leftleg";
-            return (
-              (isLL && supplementToggles.leftLeg) ||
-              (!isLL && supplementToggles.core)
-            );
-          });
-
-          const v2GroupAccent =
-            uiV2 && activeSuppCards.length > 0
-              ? activeSuppCards.some((s) => s.type === "leftleg")
-                ? "#14b8a6"
-                : "#f97316"
-              : null;
           return (
-            <div
-              key={origName}
-              style={
-                v2GroupAccent
-                  ? {
-                      borderLeft: `2px solid ${v2GroupAccent}55`,
-                      paddingLeft: 3,
-                      marginLeft: 2,
-                      borderRadius: "0 0 0 6px",
-                    }
-                  : undefined
-              }
-            >
+            <div key={origName}>
               {/* Swap indicator */}
               {exName !== origName && (
                 <div className="text-[10px] text-text-muted px-3 flex items-center gap-1">
@@ -1165,363 +1379,24 @@ export default function WorkoutView() {
                 phase={phase}
                 isExpanded={isExp}
                 onToggle={() => toggleEx(exName)}
-                onSwap={(sw) => handleSwap(workoutKey, origName, sw)}
+                onLongPress={() =>
+                  setEditSheetFor({ workoutKey, origName, exName })
+                }
+                onStartTimer={(sec) => setTimer(sec)}
                 onDiagram={(d) => setDiagramOpen(d)}
-          onOpenDiagram={(id) => setDiagramOpen(id)}
+                onOpenDiagram={(id) => setDiagramOpen(id)}
                 unavailable={unavail}
                 equipment={equipment}
-                workoutExercises={w.exercises.map((o) =>
-                  getExName(workoutKey, o)
-                )}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
-                selectedVariantId={machineSelections[exName] ?? null}
-                onSelectVariant={(id) =>
-                  setMachineSelections((prev) => ({ ...prev, [exName]: id }))
-                }
-                editMode={editMode}
-                editSlot={
-                  editMode ? (() => {
-                    const exData = EX[exName];
-                    const inUseIds = exData
-                      ? exData.requires
-                          .map((r) => EQUIP_TO_NEARBY[r])
-                          .filter(Boolean)
-                      : [];
-                    const allNearby = [
-                      ...new Set([
-                        ...inUseIds,
-                        ...(nearbySelections[exName] ?? []),
-                      ]),
-                    ];
-                    const nearbySupersets = supplementToggles.leftLeg
-                      ? NEARBY_SUPERSETS.filter(
-                          (ns) =>
-                            allNearby.includes(ns.nearbyId) &&
-                            !inUseIds.includes(ns.nearbyId) &&
-                            !ssInfo
-                        )
-                      : [];
-                    return (
-                      <div>
-                        <NearbyPicker
-                          selected={nearbySelections[exName] ?? []}
-                          inUse={inUseIds}
-                          onToggle={(id) =>
-                            setNearbySelections((prev) => {
-                              const current = prev[exName] ?? [];
-                              const next = current.includes(id)
-                                ? current.filter((x) => x !== id)
-                                : [...current, id];
-                              return { ...prev, [exName]: next };
-                            })
-                          }
-                        />
-                        {nearbySupersets.length > 0 && (
-                          <div className="mt-2 space-y-1.5">
-                            {[...nearbySupersets]
-                              .sort((a, b) => {
-                                const aDone = completedSupersets.includes(a.title);
-                                const bDone = completedSupersets.includes(b.title);
-                                if (aDone === bDone) return 0;
-                                return aDone ? 1 : -1;
-                              })
-                              .map((ns) => {
-                              const isDone = completedSupersets.includes(ns.title);
-                              return (
-                              <div
-                                key={`${ns.nearbyId}-${ns.title}`}
-                                className="rounded-lg"
-                                style={{
-                                  padding: "8px 10px",
-                                  background: isDone ? "#14b8a605" : "#14b8a60d",
-                                  border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
-                                  borderLeft: `3px solid ${isDone ? "var(--color-border)" : "#14b8a6"}`,
-                                  opacity: isDone ? 0.55 : 1,
-                                }}
-                              >
-                                <div className="flex items-center gap-1.5 mb-1">
-                                  <span
-                                    className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                                    style={{
-                                      background: isDone ? "var(--color-bg)" : "#14b8a622",
-                                      border: isDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
-                                      color: isDone ? "var(--color-text-muted)" : "#14b8a6",
-                                    }}
-                                  >
-                                    {isDone ? "DONE" : "NEARBY"}
-                                  </span>
-                                  <span
-                                    className="text-xs font-semibold"
-                                    style={{ color: isDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: isDone ? "line-through" : "none" }}
-                                  >
-                                    {ns.title}
-                                  </span>
-                                  <span className="ml-auto text-[10px] text-text-dim">
-                                    {ns.sets}
-                                  </span>
-                                  <button
-                                    onClick={(ev) => {
-                                      ev.stopPropagation();
-                                      setCompletedSupersets((prev) =>
-                                        prev.includes(ns.title)
-                                          ? prev.filter((t) => t !== ns.title)
-                                          : [...prev, ns.title]
-                                      );
-                                    }}
-                                    className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
-                                    style={{
-                                      padding: "2px 8px",
-                                      background: isDone ? "var(--color-safe-bg)" : "var(--color-card)",
-                                      border: isDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
-                                      color: isDone ? "var(--color-safe)" : "var(--color-text-muted)",
-                                    }}
-                                    title={isDone ? "Mark as not done" : "Mark as done today"}
-                                  >
-                                    {isDone ? "✓" : "○"}
-                                  </button>
-                                </div>
-                                {!isDone && (
-                                  <>
-                                    <div className="text-[11px] text-text-dim leading-relaxed">
-                                      {ns.instruction}
-                                    </div>
-                                    <div
-                                      className="text-[10px] mt-1"
-                                      style={{ color: "#14b8a6" }}
-                                    >
-                                      {"\uD83D\uDEE1\uFE0F"} {ns.safety}
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })() : undefined
-                }
-                supplementSlot={
-                  suppCards.length > 0 ? (
-                    <div className="mb-3">
-                      {suppCards.map((supp) => {
-                        const isLL = supp.type === "leftleg";
-                        if (isLL && !supplementToggles.leftLeg) return null;
-                        if (!isLL && !supplementToggles.core) return null;
-                        if (isLL && ssInfo) return null;
-                        const suppEx = EX[supp.name] ?? SUPPLEMENT_EX[supp.name];
-                        if (!suppEx) return null;
-                        const suppSets = suppEx.sets[phase] || suppEx.sets[0];
-                        const suppExpKey = "supp_" + supp.name;
-                        const suppIsExp = !!expandedEx[suppExpKey];
-                        const groupTotal = isLL ? llExercises.length : coreExData.length;
-                        const groupIdx = isLL
-                          ? llExercises.indexOf(supp.name) + 1
-                          : coreExData.findIndex((c) => c.name === supp.name) + 1;
-                        const groupLabel = `${groupIdx}/${groupTotal}`;
-
-                        if (isLL) {
-                          return (
-                            <div key={`supp-${supp.name}`} className="mx-1 my-0.5 rounded-lg overflow-hidden" style={{ background: "#14b8a609", border: "1px solid #14b8a628", borderLeft: "3px solid #14b8a6" }}>
-                              <div onClick={() => toggleEx(suppExpKey)} className="cursor-pointer flex items-center gap-1.5" style={{ padding: "8px 10px" }}>
-                                <span className="inline-flex items-center justify-center rounded text-[9px] font-extrabold shrink-0" style={{ width: 18, height: 18, background: "#14b8a622", border: "1px solid #14b8a644", color: "#14b8a6" }}>L</span>
-                                <span className="text-[9px] font-bold" style={{ color: "#14b8a6", opacity: 0.7 }}>{groupLabel}</span>
-                                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "#14b8a6" }}>Left Leg</span>
-                                <span className="font-semibold text-xs text-text flex-1">{supp.name}</span>
-                                <span className="text-[10px] text-text-dim">{suppSets[0]}&times;{suppSets[1]}</span>
-                                <span className="text-[9px] ml-1" style={{ color: "#14b8a6" }}>{suppIsExp ? "▲" : "▼"}</span>
-                              </div>
-                              {suppIsExp && (
-                                <div className="text-[11px] leading-relaxed" style={{ padding: "0 10px 10px" }}>
-                                  <div className="mb-1.5"><span className="font-bold text-[10px]" style={{ color: "#14b8a6" }}>📍 Setup: </span><span className="text-text-dim">{suppEx.setup}</span></div>
-                                  <div className="mb-1.5"><span className="font-bold text-[10px] text-safe">🔄 Execute: </span><span className="text-text-dim">{suppEx.execution}</span></div>
-                                  <div><span className="font-bold text-[10px]" style={{ color: "#14b8a6" }}>🛡️ Safety: </span><span className="text-text-dim">{suppEx.nwbCues}</span></div>
-                                  {suppEx.rest > 0 && <button onClick={(ev) => { ev.stopPropagation(); setTimer(suppEx.rest); }} className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]" style={{ padding: 7, background: "#14b8a618", border: "1px solid #14b8a633", color: "#14b8a6" }}>⏱ Start {suppEx.rest}s Rest</button>}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        } else {
-                          const regionColors: Record<string, string> = { "Upper Abs": "#f59e0b", "Lower Abs": "#ec4899", Obliques: "#a78bfa" };
-                          const regionColor = regionColors[supp.region || ""] || "#f97316";
-                          return (
-                            <div key={`supp-${supp.name}`} className="mx-1 my-0.5 rounded-lg overflow-hidden" style={{ border: "1px dashed #f9731633", background: "linear-gradient(135deg, #f9731608 0%, #f9731603 100%)" }}>
-                              <div style={{ height: 3, background: `linear-gradient(90deg, ${regionColor}, ${regionColor}66)` }} />
-                              <div onClick={() => toggleEx(suppExpKey)} className="cursor-pointer flex items-center gap-1.5" style={{ padding: "8px 10px" }}>
-                                <span className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold shrink-0" style={{ minWidth: 20, height: 20, padding: "0 4px", background: "#f9731622", border: "1px solid #f9731644", color: "#f97316" }}>{groupLabel}</span>
-                                <span className="text-[8px] font-bold uppercase tracking-wider shrink-0 rounded-lg" style={{ padding: "2px 6px", background: regionColor + "22", border: `1px solid ${regionColor}44`, color: regionColor }}>{supp.region || "Core"}</span>
-                                <span className="font-semibold text-xs text-text flex-1">{supp.name}</span>
-                                <span className="text-[10px] text-text-dim">{suppSets[0]}&times;{suppSets[1]}</span>
-                                <span className="text-[9px] ml-1" style={{ color: "#f97316" }}>{suppIsExp ? "▲" : "▼"}</span>
-                              </div>
-                              {suppIsExp && (
-                                <div className="text-[11px] leading-relaxed" style={{ padding: "0 10px 10px" }}>
-                                  <div className="mb-1.5"><span className="font-bold text-[10px]" style={{ color: "#f97316" }}>📍 Setup: </span><span className="text-text-dim">{suppEx.setup}</span></div>
-                                  <div className="mb-1.5"><span className="font-bold text-[10px] text-safe">🔄 Execute: </span><span className="text-text-dim">{suppEx.execution}</span></div>
-                                  <div><span className="font-bold text-[10px]" style={{ color: "#f97316" }}>🛡️ Safety: </span><span className="text-text-dim">{suppEx.nwbCues}</span></div>
-                                  {suppEx.rest > 0 && <button onClick={(ev) => { ev.stopPropagation(); setTimer(suppEx.rest); }} className="mt-2 w-full rounded-md text-[11px] font-semibold cursor-pointer font-[inherit]" style={{ padding: 7, background: "#f9731618", border: "1px solid #f9731633", color: "#f97316" }}>⏱ Start {suppEx.rest}s Rest</button>}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        }
-                      })}
-                    </div>
-                  ) : undefined
-                }
+                supersetSlot={buildSupersetCards(
+                  exName,
+                  ex,
+                  workoutKey,
+                  firstCableName,
+                )}
+                addComplementSlot={buildAddComplementPill(exName, ex)}
               />
-
-              {/* Supplement indicator — show in both collapsed and expanded states */}
-              {activeSuppCards.length > 0 && (
-                <div
-                  onClick={() => toggleEx(exName)}
-                  className="cursor-pointer flex items-center gap-1.5"
-                  style={{
-                    margin: "-4px 0 4px",
-                    padding: "4px 12px 6px",
-                    background:
-                      "linear-gradient(90deg, #14b8a608, #f9731608)",
-                    borderRadius: "0 0 8px 8px",
-                    borderLeft: "3px solid transparent",
-                    borderImage:
-                      "linear-gradient(to bottom, #14b8a644, #f9731644) 1",
-                  }}
-                >
-                  {activeSuppCards.map((supp, si) => {
-                    const isLL = supp.type === "leftleg";
-                    const accent = isLL ? "#14b8a6" : "#f97316";
-                    const label = isLL ? "L" : "C";
-                    const chipLabel = isLL ? "L-LEG" : "CORE";
-                    return (
-                      <span
-                        key={`ind-${si}`}
-                        className="inline-flex items-center gap-1"
-                      >
-                        {uiV2 ? (
-                          <span
-                            data-testid="v2-supp-chip"
-                            className="inline-flex items-center justify-center rounded-full text-[8px] font-extrabold tracking-wide"
-                            style={{
-                              padding: "1px 6px",
-                              background: accent + "22",
-                              border: `1px solid ${accent}44`,
-                              color: accent,
-                            }}
-                          >
-                            {chipLabel}
-                          </span>
-                        ) : (
-                          <span
-                            className="inline-flex items-center justify-center rounded text-[7px] font-extrabold"
-                            style={{
-                              width: 14,
-                              height: 14,
-                              background: accent + "22",
-                              border: `1px solid ${accent}44`,
-                              color: accent,
-                            }}
-                          >
-                            {label}
-                          </span>
-                        )}
-                        <span
-                          className="text-[9px] font-semibold"
-                          style={{ color: accent, opacity: 0.8 }}
-                        >
-                          {supp.name.length > 20
-                            ? supp.name.substring(0, 18) + "..."
-                            : supp.name}
-                        </span>
-                      </span>
-                    );
-                  })}
-                  <span className="ml-auto text-[8px] text-text-muted">
-                    {"\u25BC"} tap to expand
-                  </span>
-                </div>
-              )}
-
-              {/* Supplement cards now rendered inside ExerciseRow via supplementSlot prop */}
-
-              {/* Equipment-specific superset card */}
-              {isExp && ssInfo && (() => {
-                const ssDone = completedSupersets.includes(ssInfo.title);
-                return (
-                <div
-                  className="mx-3 mb-2 rounded-lg"
-                  style={{
-                    padding: "8px 10px",
-                    background: ssDone ? "#14b8a605" : "#14b8a60d",
-                    border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a633",
-                    borderLeft: `3px solid ${ssDone ? "var(--color-border)" : "#14b8a6"}`,
-                    opacity: ssDone ? 0.55 : 1,
-                  }}
-                >
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span
-                      className="text-[8px] font-extrabold rounded px-1 py-0.5"
-                      style={{
-                        background: ssDone ? "var(--color-bg)" : "#14b8a622",
-                        border: ssDone ? "1px solid var(--color-border)" : "1px solid #14b8a644",
-                        color: ssDone ? "var(--color-text-muted)" : "#14b8a6",
-                      }}
-                    >
-                      {ssDone ? "DONE" : "SUPERSET"}
-                    </span>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: ssDone ? "var(--color-text-muted)" : "#14b8a6", textDecoration: ssDone ? "line-through" : "none" }}
-                    >
-                      {ssInfo.title}
-                    </span>
-                    <span className="ml-auto text-[10px] text-text-dim">
-                      {ssInfo.sets}
-                    </span>
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        setCompletedSupersets((prev) =>
-                          prev.includes(ssInfo.title)
-                            ? prev.filter((t) => t !== ssInfo.title)
-                            : [...prev, ssInfo.title]
-                        );
-                      }}
-                      className="text-[11px] rounded-md cursor-pointer font-[inherit] min-h-[28px] min-w-[28px] flex items-center justify-center transition-colors duration-150"
-                      style={{
-                        padding: "2px 8px",
-                        background: ssDone ? "var(--color-safe-bg)" : "var(--color-card)",
-                        border: ssDone ? "1px solid var(--color-safe-border)" : "1px solid var(--color-border)",
-                        color: ssDone ? "var(--color-safe)" : "var(--color-text-muted)",
-                      }}
-                      title={ssDone ? "Mark as not done" : "Mark as done today"}
-                    >
-                      {ssDone ? "✓" : "○"}
-                    </button>
-                  </div>
-                  {!ssDone && (
-                    <>
-                      <div className="text-[11px] text-text-dim leading-relaxed">
-                        {ssInfo.instruction}
-                      </div>
-                      <div
-                        className="text-[10px] mt-1"
-                        style={{ color: "#14b8a6" }}
-                      >
-                        {"\uD83D\uDEE1\uFE0F"} {ssInfo.safety}
-                      </div>
-                      {ssInfo.note && (
-                        <div className="text-[10px] mt-1 text-warning">
-                          {"\u26A0\uFE0F"} {ssInfo.note}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-                );
-              })()}
-
             </div>
           );
         })}
@@ -1551,6 +1426,9 @@ export default function WorkoutView() {
             {CORE_FINISHERS[workoutKey].map((name) => {
               const ex = EX[name];
               if (!ex) return null;
+              const selMachineId = machineSelections[name];
+              const selectedVariant =
+                ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
               return (
                 <ExerciseRow
                   key={`cf-${name}`}
@@ -1559,19 +1437,22 @@ export default function WorkoutView() {
                   phase={phase}
                   isExpanded={!!expandedEx[name]}
                   onToggle={() => toggleEx(name)}
-                  onSwap={(sw) => {
-                    if (sw.startsWith("__timer__"))
-                      setTimer(parseInt(sw.replace("__timer__", "")));
-                  }}
+                  onLongPress={() =>
+                    setEditSheetFor({
+                      workoutKey: "__finisher__",
+                      origName: name,
+                      exName: name,
+                    })
+                  }
+                  onStartTimer={(sec) => setTimer(sec)}
                   onDiagram={(d) => setDiagramOpen(d)}
-          onOpenDiagram={(id) => setDiagramOpen(id)}
+                  onOpenDiagram={(id) => setDiagramOpen(id)}
                   unavailable={!isAvailable(name)}
                   equipment={equipment}
-                  selectedVariantId={machineSelections[name] ?? null}
-                  onSelectVariant={(id) =>
-                    setMachineSelections((prev) => ({ ...prev, [name]: id }))
-                  }
-                  editMode={editMode}
+                  variantSetupCues={selectedVariant?.setupCues}
+                  variantLabel={selectedVariant?.label}
+                  supersetSlot={buildSupersetCards(name, ex, "__finisher__", null)}
+                  addComplementSlot={buildAddComplementPill(name, ex)}
                 />
               );
             })}
@@ -1892,29 +1773,38 @@ export default function WorkoutView() {
           isOpen={!!openSections["cardio-t1"]}
           onToggle={() => toggleSection("cardio-t1")}
         >
-          {tier1.map((k) => (
-            <ExerciseRow
-              key={k}
-              name={k}
-              ex={EX[k]}
-              phase={phase}
-              isExpanded={!!expandedEx[k]}
-              onToggle={() => toggleEx(k)}
-              onSwap={(sw) => {
-                if (sw.startsWith("__timer__"))
-                  setTimer(parseInt(sw.replace("__timer__", "")));
-              }}
-              onDiagram={(d) => setDiagramOpen(d)}
-          onOpenDiagram={(id) => setDiagramOpen(id)}
-              unavailable={!isAvailable(k)}
-              equipment={equipment}
-              selectedVariantId={machineSelections[k] ?? null}
-              onSelectVariant={(id) =>
-                setMachineSelections((prev) => ({ ...prev, [k]: id }))
-              }
-              editMode={editMode}
-            />
-          ))}
+          {tier1.map((k) => {
+            const ex = EX[k];
+            const selMachineId = machineSelections[k];
+            const selectedVariant =
+              ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
+            return (
+              <ExerciseRow
+                key={k}
+                name={k}
+                ex={ex}
+                phase={phase}
+                isExpanded={!!expandedEx[k]}
+                onToggle={() => toggleEx(k)}
+                onLongPress={() =>
+                  setEditSheetFor({
+                    workoutKey: "__cardio__",
+                    origName: k,
+                    exName: k,
+                  })
+                }
+                onStartTimer={(sec) => setTimer(sec)}
+                onDiagram={(d) => setDiagramOpen(d)}
+                onOpenDiagram={(id) => setDiagramOpen(id)}
+                unavailable={!isAvailable(k)}
+                equipment={equipment}
+                variantSetupCues={selectedVariant?.setupCues}
+                variantLabel={selectedVariant?.label}
+                supersetSlot={buildSupersetCards(k, ex, "__cardio__", null)}
+                addComplementSlot={buildAddComplementPill(k, ex)}
+              />
+            );
+          })}
         </Section>
 
         <Section
@@ -2813,35 +2703,6 @@ export default function WorkoutView() {
         ))}
       </div>
 
-      {/* Edit / Do mode toggle pill */}
-      <div className="flex justify-center mb-4">
-        <div
-          className="flex rounded-full p-0.5"
-          style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
-        >
-          <button
-            onClick={() => setEditMode(false)}
-            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
-            style={{
-              background: !editMode ? "var(--color-accent)" : "transparent",
-              color: !editMode ? "#000" : "var(--color-text-muted)",
-            }}
-          >
-            ▶ Do
-          </button>
-          <button
-            onClick={() => setEditMode(true)}
-            className="rounded-full px-5 py-2 text-sm font-semibold cursor-pointer font-[inherit] transition-all duration-200 border-none"
-            style={{
-              background: editMode ? "var(--color-accent)" : "transparent",
-              color: editMode ? "#000" : "var(--color-text-muted)",
-            }}
-          >
-            ✏️ Edit
-          </button>
-        </div>
-      </div>
-
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
         {/* v2: sliding pill indicator */}
@@ -3253,6 +3114,63 @@ export default function WorkoutView() {
         <DiagramModal
           diagram={diagramOpen}
           onClose={() => setDiagramOpen(null)}
+        />
+      )}
+
+      {/* Edit exercise sheet — long-press / ⋮ button opens this */}
+      {editSheetFor && (() => {
+        const { workoutKey: wk, origName } = editSheetFor;
+        const exName = getExName(wk, origName);
+        const ex = EX[exName];
+        if (!ex) return null;
+        const w = WORKOUTS[wk];
+        const siblingOrigs = w
+          ? getOrderedExercises(wk).filter(
+              (o) => !(removedToday[wk] ?? []).includes(o),
+            )
+          : [origName];
+        const idx = siblingOrigs.indexOf(origName);
+        const siblingNames = siblingOrigs.map((o) => getExName(wk, o));
+        return (
+          <EditExerciseSheet
+            exerciseName={exName}
+            exercise={ex}
+            workoutExercises={siblingNames}
+            equipment={equipment}
+            selectedVariantId={machineSelections[exName] ?? null}
+            onSelectVariant={(id) =>
+              setMachineSelections((prev) => ({ ...prev, [exName]: id }))
+            }
+            onSwap={(newName) => {
+              if (w) handleSwap(wk, origName, newName);
+            }}
+            onMoveUp={() => {
+              if (w) moveExercise(wk, origName, -1);
+            }}
+            onMoveDown={() => {
+              if (w) moveExercise(wk, origName, 1);
+            }}
+            canMoveUp={!!w && idx > 0}
+            canMoveDown={!!w && idx >= 0 && idx < siblingOrigs.length - 1}
+            onRemove={() => {
+              if (w) removeExerciseToday(wk, origName);
+            }}
+            onClose={() => setEditSheetFor(null)}
+          />
+        );
+      })()}
+
+      {/* Complement picker — "+ Add complement" pill opens this */}
+      {complementPickerFor && (
+        <ComplementPicker
+          exerciseRequires={complementPickerFor.exerciseRequires}
+          exerciseCategory={complementPickerFor.exerciseCategory}
+          nearbySelections={nearbySelections[complementPickerFor.exName] ?? []}
+          activeIds={complementsToday[complementPickerFor.exName] ?? []}
+          onToggle={(id) =>
+            toggleComplement(complementPickerFor.exName, id)
+          }
+          onClose={() => setComplementPickerFor(null)}
         />
       )}
     </div>
