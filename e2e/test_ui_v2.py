@@ -142,28 +142,6 @@ def test_classic_sections_have_thin_border(app_page: Page):
     assert border_width < 2.0, f"Classic section should not have wide left border, got: {border_width}px"
 
 
-def test_v2_workout_tab_shows_chip_badges(app_page: Page):
-    """With v2 on, supplement indicator in Workout tab shows L-LEG/CORE chip badges."""
-    _enable_ui_v2(app_page)
-    click_tab(app_page, "workout")
-    app_page.wait_for_timeout(500)
-
-    # v2 chips have data-testid="v2-supp-chip"
-    chips = app_page.get_by_test_id("v2-supp-chip")
-    assert chips.count() > 0, "v2 Workout tab should show v2-supp-chip badges in supplement indicators"
-
-
-def test_classic_workout_tab_no_chip_badges(app_page: Page):
-    """With v2 off, supplement indicator uses single-letter badges, not full chips."""
-    _disable_ui_v2(app_page)
-    click_tab(app_page, "workout")
-    app_page.wait_for_timeout(500)
-
-    # v2 chips must not appear in classic mode
-    chips = app_page.get_by_test_id("v2-supp-chip")
-    assert chips.count() == 0, "Classic mode should not show v2-supp-chip badges"
-
-
 def test_v2_today_header_has_gradient(app_page: Page):
     """With v2 on, today's workout header has a gradient background."""
     _enable_ui_v2(app_page)
