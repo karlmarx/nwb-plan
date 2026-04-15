@@ -21,6 +21,12 @@ interface ExerciseRowProps {
   equipment: Record<string, boolean>;
   variantSetupCues?: string[];
   variantLabel?: string;
+  /**
+   * Requires override from the active machine variant. When present it
+   * replaces `ex.requires` for the equipment-chip display so the chips
+   * match what the selected variant actually needs.
+   */
+  variantRequires?: string[];
   /** Superset / complement cards rendered immediately under the header */
   supersetSlot?: React.ReactNode;
   /** Add-complement pill rendered below supersets */
@@ -43,6 +49,7 @@ export default function ExerciseRow({
   equipment,
   variantSetupCues,
   variantLabel,
+  variantRequires,
   supersetSlot,
   addComplementSlot,
   showActionButton = true,
@@ -330,10 +337,13 @@ export default function ExerciseRow({
             )}
           </div>
 
-          {/* Equipment chips */}
-          {ex.requires.length > 0 && (
+          {/* Equipment chips — show the active variant's requires when set,
+              otherwise fall back to the exercise-level requires. */}
+          {(() => {
+            const chipReqs = variantRequires ?? ex.requires;
+            return chipReqs.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
-              {ex.requires.map((eq) => {
+              {chipReqs.map((eq) => {
                 const eqData = EQUIPMENT[eq];
                 const has = equipment[eq] !== false;
                 return (
@@ -356,7 +366,8 @@ export default function ExerciseRow({
                 );
               })}
             </div>
-          )}
+            );
+          })()}
 
           {/* Rest timer button */}
           {ex.rest > 0 && (
