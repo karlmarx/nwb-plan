@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import {
   NEARBY_SUPERSETS,
   SUPPLEMENT_LEFT_LEG,
+  SUPPLEMENT_CORE,
   SUPPLEMENT_EX,
   EQUIP_TO_NEARBY,
   MOBILITY_SUPPLEMENTS,
@@ -13,9 +14,12 @@ import {
 import { cssAlpha } from "@/lib/css-utils";
 
 /**
- * A complement the user can add to an exercise. There are three kinds:
+ * A complement the user can add to an exercise. There are four kinds:
  *  - "nearby"   — one of NEARBY_SUPERSETS (needs nearby equipment)
  *  - "supp"     — a left-leg supplement (looked up in SUPPLEMENT_EX by name)
+ *  - "core"     — a core drill from SUPPLEMENT_CORE for the current workout day
+ *                 (also looked up in SUPPLEMENT_EX by name; distinct kind so it
+ *                 can render with a CORE label + region color)
  *  - "mobility" — a zero-equipment mobility / stretch / breathing drill
  */
 export type ComplementId = string;
@@ -28,12 +32,15 @@ export function encodeNearbyId(ns: NearbySuperset): ComplementId {
 export function encodeSuppId(name: string): ComplementId {
   return `supp${SEP}${name}`;
 }
+export function encodeCoreId(name: string): ComplementId {
+  return `core${SEP}${name}`;
+}
 export function encodeMobilityId(m: MobilitySupplement): ComplementId {
   return `mob${SEP}${m.id}`;
 }
 
 export function decodeComplement(id: ComplementId): {
-  kind: "nearby" | "supp" | "mobility";
+  kind: "nearby" | "supp" | "core" | "mobility";
   value: string;
   sub?: string;
 } {
@@ -45,6 +52,9 @@ export function decodeComplement(id: ComplementId): {
   }
   if (kind === "mob") {
     return { kind: "mobility", value: rest.join(sep) };
+  }
+  if (kind === "core") {
+    return { kind: "core", value: rest.join(sep) };
   }
   return { kind: "supp", value: rest.join(sep) };
 }
@@ -117,6 +127,8 @@ ComplementButton.displayName = "ComplementButton";
 interface ComplementPickerProps {
   exerciseRequires: string[];
   exerciseCategory: string;
+  /** Workout day key (e.g. "Push A") — surfaces day-specific core routine. */
+  workoutKey?: string;
   nearbySelections: string[];
   activeIds: ComplementId[];
   onToggle: (id: ComplementId) => void;
@@ -132,6 +144,7 @@ interface ComplementPickerProps {
 export default function ComplementPicker({
   exerciseRequires,
   exerciseCategory,
+  workoutKey,
   nearbySelections,
   activeIds,
   onToggle,
@@ -139,7 +152,7 @@ export default function ComplementPicker({
 }: ComplementPickerProps) {
   const activeSet = useMemo(() => new Set(activeIds), [activeIds]);
 
-  const { nearbyAvail, suppAvail, mobilityAvail } = useMemo(() => {
+  const { nearbyAvail, suppAvail, coreAvail, coreSubtitle, mobilityAvail } = useMemo(() => {
     const inUseIds = new Set(
       exerciseRequires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean),
     );
@@ -157,16 +170,32 @@ export default function ComplementPicker({
       data: (typeof SUPPLEMENT_EX)[string];
     }>;
 
+    const coreDay = workoutKey ? SUPPLEMENT_CORE[workoutKey] : null;
+    const coreAvail = (coreDay?.exercises ?? [])
+      .map((ce) => {
+        const data = SUPPLEMENT_EX[ce.name];
+        return data ? { name: ce.name, region: ce.region, data } : null;
+      })
+      .filter(Boolean) as Array<{
+      name: string;
+      region: string;
+      data: (typeof SUPPLEMENT_EX)[string];
+    }>;
+    const coreSubtitle = coreDay?.subtitle ?? "";
+
     const mobilityAvail = MOBILITY_SUPPLEMENTS.filter((m) =>
       m.appliesTo.includes("all") ||
       m.appliesTo.includes(exerciseCategory as "push" | "pull" | "legs" | "core" | "cardio"),
     );
 
-    return { nearbyAvail, suppAvail, mobilityAvail };
-  }, [exerciseRequires, exerciseCategory, nearbySelections]);
+    return { nearbyAvail, suppAvail, coreAvail, coreSubtitle, mobilityAvail };
+  }, [exerciseRequires, exerciseCategory, workoutKey, nearbySelections]);
 
   const hasAny =
-    nearbyAvail.length > 0 || suppAvail.length > 0 || mobilityAvail.length > 0;
+    nearbyAvail.length > 0 ||
+    suppAvail.length > 0 ||
+    coreAvail.length > 0 ||
+    mobilityAvail.length > 0;
 
   return (
     <div
@@ -265,6 +294,38 @@ export default function ComplementPicker({
                       key={id}
                       label="L-LEG"
                       color="#14b8a6"
+                      title={name}
+                      sets={`${sets[0]}\u00D7${sets[1]}`}
+                      description={data.execution}
+                      active={activeSet.has(id)}
+                      onClick={() => onToggle(id)}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {coreAvail.length > 0 && (
+            <>
+              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                Core focus ({coreAvail.length})
+              </div>
+              {coreSubtitle && (
+                <div className="text-[10px] text-text-muted mb-2 leading-snug">
+                  {coreSubtitle} &mdash; day-specific core routine for{" "}
+                  {workoutKey}.
+                </div>
+              )}
+              <div className="space-y-1.5 mb-4">
+                {coreAvail.map(({ name, region, data }) => {
+                  const id = encodeCoreId(name);
+                  const sets = data.sets[0];
+                  return (
+                    <ComplementButton
+                      key={id}
+                      label={region.toUpperCase()}
+                      color="#f97316"
                       title={name}
                       sets={`${sets[0]}\u00D7${sets[1]}`}
                       description={data.execution}

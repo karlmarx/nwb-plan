@@ -578,7 +578,12 @@ export default function WorkoutView() {
 
   // Complement picker (add equipment-aware supersets / mobility / stretches)
   const [complementPickerFor, setComplementPickerFor] = useState<
-    { exName: string; exerciseRequires: string[]; exerciseCategory: string } | null
+    {
+      exName: string;
+      exerciseRequires: string[];
+      exerciseCategory: string;
+      workoutKey?: string;
+    } | null
   >(null);
 
   // ----- Consolidated day state (date-scoped, clears daily) -----
@@ -858,7 +863,7 @@ export default function WorkoutView() {
     ): React.ReactNode => {
       type Card = {
         key: string;
-        kind: "cable" | "variant" | "nearby" | "leftleg" | "mobility";
+        kind: "cable" | "variant" | "nearby" | "leftleg" | "core" | "mobility";
         label: string;
         color: string;
         title: string;
@@ -940,6 +945,25 @@ export default function WorkoutView() {
             kind: "leftleg",
             label: "L-LEG",
             color: "#14b8a6",
+            title: decoded.value,
+            sets: `${s[0]}\u00D7${s[1]}`,
+            instruction: data.execution,
+            safety: data.nwbCues,
+            removable: true,
+            complementId: id,
+          });
+        } else if (decoded.kind === "core") {
+          const data = SUPPLEMENT_EX[decoded.value];
+          if (!data) continue;
+          const s = data.sets[0];
+          const region = SUPPLEMENT_CORE[workoutKey]?.exercises.find(
+            (ce) => ce.name === decoded.value,
+          )?.region;
+          cards.push({
+            key: id,
+            kind: "core",
+            label: region ? region.toUpperCase() : "CORE",
+            color: "#f97316",
             title: decoded.value,
             sets: `${s[0]}\u00D7${s[1]}`,
             instruction: data.execution,
@@ -1061,7 +1085,7 @@ export default function WorkoutView() {
 
   /** Render the "+ Add complement" pill. */
   const buildAddComplementPill = useCallback(
-    (exName: string, ex: Exercise): React.ReactNode => {
+    (exName: string, ex: Exercise, workoutKey?: string): React.ReactNode => {
       return (
         <button
           data-testid="add-complement"
@@ -1071,6 +1095,7 @@ export default function WorkoutView() {
               exName,
               exerciseRequires: ex.requires,
               exerciseCategory: ex.category,
+              workoutKey,
             });
           }}
           className="w-full mb-3 rounded-xl text-[12px] font-semibold cursor-pointer font-[inherit] min-h-[40px] transition-colors duration-150 flex items-center justify-center gap-1.5"
@@ -1223,6 +1248,22 @@ export default function WorkoutView() {
                   sets: `${s[0]}\u00D7${s[1]}`,
                   instruction: data.execution,
                   safety: data.nwbCues,
+                  rest: data.rest,
+                });
+              } else if (decoded.kind === "core") {
+                const data = SUPPLEMENT_EX[decoded.value];
+                if (!data) continue;
+                const s = data.sets[0];
+                const region = SUPPLEMENT_CORE[workoutKey]?.exercises.find(
+                  (ce) => ce.name === decoded.value,
+                )?.region;
+                supps.push({
+                  type: "core",
+                  name: decoded.value,
+                  sets: `${s[0]}\u00D7${s[1]}`,
+                  instruction: data.execution,
+                  safety: data.nwbCues,
+                  region,
                   rest: data.rest,
                 });
               } else if (decoded.kind === "mobility") {
@@ -1391,7 +1432,7 @@ export default function WorkoutView() {
                   workoutKey,
                   firstCableName,
                 )}
-                addComplementSlot={buildAddComplementPill(exName, ex)}
+                addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
             </div>
           );
@@ -3161,6 +3202,7 @@ export default function WorkoutView() {
         <ComplementPicker
           exerciseRequires={complementPickerFor.exerciseRequires}
           exerciseCategory={complementPickerFor.exerciseCategory}
+          workoutKey={complementPickerFor.workoutKey}
           nearbySelections={nearbySelections[complementPickerFor.exName] ?? []}
           activeIds={dayState.complements[complementPickerFor.exName] ?? []}
           onToggle={(id) =>
