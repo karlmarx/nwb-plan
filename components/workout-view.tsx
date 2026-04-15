@@ -1145,6 +1145,7 @@ export default function WorkoutView() {
           equipment={equipment}
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
+          variantRequires={selectedVariant?.requires}
           supersetSlot={buildSupersetCards(name, ex, "__core__", null)}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
@@ -1428,6 +1429,7 @@ export default function WorkoutView() {
                 equipment={equipment}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                variantRequires={selectedVariant?.requires}
                 supersetSlot={buildSupersetCards(
                   exName,
                   ex,
@@ -1490,6 +1492,7 @@ export default function WorkoutView() {
                   equipment={equipment}
                   variantSetupCues={selectedVariant?.setupCues}
                   variantLabel={selectedVariant?.label}
+                  variantRequires={selectedVariant?.requires}
                   supersetSlot={buildSupersetCards(name, ex, "__finisher__", null)}
                   addComplementSlot={buildAddComplementPill(name, ex)}
                 />
@@ -1839,6 +1842,7 @@ export default function WorkoutView() {
                 equipment={equipment}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                variantRequires={selectedVariant?.requires}
                 supersetSlot={buildSupersetCards(k, ex, "__cardio__", null)}
                 addComplementSlot={buildAddComplementPill(k, ex)}
               />
