@@ -19,6 +19,7 @@ import {
   MOBILITY_SUPPLEMENTS,
 } from "@/lib/supplements";
 import type { Exercise } from "@/lib/exercises";
+import { computeCurrentPhase } from "@/lib/program";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
@@ -512,7 +513,10 @@ const REMOVED_CORE = [
 export default function WorkoutView() {
   // ----- State -----
   const [tab, setTab] = useState(() => loadState<number>("nwb_tab", 0));
-  const [phase, setPhase] = useState(() => loadState<number>("nwb_phase", 0));
+  // Phase is derived from the program start date — always opens on the
+  // week that matches the calendar. Tapping a pill temporarily overrides
+  // within the session but doesn't persist; next mount re-syncs.
+  const [phase, setPhase] = useState(() => computeCurrentPhase());
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     () => {
       const sd = loadState<number>("nwb_startDay", 0);
@@ -664,9 +668,6 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_tab", tab);
   }, [tab]);
-  useEffect(() => {
-    saveState("nwb_phase", phase);
-  }, [phase]);
   useEffect(() => {
     saveState("nwb_equipment", equipment);
   }, [equipment]);
