@@ -255,6 +255,38 @@ export default function ComplementPicker({
             </div>
           )}
 
+          {coreAvail.length > 0 && (
+            <>
+              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                Core focus ({coreAvail.length})
+              </div>
+              {coreSubtitle && (
+                <div className="text-[10px] text-text-muted mb-2 leading-snug">
+                  {coreSubtitle} &mdash; day-specific core routine for{" "}
+                  {workoutKey}.
+                </div>
+              )}
+              <div className="space-y-1.5 mb-4">
+                {coreAvail.map(({ name, region, data }) => {
+                  const id = encodeCoreId(name);
+                  const sets = data.sets[0];
+                  return (
+                    <ComplementButton
+                      key={id}
+                      label={region.toUpperCase()}
+                      color="#f97316"
+                      title={name}
+                      sets={`${sets[0]}\u00D7${sets[1]}`}
+                      description={data.execution}
+                      active={activeSet.has(id)}
+                      onClick={() => onToggle(id)}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+
           {nearbyAvail.length > 0 && (
             <>
               <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
@@ -294,38 +326,6 @@ export default function ComplementPicker({
                       key={id}
                       label="L-LEG"
                       color="#14b8a6"
-                      title={name}
-                      sets={`${sets[0]}\u00D7${sets[1]}`}
-                      description={data.execution}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {coreAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                Core focus ({coreAvail.length})
-              </div>
-              {coreSubtitle && (
-                <div className="text-[10px] text-text-muted mb-2 leading-snug">
-                  {coreSubtitle} &mdash; day-specific core routine for{" "}
-                  {workoutKey}.
-                </div>
-              )}
-              <div className="space-y-1.5 mb-4">
-                {coreAvail.map(({ name, region, data }) => {
-                  const id = encodeCoreId(name);
-                  const sets = data.sets[0];
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label={region.toUpperCase()}
-                      color="#f97316"
                       title={name}
                       sets={`${sets[0]}\u00D7${sets[1]}`}
                       description={data.execution}

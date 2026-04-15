@@ -55,7 +55,7 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "Safety"];
+const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
@@ -63,10 +63,10 @@ const TAB_TIPS = [
   "Legs + Recovery exercise library",
   "Core exercises by body part",
   "NWB cardio options",
-  "Injury cues & safety rules",
 ];
 
-// Gear/config tab is accessed via header icon, not in the tab bar
+// Safety + Gear/config live outside the label tab strip as icon buttons
+const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
 
 const DAY_NAMES = [
@@ -647,7 +647,7 @@ export default function WorkoutView() {
 
   useLayoutEffect(() => {
     if (!uiV2) { pillInitialized.current = false; return; }
-    const activeIdx = tab <= 5 ? tab : 6; // 6 = gear
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -1374,7 +1374,8 @@ export default function WorkoutView() {
             </button>
             {coreSubtitle && (
               <span className="text-[10px] text-text-muted self-center">
-                Core focus: {coreSubtitle}
+                Core focus: {coreSubtitle} &mdash; tap ＋ Add complement on any
+                exercise to pair
               </span>
             )}
           </div>
@@ -2622,7 +2623,7 @@ export default function WorkoutView() {
     case 4:
       content = renderCardioTab();
       break;
-    case 5:
+    case SAFETY_TAB_INDEX:
       content = renderSafetyTab();
       break;
     case GEAR_TAB_INDEX:
@@ -2750,8 +2751,19 @@ export default function WorkoutView() {
             style={{
               left: pillPos.left,
               width: pillPos.width,
-              background: (tab === 0 ? todayColor : "var(--color-accent)") + "15",
-              border: `1px solid ${(tab === 0 ? todayColor : "var(--color-accent)")}55`,
+              background:
+                (tab === 0
+                  ? todayColor
+                  : tab === SAFETY_TAB_INDEX
+                    ? "var(--color-warning)"
+                    : "var(--color-accent)") + "15",
+              border: `1px solid ${
+                tab === 0
+                  ? todayColor
+                  : tab === SAFETY_TAB_INDEX
+                    ? "var(--color-warning)"
+                    : "var(--color-accent)"
+              }55`,
               transition: pillInitialized.current ? "left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1)" : "none",
             }}
           />
@@ -2781,9 +2793,30 @@ export default function WorkoutView() {
         })}
         {/* Divider */}
         <div className="w-px mx-0.5 self-stretch rounded-full" style={{ background: "var(--color-border)" }} />
+        {/* Safety (icon) */}
+        <button
+          ref={(el) => { tabRefs.current[SAFETY_TAB_INDEX] = el; }}
+          data-testid="tab-safety"
+          title="Injury cues & safety rules"
+          onClick={() => setTab(SAFETY_TAB_INDEX)}
+          className={`rounded-xl cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${tab === SAFETY_TAB_INDEX ? "tab-active" : ""}`}
+          style={{
+            width: 44,
+            minWidth: 44,
+            padding: "12px 0",
+            background: uiV2 ? "transparent" : (tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 8) : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 33) : "var(--color-border)"}`,
+            color: tab === SAFETY_TAB_INDEX ? "var(--color-warning)" : "var(--color-text-muted)",
+          }}
+        >
+          {/* Shield */}
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </button>
         {/* Gear / config */}
         <button
-          ref={(el) => { tabRefs.current[6] = el; }}
+          ref={(el) => { tabRefs.current[GEAR_TAB_INDEX] = el; }}
           data-testid="tab-gear"
           title="Equipment & configuration"
           onClick={() => setTab(GEAR_TAB_INDEX)}
