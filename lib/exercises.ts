@@ -21,6 +21,12 @@ export interface MachineVariant {
   description: string;
   setupCues: string[];
   superset?: VariantSuperset;
+  /**
+   * Override the exercise-level `requires` when this variant is selected /
+   * available. If omitted the variant inherits the exercise's requires.
+   * Used for cases like a Rogue barbell variant of a DB-default exercise.
+   */
+  requires?: string[];
 }
 
 export interface Exercise {
@@ -51,6 +57,28 @@ export interface EquipmentItem {
   name: string;
   icon: string;
   category: string;
+}
+
+/**
+ * Is this exercise usable given the current equipment map?
+ *
+ * The base config (`ex.requires`) gates availability by default, but if any
+ * `machineVariant` declares its own `requires` and all of those are present,
+ * the exercise is available through that variant even when the base isn't.
+ *
+ * `equipment[key] === false` = user flagged unavailable
+ * `equipment[key] !== false` (undefined or true) = present
+ */
+export function isExerciseAvailable(
+  ex: Exercise,
+  equipment: Record<string, boolean>,
+): boolean {
+  const hasAll = (reqs: string[]) =>
+    reqs.every((r) => equipment[r] !== false);
+  if (hasAll(ex.requires)) return true;
+  return (ex.machineVariants ?? []).some(
+    (v) => v.requires != null && hasAll(v.requires),
+  );
 }
 
 export interface Workout {
@@ -325,6 +353,7 @@ export const EX: Record<string, Exercise> = {
         label: "Rogue Rack + Barbell",
         icon: "\u{1F3CB}\uFE0F",
         description: "Rogue power rack with adjustable bench at 30-45\u00B0. Barbell for the press; plates (or lighter DBs) for the lat raise portion.",
+        requires: ["barbell", "bench"],
         setupCues: [
           "Set the Rogue adjustable bench to 30-45\u00B0 inside the rack",
           "Load barbell in the J-cups \u2014 unrack directly to the starting position over the upper chest",

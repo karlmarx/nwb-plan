@@ -10,6 +10,7 @@ import {
   NEARBY_EQUIPMENT,
   SCHED,
   PHASES,
+  isExerciseAvailable,
 } from "@/lib/exercises";
 import {
   SUPPLEMENT_CORE,
@@ -752,7 +753,7 @@ export default function WorkoutView() {
     (exName: string): boolean => {
       const ex = EX[exName];
       if (!ex) return true;
-      return ex.requires.every((r) => equipment[r] !== false);
+      return isExerciseAvailable(ex, equipment);
     },
     [equipment],
   );
@@ -1118,8 +1119,7 @@ export default function WorkoutView() {
   function renderCoreExercise(name: string) {
     const ex = EX[name];
     if (!ex) return null;
-    const unavail =
-      !ex || ex.requires.some((r) => equipment[r] === false);
+    const unavail = !isExerciseAvailable(ex, equipment);
     const selMachineId = machineSelections[name];
     const selectedVariant =
       ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import type { Exercise, MachineVariant } from "@/lib/exercises";
-import { EX, EQUIPMENT } from "@/lib/exercises";
+import { EX, EQUIPMENT, isExerciseAvailable } from "@/lib/exercises";
 import { cssAlpha } from "@/lib/css-utils";
 
 // ── Equipment category mapping ──────────────────────────────────────────
@@ -168,8 +168,7 @@ export default function EquipmentSwapPanel({
           const isExpanded = expandedGroup === group.key;
           const hasUnavailable = group.options.some(
             (o) =>
-              o.ex.requires.length > 0 &&
-              o.ex.requires.some((r) => equipment[r] === false),
+              o.ex.requires.length > 0 && !isExerciseAvailable(o.ex, equipment),
           );
 
           // Count includes variants for the current group
@@ -293,7 +292,7 @@ export default function EquipmentSwapPanel({
                   {group.options.map((option) => {
                     const isUnavailable =
                       option.ex.requires.length > 0 &&
-                      option.ex.requires.some((r) => equipment[r] === false);
+                      !isExerciseAvailable(option.ex, equipment);
                     const safetyColor =
                       option.ex.safety === "caution"
                         ? "var(--color-warning)"
