@@ -305,6 +305,7 @@ export const EX: Record<string, Exercise> = {
           "Set bench to 30-45\u00B0 incline",
           "Have two pairs of dumbbells ready (heavier for press, lighter for raises)",
           "Keep lighter pair within reach to minimize transition time",
+          "No light DBs? Plates (10-25lb) held by the flat side work fine for the lat raise portion",
         ],
       },
       {
@@ -316,7 +317,27 @@ export const EX: Record<string, Exercise> = {
           "Position bench inside the Smith machine at 30-45\u00B0",
           "Set safety catches at chest level",
           "Unrack bar with rotation, press, then re-rack for lat raises with DBs",
+          "Plates held by the flat side also work for the lat raise portion",
         ],
+      },
+      {
+        id: "rogue_rack_barbell",
+        label: "Rogue Rack + Barbell",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Rogue power rack with adjustable bench at 30-45\u00B0. Barbell for the press; plates (or lighter DBs) for the lat raise portion.",
+        setupCues: [
+          "Set the Rogue adjustable bench to 30-45\u00B0 inside the rack",
+          "Load barbell in the J-cups \u2014 unrack directly to the starting position over the upper chest",
+          "Safety pins set at chest level so you can bail without a spotter",
+          "For the lat raise portion: two plates (10\u201325 lb) held by the flat side work great \u2014 no DBs required",
+        ],
+        superset: {
+          title: "Banded Pallof / Woodchoppers (Seated)",
+          sets: "2\u00D78/side",
+          instruction: "Between press sets: stay seated on the bench with a band anchored to the rack upright at chest height. Alternate Pallof press/hold (8 presses or 10s holds per side) or high-to-low woodchoppers (8 reps/side). Resist rotation \u2014 drive from the thoracic spine, hips stay square.",
+          safety: "Seated throughout \u2014 zero left iliopsoas demand. Band only, no plate load. Keep hip flexion well under 90\u00B0. Anchor the band low enough that the pull never tips you backward.",
+          note: "Zero walking during the superset \u2014 band is anchored on the rack you're already sitting in.",
+        },
       },
     ],
     constraints: {

@@ -258,7 +258,7 @@ export default function ComplementPicker({
           {coreAvail.length > 0 && (
             <>
               <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                Core focus ({coreAvail.length})
+                Core ({coreAvail.length})
               </div>
               {coreSubtitle && (
                 <div className="text-[10px] text-text-muted mb-2 leading-snug">

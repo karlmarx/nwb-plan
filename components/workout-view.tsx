@@ -1374,7 +1374,7 @@ export default function WorkoutView() {
             </button>
             {coreSubtitle && (
               <span className="text-[10px] text-text-muted self-center">
-                Core focus: {coreSubtitle} &mdash; tap ＋ Add complement on any
+                Core: {coreSubtitle} &mdash; tap ＋ Add complement on any
                 exercise to pair
               </span>
             )}
