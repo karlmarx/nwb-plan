@@ -570,6 +570,7 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
+  const [fontSize, setFontSize] = useState(() => loadState<number>("nwb_font_size", 16));
 
   // Edit sheet (swap / machine / move / remove) — opened via long-press or ⋮ button
   const [editSheetFor, setEditSheetFor] = useState<
@@ -703,6 +704,10 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState(dayKey, dayState);
   }, [dayState, dayKey]);
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}px`;
+    saveState("nwb_font_size", fontSize);
+  }, [fontSize]);
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
@@ -2604,6 +2609,22 @@ export default function WorkoutView() {
           </h1>
           {/* Header icons */}
           <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setFontSize((s) => Math.max(12, s - 1))}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer text-xs font-bold"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title="Decrease font size"
+            >
+              A-
+            </button>
+            <button
+              onClick={() => setFontSize((s) => Math.min(24, s + 1))}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer text-xs font-bold"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title="Increase font size"
+            >
+              A+
+            </button>
             <button
               onClick={() => setAboutOpen(true)}
               data-testid="about-button"

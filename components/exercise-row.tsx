@@ -179,8 +179,8 @@ export default function ExerciseRow({
             )}
           </div>
 
-          {/* Diagram button — directly under sets/reps for fastest access */}
-          {EXERCISE_TO_DIAGRAM[ex.id] ? (
+          {/* Diagram buttons — directly under sets/reps for fastest access */}
+          {EXERCISE_TO_DIAGRAM[ex.id] && (
             <button
               onClick={(ev) => {
                 ev.stopPropagation();
@@ -195,23 +195,23 @@ export default function ExerciseRow({
             >
               {"\u{1F4D0}"} View Movement Diagram
             </button>
-          ) : (
-            ex.diagram && (
-              <button
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onDiagram(ex.diagram!);
-                }}
-                data-testid="view-diagram"
-                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
-                style={{
-                  background: cssAlpha("var(--color-accent)", 7),
-                  border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
-                }}
-              >
-                {"\u{1F4D0}"} View Movement Diagram
-              </button>
-            )
+          )}
+          {ex.diagram && (
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                onDiagram(ex.diagram!);
+              }}
+              data-testid="view-safety-diagram"
+              className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold min-h-[48px] transition-colors duration-150 mb-3"
+              style={{
+                background: cssAlpha("var(--color-warning)", 7),
+                border: `1px solid ${cssAlpha("var(--color-warning)", 20)}`,
+                color: "var(--color-warning)",
+              }}
+            >
+              {"\u{1F6E1}\uFE0F"} View Safety Diagram
+            </button>
           )}
 
           {/* Superset / complement cards — right under the diagram button */}

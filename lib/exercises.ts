@@ -1537,6 +1537,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Keep chin tucked and ribs down to prevent lumbar arching. Load with barbell or dumbbell across hips for progressive overload.",
     why: "Superior glute isolation with peak tension at the top of the movement. Primary glute builder.",
     safety: "safe",
+    diagram: "hip-thrust-support",
     swaps: ["SL Glute Bridge (Right)", "TRX SL Glute Bridge (Right)"],
     constraints: {
       requiresIliopsoas: false,
