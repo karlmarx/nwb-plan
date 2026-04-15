@@ -58,7 +58,7 @@ class HapticEngine @Inject constructor(
     fun strongPulse() {
         if (!enabled) return
         vibrator.vibrate(
-            VibrationEffect.createOneShot(200, VibrationEffect.MAX_AMPLITUDE)
+            VibrationEffect.createOneShot(200, 255)
         )
     }
 
@@ -94,7 +94,7 @@ class HapticEngine @Inject constructor(
         vibrator.vibrate(
             VibrationEffect.createWaveform(
                 longArrayOf(0, 300, 150, 300),
-                intArrayOf(0, VibrationEffect.MAX_AMPLITUDE, 0, VibrationEffect.MAX_AMPLITUDE),
+                intArrayOf(0, 255, 0, 255),
                 -1
             )
         )
@@ -106,7 +106,7 @@ class HapticEngine @Inject constructor(
         vibrator.vibrate(
             VibrationEffect.createWaveform(
                 longArrayOf(0, 100, 80, 100, 80, 200),
-                intArrayOf(0, 200, 0, 200, 0, VibrationEffect.MAX_AMPLITUDE),
+                intArrayOf(0, 200, 0, 200, 0, 255),
                 -1
             )
         )

@@ -18,9 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.MaterialTheme
-import androidx.wear.compose.material3.Switch
+import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.ToggleButton
 import com.nwb.watch.ui.WorkoutViewModel
 import com.nwb.watch.ui.theme.NwbSlate
 
@@ -107,13 +106,12 @@ private fun SettingsToggle(
     checked: Boolean,
     onToggle: () -> Unit,
 ) {
-    ToggleButton(
+    SwitchButton(
         checked = checked,
         onCheckedChange = { onToggle() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp),
-        toggleControl = { Switch(checked = checked) },
         label = {
             Text(text = label, fontSize = 13.sp)
         },
