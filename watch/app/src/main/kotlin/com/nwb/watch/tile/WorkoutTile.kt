@@ -18,7 +18,10 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.nwb.watch.data.ExerciseRepository
 import com.nwb.watch.data.WorkoutScheduler
+import com.nwb.watch.data.WorkoutState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -33,6 +36,7 @@ class WorkoutTileService : androidx.wear.tiles.TileService() {
 
     @Inject lateinit var scheduler: WorkoutScheduler
     @Inject lateinit var repository: ExerciseRepository
+    @Inject lateinit var workoutState: WorkoutState
 
     private val RESOURCES_VERSION = "1"
 
@@ -40,10 +44,12 @@ class WorkoutTileService : androidx.wear.tiles.TileService() {
         requestParams: RequestBuilders.TileRequest
     ): ListenableFuture<TileBuilders.Tile> {
         val today = java.time.LocalDate.now()
+        val epoch = runBlocking { workoutState.programStartEpoch.first() }
+        val startDate = scheduler.programStartDate(epoch, today)
         val title = scheduler.todayWorkoutTitle(today)
-        val phase = scheduler.currentPhase(today)
-        val week = scheduler.currentWeek(today)
-        val exerciseCount = scheduler.todayExercises(today).size
+        val phase = scheduler.currentPhase(today, startDate)
+        val week = scheduler.currentWeek(today, startDate)
+        val exerciseCount = scheduler.todayExercises(today, startDate).size
 
             val layout = PrimaryLayout.Builder(requestParams.deviceConfiguration)
                 .setContent(

@@ -12,6 +12,7 @@ import com.nwb.watch.data.model.Exercise
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,16 +55,27 @@ class WorkoutViewModel @Inject constructor(
     private var restTimerJob: Job? = null
 
     val uiState: StateFlow<WorkoutUiState> = combine(
-        workoutState.activeWorkoutKey,
-        workoutState.activeExerciseIndex,
-        workoutState.completedSets,
-        workoutState.ttsEnabled,
-        workoutState.hapticsEnabled,
-    ) { activeKey, exerciseIdx, sets, ttsOn, hapticsOn ->
+        flows = arrayOf<Flow<Any?>>(
+            workoutState.activeWorkoutKey,
+            workoutState.activeExerciseIndex,
+            workoutState.completedSets,
+            workoutState.ttsEnabled,
+            workoutState.hapticsEnabled,
+            workoutState.programStartEpoch,
+        ),
+    ) { values ->
+        val activeKey = values[0] as String?
+        val exerciseIdx = values[1] as Int
+        val sets = values[2] as Int
+        val ttsOn = values[3] as Boolean
+        val hapticsOn = values[4] as Boolean
+        val epoch = values[5] as Long?
+
         val today = LocalDate.now()
+        val startDate = scheduler.programStartDate(epoch, today)
         val key = activeKey ?: scheduler.todayWorkoutKey(today)
-        val phase = scheduler.currentPhase(today)
-        val phaseIdx = scheduler.currentPhaseIndex(today)
+        val phase = scheduler.currentPhase(today, startDate)
+        val phaseIdx = scheduler.currentPhaseIndex(today, startDate)
         val schedule = scheduler.todaySchedule(today)
 
         WorkoutUiState(
@@ -72,8 +84,8 @@ class WorkoutViewModel @Inject constructor(
             workoutColor = schedule.c,
             phaseName = phase.name,
             phaseIndex = phaseIdx,
-            weekNumber = scheduler.currentWeek(today),
-            programProgress = scheduler.programProgress(today),
+            weekNumber = scheduler.currentWeek(today, startDate),
+            programProgress = scheduler.programProgress(today, startDate),
             exercises = repository.exercisesForWorkout(key, phaseIdx),
             currentExerciseIndex = exerciseIdx,
             completedSets = sets,
@@ -241,6 +253,13 @@ class WorkoutViewModel @Inject constructor(
             workoutState.setHapticsEnabled(!current)
         }
         hapticEngine.enabled = !current
+    }
+
+    fun setCurrentWeek(week: Int) {
+        val startDate = scheduler.startDateForWeek(week, LocalDate.now())
+        viewModelScope.launch {
+            workoutState.setProgramStartEpoch(startDate.toEpochDay())
+        }
     }
 
     fun readAloud(text: String) {
