@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from "react";
 import type { Exercise, MachineVariant } from "@/lib/exercises";
-import { EX, EQUIPMENT } from "@/lib/exercises";
+import { EX, EQUIPMENT, isExerciseAvailable } from "@/lib/exercises";
+import { cssAlpha } from "@/lib/css-utils";
 
 // ── Equipment category mapping ──────────────────────────────────────────
 
@@ -167,8 +168,7 @@ export default function EquipmentSwapPanel({
           const isExpanded = expandedGroup === group.key;
           const hasUnavailable = group.options.some(
             (o) =>
-              o.ex.requires.length > 0 &&
-              o.ex.requires.some((r) => equipment[r] === false),
+              o.ex.requires.length > 0 && !isExerciseAvailable(o.ex, equipment),
           );
 
           // Count includes variants for the current group
@@ -185,7 +185,7 @@ export default function EquipmentSwapPanel({
                   ? "var(--color-accent-dim)"
                   : "var(--color-card)",
                 border: group.hasCurrentExercise
-                  ? "1px solid var(--color-accent)44"
+                  ? `1px solid ${cssAlpha("var(--color-accent)", 27)}`
                   : "1px solid var(--color-border)",
                 opacity: hasUnavailable && !group.hasCurrentExercise ? 0.6 : 1,
               }}
@@ -215,7 +215,7 @@ export default function EquipmentSwapPanel({
                   <span
                     className="text-[10px] font-bold uppercase rounded-md px-1.5 py-0.5"
                     style={{
-                      background: "var(--color-accent)22",
+                      background: cssAlpha("var(--color-accent)", 13),
                       color: "var(--color-accent)",
                     }}
                   >
@@ -292,7 +292,7 @@ export default function EquipmentSwapPanel({
                   {group.options.map((option) => {
                     const isUnavailable =
                       option.ex.requires.length > 0 &&
-                      option.ex.requires.some((r) => equipment[r] === false);
+                      !isExerciseAvailable(option.ex, equipment);
                     const safetyColor =
                       option.ex.safety === "caution"
                         ? "var(--color-warning)"
@@ -312,10 +312,10 @@ export default function EquipmentSwapPanel({
                         className="w-full text-left rounded-lg p-3 cursor-pointer font-[inherit] min-h-[48px] transition-colors duration-150 disabled:cursor-default"
                         style={{
                           background: option.isCurrent
-                            ? "var(--color-accent)15"
+                            ? cssAlpha("var(--color-accent)", 8)
                             : "var(--color-bg)",
                           border: option.isCurrent
-                            ? `1px solid var(--color-accent)44`
+                            ? `1px solid ${cssAlpha("var(--color-accent)", 27)}`
                             : `1px solid var(--color-border)`,
                           borderLeft: `3px solid ${option.isCurrent ? "var(--color-accent)" : safetyColor}`,
                           opacity: isUnavailable ? 0.4 : 1,
@@ -341,7 +341,7 @@ export default function EquipmentSwapPanel({
                             <span
                               className="text-[10px] font-bold rounded px-1 py-0.5"
                               style={{
-                                background: "var(--color-warning)22",
+                                background: cssAlpha("var(--color-warning)", 13),
                                 color: "var(--color-warning)",
                               }}
                             >
@@ -352,7 +352,7 @@ export default function EquipmentSwapPanel({
                             <span
                               className="text-[10px] font-bold rounded px-1 py-0.5"
                               style={{
-                                background: "var(--color-danger)22",
+                                background: cssAlpha("var(--color-danger)", 13),
                                 color: "var(--color-danger)",
                               }}
                             >

@@ -21,6 +21,12 @@ export interface MachineVariant {
   description: string;
   setupCues: string[];
   superset?: VariantSuperset;
+  /**
+   * Override the exercise-level `requires` when this variant is selected /
+   * available. If omitted the variant inherits the exercise's requires.
+   * Used for cases like a Rogue barbell variant of a DB-default exercise.
+   */
+  requires?: string[];
 }
 
 export interface Exercise {
@@ -51,6 +57,28 @@ export interface EquipmentItem {
   name: string;
   icon: string;
   category: string;
+}
+
+/**
+ * Is this exercise usable given the current equipment map?
+ *
+ * The base config (`ex.requires`) gates availability by default, but if any
+ * `machineVariant` declares its own `requires` and all of those are present,
+ * the exercise is available through that variant even when the base isn't.
+ *
+ * `equipment[key] === false` = user flagged unavailable
+ * `equipment[key] !== false` (undefined or true) = present
+ */
+export function isExerciseAvailable(
+  ex: Exercise,
+  equipment: Record<string, boolean>,
+): boolean {
+  const hasAll = (reqs: string[]) =>
+    reqs.every((r) => equipment[r] !== false);
+  if (hasAll(ex.requires)) return true;
+  return (ex.machineVariants ?? []).some(
+    (v) => v.requires != null && hasAll(v.requires),
+  );
 }
 
 export interface Workout {
@@ -305,6 +333,7 @@ export const EX: Record<string, Exercise> = {
           "Set bench to 30-45\u00B0 incline",
           "Have two pairs of dumbbells ready (heavier for press, lighter for raises)",
           "Keep lighter pair within reach to minimize transition time",
+          "No light DBs? Plates (10-25lb) held by the flat side work fine for the lat raise portion",
         ],
       },
       {
@@ -316,7 +345,28 @@ export const EX: Record<string, Exercise> = {
           "Position bench inside the Smith machine at 30-45\u00B0",
           "Set safety catches at chest level",
           "Unrack bar with rotation, press, then re-rack for lat raises with DBs",
+          "Plates held by the flat side also work for the lat raise portion",
         ],
+      },
+      {
+        id: "rogue_rack_barbell",
+        label: "Rogue Rack + Barbell",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Rogue power rack with adjustable bench at 30-45\u00B0. Barbell for the press; plates (or lighter DBs) for the lat raise portion.",
+        requires: ["barbell", "bench"],
+        setupCues: [
+          "Set the Rogue adjustable bench to 30-45\u00B0 inside the rack",
+          "Load barbell in the J-cups \u2014 unrack directly to the starting position over the upper chest",
+          "Safety pins set at chest level so you can bail without a spotter",
+          "For the lat raise portion: two plates (10\u201325 lb) held by the flat side work great \u2014 no DBs required",
+        ],
+        superset: {
+          title: "Banded Pallof / Woodchoppers (Seated)",
+          sets: "2\u00D78/side",
+          instruction: "Between press sets: stay seated on the bench with a band anchored to the rack upright at chest height. Alternate Pallof press/hold (8 presses or 10s holds per side) or high-to-low woodchoppers (8 reps/side). Resist rotation \u2014 drive from the thoracic spine, hips stay square.",
+          safety: "Seated throughout \u2014 zero left iliopsoas demand. Band only, no plate load. Keep hip flexion well under 90\u00B0. Anchor the band low enough that the pull never tips you backward.",
+          note: "Zero walking during the superset \u2014 band is anchored on the rack you're already sitting in.",
+        },
       },
     ],
     constraints: {
@@ -901,6 +951,38 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Seated Cable Row", "Chest-Supported DB Row"],
     visual: "| (Pulley)\n|   \\\n|    \\ _ [] (One arm)\n|    /\n|   O\n|  /|\\\n| +-+-+ (Seat)",
+    machineVariants: [
+      {
+        id: "cable_column",
+        label: "Cable Column",
+        icon: "\u2696\uFE0F",
+        description: "Standard cable column with D-handle, bench or standing",
+        setupCues: [
+          "Set pulley to chest height on a cable column",
+          "Sit on a bench or seat facing the column",
+          "Grab D-handle with one hand, keep other hand on thigh for stability",
+        ],
+      },
+      {
+        id: "nautilus_low_row",
+        label: "Nautilus Multi Station Low Row",
+        icon: "\uD83E\uDDBE",
+        description: "Nautilus Multi Station low row \u2014 pin-loaded, foot plates, no chest pad. Sit on the platform and row from below.",
+        setupCues: [
+          "Sit on the platform facing the cable attachment \u2014 NOT standing as the machine label shows",
+          "Right foot braced flat against the foot plate for stability",
+          "Left foot resting passively on the plate \u2014 zero push",
+          "Grab the handle with one hand, slight forward lean from the hips (stay under 90\u00B0)",
+          "Pin-loaded stack: easy to adjust weight between arms",
+        ],
+        superset: {
+          title: "R-Leg Calf Raise on Foot Plate",
+          sets: "2\u00D712",
+          instruction: "Between row sets: RIGHT foot only \u2014 press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. Keep left foot completely passive.",
+          safety: "LEFT foot stays passive on the plate \u2014 zero push. No Pallof holds on this station \u2014 without a chest pad the anti-rotation force goes through your hips, risking left iliopsoas engagement.",
+        },
+      },
+    ],
     cableSuperset: true,
     constraints: {
       requiresIliopsoas: false,
@@ -1505,6 +1587,7 @@ export const EX: Record<string, Exercise> = {
     nwbCues: "Keep chin tucked and ribs down to prevent lumbar arching. Load with barbell or dumbbell across hips for progressive overload.",
     why: "Superior glute isolation with peak tension at the top of the movement. Primary glute builder.",
     safety: "safe",
+    diagram: "hip-thrust-support",
     swaps: ["SL Glute Bridge (Right)", "TRX SL Glute Bridge (Right)"],
     constraints: {
       requiresIliopsoas: false,

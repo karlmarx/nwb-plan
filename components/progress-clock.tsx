@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { PROG_START, PROG_DURATION } from "@/lib/program";
 
-// Program start: March 17, 2026 at noon EDT = 16:00 UTC
-const PROG_START = new Date("2026-03-17T16:00:00Z");
-const PROG_DURATION = 42 * 24 * 60 * 60 * 1000; // 6 weeks in ms
 const PROG_END = new Date(PROG_START.getTime() + PROG_DURATION);
 
 function fmt(ms: number) {

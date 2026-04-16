@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder tile preview - replace with actual screenshot -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#0F172A" />
+    <size android:width="384dp" android:height="384dp" />
+</shape>

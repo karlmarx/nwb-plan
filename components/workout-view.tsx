@@ -10,6 +10,7 @@ import {
   NEARBY_EQUIPMENT,
   SCHED,
   PHASES,
+  isExerciseAvailable,
 } from "@/lib/exercises";
 import {
   SUPPLEMENT_CORE,
@@ -19,6 +20,7 @@ import {
   MOBILITY_SUPPLEMENTS,
 } from "@/lib/supplements";
 import type { Exercise } from "@/lib/exercises";
+import { computeCurrentPhase } from "@/lib/program";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import RemovedRow from "@/components/removed-row";
@@ -37,6 +39,7 @@ import ComplementPicker, {
   type ComplementId,
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
+import { cssAlpha } from "@/lib/css-utils";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -54,7 +57,7 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio", "Safety"];
+const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
@@ -62,10 +65,10 @@ const TAB_TIPS = [
   "Legs + Recovery exercise library",
   "Core exercises by body part",
   "NWB cardio options",
-  "Injury cues & safety rules",
 ];
 
-// Gear/config tab is accessed via header icon, not in the tab bar
+// Safety + Gear/config live outside the label tab strip as icon buttons
+const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
 
 const DAY_NAMES = [
@@ -511,7 +514,10 @@ const REMOVED_CORE = [
 export default function WorkoutView() {
   // ----- State -----
   const [tab, setTab] = useState(() => loadState<number>("nwb_tab", 0));
-  const [phase, setPhase] = useState(() => loadState<number>("nwb_phase", 0));
+  // Phase is derived from the program start date — always opens on the
+  // week that matches the calendar. Tapping a pill temporarily overrides
+  // within the session but doesn't persist; next mount re-syncs.
+  const [phase, setPhase] = useState(() => computeCurrentPhase());
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     () => {
       const sd = loadState<number>("nwb_startDay", 0);
@@ -551,7 +557,7 @@ export default function WorkoutView() {
   const [machineSelections, setMachineSelections] = useState<
     Record<string, string>
   >(() => loadState("nwb_machines", {}));
-  const [nearbySelections, setNearbySelections] = useState<
+  const [nearbySelections] = useState<
     Record<string, string[]>
   >(() => loadState("nwb_nearby", {}));
   const [coreNearby, setCoreNearby] = useState<string[]>(
@@ -569,6 +575,7 @@ export default function WorkoutView() {
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
   const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
+  const [fontSize, setFontSize] = useState(() => loadState<number>("nwb_font_size", 16));
 
   // Edit sheet (swap / machine / move / remove) — opened via long-press or ⋮ button
   const [editSheetFor, setEditSheetFor] = useState<
@@ -577,20 +584,32 @@ export default function WorkoutView() {
 
   // Complement picker (add equipment-aware supersets / mobility / stretches)
   const [complementPickerFor, setComplementPickerFor] = useState<
-    { exName: string; exerciseRequires: string[]; exerciseCategory: string } | null
+    {
+      exName: string;
+      exerciseRequires: string[];
+      exerciseCategory: string;
+      workoutKey?: string;
+    } | null
   >(null);
 
-  // User-opted-in complements per exercise (date-scoped so they clear tomorrow)
-  const complementsKey = `nwb_complements_${new Date().toISOString().slice(0, 10)}`;
-  const [complementsToday, setComplementsToday] = useState<
-    Record<string, ComplementId[]>
-  >(() => loadState<Record<string, ComplementId[]>>(complementsKey, {}));
-
-  // Removed exercises (date-scoped — return tomorrow)
-  const removedKey = `nwb_removed_${new Date().toISOString().slice(0, 10)}`;
-  const [removedToday, setRemovedToday] = useState<Record<string, string[]>>(
-    () => loadState<Record<string, string[]>>(removedKey, {}),
-  );
+  // ----- Consolidated day state (date-scoped, clears daily) -----
+  type DayState = {
+    complements: Record<string, ComplementId[]>;
+    removed: Record<string, string[]>;
+    completedSupersets: string[];
+  };
+  const dayKey = `nwb_day_${new Date().toISOString().slice(0, 10)}`;
+  const [dayState, setDayState] = useState<DayState>(() => {
+    const stored = loadState<DayState | null>(dayKey, null);
+    if (stored) return stored;
+    // Migrate from legacy per-field keys
+    const dateStr = new Date().toISOString().slice(0, 10);
+    return {
+      complements: loadState<Record<string, ComplementId[]>>(`nwb_complements_${dateStr}`, {}),
+      removed: loadState<Record<string, string[]>>(`nwb_removed_${dateStr}`, {}),
+      completedSupersets: loadState<string[]>(`nwb_done_ss_${dateStr}`, []),
+    };
+  });
 
   // Per-workout exercise reorder (persistent)
   const [exerciseOrder, setExerciseOrder] = useState<Record<string, string[]>>(
@@ -626,12 +645,6 @@ export default function WorkoutView() {
     return () => window.removeEventListener("keydown", handler);
   }, [focusState]);
 
-  // ----- Completed supersets tracking (per day) -----
-  const todayKey = `nwb_done_ss_${new Date().toISOString().slice(0, 10)}`;
-  const [completedSupersets, setCompletedSupersets] = useState<string[]>(
-    () => loadState<string[]>(todayKey, []),
-  );
-
   // ----- Sliding tab pill (v2) -----
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -640,7 +653,7 @@ export default function WorkoutView() {
 
   useLayoutEffect(() => {
     if (!uiV2) { pillInitialized.current = false; return; }
-    const activeIdx = tab <= 5 ? tab : 6; // 6 = gear
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -657,9 +670,6 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_tab", tab);
   }, [tab]);
-  useEffect(() => {
-    saveState("nwb_phase", phase);
-  }, [phase]);
   useEffect(() => {
     saveState("nwb_equipment", equipment);
   }, [equipment]);
@@ -699,17 +709,15 @@ export default function WorkoutView() {
     saveState("nwb_ui_v2", uiV2);
   }, [uiV2]);
   useEffect(() => {
-    saveState(complementsKey, complementsToday);
-  }, [complementsToday, complementsKey]);
+    saveState(dayKey, dayState);
+  }, [dayState, dayKey]);
   useEffect(() => {
-    saveState(removedKey, removedToday);
-  }, [removedToday, removedKey]);
+    document.documentElement.style.fontSize = `${fontSize}px`;
+    saveState("nwb_font_size", fontSize);
+  }, [fontSize]);
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
-  useEffect(() => {
-    saveState(todayKey, completedSupersets);
-  }, [completedSupersets, todayKey]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -750,7 +758,7 @@ export default function WorkoutView() {
     (exName: string): boolean => {
       const ex = EX[exName];
       if (!ex) return true;
-      return ex.requires.every((r) => equipment[r] !== false);
+      return isExerciseAvailable(ex, equipment);
     },
     [equipment],
   );
@@ -827,10 +835,10 @@ export default function WorkoutView() {
 
   const removeExerciseToday = useCallback(
     (workoutKey: string, origName: string) => {
-      setRemovedToday((prev) => {
-        const cur = prev[workoutKey] ?? [];
+      setDayState((prev) => {
+        const cur = prev.removed[workoutKey] ?? [];
         if (cur.includes(origName)) return prev;
-        return { ...prev, [workoutKey]: [...cur, origName] };
+        return { ...prev, removed: { ...prev.removed, [workoutKey]: [...cur, origName] } };
       });
     },
     [],
@@ -838,12 +846,12 @@ export default function WorkoutView() {
 
   const toggleComplement = useCallback(
     (exName: string, id: ComplementId) => {
-      setComplementsToday((prev) => {
-        const cur = prev[exName] ?? [];
+      setDayState((prev) => {
+        const cur = prev.complements[exName] ?? [];
         const next = cur.includes(id)
           ? cur.filter((x) => x !== id)
           : [...cur, id];
-        return { ...prev, [exName]: next };
+        return { ...prev, complements: { ...prev.complements, [exName]: next } };
       });
     },
     [],
@@ -851,7 +859,7 @@ export default function WorkoutView() {
 
   /**
    * Build superset cards for an exercise — combines auto supersets (cable,
-   * variant-specific) with user-opted-in complements from complementsToday.
+   * variant-specific) with user-opted-in complements from dayState.complements.
    */
   const buildSupersetCards = useCallback(
     (
@@ -862,7 +870,7 @@ export default function WorkoutView() {
     ): React.ReactNode => {
       type Card = {
         key: string;
-        kind: "cable" | "variant" | "nearby" | "leftleg" | "mobility";
+        kind: "cable" | "variant" | "nearby" | "leftleg" | "core" | "mobility";
         label: string;
         color: string;
         title: string;
@@ -915,7 +923,7 @@ export default function WorkoutView() {
       }
 
       // 3. User-opted-in complements
-      const userComps = complementsToday[exName] ?? [];
+      const userComps = dayState.complements[exName] ?? [];
       for (const id of userComps) {
         const decoded = decodeComplement(id);
         if (decoded.kind === "nearby") {
@@ -944,6 +952,25 @@ export default function WorkoutView() {
             kind: "leftleg",
             label: "L-LEG",
             color: "#14b8a6",
+            title: decoded.value,
+            sets: `${s[0]}\u00D7${s[1]}`,
+            instruction: data.execution,
+            safety: data.nwbCues,
+            removable: true,
+            complementId: id,
+          });
+        } else if (decoded.kind === "core") {
+          const data = SUPPLEMENT_EX[decoded.value];
+          if (!data) continue;
+          const s = data.sets[0];
+          const region = SUPPLEMENT_CORE[workoutKey]?.exercises.find(
+            (ce) => ce.name === decoded.value,
+          )?.region;
+          cards.push({
+            key: id,
+            kind: "core",
+            label: region ? region.toUpperCase() : "CORE",
+            color: "#f97316",
             title: decoded.value,
             sets: `${s[0]}\u00D7${s[1]}`,
             instruction: data.execution,
@@ -1056,7 +1083,7 @@ export default function WorkoutView() {
       );
     },
     [
-      complementsToday,
+      dayState.complements,
       machineSelections,
       supplementToggles.leftLeg,
       toggleComplement,
@@ -1065,7 +1092,7 @@ export default function WorkoutView() {
 
   /** Render the "+ Add complement" pill. */
   const buildAddComplementPill = useCallback(
-    (exName: string, ex: Exercise): React.ReactNode => {
+    (exName: string, ex: Exercise, workoutKey?: string): React.ReactNode => {
       return (
         <button
           data-testid="add-complement"
@@ -1075,6 +1102,7 @@ export default function WorkoutView() {
               exName,
               exerciseRequires: ex.requires,
               exerciseCategory: ex.category,
+              workoutKey,
             });
           }}
           className="w-full mb-3 rounded-xl text-[12px] font-semibold cursor-pointer font-[inherit] min-h-[40px] transition-colors duration-150 flex items-center justify-center gap-1.5"
@@ -1096,8 +1124,7 @@ export default function WorkoutView() {
   function renderCoreExercise(name: string) {
     const ex = EX[name];
     if (!ex) return null;
-    const unavail =
-      !ex || ex.requires.some((r) => equipment[r] === false);
+    const unavail = !isExerciseAvailable(ex, equipment);
     const selMachineId = machineSelections[name];
     const selectedVariant =
       ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
@@ -1123,6 +1150,7 @@ export default function WorkoutView() {
           equipment={equipment}
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
+          variantRequires={selectedVariant?.requires}
           supersetSlot={buildSupersetCards(name, ex, "__core__", null)}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
@@ -1139,7 +1167,7 @@ export default function WorkoutView() {
 
     // Effective exercise order with removals applied
     const orderedOrigs = getOrderedExercises(workoutKey).filter(
-      (o) => !(removedToday[workoutKey] ?? []).includes(o),
+      (o) => !(dayState.removed[workoutKey] ?? []).includes(o),
     );
 
     // Find first cable exercise for cable superset
@@ -1202,7 +1230,7 @@ export default function WorkoutView() {
             }
 
             // User-opted-in complements
-            const userComps = complementsToday[nm] ?? [];
+            const userComps = dayState.complements[nm] ?? [];
             for (const id of userComps) {
               const decoded = decodeComplement(id);
               if (decoded.kind === "nearby") {
@@ -1227,6 +1255,22 @@ export default function WorkoutView() {
                   sets: `${s[0]}\u00D7${s[1]}`,
                   instruction: data.execution,
                   safety: data.nwbCues,
+                  rest: data.rest,
+                });
+              } else if (decoded.kind === "core") {
+                const data = SUPPLEMENT_EX[decoded.value];
+                if (!data) continue;
+                const s = data.sets[0];
+                const region = SUPPLEMENT_CORE[workoutKey]?.exercises.find(
+                  (ce) => ce.name === decoded.value,
+                )?.region;
+                supps.push({
+                  type: "core",
+                  name: decoded.value,
+                  sets: `${s[0]}\u00D7${s[1]}`,
+                  instruction: data.execution,
+                  safety: data.nwbCues,
+                  region,
                   rest: data.rest,
                 });
               } else if (decoded.kind === "mobility") {
@@ -1323,7 +1367,7 @@ export default function WorkoutView() {
               style={{
                 padding: "6px 12px",
                 background: supplementToggles.leftLeg
-                  ? "var(--color-ll)15"
+                  ? cssAlpha("var(--color-ll)", 8)
                   : "transparent",
                 border: `1.5px solid ${supplementToggles.leftLeg ? "var(--color-ll)" : "var(--color-border)"}`,
                 color: supplementToggles.leftLeg
@@ -1337,7 +1381,8 @@ export default function WorkoutView() {
             </button>
             {coreSubtitle && (
               <span className="text-[10px] text-text-muted self-center">
-                Core focus: {coreSubtitle}
+                Core: {coreSubtitle} &mdash; tap ＋ Add complement on any
+                exercise to pair
               </span>
             )}
           </div>
@@ -1389,13 +1434,14 @@ export default function WorkoutView() {
                 equipment={equipment}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                variantRequires={selectedVariant?.requires}
                 supersetSlot={buildSupersetCards(
                   exName,
                   ex,
                   workoutKey,
                   firstCableName,
                 )}
-                addComplementSlot={buildAddComplementPill(exName, ex)}
+                addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
             </div>
           );
@@ -1417,7 +1463,7 @@ export default function WorkoutView() {
             style={{
               padding: "14px",
               background: "var(--color-bg)",
-              border: "1px dashed var(--color-warning)33",
+              border: `1px dashed ${cssAlpha("var(--color-warning)", 20)}`,
             }}
           >
             <div className="text-[13px] font-bold text-warning mb-3 tracking-wide">
@@ -1451,6 +1497,7 @@ export default function WorkoutView() {
                   equipment={equipment}
                   variantSetupCues={selectedVariant?.setupCues}
                   variantLabel={selectedVariant?.label}
+                  variantRequires={selectedVariant?.requires}
                   supersetSlot={buildSupersetCards(name, ex, "__finisher__", null)}
                   addComplementSlot={buildAddComplementPill(name, ex)}
                 />
@@ -1800,6 +1847,7 @@ export default function WorkoutView() {
                 equipment={equipment}
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
+                variantRequires={selectedVariant?.requires}
                 supersetSlot={buildSupersetCards(k, ex, "__cardio__", null)}
                 addComplementSlot={buildAddComplementPill(k, ex)}
               />
@@ -1818,7 +1866,7 @@ export default function WorkoutView() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid var(--color-accent)44",
+                    borderBottom: `2px solid ${cssAlpha("var(--color-accent)", 27)}`,
                   }}
                 >
                   {["Day", "AM", "PM", "~Cal"].map((h) => (
@@ -1972,7 +2020,7 @@ export default function WorkoutView() {
                   style={{
                     padding: "6px 12px",
                     background: isSelected
-                      ? "var(--color-accent)22"
+                      ? cssAlpha("var(--color-accent)", 13)
                       : "var(--color-bg)",
                     border: `1.5px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
                     color: isSelected
@@ -2095,7 +2143,7 @@ export default function WorkoutView() {
                   style={{
                     padding: "10px 2px",
                     background: isCurrent
-                      ? "var(--color-accent)22"
+                      ? cssAlpha("var(--color-accent)", 13)
                       : "var(--color-bg)",
                     border: `1px solid ${isCurrent ? "var(--color-accent)" : "var(--color-border)"}`,
                     color: isCurrent
@@ -2249,7 +2297,7 @@ export default function WorkoutView() {
                         height: 20,
                         background: isOn
                           ? "var(--color-safe)"
-                          : "var(--color-text-muted)44",
+                          : cssAlpha("var(--color-text-muted)", 27),
                       }}
                     >
                       <div
@@ -2447,7 +2495,7 @@ export default function WorkoutView() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid var(--color-accent)44",
+                    borderBottom: `2px solid ${cssAlpha("var(--color-accent)", 27)}`,
                   }}
                 >
                   {["Method", "Requires", "Difficulty"].map((h) => (
@@ -2585,7 +2633,7 @@ export default function WorkoutView() {
     case 4:
       content = renderCardioTab();
       break;
-    case 5:
+    case SAFETY_TAB_INDEX:
       content = renderSafetyTab();
       break;
     case GEAR_TAB_INDEX:
@@ -2608,6 +2656,22 @@ export default function WorkoutView() {
           </h1>
           {/* Header icons */}
           <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setFontSize((s) => Math.max(12, s - 1))}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer text-xs font-bold"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title="Decrease font size"
+            >
+              A-
+            </button>
+            <button
+              onClick={() => setFontSize((s) => Math.min(24, s + 1))}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer text-xs font-bold"
+              style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+              title="Increase font size"
+            >
+              A+
+            </button>
             <button
               onClick={() => setAboutOpen(true)}
               data-testid="about-button"
@@ -2713,8 +2777,19 @@ export default function WorkoutView() {
             style={{
               left: pillPos.left,
               width: pillPos.width,
-              background: (tab === 0 ? todayColor : "var(--color-accent)") + "15",
-              border: `1px solid ${(tab === 0 ? todayColor : "var(--color-accent)")}55`,
+              background:
+                (tab === 0
+                  ? todayColor
+                  : tab === SAFETY_TAB_INDEX
+                    ? "var(--color-warning)"
+                    : "var(--color-accent)") + "15",
+              border: `1px solid ${
+                tab === 0
+                  ? todayColor
+                  : tab === SAFETY_TAB_INDEX
+                    ? "var(--color-warning)"
+                    : "var(--color-accent)"
+              }55`,
               transition: pillInitialized.current ? "left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1)" : "none",
             }}
           />
@@ -2744,9 +2819,30 @@ export default function WorkoutView() {
         })}
         {/* Divider */}
         <div className="w-px mx-0.5 self-stretch rounded-full" style={{ background: "var(--color-border)" }} />
+        {/* Safety (icon) */}
+        <button
+          ref={(el) => { tabRefs.current[SAFETY_TAB_INDEX] = el; }}
+          data-testid="tab-safety"
+          title="Injury cues & safety rules"
+          onClick={() => setTab(SAFETY_TAB_INDEX)}
+          className={`rounded-xl cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${tab === SAFETY_TAB_INDEX ? "tab-active" : ""}`}
+          style={{
+            width: 44,
+            minWidth: 44,
+            padding: "12px 0",
+            background: uiV2 ? "transparent" : (tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 8) : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 33) : "var(--color-border)"}`,
+            color: tab === SAFETY_TAB_INDEX ? "var(--color-warning)" : "var(--color-text-muted)",
+          }}
+        >
+          {/* Shield */}
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </button>
         {/* Gear / config */}
         <button
-          ref={(el) => { tabRefs.current[6] = el; }}
+          ref={(el) => { tabRefs.current[GEAR_TAB_INDEX] = el; }}
           data-testid="tab-gear"
           title="Equipment & configuration"
           onClick={() => setTab(GEAR_TAB_INDEX)}
@@ -2755,8 +2851,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? "var(--color-accent)15" : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? "var(--color-accent)55" : "var(--color-border)"}`,
+            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
@@ -3126,7 +3222,7 @@ export default function WorkoutView() {
         const w = WORKOUTS[wk];
         const siblingOrigs = w
           ? getOrderedExercises(wk).filter(
-              (o) => !(removedToday[wk] ?? []).includes(o),
+              (o) => !(dayState.removed[wk] ?? []).includes(o),
             )
           : [origName];
         const idx = siblingOrigs.indexOf(origName);
@@ -3165,8 +3261,9 @@ export default function WorkoutView() {
         <ComplementPicker
           exerciseRequires={complementPickerFor.exerciseRequires}
           exerciseCategory={complementPickerFor.exerciseCategory}
+          workoutKey={complementPickerFor.workoutKey}
           nearbySelections={nearbySelections[complementPickerFor.exName] ?? []}
-          activeIds={complementsToday[complementPickerFor.exName] ?? []}
+          activeIds={dayState.complements[complementPickerFor.exName] ?? []}
           onToggle={(id) =>
             toggleComplement(complementPickerFor.exName, id)
           }

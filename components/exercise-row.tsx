@@ -5,6 +5,7 @@ import Badge from "@/components/badge";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
 import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
 import { useLongPress } from "@/lib/use-long-press";
+import { cssAlpha } from "@/lib/css-utils";
 
 interface ExerciseRowProps {
   name: string;
@@ -20,6 +21,12 @@ interface ExerciseRowProps {
   equipment: Record<string, boolean>;
   variantSetupCues?: string[];
   variantLabel?: string;
+  /**
+   * Requires override from the active machine variant. When present it
+   * replaces `ex.requires` for the equipment-chip display so the chips
+   * match what the selected variant actually needs.
+   */
+  variantRequires?: string[];
   /** Superset / complement cards rendered immediately under the header */
   supersetSlot?: React.ReactNode;
   /** Add-complement pill rendered below supersets */
@@ -42,6 +49,7 @@ export default function ExerciseRow({
   equipment,
   variantSetupCues,
   variantLabel,
+  variantRequires,
   supersetSlot,
   addComplementSlot,
   showActionButton = true,
@@ -178,8 +186,8 @@ export default function ExerciseRow({
             )}
           </div>
 
-          {/* Diagram button — directly under sets/reps for fastest access */}
-          {EXERCISE_TO_DIAGRAM[ex.id] ? (
+          {/* Diagram buttons — directly under sets/reps for fastest access */}
+          {EXERCISE_TO_DIAGRAM[ex.id] && (
             <button
               onClick={(ev) => {
                 ev.stopPropagation();
@@ -188,29 +196,29 @@ export default function ExerciseRow({
               data-testid="view-diagram"
               className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
               style={{
-                background: "var(--color-accent)11",
-                border: "1px solid var(--color-accent)33",
+                background: cssAlpha("var(--color-accent)", 7),
+                border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
               }}
             >
               {"\u{1F4D0}"} View Movement Diagram
             </button>
-          ) : (
-            ex.diagram && (
-              <button
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onDiagram(ex.diagram!);
-                }}
-                data-testid="view-diagram"
-                className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold text-accent min-h-[48px] transition-colors duration-150 mb-3"
-                style={{
-                  background: "var(--color-accent)11",
-                  border: "1px solid var(--color-accent)33",
-                }}
-              >
-                {"\u{1F4D0}"} View Movement Diagram
-              </button>
-            )
+          )}
+          {ex.diagram && (
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                onDiagram(ex.diagram!);
+              }}
+              data-testid="view-safety-diagram"
+              className="w-full p-3 rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-bold min-h-[48px] transition-colors duration-150 mb-3"
+              style={{
+                background: cssAlpha("var(--color-warning)", 7),
+                border: `1px solid ${cssAlpha("var(--color-warning)", 20)}`,
+                color: "var(--color-warning)",
+              }}
+            >
+              {"\u{1F6E1}\uFE0F"} View Safety Diagram
+            </button>
           )}
 
           {/* Superset / complement cards — right under the diagram button */}
@@ -233,7 +241,7 @@ export default function ExerciseRow({
                   style={{
                     padding: "8px 10px",
                     background: "var(--color-accent-dim)",
-                    border: "1px solid var(--color-accent)33",
+                    border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
                   }}
                 >
                   <div className="text-[10px] font-bold text-accent uppercase mb-1">
@@ -329,10 +337,13 @@ export default function ExerciseRow({
             )}
           </div>
 
-          {/* Equipment chips */}
-          {ex.requires.length > 0 && (
+          {/* Equipment chips — show the active variant's requires when set,
+              otherwise fall back to the exercise-level requires. */}
+          {(() => {
+            const chipReqs = variantRequires ?? ex.requires;
+            return chipReqs.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
-              {ex.requires.map((eq) => {
+              {chipReqs.map((eq) => {
                 const eqData = EQUIPMENT[eq];
                 const has = equipment[eq] !== false;
                 return (
@@ -355,7 +366,8 @@ export default function ExerciseRow({
                 );
               })}
             </div>
-          )}
+            );
+          })()}
 
           {/* Rest timer button */}
           {ex.rest > 0 && (
@@ -366,8 +378,8 @@ export default function ExerciseRow({
               }}
               className="mt-3 w-full p-3 rounded-xl text-sm font-bold cursor-pointer font-[inherit] text-accent min-h-[48px] transition-colors duration-150"
               style={{
-                background: "var(--color-accent)" + "15",
-                border: `1px solid var(--color-accent)33`,
+                background: cssAlpha("var(--color-accent)", 8),
+                border: `1px solid ${cssAlpha("var(--color-accent)", 20)}`,
               }}
             >
               {"\u23F1"} Start {ex.rest}s Rest Timer

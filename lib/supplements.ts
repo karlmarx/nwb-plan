@@ -1,3 +1,13 @@
+// ===== NWB SAFETY INVARIANTS (must hold for every entry in this file) =====
+// 1. ZERO left leg weight bearing — left femoral neck compression-side stress fracture
+// 2. ZERO left iliopsoas activation — no left hip flexion against gravity
+// 3. Hip flexion <90° both sides (bilateral FAI + labral tears)
+// 4. No standing exercises of any kind
+// 5. No swimming
+// Any future additions MUST comply with all five constraints.
+// All left-leg exercises must be isometric, last-range, or passive.
+// All mobility drills must be seated/reclined, right-side-only for leg work.
+
 // ===== LEFT LEG MAINTENANCE SUPPLEMENTS =====
 // Interleaved with main exercises as supersets
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder launcher icon - replace with proper adaptive icon -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/nwb_dark_bg" />
+    <foreground android:drawable="@color/nwb_blue" />
+</adaptive-icon>
