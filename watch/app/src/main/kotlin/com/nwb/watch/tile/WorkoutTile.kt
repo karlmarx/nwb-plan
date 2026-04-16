@@ -45,7 +45,7 @@ class WorkoutTileService : androidx.wear.tiles.TileService() {
     ): ListenableFuture<TileBuilders.Tile> {
         val today = java.time.LocalDate.now()
         val epoch = runBlocking { workoutState.programStartEpoch.first() }
-        val startDate = scheduler.programStartDate(epoch, today)
+        val startDate = scheduler.programStartDate(epoch)
         val title = scheduler.todayWorkoutTitle(today)
         val phase = scheduler.currentPhase(today, startDate)
         val week = scheduler.currentWeek(today, startDate)

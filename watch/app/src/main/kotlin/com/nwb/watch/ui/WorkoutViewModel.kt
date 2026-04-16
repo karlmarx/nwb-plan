@@ -72,7 +72,7 @@ class WorkoutViewModel @Inject constructor(
         val epoch = values[5] as Long?
 
         val today = LocalDate.now()
-        val startDate = scheduler.programStartDate(epoch, today)
+        val startDate = scheduler.programStartDate(epoch)
         val key = activeKey ?: scheduler.todayWorkoutKey(today)
         val phase = scheduler.currentPhase(today, startDate)
         val phaseIdx = scheduler.currentPhaseIndex(today, startDate)

@@ -2,7 +2,11 @@
 // The canonical source for program start — the progress clock and the
 // auto-phase logic both depend on this.
 
-/** Program start: March 17, 2026 at noon EDT = 16:00 UTC */
+/**
+ * Program start: March 17, 2026 at noon EDT = 16:00 UTC.
+ * Mirrored on the watch in watch/app/src/main/kotlin/com/nwb/watch/data/WorkoutScheduler.kt
+ * (DEFAULT_PROGRAM_START) — keep in sync.
+ */
 export const PROG_START = new Date("2026-03-17T16:00:00Z");
 
 /** 6 weeks in ms. */

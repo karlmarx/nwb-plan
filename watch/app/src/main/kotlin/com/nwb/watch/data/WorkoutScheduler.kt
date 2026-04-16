@@ -8,6 +8,9 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// Mirrors lib/program.ts PROG_START on the web side — keep in sync.
+private val DEFAULT_PROGRAM_START: LocalDate = LocalDate.of(2026, 3, 17)
+
 /**
  * Determines today's workout and current training phase based on
  * the 7-day schedule rotation and 6-week program timeline.
@@ -21,11 +24,12 @@ class WorkoutScheduler @Inject constructor(
     private val repository: ExerciseRepository,
 ) {
     /**
-     * Resolve the program start date from a persisted epoch day
-     * (null on first run → nearest past Monday of [today]).
+     * Resolve the program start date from a persisted epoch day.
+     * First-run fallback matches the web app's hardcoded PROG_START
+     * so the watch and PWA agree out of the box.
      */
-    fun programStartDate(epoch: Long?, today: LocalDate = LocalDate.now()): LocalDate =
-        epoch?.let { LocalDate.ofEpochDay(it) } ?: findNearestPastMonday(today)
+    fun programStartDate(epoch: Long?): LocalDate =
+        epoch?.let { LocalDate.ofEpochDay(it) } ?: DEFAULT_PROGRAM_START
 
     private fun findNearestPastMonday(date: LocalDate): LocalDate {
         var d = date
