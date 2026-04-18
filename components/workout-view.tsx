@@ -32,6 +32,7 @@ import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
+import AddExercisePicker from "@/components/add-exercise-picker";
 import ComplementPicker, {
   decodeComplement,
   encodeNearbyId,
@@ -654,6 +655,14 @@ export default function WorkoutView() {
     () => loadState<Record<string, string[]>>("nwb_order", {}),
   );
 
+  // Per-workout extra exercises added from the catalog (persistent)
+  const [addedExercises, setAddedExercises] = useState<Record<string, string[]>>(
+    () => loadState<Record<string, string[]>>("nwb_added", {}),
+  );
+
+  // Add-exercise picker — workoutKey the user is adding into
+  const [addPickerFor, setAddPickerFor] = useState<string | null>(null);
+
   // Focus mode: fullscreen exercise walkthrough
   type FocusSupplement = {
     type: "leftleg" | "core" | "cable" | "variant" | "nearby";
@@ -756,6 +765,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
+  useEffect(() => {
+    saveState("nwb_added", addedExercises);
+  }, [addedExercises]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -844,7 +856,9 @@ export default function WorkoutView() {
     (workoutKey: string): string[] => {
       const w = WORKOUTS[workoutKey];
       if (!w) return [];
-      const base = w.exercises;
+      // Base list = shipped defaults + user-added extras (in the order they were added)
+      const added = addedExercises[workoutKey] ?? [];
+      const base = [...w.exercises, ...added];
       const saved = exerciseOrder[workoutKey];
       if (!saved) return base;
       // Merge saved order with base: saved first (if still in base), then any new exercises
@@ -854,7 +868,30 @@ export default function WorkoutView() {
       for (const n of base) if (!savedSet.has(n)) merged.push(n);
       return merged;
     },
-    [exerciseOrder],
+    [exerciseOrder, addedExercises],
+  );
+
+  /**
+   * Add an arbitrary exercise (by name in the EX catalog) to a workout. Persists
+   * in nwb_added so it survives across sessions. No-op if it's already in the
+   * workout (default or previously added).
+   */
+  const addExerciseToWorkout = useCallback(
+    (workoutKey: string, name: string) => {
+      if (!EX[name]) return;
+      const w = WORKOUTS[workoutKey];
+      if (!w) return;
+      const currentBase = [
+        ...w.exercises,
+        ...(addedExercises[workoutKey] ?? []),
+      ];
+      if (currentBase.includes(name)) return;
+      setAddedExercises((prev) => ({
+        ...prev,
+        [workoutKey]: [...(prev[workoutKey] ?? []), name],
+      }));
+    },
+    [addedExercises],
   );
 
   const moveExercise = useCallback(
@@ -1484,6 +1521,22 @@ export default function WorkoutView() {
             </div>
           );
         })}
+
+        {/* Add exercise */}
+        <button
+          data-testid="add-exercise"
+          onClick={() => setAddPickerFor(workoutKey)}
+          className="mt-2 w-full rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-semibold min-h-[44px] transition-colors duration-150"
+          style={{
+            background: "var(--color-bg)",
+            border: `1px dashed ${cssAlpha("var(--color-accent)", 40)}`,
+            color: "var(--color-accent)",
+          }}
+          title="Pick any exercise from the catalog to add to this workout"
+        >
+          <span className="text-base leading-none">＋</span>
+          Add exercise
+        </button>
 
         {/* Removed exercises */}
         {w.removed.length > 0 && (
@@ -3313,6 +3366,28 @@ export default function WorkoutView() {
           onClose={() => setComplementPickerFor(null)}
         />
       )}
+
+      {/* Add-exercise picker — "＋ Add exercise" button opens this */}
+      {addPickerFor && (() => {
+        const wk = addPickerFor;
+        const w = WORKOUTS[wk];
+        const current = w
+          ? [...w.exercises, ...(addedExercises[wk] ?? [])]
+          : [];
+        const preferred =
+          wk.startsWith("Push") ? "push"
+            : wk.startsWith("Pull") ? "pull"
+              : wk.startsWith("Legs") ? "legs"
+                : undefined;
+        return (
+          <AddExercisePicker
+            currentExercises={current}
+            preferredCategory={preferred}
+            onAdd={(name) => addExerciseToWorkout(wk, name)}
+            onClose={() => setAddPickerFor(null)}
+          />
+        );
+      })()}
     </div>
   );
 }
