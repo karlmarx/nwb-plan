@@ -67,40 +67,36 @@ const TAB_TIPS = [
   "NWB cardio options",
 ];
 
-// Lucide-style stroke icons for each main tab. Rendered as 16px SVGs so the
+// Lucide-style stroke icons for each main tab. Rendered as 18px SVGs so the
 // tab bar never overflows on narrow phones.
 const TAB_ICONS: Record<string, React.ReactNode> = {
   Workout: (
-    // Calendar with checkmark — "today's workout"
+    // Barbell — today's workout
     <>
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-      <path d="M9 16l2 2 4-4" />
+      <rect x="2" y="9" width="3" height="6" rx="1" />
+      <rect x="19" y="9" width="3" height="6" rx="1" />
+      <rect x="5" y="11" width="14" height="2" rx="1" />
     </>
   ),
   Upper: (
-    // Dumbbell — push/pull library
+    // Up arrow — upper body library
     <>
-      <path d="M6 6v12M18 6v12" />
-      <path d="M10 7v10M14 7v10" />
-      <path d="M10 12h4" />
-      <path d="M2 10v4M22 10v4" />
+      <path d="M12 19V5" />
+      <path d="M5 12l7-7 7 7" />
     </>
   ),
   Lower: (
-    // Two diverging legs — lower body library
+    // Down arrow — lower body library
     <>
-      <path d="M9 3v7l-3 11" />
-      <path d="M15 3v7l3 11" />
-      <path d="M9 10h6" />
+      <path d="M12 5v14" />
+      <path d="M5 12l7 7 7-7" />
     </>
   ),
   Core: (
-    // Concentric target — core focus
+    // Abs outline — torso with 6-pack grid
     <>
-      <circle cx="12" cy="12" r="9" />
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="12" r="1" />
+      <rect x="7" y="4" width="10" height="16" rx="3" />
+      <path d="M7 9h10M7 14h10M12 4v16" />
     </>
   ),
   Cardio: (
