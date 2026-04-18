@@ -905,7 +905,7 @@ export default function WorkoutView() {
       ex: Exercise,
       workoutKey: string,
       firstCableName: string | null,
-    ): React.ReactNode => {
+    ): React.ReactElement[] => {
       type Card = {
         key: string;
         kind: "cable" | "variant" | "nearby" | "leftleg" | "core" | "mobility";
@@ -1046,79 +1046,84 @@ export default function WorkoutView() {
         }
       }
 
-      if (cards.length === 0) return null;
+      if (cards.length === 0) return [];
 
-      return (
-        <div className="mb-3 space-y-1.5">
-          {cards.map((c) => (
-            <div
-              key={c.key}
-              className="rounded-lg"
-              style={{
-                padding: "8px 10px",
-                background: c.color + "0d",
-                border: `1px solid ${c.color}33`,
-                borderLeft: `3px solid ${c.color}`,
-              }}
-            >
-              <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                <span
-                  className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+      return cards.map((c) => (
+        <div
+          key={`${exName}-${c.key}`}
+          data-testid="superset-card"
+          className="mb-2 ml-3 rounded-xl overflow-hidden"
+          style={{
+            background: c.color + "10",
+            borderLeft: `3px solid ${c.color}`,
+            border: `1px solid ${c.color}33`,
+            borderLeftWidth: 3,
+          }}
+        >
+          <div className="px-3.5 py-2.5">
+            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+              <span
+                className="text-[10px] text-text-muted"
+                title={`Paired with ${exName}`}
+              >
+                {"\u21B3"}
+              </span>
+              <span
+                className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                style={{
+                  background: c.color + "22",
+                  border: `1px solid ${c.color}44`,
+                  color: c.color,
+                }}
+              >
+                {c.label}
+              </span>
+              <span
+                className="text-[12px] font-semibold flex-1 min-w-0"
+                style={{ color: c.color }}
+              >
+                {c.title}
+              </span>
+              <span className="text-[10px] text-text-dim tabular-nums flex-shrink-0">
+                {c.sets}
+              </span>
+              {c.removable && c.complementId && (
+                <button
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    toggleComplement(exName, c.complementId!);
+                  }}
+                  aria-label="Remove complement"
+                  className="text-[11px] rounded-md cursor-pointer font-[inherit] w-6 h-6 flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: c.color + "22",
-                    border: `1px solid ${c.color}44`,
-                    color: c.color,
+                    background: "var(--color-bg)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text-muted)",
                   }}
                 >
-                  {c.label}
-                </span>
-                <span
-                  className="text-[12px] font-semibold"
-                  style={{ color: c.color }}
-                >
-                  {c.title}
-                </span>
-                <span className="ml-auto text-[10px] text-text-dim">
-                  {c.sets}
-                </span>
-                {c.removable && c.complementId && (
-                  <button
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      toggleComplement(exName, c.complementId!);
-                    }}
-                    aria-label="Remove complement"
-                    className="text-[11px] rounded-md cursor-pointer font-[inherit] w-6 h-6 flex items-center justify-center"
-                    style={{
-                      background: "var(--color-bg)",
-                      border: "1px solid var(--color-border)",
-                      color: "var(--color-text-muted)",
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-              <div className="text-[11px] text-text-dim leading-snug">
-                {c.instruction}
-              </div>
-              {c.safety && (
-                <div
-                  className="text-[10px] mt-1"
-                  style={{ color: c.color }}
-                >
-                  {"\u{1F6E1}\uFE0F"} {c.safety}
-                </div>
-              )}
-              {c.note && (
-                <div className="text-[10px] mt-1 text-warning">
-                  {"\u26A0\uFE0F"} {c.note}
-                </div>
+                  ×
+                </button>
               )}
             </div>
-          ))}
+            <div className="text-[11px] text-text-dim leading-snug pl-4">
+              {c.instruction}
+            </div>
+            {c.safety && (
+              <div
+                className="text-[10px] mt-1 pl-4"
+                style={{ color: c.color }}
+              >
+                {"\u{1F6E1}\uFE0F"} {c.safety}
+              </div>
+            )}
+            {c.note && (
+              <div className="text-[10px] mt-1 pl-4 text-warning">
+                {"\u26A0\uFE0F"} {c.note}
+              </div>
+            )}
+          </div>
         </div>
-      );
+      ));
     },
     [
       dayState.complements,
@@ -1189,9 +1194,9 @@ export default function WorkoutView() {
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
           variantRequires={selectedVariant?.requires}
-          supersetSlot={buildSupersetCards(name, ex, "__core__", null)}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
+        {buildSupersetCards(name, ex, "__core__", null)}
       </div>
     );
   }
@@ -1473,14 +1478,9 @@ export default function WorkoutView() {
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
                 variantRequires={selectedVariant?.requires}
-                supersetSlot={buildSupersetCards(
-                  exName,
-                  ex,
-                  workoutKey,
-                  firstCableName,
-                )}
                 addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
+              {buildSupersetCards(exName, ex, workoutKey, firstCableName)}
             </div>
           );
         })}
@@ -1514,31 +1514,32 @@ export default function WorkoutView() {
               const selectedVariant =
                 ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
               return (
-                <ExerciseRow
-                  key={`cf-${name}`}
-                  name={name}
-                  ex={ex}
-                  phase={phase}
-                  isExpanded={!!expandedEx[name]}
-                  onToggle={() => toggleEx(name)}
-                  onLongPress={() =>
-                    setEditSheetFor({
-                      workoutKey: "__finisher__",
-                      origName: name,
-                      exName: name,
-                    })
-                  }
-                  onStartTimer={(sec) => setTimer(sec)}
-                  onDiagram={(d) => setDiagramOpen(d)}
-                  onOpenDiagram={(id) => setDiagramOpen(id)}
-                  unavailable={!isAvailable(name)}
-                  equipment={equipment}
-                  variantSetupCues={selectedVariant?.setupCues}
-                  variantLabel={selectedVariant?.label}
-                  variantRequires={selectedVariant?.requires}
-                  supersetSlot={buildSupersetCards(name, ex, "__finisher__", null)}
-                  addComplementSlot={buildAddComplementPill(name, ex)}
-                />
+                <div key={`cf-${name}`}>
+                  <ExerciseRow
+                    name={name}
+                    ex={ex}
+                    phase={phase}
+                    isExpanded={!!expandedEx[name]}
+                    onToggle={() => toggleEx(name)}
+                    onLongPress={() =>
+                      setEditSheetFor({
+                        workoutKey: "__finisher__",
+                        origName: name,
+                        exName: name,
+                      })
+                    }
+                    onStartTimer={(sec) => setTimer(sec)}
+                    onDiagram={(d) => setDiagramOpen(d)}
+                    onOpenDiagram={(id) => setDiagramOpen(id)}
+                    unavailable={!isAvailable(name)}
+                    equipment={equipment}
+                    variantSetupCues={selectedVariant?.setupCues}
+                    variantLabel={selectedVariant?.label}
+                    variantRequires={selectedVariant?.requires}
+                    addComplementSlot={buildAddComplementPill(name, ex)}
+                  />
+                  {buildSupersetCards(name, ex, "__finisher__", null)}
+                </div>
               );
             })}
           </div>
@@ -1864,31 +1865,32 @@ export default function WorkoutView() {
             const selectedVariant =
               ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
             return (
-              <ExerciseRow
-                key={k}
-                name={k}
-                ex={ex}
-                phase={phase}
-                isExpanded={!!expandedEx[k]}
-                onToggle={() => toggleEx(k)}
-                onLongPress={() =>
-                  setEditSheetFor({
-                    workoutKey: "__cardio__",
-                    origName: k,
-                    exName: k,
-                  })
-                }
-                onStartTimer={(sec) => setTimer(sec)}
-                onDiagram={(d) => setDiagramOpen(d)}
-                onOpenDiagram={(id) => setDiagramOpen(id)}
-                unavailable={!isAvailable(k)}
-                equipment={equipment}
-                variantSetupCues={selectedVariant?.setupCues}
-                variantLabel={selectedVariant?.label}
-                variantRequires={selectedVariant?.requires}
-                supersetSlot={buildSupersetCards(k, ex, "__cardio__", null)}
-                addComplementSlot={buildAddComplementPill(k, ex)}
-              />
+              <div key={k}>
+                <ExerciseRow
+                  name={k}
+                  ex={ex}
+                  phase={phase}
+                  isExpanded={!!expandedEx[k]}
+                  onToggle={() => toggleEx(k)}
+                  onLongPress={() =>
+                    setEditSheetFor({
+                      workoutKey: "__cardio__",
+                      origName: k,
+                      exName: k,
+                    })
+                  }
+                  onStartTimer={(sec) => setTimer(sec)}
+                  onDiagram={(d) => setDiagramOpen(d)}
+                  onOpenDiagram={(id) => setDiagramOpen(id)}
+                  unavailable={!isAvailable(k)}
+                  equipment={equipment}
+                  variantSetupCues={selectedVariant?.setupCues}
+                  variantLabel={selectedVariant?.label}
+                  variantRequires={selectedVariant?.requires}
+                  addComplementSlot={buildAddComplementPill(k, ex)}
+                />
+                {buildSupersetCards(k, ex, "__cardio__", null)}
+              </div>
             );
           })}
         </Section>
