@@ -700,6 +700,111 @@ export function StabBallHamCurlRight({ t }: AnimProps) {
   );
 }
 
+// Prone hip extension (bent-knee, floor) — NWB bridge/thrust alternative.
+// Side view: head at left, hips mid. Right knee bent 90° (sole toward ceiling);
+// the hip extends to drive the right heel up. Left leg flat and passive.
+export function ProneHipExtensionRight({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const hold = phase > 0.4 && phase < 0.6 ? 1 : lift;
+
+  const floorY = 220;
+  const matY = floorY - 2;
+
+  // Prone torso on mat
+  const hdX = 95, hdY = floorY - 12;
+  const shX = 140, shY = floorY - 9;
+  const hipX = 215, hipY = floorY - 9;
+
+  // Left leg — extends to the right, flat on mat, passive red dashed
+  const lKneeX = hipX + 48, lKneeY = floorY - 6;
+  const lFootX = hipX + 95, lFootY = floorY - 4;
+
+  // Right leg — thigh lifts off mat via hip extension; shin stays at 90° knee bend
+  const thighLen = 46;
+  const shinLen = 40;
+  const maxTheta = 0.5; // ~28° at peak
+  const theta = hold * maxTheta;
+  const rKneeX = hipX + thighLen * Math.cos(theta);
+  const rKneeY = hipY - thighLen * Math.sin(theta);
+  // Shin is perpendicular to thigh, pointing toward ceiling at rest
+  const rFootX = rKneeX - shinLen * Math.sin(theta);
+  const rFootY = rKneeY - shinLen * Math.cos(theta);
+
+  // Ghost of resting position (thigh flat, shin vertical) for reference
+  const ghostKneeX = hipX + thighLen, ghostKneeY = hipY;
+  const ghostFootX = ghostKneeX, ghostFootY = ghostKneeY - shinLen;
+
+  return (
+    <g>
+      {/* Floor + mat */}
+      <Floor y={floorY} />
+      <rect x={60} y={matY - 2} width={300} height="5" rx="2" fill="#1a2636" opacity="0.7" />
+
+      {/* Head (side view, face turned down toward mat) */}
+      <circle cx={hdX} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="2.5" />
+      {/* Stacked-hand pad under forehead */}
+      <rect x={hdX - 16} y={hdY + 6} width="28" height="5" rx="2" fill={C.body} opacity="0.35" />
+
+      {/* Torso prone on mat */}
+      <line x1={hdX + 10} y1={hdY + 2} x2={shX} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      {/* Hip joint marker */}
+      <circle cx={hipX} cy={hipY} r="4" fill={C.body} />
+
+      {/* Left leg — passive, flat on mat, red dashed */}
+      <line x1={hipX - 3} y1={hipY + 2} x2={lKneeX} y2={lKneeY} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" strokeDasharray="6,3" opacity="0.6" />
+      <line x1={lKneeX} y1={lKneeY} x2={lFootX} y2={lFootY} stroke={C.leftLeg} strokeWidth="3.5" strokeLinecap="round" strokeDasharray="6,3" opacity="0.6" />
+      <ellipse cx={lFootX + 4} cy={lFootY + 1} rx="6" ry="3" fill="none" stroke={C.leftLeg} strokeWidth="1.5" strokeDasharray="3,2" opacity="0.5" />
+      <text x={lFootX + 14} y={lFootY + 4} fontSize="10" fill={C.leftLeg} fontFamily="monospace">L passive</text>
+
+      {/* Ghost of starting position — faint outline */}
+      <line x1={hipX} y1={hipY} x2={ghostKneeX} y2={ghostKneeY} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.12" />
+      <line x1={ghostKneeX} y1={ghostKneeY} x2={ghostFootX} y2={ghostFootY} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.12" />
+
+      {/* Right leg — thigh (active) */}
+      <line x1={hipX} y1={hipY} x2={rKneeX} y2={rKneeY} stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      {/* Right leg — shin staying perpendicular to thigh (90° knee bend) */}
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY} stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      {/* Heel — what lifts toward ceiling */}
+      <circle cx={rFootX} cy={rFootY} r="4.5" fill={C.active} />
+      {/* Sole plate (foot flat, sole pointing up) — short perpendicular segment at foot */}
+      <line
+        x1={rFootX - 7 * Math.cos(theta)}
+        y1={rFootY + 7 * Math.sin(theta)}
+        x2={rFootX + 7 * Math.cos(theta)}
+        y2={rFootY - 7 * Math.sin(theta)}
+        stroke={C.active}
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
+      {/* Glute activation glow at hip */}
+      <circle cx={hipX + 4} cy={hipY - 4} r="12" fill={C.active} opacity={hold * 0.35} />
+
+      {/* Heel-to-ceiling arrow + SQUEEZE cue at peak */}
+      {hold > 0.25 && (
+        <>
+          <line x1={rFootX + 14} y1={rFootY + 2} x2={rFootX + 14} y2={rFootY - 20} stroke={C.active} strokeWidth="1.5" strokeDasharray="3,2" />
+          <polygon
+            points={`${rFootX + 10},${rFootY - 16} ${rFootX + 14},${rFootY - 24} ${rFootX + 18},${rFootY - 16}`}
+            fill={C.active}
+          />
+          <text x={rFootX + 22} y={rFootY - 14} fontSize="9" fontWeight="bold" fill={C.active} fontFamily="monospace">heel ↑</text>
+        </>
+      )}
+      {hold > 0.5 && (
+        <text x={hipX - 30} y={hipY - 22} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">SQUEEZE</text>
+      )}
+
+      {/* Labels */}
+      <text x={rKneeX + 6} y={rKneeY + 2} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">R</text>
+      <text x={hipX - 40} y={hipY + 14} fontSize="8" fill={C.label} fontFamily="monospace">hip neutral</text>
+      <text x={hdX - 18} y={hdY - 16} fontSize="8" fill={C.label} fontFamily="monospace">prone</text>
+    </g>
+  );
+}
+
 export const GLUTE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   g1: GluteBridge,
   g2: BandedClamshell,
@@ -711,4 +816,5 @@ export const GLUTE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   g8: HackSquatRight,
   g9: LowBoxStepUpRight,
   g10: StabBallHamCurlRight,
+  g11: ProneHipExtensionRight,
 };

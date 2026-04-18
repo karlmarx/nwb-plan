@@ -423,6 +423,17 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Smoother contraction than heavy RDLs. Zero spinal load.",
     equipment: ["Stability Ball"],
   },
+  {
+    id: "g11", category: "legs", name: "Prone Hip Extension (R)",
+    target: "Glute Max / Hip Extension — NWB bridge-thrust alt",
+    cues: [
+      "Face down on mat. RIGHT knee bent 90° — sole toward ceiling.",
+      "Left leg flat on the floor, fully passive.",
+      "Squeeze RIGHT glute to lift heel straight toward ceiling. Pause 1s at top.",
+      "Lower with control. Keep the knee bent the whole time — only the hip moves.",
+    ],
+    safetyNote: "Feel it in the glute, not the low back. If the lumbar compensates, reduce ROM. Left hip stays in neutral extension — zero iliopsoas risk. NWB-safe substitute for SL Glute Bridge & SL Hip Thrust.",
+  },
 
   // ── TRX → split: pull (t3 row), core (others) ──
   {
