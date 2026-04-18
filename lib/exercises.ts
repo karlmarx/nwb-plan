@@ -1641,6 +1641,50 @@ export const EX: Record<string, Exercise> = {
     },
   },
 
+  "Side-Lying Hip Abduction (Left)": {
+    id: "side_lying_hip_abduction_left",
+    name: "Side-Lying Hip Abduction (Left)",
+    requires: ["mat"],
+    category: "legs",
+    sets: [["3", "12-15"], ["3", "12-15"], ["3", "15-20"]],
+    rest: 60,
+    setup: "Lie on the RIGHT (healthy) side on a mat. Head resting on a pillow or the bottom arm. Bottom (right) leg extended and relaxed on the floor. Top (left) leg stacked over it, toes pointing forward \u2014 NOT up at the ceiling. Top arm rests along the front of the torso for balance.",
+    execution: "Lift the LEFT leg up and slightly back, keeping it in line with (or just behind) the torso. Pause 1\u20132 seconds at the top \u2014 roughly 30\u201345\u00B0 of abduction. Lower slowly under control. 2 seconds up, 1s hold, 2s down.",
+    nwbCues: "Hips stacked vertically \u2014 do NOT let the top hip roll backward (TFL/hip flexors take over if you do). Toes pointing forward, not up; internal rotation shuts glute med off. Leg slightly BEHIND neutral is better than forward \u2014 keeps left iliopsoas silent. Zero weight bearing on the left leg; it moves freely in space. Stop at the first sign of groin or anterior hip sensation.",
+    why: "Direct left glute medius reconditioning in a fully NWB position. Complements Banded Clamshells (which hits glute med in flexion) by loading pure hip abduction without any weight-bearing or iliopsoas recruitment.",
+    safety: "safe",
+    swaps: ["Banded Clamshells"],
+    machineVariants: [
+      {
+        id: "bodyweight",
+        label: "Bodyweight",
+        icon: "\u{1F9D8}",
+        description: "Floor + pillow, no external load",
+        setupCues: [
+          "Lie on RIGHT side, legs stacked and straight",
+          "Pillow under head; bottom arm straight overhead or folded under head",
+          "Toes pointing forward throughout \u2014 no ceiling-pointing toes",
+        ],
+      },
+      {
+        id: "ankle_weight",
+        label: "Ankle Weight",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Progression: 2lb \u2192 3lb \u2192 5lb on the left ankle",
+        setupCues: [
+          "Strap ankle weight just above the left ankle",
+          "Start at 2lb; progress only when 3\u00D715 feels clean and pain-free",
+          "Reduce weight or range if the top hip rolls back or iliopsoas pipes up",
+        ],
+      },
+    ],
+    constraints: {
+      requiresIliopsoas: false,
+      maxHipFlexion: 0,
+      requiresWeightBearing: false,
+    },
+  },
+
   "Prone Ham Curl (Right)": {
     id: "prone_ham_curl_right",
     name: "Prone Ham Curl (Right)",
