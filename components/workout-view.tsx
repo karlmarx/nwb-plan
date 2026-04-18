@@ -67,6 +67,48 @@ const TAB_TIPS = [
   "NWB cardio options",
 ];
 
+// Lucide-style stroke icons for each main tab. Rendered as 16px SVGs so the
+// tab bar never overflows on narrow phones.
+const TAB_ICONS: Record<string, React.ReactNode> = {
+  Workout: (
+    // Calendar with checkmark — "today's workout"
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+      <path d="M9 16l2 2 4-4" />
+    </>
+  ),
+  Upper: (
+    // Dumbbell — push/pull library
+    <>
+      <path d="M6 6v12M18 6v12" />
+      <path d="M10 7v10M14 7v10" />
+      <path d="M10 12h4" />
+      <path d="M2 10v4M22 10v4" />
+    </>
+  ),
+  Lower: (
+    // Two diverging legs — lower body library
+    <>
+      <path d="M9 3v7l-3 11" />
+      <path d="M15 3v7l3 11" />
+      <path d="M9 10h6" />
+    </>
+  ),
+  Core: (
+    // Concentric target — core focus
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" />
+    </>
+  ),
+  Cardio: (
+    // Heart-rate pulse line
+    <polyline points="3 12 7 12 10 6 14 18 17 12 21 12" />
+  ),
+};
+
 // Safety + Gear/config live outside the label tab strip as icon buttons
 const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
@@ -2804,8 +2846,9 @@ export default function WorkoutView() {
               ref={(el) => { tabRefs.current[i] = el; }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
+              aria-label={t}
               onClick={() => setTab(i)}
-              className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] transition-all duration-150 ${isActive ? "tab-active" : ""}`}
+              className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
                 background: uiV2 ? "transparent" : (isActive ? activeColor + "15" : "none"),
@@ -2813,7 +2856,9 @@ export default function WorkoutView() {
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
-              {t}
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                {TAB_ICONS[t]}
+              </svg>
             </button>
           );
         })}
