@@ -27,9 +27,7 @@ interface ExerciseRowProps {
    * match what the selected variant actually needs.
    */
   variantRequires?: string[];
-  /** Superset / complement cards rendered immediately under the header */
-  supersetSlot?: React.ReactNode;
-  /** Add-complement pill rendered below supersets */
+  /** Add-complement pill rendered below the exercise's detail block */
   addComplementSlot?: React.ReactNode;
   /** Small top-right action button (opens edit sheet). Hidden if omitted. */
   showActionButton?: boolean;
@@ -50,7 +48,6 @@ export default function ExerciseRow({
   variantSetupCues,
   variantLabel,
   variantRequires,
-  supersetSlot,
   addComplementSlot,
   showActionButton = true,
 }: ExerciseRowProps) {
@@ -140,21 +137,23 @@ export default function ExerciseRow({
             {showActionButton && onLongPress && (
               <button
                 data-testid="exercise-row-action"
-                aria-label="Edit exercise"
+                aria-label="Equipment & edit"
                 onClick={(ev) => {
                   ev.stopPropagation();
                   onLongPress();
                 }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer font-bold"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted cursor-pointer"
                 style={{
                   background: "var(--color-card)",
                   border: "1px solid var(--color-border)",
-                  fontSize: 14,
                   lineHeight: 1,
                 }}
-                title="Swap, change machine, or reorder (long-press on mobile)"
+                title="Equipment swap, machine, reorder (long-press on mobile)"
               >
-                {"\u22EE"}
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
               </button>
             )}
           </div>
@@ -221,10 +220,7 @@ export default function ExerciseRow({
             </button>
           )}
 
-          {/* Superset / complement cards — right under the diagram button */}
-          {supersetSlot}
-
-          {/* Add-complement pill */}
+          {/* Add-complement pill — right under the diagram button */}
           {addComplementSlot}
 
           {/* Instructions */}

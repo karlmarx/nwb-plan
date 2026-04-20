@@ -32,6 +32,7 @@ import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
+import AddExercisePicker from "@/components/add-exercise-picker";
 import ComplementPicker, {
   decodeComplement,
   encodeNearbyId,
@@ -66,6 +67,44 @@ const TAB_TIPS = [
   "Core exercises by body part",
   "NWB cardio options",
 ];
+
+// Lucide-style stroke icons for each main tab. Rendered as 18px SVGs so the
+// tab bar never overflows on narrow phones.
+const TAB_ICONS: Record<string, React.ReactNode> = {
+  Workout: (
+    // Barbell — today's workout
+    <>
+      <rect x="2" y="9" width="3" height="6" rx="1" />
+      <rect x="19" y="9" width="3" height="6" rx="1" />
+      <rect x="5" y="11" width="14" height="2" rx="1" />
+    </>
+  ),
+  Upper: (
+    // Up arrow — upper body library
+    <>
+      <path d="M12 19V5" />
+      <path d="M5 12l7-7 7 7" />
+    </>
+  ),
+  Lower: (
+    // Down arrow — lower body library
+    <>
+      <path d="M12 5v14" />
+      <path d="M5 12l7 7 7-7" />
+    </>
+  ),
+  Core: (
+    // Abs outline — torso with 6-pack grid
+    <>
+      <rect x="7" y="4" width="10" height="16" rx="3" />
+      <path d="M7 9h10M7 14h10M12 4v16" />
+    </>
+  ),
+  Cardio: (
+    // Heart-rate pulse line
+    <polyline points="3 12 7 12 10 6 14 18 17 12 21 12" />
+  ),
+};
 
 // Safety + Gear/config live outside the label tab strip as icon buttons
 const SAFETY_TAB_INDEX = 5;
@@ -616,6 +655,14 @@ export default function WorkoutView() {
     () => loadState<Record<string, string[]>>("nwb_order", {}),
   );
 
+  // Per-workout extra exercises added from the catalog (persistent)
+  const [addedExercises, setAddedExercises] = useState<Record<string, string[]>>(
+    () => loadState<Record<string, string[]>>("nwb_added", {}),
+  );
+
+  // Add-exercise picker — workoutKey the user is adding into
+  const [addPickerFor, setAddPickerFor] = useState<string | null>(null);
+
   // Focus mode: fullscreen exercise walkthrough
   type FocusSupplement = {
     type: "leftleg" | "core" | "cable" | "variant" | "nearby";
@@ -718,6 +765,9 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
+  useEffect(() => {
+    saveState("nwb_added", addedExercises);
+  }, [addedExercises]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -806,7 +856,9 @@ export default function WorkoutView() {
     (workoutKey: string): string[] => {
       const w = WORKOUTS[workoutKey];
       if (!w) return [];
-      const base = w.exercises;
+      // Base list = shipped defaults + user-added extras (in the order they were added)
+      const added = addedExercises[workoutKey] ?? [];
+      const base = [...w.exercises, ...added];
       const saved = exerciseOrder[workoutKey];
       if (!saved) return base;
       // Merge saved order with base: saved first (if still in base), then any new exercises
@@ -816,7 +868,30 @@ export default function WorkoutView() {
       for (const n of base) if (!savedSet.has(n)) merged.push(n);
       return merged;
     },
-    [exerciseOrder],
+    [exerciseOrder, addedExercises],
+  );
+
+  /**
+   * Add an arbitrary exercise (by name in the EX catalog) to a workout. Persists
+   * in nwb_added so it survives across sessions. No-op if it's already in the
+   * workout (default or previously added).
+   */
+  const addExerciseToWorkout = useCallback(
+    (workoutKey: string, name: string) => {
+      if (!EX[name]) return;
+      const w = WORKOUTS[workoutKey];
+      if (!w) return;
+      const currentBase = [
+        ...w.exercises,
+        ...(addedExercises[workoutKey] ?? []),
+      ];
+      if (currentBase.includes(name)) return;
+      setAddedExercises((prev) => ({
+        ...prev,
+        [workoutKey]: [...(prev[workoutKey] ?? []), name],
+      }));
+    },
+    [addedExercises],
   );
 
   const moveExercise = useCallback(
@@ -867,7 +942,7 @@ export default function WorkoutView() {
       ex: Exercise,
       workoutKey: string,
       firstCableName: string | null,
-    ): React.ReactNode => {
+    ): React.ReactElement[] => {
       type Card = {
         key: string;
         kind: "cable" | "variant" | "nearby" | "leftleg" | "core" | "mobility";
@@ -1008,79 +1083,84 @@ export default function WorkoutView() {
         }
       }
 
-      if (cards.length === 0) return null;
+      if (cards.length === 0) return [];
 
-      return (
-        <div className="mb-3 space-y-1.5">
-          {cards.map((c) => (
-            <div
-              key={c.key}
-              className="rounded-lg"
-              style={{
-                padding: "8px 10px",
-                background: c.color + "0d",
-                border: `1px solid ${c.color}33`,
-                borderLeft: `3px solid ${c.color}`,
-              }}
-            >
-              <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                <span
-                  className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+      return cards.map((c) => (
+        <div
+          key={`${exName}-${c.key}`}
+          data-testid="superset-card"
+          className="mb-2 ml-3 rounded-xl overflow-hidden"
+          style={{
+            background: c.color + "10",
+            borderLeft: `3px solid ${c.color}`,
+            border: `1px solid ${c.color}33`,
+            borderLeftWidth: 3,
+          }}
+        >
+          <div className="px-3.5 py-2.5">
+            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+              <span
+                className="text-[10px] text-text-muted"
+                title={`Paired with ${exName}`}
+              >
+                {"\u21B3"}
+              </span>
+              <span
+                className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                style={{
+                  background: c.color + "22",
+                  border: `1px solid ${c.color}44`,
+                  color: c.color,
+                }}
+              >
+                {c.label}
+              </span>
+              <span
+                className="text-[12px] font-semibold flex-1 min-w-0"
+                style={{ color: c.color }}
+              >
+                {c.title}
+              </span>
+              <span className="text-[10px] text-text-dim tabular-nums flex-shrink-0">
+                {c.sets}
+              </span>
+              {c.removable && c.complementId && (
+                <button
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    toggleComplement(exName, c.complementId!);
+                  }}
+                  aria-label="Remove complement"
+                  className="text-[11px] rounded-md cursor-pointer font-[inherit] w-6 h-6 flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: c.color + "22",
-                    border: `1px solid ${c.color}44`,
-                    color: c.color,
+                    background: "var(--color-bg)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text-muted)",
                   }}
                 >
-                  {c.label}
-                </span>
-                <span
-                  className="text-[12px] font-semibold"
-                  style={{ color: c.color }}
-                >
-                  {c.title}
-                </span>
-                <span className="ml-auto text-[10px] text-text-dim">
-                  {c.sets}
-                </span>
-                {c.removable && c.complementId && (
-                  <button
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      toggleComplement(exName, c.complementId!);
-                    }}
-                    aria-label="Remove complement"
-                    className="text-[11px] rounded-md cursor-pointer font-[inherit] w-6 h-6 flex items-center justify-center"
-                    style={{
-                      background: "var(--color-bg)",
-                      border: "1px solid var(--color-border)",
-                      color: "var(--color-text-muted)",
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-              <div className="text-[11px] text-text-dim leading-snug">
-                {c.instruction}
-              </div>
-              {c.safety && (
-                <div
-                  className="text-[10px] mt-1"
-                  style={{ color: c.color }}
-                >
-                  {"\u{1F6E1}\uFE0F"} {c.safety}
-                </div>
-              )}
-              {c.note && (
-                <div className="text-[10px] mt-1 text-warning">
-                  {"\u26A0\uFE0F"} {c.note}
-                </div>
+                  ×
+                </button>
               )}
             </div>
-          ))}
+            <div className="text-[11px] text-text-dim leading-snug pl-4">
+              {c.instruction}
+            </div>
+            {c.safety && (
+              <div
+                className="text-[10px] mt-1 pl-4"
+                style={{ color: c.color }}
+              >
+                {"\u{1F6E1}\uFE0F"} {c.safety}
+              </div>
+            )}
+            {c.note && (
+              <div className="text-[10px] mt-1 pl-4 text-warning">
+                {"\u26A0\uFE0F"} {c.note}
+              </div>
+            )}
+          </div>
         </div>
-      );
+      ));
     },
     [
       dayState.complements,
@@ -1151,9 +1231,9 @@ export default function WorkoutView() {
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
           variantRequires={selectedVariant?.requires}
-          supersetSlot={buildSupersetCards(name, ex, "__core__", null)}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
+        {buildSupersetCards(name, ex, "__core__", null)}
       </div>
     );
   }
@@ -1435,17 +1515,28 @@ export default function WorkoutView() {
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
                 variantRequires={selectedVariant?.requires}
-                supersetSlot={buildSupersetCards(
-                  exName,
-                  ex,
-                  workoutKey,
-                  firstCableName,
-                )}
                 addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
+              {buildSupersetCards(exName, ex, workoutKey, firstCableName)}
             </div>
           );
         })}
+
+        {/* Add exercise */}
+        <button
+          data-testid="add-exercise"
+          onClick={() => setAddPickerFor(workoutKey)}
+          className="mt-2 w-full rounded-xl cursor-pointer font-[inherit] flex items-center justify-center gap-2 text-[13px] font-semibold min-h-[44px] transition-colors duration-150"
+          style={{
+            background: "var(--color-bg)",
+            border: `1px dashed ${cssAlpha("var(--color-accent)", 40)}`,
+            color: "var(--color-accent)",
+          }}
+          title="Pick any exercise from the catalog to add to this workout"
+        >
+          <span className="text-base leading-none">＋</span>
+          Add exercise
+        </button>
 
         {/* Removed exercises */}
         {w.removed.length > 0 && (
@@ -1476,31 +1567,32 @@ export default function WorkoutView() {
               const selectedVariant =
                 ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
               return (
-                <ExerciseRow
-                  key={`cf-${name}`}
-                  name={name}
-                  ex={ex}
-                  phase={phase}
-                  isExpanded={!!expandedEx[name]}
-                  onToggle={() => toggleEx(name)}
-                  onLongPress={() =>
-                    setEditSheetFor({
-                      workoutKey: "__finisher__",
-                      origName: name,
-                      exName: name,
-                    })
-                  }
-                  onStartTimer={(sec) => setTimer(sec)}
-                  onDiagram={(d) => setDiagramOpen(d)}
-                  onOpenDiagram={(id) => setDiagramOpen(id)}
-                  unavailable={!isAvailable(name)}
-                  equipment={equipment}
-                  variantSetupCues={selectedVariant?.setupCues}
-                  variantLabel={selectedVariant?.label}
-                  variantRequires={selectedVariant?.requires}
-                  supersetSlot={buildSupersetCards(name, ex, "__finisher__", null)}
-                  addComplementSlot={buildAddComplementPill(name, ex)}
-                />
+                <div key={`cf-${name}`}>
+                  <ExerciseRow
+                    name={name}
+                    ex={ex}
+                    phase={phase}
+                    isExpanded={!!expandedEx[name]}
+                    onToggle={() => toggleEx(name)}
+                    onLongPress={() =>
+                      setEditSheetFor({
+                        workoutKey: "__finisher__",
+                        origName: name,
+                        exName: name,
+                      })
+                    }
+                    onStartTimer={(sec) => setTimer(sec)}
+                    onDiagram={(d) => setDiagramOpen(d)}
+                    onOpenDiagram={(id) => setDiagramOpen(id)}
+                    unavailable={!isAvailable(name)}
+                    equipment={equipment}
+                    variantSetupCues={selectedVariant?.setupCues}
+                    variantLabel={selectedVariant?.label}
+                    variantRequires={selectedVariant?.requires}
+                    addComplementSlot={buildAddComplementPill(name, ex)}
+                  />
+                  {buildSupersetCards(name, ex, "__finisher__", null)}
+                </div>
               );
             })}
           </div>
@@ -1826,31 +1918,32 @@ export default function WorkoutView() {
             const selectedVariant =
               ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
             return (
-              <ExerciseRow
-                key={k}
-                name={k}
-                ex={ex}
-                phase={phase}
-                isExpanded={!!expandedEx[k]}
-                onToggle={() => toggleEx(k)}
-                onLongPress={() =>
-                  setEditSheetFor({
-                    workoutKey: "__cardio__",
-                    origName: k,
-                    exName: k,
-                  })
-                }
-                onStartTimer={(sec) => setTimer(sec)}
-                onDiagram={(d) => setDiagramOpen(d)}
-                onOpenDiagram={(id) => setDiagramOpen(id)}
-                unavailable={!isAvailable(k)}
-                equipment={equipment}
-                variantSetupCues={selectedVariant?.setupCues}
-                variantLabel={selectedVariant?.label}
-                variantRequires={selectedVariant?.requires}
-                supersetSlot={buildSupersetCards(k, ex, "__cardio__", null)}
-                addComplementSlot={buildAddComplementPill(k, ex)}
-              />
+              <div key={k}>
+                <ExerciseRow
+                  name={k}
+                  ex={ex}
+                  phase={phase}
+                  isExpanded={!!expandedEx[k]}
+                  onToggle={() => toggleEx(k)}
+                  onLongPress={() =>
+                    setEditSheetFor({
+                      workoutKey: "__cardio__",
+                      origName: k,
+                      exName: k,
+                    })
+                  }
+                  onStartTimer={(sec) => setTimer(sec)}
+                  onDiagram={(d) => setDiagramOpen(d)}
+                  onOpenDiagram={(id) => setDiagramOpen(id)}
+                  unavailable={!isAvailable(k)}
+                  equipment={equipment}
+                  variantSetupCues={selectedVariant?.setupCues}
+                  variantLabel={selectedVariant?.label}
+                  variantRequires={selectedVariant?.requires}
+                  addComplementSlot={buildAddComplementPill(k, ex)}
+                />
+                {buildSupersetCards(k, ex, "__cardio__", null)}
+              </div>
             );
           })}
         </Section>
@@ -2804,8 +2897,9 @@ export default function WorkoutView() {
               ref={(el) => { tabRefs.current[i] = el; }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
+              aria-label={t}
               onClick={() => setTab(i)}
-              className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] transition-all duration-150 ${isActive ? "tab-active" : ""}`}
+              className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
                 background: uiV2 ? "transparent" : (isActive ? activeColor + "15" : "none"),
@@ -2813,7 +2907,9 @@ export default function WorkoutView() {
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
-              {t}
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                {TAB_ICONS[t]}
+              </svg>
             </button>
           );
         })}
@@ -3270,6 +3366,28 @@ export default function WorkoutView() {
           onClose={() => setComplementPickerFor(null)}
         />
       )}
+
+      {/* Add-exercise picker — "＋ Add exercise" button opens this */}
+      {addPickerFor && (() => {
+        const wk = addPickerFor;
+        const w = WORKOUTS[wk];
+        const current = w
+          ? [...w.exercises, ...(addedExercises[wk] ?? [])]
+          : [];
+        const preferred =
+          wk.startsWith("Push") ? "push"
+            : wk.startsWith("Pull") ? "pull"
+              : wk.startsWith("Legs") ? "legs"
+                : undefined;
+        return (
+          <AddExercisePicker
+            currentExercises={current}
+            preferredCategory={preferred}
+            onAdd={(name) => addExerciseToWorkout(wk, name)}
+            onClose={() => setAddPickerFor(null)}
+          />
+        );
+      })()}
     </div>
   );
 }
