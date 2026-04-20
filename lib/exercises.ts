@@ -171,10 +171,32 @@ export const EX: Record<string, Exercise> = {
     setup: "Lie flat on the floor with a barbell racked above you (use a squat rack or have a partner hand it off). Right leg bent with foot flat, left leg straight and relaxed.",
     execution: "Lower the bar until your triceps touch the floor. Full dead-stop for 1 second \u2014 no bouncing. Press explosively back up. The floor limits ROM, eliminating the stretch reflex.",
     nwbCues: "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive \u2014 like a log on the floor. If you need leg drive, the weight is too heavy.",
-    why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
+    why: "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise. Using the rack for the handoff avoids the risky DB-to-floor lowering that has caused near-misses.",
     safety: "safe",
     swaps: ["DB Floor Press", "Incline DB Bench Press", "Machine Chest Press", "TRX Chest Press", "Band Chest Press (Seated)"],
     visual: "      O===+===O      (Barbell)\n      |       |\n  o__/|\\_    _|__   (Torso on floor)\n     / \\\n    L   R            (L straight, R bent)",
+    machineVariants: [
+      {
+        id: "rogue_rack",
+        label: "Rogue Rack + Barbell",
+        icon: "\u{1F3CB}\uFE0F",
+        description: "Rogue power rack with J-cups set low so the bar is handed off directly into the pressing position on the floor \u2014 no DB wrestle, no partner needed.",
+        requires: ["barbell", "rack", "mat"],
+        setupCues: [
+          "Set J-cups at the LOWEST pin position so the bar sits just above your chest when lying on the floor",
+          "Safety pins / spotter arms set at floor-press bottom height so you can bail into the pins without trapping yourself",
+          "Lie on the mat directly under the bar, shoulder blades packed, right foot flat, left leg straight and heavy",
+          "Unrack by pressing straight up off the J-cups \u2014 never roll the bar over your face",
+        ],
+        superset: {
+          title: "Dead Bug (R Leg Only)",
+          sets: "2\u00D745s",
+          instruction: "Between press sets: stay on your back on the mat under the rack. Right leg up at 90\u00B0, LEFT FOOT PLANTED and motionless. Slowly lower right leg + left arm \u2014 4s down, 3s hover 1 inch off the floor, 4s back. Press lower back INTO the mat the entire time.",
+          safety: "Left foot stays planted the whole set \u2014 zero left iliopsoas load. Do not let the lumbar spine arch off the mat; if it does, shorten the lever (bend the knee a bit). Stay out from under the loaded bar \u2014 scoot down or to the side if needed before starting the dead bug.",
+          note: "Zero transition cost \u2014 you're already lying on the mat. Keeps the floor-based flow that makes this exercise safe.",
+        },
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
@@ -3053,7 +3075,7 @@ export const WORKOUTS: Record<string, Workout> = {
     color: "#38bdf8",
     hevy: "https://hevy.com/routine/j0XrGQzMyF1",
     exercises: [
-      "DB Floor Press",
+      "Barbell Floor Press",
       "Mechanical Drop Set (Press)",
       "Landmine Press (seated)",
       "Cable Chest Fly",

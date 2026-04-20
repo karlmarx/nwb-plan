@@ -25,7 +25,7 @@
     "setup": "Lie flat on the floor with a barbell racked above you (use a squat rack or have a partner hand it off). Right leg bent with foot flat, left leg straight and relaxed.",
     "execution": "Lower the bar until your triceps touch the floor. Full dead-stop for 1 second — no bouncing. Press explosively back up. The floor limits ROM, eliminating the stretch reflex.",
     "nwbCues": "Do NOT arch your back or bridge your hips to complete reps. Your left leg stays passive — like a log on the floor. If you need leg drive, the weight is too heavy.",
-    "why": "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise.",
+    "why": "Dead-stop builds pure concentric power. Floor limits ROM to protect shoulders. No leg drive needed = perfect NWB exercise. Using the rack for the handoff avoids the risky DB-to-floor lowering that has caused near-misses.",
     "safety": "safe",
     "swaps": [
       "DB Floor Press",
@@ -38,7 +38,27 @@
       "requiresIliopsoas": false,
       "maxHipFlexion": 0,
       "requiresWeightBearing": false
-    }
+    },
+    "machineVariants": [
+      {
+        "id": "rogue_rack",
+        "label": "Rogue Rack + Barbell",
+        "description": "Rogue power rack with J-cups set low so the bar is handed off directly into the pressing position on the floor — no DB wrestle, no partner needed.",
+        "setupCues": [
+          "Set J-cups at the LOWEST pin position so the bar sits just above your chest when lying on the floor",
+          "Safety pins / spotter arms set at floor-press bottom height so you can bail into the pins without trapping yourself",
+          "Lie on the mat directly under the bar, shoulder blades packed, right foot flat, left leg straight and heavy",
+          "Unrack by pressing straight up off the J-cups — never roll the bar over your face"
+        ],
+        "superset": {
+          "title": "Dead Bug (R Leg Only)",
+          "sets": "2×45s",
+          "instruction": "Between press sets: stay on your back on the mat under the rack. Right leg up at 90°, LEFT FOOT PLANTED and motionless. Slowly lower right leg + left arm — 4s down, 3s hover 1 inch off the floor, 4s back. Press lower back INTO the mat the entire time.",
+          "safety": "Left foot stays planted the whole set — zero left iliopsoas load. Do not let the lumbar spine arch off the mat; if it does, shorten the lever (bend the knee a bit). Stay out from under the loaded bar — scoot down or to the side if needed before starting the dead bug.",
+          "note": "Zero transition cost — you're already lying on the mat. Keeps the floor-based flow that makes this exercise safe."
+        }
+      }
+    ]
   },
   "Incline DB Bench Press": {
     "id": "incline_db_bench_press",
@@ -304,7 +324,8 @@
         "setupCues": [
           "Set bench to 30-45° incline",
           "Have two pairs of dumbbells ready (heavier for press, lighter for raises)",
-          "Keep lighter pair within reach to minimize transition time"
+          "Keep lighter pair within reach to minimize transition time",
+          "No light DBs? Plates (10-25lb) held by the flat side work fine for the lat raise portion"
         ]
       },
       {
@@ -314,8 +335,27 @@
         "setupCues": [
           "Position bench inside the Smith machine at 30-45°",
           "Set safety catches at chest level",
-          "Unrack bar with rotation, press, then re-rack for lat raises with DBs"
+          "Unrack bar with rotation, press, then re-rack for lat raises with DBs",
+          "Plates held by the flat side also work for the lat raise portion"
         ]
+      },
+      {
+        "id": "rogue_rack_barbell",
+        "label": "Rogue Rack + Barbell",
+        "description": "Rogue power rack with adjustable bench at 30-45°. Barbell for the press; plates (or lighter DBs) for the lat raise portion.",
+        "setupCues": [
+          "Set the Rogue adjustable bench to 30-45° inside the rack",
+          "Load barbell in the J-cups — unrack directly to the starting position over the upper chest",
+          "Safety pins set at chest level so you can bail without a spotter",
+          "For the lat raise portion: two plates (10–25 lb) held by the flat side work great — no DBs required"
+        ],
+        "superset": {
+          "title": "Banded Pallof / Woodchoppers (Seated)",
+          "sets": "2×8/side",
+          "instruction": "Between press sets: stay seated on the bench with a band anchored to the rack upright at chest height. Alternate Pallof press/hold (8 presses or 10s holds per side) or high-to-low woodchoppers (8 reps/side). Resist rotation — drive from the thoracic spine, hips stay square.",
+          "safety": "Seated throughout — zero left iliopsoas demand. Band only, no plate load. Keep hip flexion well under 90°. Anchor the band low enough that the pull never tips you backward.",
+          "note": "Zero walking during the superset — band is anchored on the rack you're already sitting in."
+        }
       }
     ]
   },
@@ -1272,7 +1312,37 @@
       "requiresIliopsoas": false,
       "maxHipFlexion": 90,
       "requiresWeightBearing": false
-    }
+    },
+    "machineVariants": [
+      {
+        "id": "cable_column",
+        "label": "Cable Column",
+        "description": "Standard cable column with D-handle, bench or standing",
+        "setupCues": [
+          "Set pulley to chest height on a cable column",
+          "Sit on a bench or seat facing the column",
+          "Grab D-handle with one hand, keep other hand on thigh for stability"
+        ]
+      },
+      {
+        "id": "nautilus_low_row",
+        "label": "Nautilus Multi Station Low Row",
+        "description": "Nautilus Multi Station low row — pin-loaded, foot plates, no chest pad. Sit on the platform and row from below.",
+        "setupCues": [
+          "Sit on the platform facing the cable attachment — NOT standing as the machine label shows",
+          "Right foot braced flat against the foot plate for stability",
+          "Left foot resting passively on the plate — zero push",
+          "Grab the handle with one hand, slight forward lean from the hips (stay under 90°)",
+          "Pin-loaded stack: easy to adjust weight between arms"
+        ],
+        "superset": {
+          "title": "R-Leg Calf Raise on Foot Plate",
+          "sets": "2×12",
+          "instruction": "Between row sets: RIGHT foot only — press through the ball of the foot against the foot plate for 12 calf raises, slow 2s up / 2s down. Keep left foot completely passive.",
+          "safety": "LEFT foot stays passive on the plate — zero push. No Pallof holds on this station — without a chest pad the anti-rotation force goes through your hips, risking left iliopsoas engagement."
+        }
+      }
+    ]
   },
   "Seated Face Pulls": {
     "id": "seated_face_pulls",
@@ -2148,7 +2218,8 @@
     "safety": "safe",
     "swaps": [
       "SL Hip Thrust (Right)",
-      "TRX SL Glute Bridge (Right)"
+      "TRX SL Glute Bridge (Right)",
+      "Prone Hip Extension (Right)"
     ],
     "constraints": {
       "requiresIliopsoas": false,
@@ -2185,13 +2256,133 @@
     "safety": "safe",
     "swaps": [
       "SL Glute Bridge (Right)",
-      "TRX SL Glute Bridge (Right)"
+      "TRX SL Glute Bridge (Right)",
+      "Prone Hip Extension (Right)"
     ],
     "constraints": {
       "requiresIliopsoas": false,
       "maxHipFlexion": 90,
       "requiresWeightBearing": false
     }
+  },
+  "Prone Hip Extension (Right)": {
+    "id": "prone_hip_extension_right",
+    "name": "Prone Hip Extension (Right)",
+    "requires": [
+      "mat"
+    ],
+    "category": "legs",
+    "sets": [
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Face down on the mat. RIGHT knee bent 90° so the sole points toward the ceiling. Left leg flat on the floor, fully passive. Forehead resting on stacked hands or a folded towel.",
+    "execution": "Squeeze the right glute to lift the right heel straight up toward the ceiling. Pause 1 second at the top, then lower with control. Keep the knee bent 90° the entire time — only the hip extends.",
+    "nwbCues": "Feel it in the glute, not the low back. If the lumbar compensates (arching, pinching), reduce range of motion — a small, clean lift beats a high, sloppy one. Left leg stays totally passive on the mat.",
+    "why": "NWB-safe substitute for SL Glute Bridge / SL Hip Thrust. Same joint action (hip extension) and same prime mover (glute max), with zero setup overhead and zero risk of accidental left iliopsoas activation — the left hip is in neutral extension throughout.",
+    "safety": "safe",
+    "swaps": [
+      "SL Glute Bridge (Right)",
+      "SL Hip Thrust (Right)",
+      "TRX SL Glute Bridge (Right)"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    },
+    "machineVariants": [
+      {
+        "id": "bodyweight",
+        "label": "Bodyweight",
+        "description": "Floor-only version — zero equipment beyond a mat",
+        "setupCues": [
+          "Face down on the mat, forehead on stacked hands",
+          "RIGHT knee bent 90°, sole toward ceiling",
+          "Left leg flat on the floor, passive"
+        ]
+      },
+      {
+        "id": "ankle_weight",
+        "label": "Ankle Weight",
+        "description": "Progression: 2lb → 5lb → 10lb ankle weight on the right ankle",
+        "setupCues": [
+          "Strap ankle weight just above the right ankle — snug, not tight",
+          "Keep the knee bent 90°; the weight rides on the shin",
+          "Start at 2lb and only progress when you can clear 3×15 clean reps",
+          "Drop weight or range the moment the low back starts to drive the rep"
+        ]
+      }
+    ]
+  },
+  "Side-Lying Hip Abduction (Left)": {
+    "id": "side_lying_hip_abduction_left",
+    "name": "Side-Lying Hip Abduction (Left)",
+    "requires": [
+      "mat"
+    ],
+    "category": "legs",
+    "sets": [
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "15-20"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie on the RIGHT (healthy) side on a mat. Head resting on a pillow or the bottom arm. Bottom (right) leg extended and relaxed on the floor. Top (left) leg stacked over it, toes pointing forward — NOT up at the ceiling. Top arm rests along the front of the torso for balance.",
+    "execution": "Lift the LEFT leg up and slightly back, keeping it in line with (or just behind) the torso. Pause 1–2 seconds at the top — roughly 30–45° of abduction. Lower slowly under control. 2 seconds up, 1s hold, 2s down.",
+    "nwbCues": "Hips stacked vertically — do NOT let the top hip roll backward (TFL/hip flexors take over if you do). Toes pointing forward, not up; internal rotation shuts glute med off. Leg slightly BEHIND neutral is better than forward — keeps left iliopsoas silent. Zero weight bearing on the left leg; it moves freely in space. Stop at the first sign of groin or anterior hip sensation.",
+    "why": "Direct left glute medius reconditioning in a fully NWB position. Complements Banded Clamshells (which hits glute med in flexion) by loading pure hip abduction without any weight-bearing or iliopsoas recruitment.",
+    "safety": "safe",
+    "swaps": [
+      "Banded Clamshells"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    },
+    "machineVariants": [
+      {
+        "id": "bodyweight",
+        "label": "Bodyweight",
+        "description": "Floor + pillow, no external load",
+        "setupCues": [
+          "Lie on RIGHT side, legs stacked and straight",
+          "Pillow under head; bottom arm straight overhead or folded under head",
+          "Toes pointing forward throughout — no ceiling-pointing toes"
+        ]
+      },
+      {
+        "id": "ankle_weight",
+        "label": "Ankle Weight",
+        "description": "Progression: 2lb → 3lb → 5lb on the left ankle",
+        "setupCues": [
+          "Strap ankle weight just above the left ankle",
+          "Start at 2lb; progress only when 3×15 feels clean and pain-free",
+          "Reduce weight or range if the top hip rolls back or iliopsoas pipes up"
+        ]
+      }
+    ]
   },
   "Prone Ham Curl (Right)": {
     "id": "prone_ham_curl_right",
@@ -2672,7 +2863,8 @@
     "safety": "safe",
     "swaps": [
       "SL Glute Bridge (Right)",
-      "SL Hip Thrust (Right)"
+      "SL Hip Thrust (Right)",
+      "Prone Hip Extension (Right)"
     ],
     "constraints": {
       "requiresIliopsoas": false,
@@ -4349,6 +4541,228 @@
     "constraints": {
       "requiresIliopsoas": false,
       "maxHipFlexion": 80,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone Y-Raise": {
+    "id": "prone_y_raise",
+    "name": "Prone Y-Raise",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "10-12"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Arms hang toward floor. Thumbs up.",
+    "execution": "Lift arms into Y overhead at ~45° angle. Squeeze lower traps hard at top for 2 seconds. Lower with control.",
+    "nwbCues": "Ankles locked under pad = zero lower-body demand. Prone position means zero hip flexion. Pure scapular work.",
+    "why": "Lower trap and serratus activation in a fully supported, NWB-safe prone position. Excellent shoulder health superset between ham curl sets.",
+    "safety": "safe",
+    "swaps": [
+      "Prone T-Raise",
+      "Prone W-Raise"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone T-Raise": {
+    "id": "prone_t_raise",
+    "name": "Prone T-Raise",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "10-12"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Arms hang toward floor. Palms down.",
+    "execution": "Raise arms straight out to sides (perpendicular to body). Pinch shoulder blades together at top. Hold 1-2 seconds.",
+    "nwbCues": "Ankles locked under pad = zero lower-body demand. Mid-trap and rhomboid focus.",
+    "why": "Mid-trap retraction in a fully supported prone position. Counterbalances all the pressing volume in push workouts.",
+    "safety": "safe",
+    "swaps": [
+      "Prone Y-Raise",
+      "Prone W-Raise"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone W-Raise": {
+    "id": "prone_w_raise",
+    "name": "Prone W-Raise",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "12-15"
+      ],
+      [
+        "3",
+        "10-12"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Elbows bent 90°.",
+    "execution": "Externally rotate shoulders, squeezing shoulder blades down and back into W shape. Hold 2 seconds at peak. Lower with control.",
+    "nwbCues": "Ankles locked under pad = zero lower-body demand. Rotator cuff prehab in a completely NWB position.",
+    "why": "Rotator cuff and lower trap activation. Critical for shoulder health with heavy pressing/pulling volume.",
+    "safety": "safe",
+    "swaps": [
+      "Prone Y-Raise",
+      "Prone T-Raise"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone Trunk Extension": {
+    "id": "prone_trunk_extension",
+    "name": "Prone Trunk Extension",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "10-12"
+      ],
+      [
+        "3",
+        "10-12"
+      ],
+      [
+        "4",
+        "8-10"
+      ]
+    ],
+    "rest": 90,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Hands behind head (add plate to progress).",
+    "execution": "Lift chest 1-2 inches off the pad. Hold 1 second at top. Lower with control. Keep chin tucked — neck neutral.",
+    "nwbCues": "Ankles locked = zero lower-body demand. Anti-flexion core in a completely NWB position. The ham curl pad anchors your lower body.",
+    "why": "Erector spinae and posterior chain strengthening. Same position as ham curls — perfect superset for full posterior chain.",
+    "safety": "safe",
+    "swaps": [
+      "Prone Iso Hold",
+      "Prone Lateral Trunk Raise"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone Iso Hold": {
+    "id": "prone_iso_hold",
+    "name": "Prone Iso Hold",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "20-45s"
+      ],
+      [
+        "3",
+        "30-45s"
+      ],
+      [
+        "3",
+        "30-60s"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Arms at sides or hands behind head.",
+    "execution": "Lift chest slightly off the pad. Hold 20-45 seconds. Breathe into brace — don't hold breath. Progress by adding time or holding a plate.",
+    "nwbCues": "Isometric erector hold. Ankles locked = zero lower-body demand. Respiratory demand is the real progression.",
+    "why": "Isometric endurance for erectors and deep core stabilizers. Perfect between ham curl sets — same machine, no transitions.",
+    "safety": "safe",
+    "swaps": [
+      "Prone Trunk Extension",
+      "Prone Lateral Trunk Raise"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
+      "requiresWeightBearing": false
+    }
+  },
+  "Prone Lateral Trunk Raise": {
+    "id": "prone_lateral_trunk_raise",
+    "name": "Prone Lateral Trunk Raise",
+    "requires": [
+      "hamcurl"
+    ],
+    "category": "core",
+    "sets": [
+      [
+        "3",
+        "10/side"
+      ],
+      [
+        "3",
+        "10-12/side"
+      ],
+      [
+        "3",
+        "12/side"
+      ]
+    ],
+    "rest": 60,
+    "setup": "Lie face-down on prone ham curl machine with ankles locked under the pad. Arms at sides.",
+    "execution": "Small side bend — lift and rotate torso slightly left, then right. Alternate sides each rep. Keep range small and controlled.",
+    "nwbCues": "Ankles locked = zero lower-body demand. Controlled lateral flexion through the thoracic spine only.",
+    "why": "Oblique and QL activation in a NWB-safe prone position. Addresses lateral core that most supine exercises miss.",
+    "safety": "safe",
+    "swaps": [
+      "Prone Trunk Extension",
+      "Prone Iso Hold"
+    ],
+    "constraints": {
+      "requiresIliopsoas": false,
+      "maxHipFlexion": 0,
       "requiresWeightBearing": false
     }
   }

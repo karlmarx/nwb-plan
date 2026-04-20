@@ -450,6 +450,78 @@
       "execution": "Resist lateral lean — keep spine perfectly vertical while holding the weight. Switch sides.",
       "nwbCues": "Seated. Core keeps you upright. No lateral hip shift.",
       "rest": 45
+    },
+    "Prone Y-Raise": {
+      "sets": [
+        [
+          "3",
+          "12-15"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms hang down, thumbs up.",
+      "execution": "Lift arms into Y overhead at ~45°. Squeeze lower traps hard at top for 2 seconds. Lower with control.",
+      "nwbCues": "Ankles locked = zero lower-body demand. Pure scapular depression + retraction.",
+      "rest": 60
+    },
+    "Prone T-Raise": {
+      "sets": [
+        [
+          "3",
+          "12-15"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms hang down, palms down.",
+      "execution": "Raise arms straight out to sides. Pinch shoulder blades together at top. Hold 1-2 seconds.",
+      "nwbCues": "Ankles locked = zero lower-body demand. Mid-trap and rhomboid focus.",
+      "rest": 60
+    },
+    "Prone W-Raise": {
+      "sets": [
+        [
+          "3",
+          "12-15"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Elbows bent 90°.",
+      "execution": "Externally rotate shoulders, squeezing shoulder blades down and back into W shape. Hold 2 seconds.",
+      "nwbCues": "Ankles locked = zero lower-body demand. Rotator cuff prehab.",
+      "rest": 60
+    },
+    "Prone Trunk Extension": {
+      "sets": [
+        [
+          "3",
+          "10-12"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Hands behind head.",
+      "execution": "Lift chest 1-2 inches off pad. Hold 1 second at top. Lower with control. Add plate to progress.",
+      "nwbCues": "Ankles locked = zero lower-body demand. Anti-flexion core, fully NWB-safe.",
+      "rest": 90
+    },
+    "Prone Iso Hold": {
+      "sets": [
+        [
+          "3",
+          "20-45s"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms at sides or behind head.",
+      "execution": "Lift chest slightly off pad. Hold 20-45 seconds. Breathe into brace — don't hold breath.",
+      "nwbCues": "Isometric erector hold. Ankles locked = zero lower-body demand. Respiratory demand is the progression.",
+      "rest": 60
+    },
+    "Prone Lateral Trunk Raise": {
+      "sets": [
+        [
+          "3",
+          "10/side"
+        ]
+      ],
+      "setup": "Lie face-down on prone ham curl machine. Ankles locked under pad. Arms at sides.",
+      "execution": "Small side bend — lift and rotate torso slightly left, then right. Alternate sides. Keep range small.",
+      "nwbCues": "Ankles locked = zero lower-body demand. Controlled lateral flexion, thoracic spine only.",
+      "rest": 60
     }
   },
   "nearbySupersets": [
@@ -522,6 +594,48 @@
       "sets": "2×10, 5s hold",
       "instruction": "Sit on one of the parallel bars or the dip station seat. Press back of left knee into the bar surface. Hold 5 seconds, release, repeat.",
       "safety": "Pure isometric, zero joint stress. Seated position is fully NWB-safe."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone Trunk Extension",
+      "sets": "3×10-12",
+      "instruction": "Stay face-down on the ham curl machine. Hands behind head (add plate to progress). Lift chest 1-2\" off pad. Hold 1s at top, lower with control.",
+      "safety": "Same machine, same position. Ankles locked under pad = zero lower-body demand. Full posterior chain superset with ham curls."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone Iso Hold",
+      "sets": "20-45s",
+      "instruction": "Stay face-down on the ham curl machine. Lift chest slightly off pad. Hold 20-45 seconds. Breathe into brace — don't hold breath.",
+      "safety": "Isometric erector endurance. Same machine, zero transitions. Breathe through the hold."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone Y-Raise",
+      "sets": "3×12-15",
+      "instruction": "Stay face-down on the ham curl machine. Arms hang down, thumbs up. Lift arms into Y overhead at ~45°. Squeeze lower traps 2s at top.",
+      "safety": "Pure scapular work. Zero lower-body demand. Excellent shoulder health between ham curl sets."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone T-Raise",
+      "sets": "3×12-15",
+      "instruction": "Stay face-down on the ham curl machine. Raise arms straight out to sides, palms down. Pinch shoulder blades together. Hold 1-2s.",
+      "safety": "Mid-trap retraction. Same machine, zero transitions. Counterbalances pressing volume."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone W-Raise",
+      "sets": "3×12-15",
+      "instruction": "Stay face-down on the ham curl machine. Elbows bent 90°, externally rotate. Squeeze shoulder blades down & back into W. Hold 2s.",
+      "safety": "Rotator cuff prehab. Same machine, zero transitions. Critical for shoulder health."
+    },
+    {
+      "nearbyId": "hamcurl_machine",
+      "title": "Prone Lateral Trunk Raise",
+      "sets": "3×10/side",
+      "instruction": "Stay face-down on the ham curl machine. Small side bend — lift & rotate torso slightly left/right. Alternate sides each rep.",
+      "safety": "Obliques and QL in a NWB-safe prone position. Keep range small and controlled."
     }
   ],
   "mobilitySupplement": [
