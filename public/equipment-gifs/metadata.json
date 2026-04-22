@@ -1,0 +1,56 @@
+{
+  "barbell": [
+    {
+      "file": "barbell_01.gif",
+      "exercises": [],
+      "intensity": "unknown",
+      "score": 55
+    },
+    {
+      "file": "barbell_04.gif",
+      "exercises": [
+        "chest stretch"
+      ],
+      "intensity": "low",
+      "score": 50
+    }
+  ],
+  "cable": [
+    {
+      "file": "cable_01.gif",
+      "exercises": [
+        "leg extension"
+      ],
+      "intensity": "unknown",
+      "score": 60
+    }
+  ],
+  "dumbbell": [
+    {
+      "file": "dumbbell_01.gif",
+      "exercises": [],
+      "intensity": "unknown",
+      "score": 58
+    },
+    {
+      "file": "dumbbell_02.gif",
+      "exercises": [],
+      "intensity": "unknown",
+      "score": 50
+    },
+    {
+      "file": "dumbbell_04.gif",
+      "exercises": [],
+      "intensity": "unknown",
+      "score": 50
+    }
+  ],
+  "trx": [
+    {
+      "file": "trx_01.gif",
+      "exercises": [],
+      "intensity": "unknown",
+      "score": 58
+    }
+  ]
+}

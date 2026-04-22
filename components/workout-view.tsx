@@ -30,6 +30,7 @@ import ProgressClock from "@/components/progress-clock";
 import Badge from "@/components/badge";
 import DiagramModal from "@/components/diagram-modal";
 import DiagramGallery from "@/components/diagrams/gallery";
+import EquipmentGallery from "@/components/equipment-gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
 import ComplementPicker, {
@@ -40,6 +41,7 @@ import ComplementPicker, {
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+import { pullState, pushState, getSyncSecret } from "@/lib/sync";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -718,6 +720,22 @@ export default function WorkoutView() {
   useEffect(() => {
     saveState("nwb_order", exerciseOrder);
   }, [exerciseOrder]);
+
+  // ----- Sync: pull remote state on mount, push on changes -----
+  const syncReady = typeof window !== "undefined" && !!getSyncSecret();
+  // Pull once on mount
+  useEffect(() => {
+    if (!syncReady) return;
+    pullState().then((updated) => {
+      if (updated) window.location.reload(); // simplest way to reload all state
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // Push on any sync-relevant change
+  useEffect(() => {
+    if (!syncReady) return;
+    pushState();
+  }, [syncReady, swaps, equipment, machineSelections, nearbySelections, coreNearby, supplementToggles, exerciseOrder, startDay, restDay]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -2121,6 +2139,11 @@ export default function WorkoutView() {
           </button>
         </div>
 
+        {/* Equipment guides gallery */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <EquipmentGallery />
+        </div>
+
         {/* Week start day picker */}
         <Section
           title="Week Start Day"
@@ -2351,6 +2374,44 @@ export default function WorkoutView() {
               </div>
             </div>
           ))}
+        </Section>
+
+        {/* Watch Sync */}
+        <Section
+          title="Watch Sync"
+          icon={"\u231A"}
+          isOpen={!!openSections["watch-sync"]}
+          onToggle={() => toggleSection("watch-sync")}
+        >
+          <div className="text-[11px] text-text-dim mb-2.5">
+            Paste the sync secret to enable PWA &harr; Watch state sync.
+          </div>
+          <input
+            type="password"
+            placeholder="Sync secret"
+            defaultValue={getSyncSecret() ?? ""}
+            onBlur={(e) => {
+              const v = e.target.value.trim();
+              if (v) {
+                (async () => {
+                  const { setSyncSecret } = await import("@/lib/sync");
+                  setSyncSecret(v);
+                })();
+              }
+            }}
+            className="w-full rounded-lg text-[13px] font-mono"
+            style={{
+              padding: "10px 12px",
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+            }}
+          />
+          {syncReady && (
+            <div className="mt-2 text-[11px] font-medium" style={{ color: "#22c55e" }}>
+              Sync active
+            </div>
+          )}
         </Section>
       </div>
     );
