@@ -423,6 +423,28 @@ export const EXERCISES: ExerciseDiagram[] = [
     safetyNote: "Smoother contraction than heavy RDLs. Zero spinal load.",
     equipment: ["Stability Ball"],
   },
+  {
+    id: "g11", category: "legs", name: "Prone Hip Extension (R)",
+    target: "Glute Max / Hip Extension — NWB bridge-thrust alt",
+    cues: [
+      "Face down on mat. RIGHT knee bent 90° — sole toward ceiling.",
+      "Left leg flat on the floor, fully passive.",
+      "Squeeze RIGHT glute to lift heel straight toward ceiling. Pause 1s at top.",
+      "Lower with control. Keep the knee bent the whole time — only the hip moves.",
+    ],
+    safetyNote: "Feel it in the glute, not the low back. If the lumbar compensates, reduce ROM. Left hip stays in neutral extension — zero iliopsoas risk. NWB-safe substitute for SL Glute Bridge & SL Hip Thrust.",
+  },
+  {
+    id: "g12", category: "legs", name: "Side-Lying Hip Abduction (L)",
+    target: "Left Glute Medius / Hip Abduction",
+    cues: [
+      "Lie on the RIGHT (healthy) side. Head on pillow. Legs stacked and straight.",
+      "Lift the LEFT leg up and slightly back — in line with the torso, NOT forward.",
+      "Pause 1–2s at ~30–45° of abduction. Lower with control.",
+      "Toes pointing forward throughout — internal rotation (toes up) shuts glute med off.",
+    ],
+    safetyNote: "Hips stacked vertically — don't let the top hip roll backward (TFL/hip flexors take over). Leg slightly BEHIND neutral keeps left iliopsoas silent. Zero weight bearing on the left leg; it moves freely in space. Stop at any groin or anterior hip sensation.",
+  },
 
   // ── TRX → split: pull (t3 row), core (others) ──
   {
