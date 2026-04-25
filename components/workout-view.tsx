@@ -45,6 +45,7 @@ import ComplementPicker, {
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+import HevyImportPanel from "@/components/hevy-import-panel";
 
 // Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
 // avoids a Turbopack chunk-init order issue when the tracker is bundled into
@@ -2465,6 +2466,11 @@ export default function WorkoutView() {
             </div>
           ))}
         </Section>
+
+        {/* Hevy CSV import */}
+        <div style={{ marginTop: 8 }}>
+          <HevyImportPanel />
+        </div>
       </div>
     );
   }
