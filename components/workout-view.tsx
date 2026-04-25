@@ -33,6 +33,8 @@ import DiagramGallery from "@/components/diagrams/gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
 import AddExercisePicker from "@/components/add-exercise-picker";
+import SessionBar from "@/components/session-bar";
+import { useWorkoutLog } from "@/lib/use-workout-log";
 import ComplementPicker, {
   decodeComplement,
   encodeNearbyId,
@@ -1231,6 +1233,8 @@ export default function WorkoutView() {
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
           variantRequires={selectedVariant?.requires}
+          variantId={selectedVariant?.id}
+          log={log}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
         {buildSupersetCards(name, ex, "__core__", null)}
@@ -1515,6 +1519,8 @@ export default function WorkoutView() {
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
                 variantRequires={selectedVariant?.requires}
+                variantId={selectedVariant?.id}
+                log={log}
                 addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
               {buildSupersetCards(exName, ex, workoutKey, firstCableName)}
@@ -1589,6 +1595,8 @@ export default function WorkoutView() {
                     variantSetupCues={selectedVariant?.setupCues}
                     variantLabel={selectedVariant?.label}
                     variantRequires={selectedVariant?.requires}
+                    variantId={selectedVariant?.id}
+                    log={log}
                     addComplementSlot={buildAddComplementPill(name, ex)}
                   />
                   {buildSupersetCards(name, ex, "__finisher__", null)}
@@ -1940,6 +1948,8 @@ export default function WorkoutView() {
                   variantSetupCues={selectedVariant?.setupCues}
                   variantLabel={selectedVariant?.label}
                   variantRequires={selectedVariant?.requires}
+                  variantId={selectedVariant?.id}
+                  log={log}
                   addComplementSlot={buildAddComplementPill(k, ex)}
                 />
                 {buildSupersetCards(k, ex, "__cardio__", null)}
@@ -2708,6 +2718,13 @@ export default function WorkoutView() {
     );
   }
 
+  // ===== ACTIVE WORKOUT-LOG SESSION =====
+  // Must be declared BEFORE the render-tab switch — renderTodayTab() and
+  // renderWorkout() iterate exercises and pass `log` into ExerciseRow as a
+  // prop, so the const has to be initialised before those functions execute.
+  const todayWorkoutKey = getWorkoutForDay(selectedDay).t;
+  const log = useWorkoutLog(todayWorkoutKey);
+
   // ===== RENDER ACTIVE TAB =====
   let content: React.ReactNode = null;
   switch (tab) {
@@ -2739,6 +2756,8 @@ export default function WorkoutView() {
   // ===== MAIN LAYOUT =====
   return (
     <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-4 pb-24 min-h-screen bg-bg">
+      <SessionBar log={log} workoutLabel={log.active?.workoutKey ?? todayWorkoutKey} />
+
       {/* Header */}
       <div className="pt-8 pb-5 text-center">
         <div className="flex items-center justify-center gap-2.5">
