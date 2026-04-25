@@ -16,6 +16,12 @@ function formatWeight(w: number): string {
   return w % 1 === 0 ? String(w) : w.toFixed(1);
 }
 
+function parsePrescribedLow(prescribed?: string): number | null {
+  if (!prescribed) return null;
+  const m = prescribed.match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
 function timeAgo(ts: number): string {
   const diff = Date.now() - ts;
   const minutes = Math.floor(diff / 60000);
@@ -51,24 +57,26 @@ function NumStepper({
       <button
         type="button"
         onClick={onMinus}
-        className="px-2.5 text-text-muted text-base font-bold min-w-[36px] active:bg-card-hover"
+        className="px-2 text-text-dim text-lg font-bold min-w-[32px] active:bg-card-hover"
         aria-label={`Decrease ${label}`}
       >
         −
       </button>
       <input
-        type="number"
+        type="text"
         inputMode={label === "lbs" ? "decimal" : "numeric"}
+        pattern="[0-9.]*"
         value={value}
-        onChange={(ev) => onChange(ev.target.value)}
-        placeholder={hint ?? "0"}
-        className="flex-1 min-w-0 px-1 py-1.5 text-center text-[15px] font-bold tabular-nums bg-transparent text-text placeholder:text-text-muted focus:outline-none"
+        onChange={(ev) => onChange(ev.target.value.replace(/[^0-9.]/g, ""))}
+        placeholder={hint && hint.length > 0 ? hint : "0"}
+        className="flex-1 min-w-0 px-1 py-2 text-center text-base font-bold tabular-nums bg-transparent text-text placeholder:text-text-dim focus:outline-none"
+        style={{ color: value ? "var(--color-text)" : undefined }}
         aria-label={label}
       />
       <button
         type="button"
         onClick={onPlus}
-        className="px-2.5 text-text-muted text-base font-bold min-w-[36px] active:bg-card-hover"
+        className="px-2 text-text-dim text-lg font-bold min-w-[32px] active:bg-card-hover"
         aria-label={`Increase ${label}`}
       >
         +
@@ -244,7 +252,10 @@ export default function SetTracker({
   // 3. blank — let user type.
   const seed = sets.length > 0 ? sets[sets.length - 1] : lastEver;
   const seedWeight = seed?.weight ?? 0;
-  const seedReps = seed?.reps ?? 0;
+  // Prefill reps: prefer last logged, else low end of prescribed range
+  // ("5-6" → 5, "8" → 8) so user just adjusts ± rather than typing from blank.
+  const prescribedLow = parsePrescribedLow(prescribedReps);
+  const seedReps = seed?.reps ?? prescribedLow ?? 0;
 
   const [draftWeight, setDraftWeight] = useState<string>(() =>
     seedWeight ? String(seedWeight) : "",
