@@ -1,6 +1,6 @@
 // Rack core exercise animations (new)
 
-import { C, Floor, Rack, Dumbbell, Plate } from "./helpers";
+import { C, Floor, Rack, Dumbbell, Plate, Box, Strap } from "./helpers";
 
 interface AnimProps { t: number }
 
@@ -391,6 +391,303 @@ export function StirThePot({ t }: AnimProps) {
   );
 }
 
+// ── LEFT-OBLIQUE LOADED / SEATED BLOCK ──
+
+// Seated on bench, cable low-left, chop diagonally up-and-across
+// to above the right shoulder. Left leg propped passively on scooter.
+export function SeatedCableChopLowToHigh({ t }: AnimProps) {
+  // Phase 0→0.5 = chop up; 0.5→1 = return
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const chop = Math.sin(phase * Math.PI * 0.5);
+  const floorY = 220;
+
+  // Bench — seat span horizontal
+  const benchX = 170, benchY = floorY - 38, benchW = 120, benchH = 14;
+  // Seated figure center on the bench
+  const hipX = benchX + benchW / 2;
+  const hipY = benchY;
+  const shX = hipX, shY = hipY - 55;
+  const hdY = shY - 20;
+
+  // Low-left cable anchor (low pulley on left)
+  const anchorX = 60, anchorY = floorY - 25;
+
+  // Hands travel diagonally from low-left to upper-right
+  const startHX = anchorX + 30, startHY = hipY - 10;
+  const endHX   = shX + 55,    endHY   = shY - 40;
+  const handX = startHX + (endHX - startHX) * chop;
+  const handY = startHY + (endHY - startHY) * chop;
+
+  // Slight trunk rotation to the right
+  const rot = chop * 10;
+
+  return (
+    <g>
+      <Floor y={floorY} />
+      {/* Bench */}
+      <Box x={benchX} y={benchY} w={benchW} h={benchH} />
+      <rect x={benchX + 4} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+      <rect x={benchX + benchW - 8} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+
+      {/* Cable stack on the far left */}
+      <rect x={30} y={floorY - 100} width={28} height={90} fill={C.equipment} rx="3" />
+      <rect x={34} y={floorY - 95} width={20} height="60" fill={C.weight} rx="2" opacity="0.7" />
+      {/* Low pulley */}
+      <circle cx={anchorX} cy={anchorY} r="5" fill={C.equipLight} stroke={C.equipment} strokeWidth="1.5" />
+
+      {/* Knee scooter on the left of bench for passive left leg */}
+      <rect x={benchX - 42} y={floorY - 28} width={38} height={8} fill={C.equipment} rx="2" />
+      <circle cx={benchX - 38} cy={floorY - 6} r="6" fill={C.weight} />
+      <circle cx={benchX - 10} cy={floorY - 6} r="6" fill={C.weight} />
+      <rect x={benchX - 32} y={floorY - 44} width={22} height={12} fill={C.equipLight} rx="2" />
+      <text x={benchX - 50} y={floorY - 55} fill={C.label} fontSize="8" fontFamily="monospace">scooter</text>
+
+      {/* Right leg down to floor */}
+      <line x1={hipX + 6} y1={hipY} x2={hipX + 6} y2={floorY - 12} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={hipX + 6} y1={floorY - 12} x2={hipX + 18} y2={floorY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Left leg — propped on scooter, passive */}
+      <line x1={hipX - 6} y1={hipY} x2={benchX - 20} y2={floorY - 36} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" />
+      <line x1={benchX - 20} y1={floorY - 36} x2={benchX - 38} y2={floorY - 32} stroke={C.leftLeg} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={benchX - 38} cy={floorY - 32} r="3" fill={C.leftLeg} />
+
+      {/* Torso rotated slightly right */}
+      <line x1={hipX} y1={hipY} x2={shX + rot * 0.3} y2={shY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <circle cx={shX + rot * 0.3} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="3" />
+
+      {/* Arms gripping cable handle — both hands together */}
+      <line x1={shX + rot * 0.3 - 6} y1={shY + 3} x2={handX - 3} y2={handY} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+      <line x1={shX + rot * 0.3 + 6} y1={shY + 3} x2={handX + 3} y2={handY} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Cable — dashed line from pulley to hands */}
+      <Strap x1={anchorX} y1={anchorY} x2={handX} y2={handY} />
+      {/* Handle / rope end */}
+      <circle cx={handX} cy={handY} r="5" fill={C.strap} />
+
+      {/* Left oblique activation highlight */}
+      <ellipse cx={hipX - 10 + rot * 0.2} cy={(hipY + shY) / 2} rx="7" ry="18" fill={C.active} opacity={chop * 0.55} />
+      {chop > 0.3 && (
+        <text x={hipX - 70} y={(hipY + shY) / 2 + 4} fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">L oblique</text>
+      )}
+
+      {/* Chop direction arrow */}
+      {chop > 0.5 && (
+        <>
+          <line x1={startHX + 20} y1={startHY - 10} x2={endHX - 20} y2={endHY + 10} stroke={C.strap} strokeWidth="1.5" strokeDasharray="3,3" />
+          <polygon points={`${endHX - 20},${endHY + 6} ${endHX - 12},${endHY + 10} ${endHX - 18},${endHY + 14}`} fill={C.strap} />
+        </>
+      )}
+    </g>
+  );
+}
+
+// Seated Pallof with rotation away from the stack (cable anchor on LEFT).
+// Trunk rotates right while arms press straight out.
+export function SeatedPallofPressWithRotation({ t }: AnimProps) {
+  // t 0→0.4 press out; 0.4→0.6 rotate right + pause; 0.6→1 return
+  const pressPhase = Math.min(1, t / 0.25);
+  const rotPhase = t < 0.4 ? 0 : t < 0.7 ? (t - 0.4) / 0.3 : 1 - (t - 0.7) / 0.3;
+  const press = pressPhase;
+  const rot = Math.sin(rotPhase * Math.PI * 0.5);
+  const floorY = 220;
+
+  const benchX = 170, benchY = floorY - 38, benchW = 120, benchH = 14;
+  const hipX = benchX + benchW / 2;
+  const hipY = benchY;
+  const shX = hipX, shY = hipY - 55;
+  const hdY = shY - 20;
+
+  // Cable anchor on left at sternum height
+  const anchorX = 55, anchorY = shY + 5;
+
+  // Hands extend straight out from sternum, then rotate right
+  const extOutX = shX + 50, extOutY = shY + 5;
+  const rotX = rot * 28;
+  const rotY = rot * 5;
+  const handX = (shX + (extOutX - shX) * press) + rotX;
+  const handY = extOutY + rotY;
+
+  return (
+    <g>
+      <Floor y={floorY} />
+      <Box x={benchX} y={benchY} w={benchW} h={benchH} />
+      <rect x={benchX + 4} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+      <rect x={benchX + benchW - 8} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+
+      {/* Cable stack */}
+      <rect x={25} y={floorY - 170} width={28} height={160} fill={C.equipment} rx="3" />
+      <rect x={29} y={floorY - 165} width={20} height="110" fill={C.weight} rx="2" opacity="0.7" />
+      <circle cx={anchorX} cy={anchorY} r="5" fill={C.equipLight} stroke={C.equipment} strokeWidth="1.5" />
+
+      {/* Scooter — left leg passive */}
+      <rect x={benchX - 42} y={floorY - 28} width={38} height={8} fill={C.equipment} rx="2" />
+      <circle cx={benchX - 38} cy={floorY - 6} r="6" fill={C.weight} />
+      <circle cx={benchX - 10} cy={floorY - 6} r="6" fill={C.weight} />
+      <rect x={benchX - 32} y={floorY - 44} width={22} height={12} fill={C.equipLight} rx="2" />
+
+      {/* Right leg down */}
+      <line x1={hipX + 6} y1={hipY} x2={hipX + 6} y2={floorY - 12} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={hipX + 6} y1={floorY - 12} x2={hipX + 18} y2={floorY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Left leg passive on scooter */}
+      <line x1={hipX - 6} y1={hipY} x2={benchX - 20} y2={floorY - 36} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" />
+      <line x1={benchX - 20} y1={floorY - 36} x2={benchX - 38} y2={floorY - 32} stroke={C.leftLeg} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={benchX - 38} cy={floorY - 32} r="3" fill={C.leftLeg} />
+
+      {/* Torso rotates right */}
+      <line x1={hipX} y1={hipY} x2={shX + rot * 14} y2={shY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <circle cx={shX + rot * 14} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="3" />
+
+      {/* Arms pressing handle out, then rotated */}
+      <line x1={shX + rot * 14 - 6} y1={shY + 5} x2={handX - 3} y2={handY} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+      <line x1={shX + rot * 14 + 6} y1={shY + 5} x2={handX + 3} y2={handY} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Cable — anchor to hands */}
+      <Strap x1={anchorX} y1={anchorY} x2={handX} y2={handY} />
+      <circle cx={handX} cy={handY} r="5" fill={C.strap} />
+
+      {/* Left oblique highlight — lights up hardest during rotation hold */}
+      <ellipse cx={hipX - 9} cy={(hipY + shY) / 2} rx="7" ry="17" fill={C.active} opacity={rot * 0.6} />
+      {rot > 0.4 && (
+        <text x={hipX - 70} y={(hipY + shY) / 2 + 4} fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">L oblique</text>
+      )}
+
+      {/* Rotation arrow */}
+      {rot > 0.6 && press > 0.9 && (
+        <text x={shX + 30} y={shY - 18} fill={C.strap} fontSize="14" fontFamily="monospace">{"↻"}</text>
+      )}
+    </g>
+  );
+}
+
+// Seated single-side suitcase iso-hold — DB in right hand only, upright.
+export function SeatedSuitcaseIsoHoldR({ t }: AnimProps) {
+  // Subtle tremor to telegraph the isometric effort
+  const tremor = Math.sin(t * Math.PI * 8) * 0.6;
+  const floorY = 220;
+
+  const benchX = 170, benchY = floorY - 38, benchW = 120, benchH = 14;
+  const hipX = benchX + benchW / 2;
+  const hipY = benchY;
+  const shX = hipX, shY = hipY - 55;
+  const hdY = shY - 20;
+
+  // DB in right hand, hanging at side
+  const dbX = hipX + 38, dbY = hipY + 25;
+
+  return (
+    <g>
+      <Floor y={floorY} />
+      <Box x={benchX} y={benchY} w={benchW} h={benchH} />
+      <rect x={benchX + 4} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+      <rect x={benchX + benchW - 8} y={benchY + benchH} width="4" height="26" fill={C.equipment} rx="1" />
+
+      {/* Right leg down */}
+      <line x1={hipX + 6} y1={hipY} x2={hipX + 6} y2={floorY - 12} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={hipX + 6} y1={floorY - 12} x2={hipX + 18} y2={floorY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+
+      {/* Left leg passive on floor (or scooter) */}
+      <line x1={hipX - 6} y1={hipY} x2={hipX - 20} y2={floorY - 10} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" />
+      <line x1={hipX - 20} y1={floorY - 10} x2={hipX - 40} y2={floorY} stroke={C.leftLeg} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={hipX - 40} cy={floorY} r="3" fill={C.leftLeg} />
+
+      {/* Torso — stays tall, resists tipping (tiny tremor) */}
+      <line x1={hipX + tremor * 0.2} y1={hipY} x2={shX + tremor * 0.1} y2={shY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <circle cx={shX + tremor * 0.1} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="3" />
+
+      {/* Left arm — empty, hangs relaxed */}
+      <line x1={shX - 8} y1={shY + 5} x2={hipX - 18} y2={hipY + 10} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+
+      {/* Right arm — loaded with DB */}
+      <line x1={shX + 8} y1={shY + 5} x2={dbX} y2={dbY - 8} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+      <Dumbbell x={dbX} y={dbY} angle={90} size={24} />
+
+      {/* LEFT oblique + QL glow — lights up hard, this is the working side */}
+      <ellipse cx={hipX - 10} cy={(hipY + shY) / 2} rx="7" ry="20" fill={C.active} opacity={0.6} />
+      <text x={hipX - 82} y={(hipY + shY) / 2 + 4} fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">L QL + oblique</text>
+
+      {/* Level shoulders reference */}
+      <line x1={shX - 25} y1={shY - 3} x2={shX + 25} y2={shY - 3} stroke={C.active} strokeWidth="1" strokeDasharray="3,3" opacity="0.4" />
+
+      {/* Tip arrow (what you resist) */}
+      <text x={dbX + 8} y={dbY - 14} fill={C.strap} fontSize="12" fontFamily="monospace">{"↓"}</text>
+    </g>
+  );
+}
+
+// Right-side-down side plank on bench, DB in left (top) hand threading under torso
+export function SidePlankThreadTheNeedle({ t }: AnimProps) {
+  // Phase 0→0.5 thread under, pause, return
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const thread = Math.sin(phase * Math.PI * 0.5);
+  const floorY = 220;
+
+  // Bench runs horizontally; forearm rests on it
+  const benchX = 80, benchY = floorY - 30, benchW = 140, benchH = 12;
+
+  // Right elbow on bench
+  const elbX = benchX + 35, elbY = benchY;
+  const shX = elbX + 50, shY = benchY - 32;
+  const hdX = shX + 40, hdY = shY - 12;
+
+  // Hip along the diagonal line
+  const hipX = shX + 70, hipY = benchY + 18;
+  // Stacked legs — both extend from hip outward to the right (feet end)
+  const footX = hipX + 85, footY = hipY + 18;
+
+  // Top (left) arm — DB starts at ceiling, threads under torso, returns
+  const ceilingX = shX + 10, ceilingY = shY - 55;
+  const underX = shX + 35,   underY = shY + 30;
+  const dbX = ceilingX + (underX - ceilingX) * thread;
+  const dbY = ceilingY + (underY - ceilingY) * thread;
+
+  return (
+    <g>
+      <Floor y={floorY} />
+
+      {/* Bench */}
+      <Box x={benchX} y={benchY} w={benchW} h={benchH} />
+      <rect x={benchX + 6} y={benchY + benchH} width="4" height="18" fill={C.equipment} rx="1" />
+      <rect x={benchX + benchW - 10} y={benchY + benchH} width="4" height="18" fill={C.equipment} rx="1" />
+
+      {/* Right forearm on bench — supporting arm */}
+      <line x1={elbX} y1={elbY} x2={shX} y2={shY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      {/* Forearm along bench surface */}
+      <line x1={elbX} y1={elbY} x2={elbX + 40} y2={elbY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+
+      {/* Torso — diagonal from shoulder to hip */}
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      {/* Head */}
+      <circle cx={hdX} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="3" />
+
+      {/* Stacked legs — RIGHT leg underneath (body color) */}
+      <line x1={hipX} y1={hipY} x2={footX} y2={footY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <rect x={footX - 2} y={footY - 2} width="10" height="6" fill={C.body} rx="1" />
+
+      {/* LEFT leg — stacked PASSIVELY on top of right, drawn just above */}
+      <line x1={hipX + 2} y1={hipY - 6} x2={footX - 2} y2={footY - 8} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" />
+      <circle cx={footX - 2} cy={footY - 8} r="3" fill={C.leftLeg} />
+      <text x={footX + 10} y={footY - 6} fill={C.leftLeg} fontSize="8" fontFamily="monospace">L stacked passive</text>
+
+      {/* Top (left) arm from shoulder to DB position */}
+      <line x1={shX} y1={shY} x2={dbX} y2={dbY - 6} stroke={C.active} strokeWidth="4" strokeLinecap="round" />
+      <Dumbbell x={dbX} y={dbY} angle={thread * 90} size={22} />
+
+      {/* Trunk rotation arc — dashed path showing the thread motion */}
+      <path
+        d={`M ${ceilingX} ${ceilingY} Q ${shX + 50} ${shY - 10} ${underX} ${underY}`}
+        fill="none" stroke={C.strap} strokeWidth="1.5" strokeDasharray="3,3" opacity="0.6"
+      />
+
+      {/* Left oblique activation glow — bulges at midpoint of thread */}
+      <ellipse cx={(shX + hipX) / 2} cy={(shY + hipY) / 2 - 8} rx="10" ry="6" fill={C.active} opacity={thread * 0.55} />
+      {thread > 0.3 && (
+        <text x={(shX + hipX) / 2 - 25} y={(shY + hipY) / 2 - 18} fill={C.active} fontSize="10" fontWeight="bold" fontFamily="monospace">L oblique</text>
+      )}
+    </g>
+  );
+}
+
 export const RACK_CORE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   r1: LandmineRotation,
   r2: PlateHalos,
@@ -399,4 +696,8 @@ export const RACK_CORE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   r5: OverheadPlateHold,
   r6: McGillCurlUp,
   r7: StirThePot,
+  r8: SeatedCableChopLowToHigh,
+  r9: SeatedPallofPressWithRotation,
+  r10: SeatedSuitcaseIsoHoldR,
+  r11: SidePlankThreadTheNeedle,
 };
