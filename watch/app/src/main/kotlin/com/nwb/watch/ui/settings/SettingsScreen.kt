@@ -1,5 +1,6 @@
 package com.nwb.watch.ui.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,10 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.MaterialTheme
-import androidx.wear.compose.material3.Switch
+import androidx.wear.compose.material3.OutlinedButton
+import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.ToggleButton
 import com.nwb.watch.ui.WorkoutViewModel
 import com.nwb.watch.ui.theme.NwbSlate
 
@@ -42,6 +46,14 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+            )
+        }
+
+        // Week picker — lets the user correct which week the program thinks they're in
+        item {
+            WeekPicker(
+                currentWeek = state.weekNumber,
+                onPick = { viewModel.setCurrentWeek(it) },
             )
         }
 
@@ -101,19 +113,79 @@ fun SettingsScreen(
 }
 
 @Composable
+private fun WeekPicker(
+    currentWeek: Int,
+    onPick: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "I'm on Week",
+            fontSize = 11.sp,
+            color = NwbSlate,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+        ) {
+            (1..3).forEach { week ->
+                WeekButton(week, currentWeek == week, onPick)
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+        ) {
+            (4..6).forEach { week ->
+                WeekButton(week, currentWeek == week, onPick)
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeekButton(
+    week: Int,
+    selected: Boolean,
+    onPick: (Int) -> Unit,
+) {
+    if (selected) {
+        Button(
+            onClick = { onPick(week) },
+            modifier = Modifier.size(width = 44.dp, height = 32.dp),
+            colors = ButtonDefaults.buttonColors(),
+        ) {
+            Text(text = week.toString(), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+    } else {
+        OutlinedButton(
+            onClick = { onPick(week) },
+            modifier = Modifier.size(width = 44.dp, height = 32.dp),
+        ) {
+            Text(text = week.toString(), fontSize = 13.sp)
+        }
+    }
+}
+
+@Composable
 private fun SettingsToggle(
     label: String,
     description: String,
     checked: Boolean,
     onToggle: () -> Unit,
 ) {
-    ToggleButton(
+    SwitchButton(
         checked = checked,
         onCheckedChange = { onToggle() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp),
-        toggleControl = { Switch(checked = checked) },
         label = {
             Text(text = label, fontSize = 13.sp)
         },

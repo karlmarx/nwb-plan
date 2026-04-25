@@ -143,9 +143,9 @@ private fun ExerciseCard(
             .padding(horizontal = 8.dp, vertical = 3.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isCurrent) {
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.surfaceContainer
             } else {
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f)
             },
         ),
         shape = RoundedCornerShape(12.dp),
