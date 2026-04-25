@@ -43,6 +43,7 @@ import ComplementPicker, {
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+import HevyImportPanel from "@/components/hevy-import-panel";
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -2455,6 +2456,11 @@ export default function WorkoutView() {
             </div>
           ))}
         </Section>
+
+        {/* Hevy CSV import */}
+        <div style={{ marginTop: 8 }}>
+          <HevyImportPanel />
+        </div>
       </div>
     );
   }
