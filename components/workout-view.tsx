@@ -34,6 +34,7 @@ import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/component
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
 import AddExercisePicker from "@/components/add-exercise-picker";
 import SessionBar from "@/components/session-bar";
+import HistoryView from "@/components/history-view";
 import { useWorkoutLog } from "@/lib/use-workout-log";
 import ComplementPicker, {
   decodeComplement,
@@ -108,9 +109,10 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-// Safety + Gear/config live outside the label tab strip as icon buttons
+// Safety + History + Gear/config live outside the label tab strip as icon buttons
 const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
+const HISTORY_TAB_INDEX = 7;
 
 const DAY_NAMES = [
   "Monday",
@@ -702,7 +704,7 @@ export default function WorkoutView() {
 
   useLayoutEffect(() => {
     if (!uiV2) { pillInitialized.current = false; return; }
-    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -2749,6 +2751,9 @@ export default function WorkoutView() {
     case GEAR_TAB_INDEX:
       content = renderEquipTab();
       break;
+    case HISTORY_TAB_INDEX:
+      content = <HistoryView />;
+      break;
   }
 
   const todayColor = getWorkoutForDay(selectedDay).c;
@@ -2953,6 +2958,30 @@ export default function WorkoutView() {
           {/* Shield */}
           <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </button>
+        {/* History (icon) */}
+        <button
+          ref={(el) => { tabRefs.current[HISTORY_TAB_INDEX] = el; }}
+          data-testid="tab-history"
+          title="Workout history"
+          aria-label="History"
+          onClick={() => setTab(HISTORY_TAB_INDEX)}
+          className={`rounded-xl cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${tab === HISTORY_TAB_INDEX ? "tab-active" : ""}`}
+          style={{
+            width: 44,
+            minWidth: 44,
+            padding: "12px 0",
+            background: uiV2 ? "transparent" : (tab === HISTORY_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
+            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === HISTORY_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
+            color: tab === HISTORY_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
+          }}
+        >
+          {/* Clock with rewind arrow */}
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l3 2" />
           </svg>
         </button>
         {/* Gear / config */}
