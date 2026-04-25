@@ -331,10 +331,6 @@ export default function SetTracker({
 
       <div className="px-3 pb-3">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-text-dim w-5 text-center tabular-nums shrink-0">
-            {sets.length + 1}
-          </span>
-
           <div className="flex-1 min-w-0">
             <NumStepper
               value={draftWeight}
