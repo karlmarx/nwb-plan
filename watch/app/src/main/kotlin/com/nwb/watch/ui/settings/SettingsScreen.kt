@@ -10,6 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -94,8 +99,132 @@ fun SettingsScreen(
             }
         }
 
+        // Sync section
+        item {
+            Spacer(modifier = Modifier.height(12.dp))
+            SyncSection(viewModel)
+        }
+
         item {
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun SyncSection(viewModel: WorkoutViewModel) {
+    val scope = rememberCoroutineScope()
+    var syncStatus by remember { mutableStateOf("") }
+    val hasCreds = viewModel.hasSyncCredentials()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "Sync",
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = NwbSlate,
+        )
+        if (hasCreds) {
+            Button(
+                onClick = {
+                    syncStatus = "Syncing..."
+                    scope.launch {
+                        val ok = viewModel.syncNow()
+                        syncStatus = if (ok) "Synced!" else "Failed"
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+            ) {
+                Text("Sync Now", fontSize = 12.sp)
+            }
+        } else {
+            Text(
+                text = "Set via ADB:",
+                fontSize = 10.sp,
+                color = NwbSlate,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            Text(
+                text = "setSyncConfig",
+                fontSize = 9.sp,
+                color = NwbSlate,
+            )
+        }
+        if (syncStatus.isNotBlank()) {
+            Text(
+                text = syncStatus,
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WeekPicker(
+    currentWeek: Int,
+    onPick: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "I'm on Week",
+            fontSize = 11.sp,
+            color = NwbSlate,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+        ) {
+            (1..3).forEach { week ->
+                WeekButton(week, currentWeek == week, onPick)
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+        ) {
+            (4..6).forEach { week ->
+                WeekButton(week, currentWeek == week, onPick)
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeekButton(
+    week: Int,
+    selected: Boolean,
+    onPick: (Int) -> Unit,
+) {
+    if (selected) {
+        Button(
+            onClick = { onPick(week) },
+            modifier = Modifier.size(width = 44.dp, height = 32.dp),
+            colors = ButtonDefaults.buttonColors(),
+        ) {
+            Text(text = week.toString(), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+    } else {
+        OutlinedButton(
+            onClick = { onPick(week) },
+            modifier = Modifier.size(width = 44.dp, height = 32.dp),
+        ) {
+            Text(text = week.toString(), fontSize = 13.sp)
         }
     }
 }

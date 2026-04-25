@@ -4,6 +4,10 @@
     <!-- Wear OS standalone app (no phone required) -->
     <uses-feature android:name="android.hardware.type.watch" />
 
+    <!-- Network for state sync with PWA -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- Vibration for haptic feedback -->
     <uses-permission android:name="android.permission.VIBRATE" />
 

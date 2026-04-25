@@ -5,6 +5,7 @@ import com.nwb.watch.coaching.HapticEngine
 import com.nwb.watch.coaching.TempoTracker
 import com.nwb.watch.coaching.VoiceCoach
 import com.nwb.watch.data.ExerciseRepository
+import com.nwb.watch.data.SyncClient
 import com.nwb.watch.data.WorkoutScheduler
 import com.nwb.watch.data.WorkoutState
 import dagger.Module
@@ -35,6 +36,12 @@ object AppModule {
     fun provideWorkoutState(
         @ApplicationContext context: Context,
     ): WorkoutState = WorkoutState(context)
+
+    @Provides
+    @Singleton
+    fun provideSyncClient(
+        workoutState: WorkoutState,
+    ): SyncClient = SyncClient(workoutState)
 
     @Provides
     @Singleton

@@ -34,6 +34,10 @@ class WorkoutState @Inject constructor(
         val SUPPLEMENT_CORE = booleanPreferencesKey("supplement_core")
         val NEARBY_EQUIPMENT = stringSetPreferencesKey("nearby_equipment")
         val PROGRAM_START_EPOCH = longPreferencesKey("program_start_epoch")
+        val SYNC_SECRET = stringPreferencesKey("sync_secret")
+        val SYNC_URL = stringPreferencesKey("sync_url")
+        val SYNC_TS = longPreferencesKey("sync_ts")
+        val SWAPS = stringPreferencesKey("swaps_json") // JSON map
 
         // Active workout state
         val ACTIVE_WORKOUT_KEY = stringPreferencesKey("active_workout_key")
@@ -60,6 +64,22 @@ class WorkoutState @Inject constructor(
 
     val nearbyEquipment: Flow<Set<String>> = context.dataStore.data
         .map { it[Keys.NEARBY_EQUIPMENT] ?: emptySet() }
+
+    val programStartEpoch: Flow<Long?> = context.dataStore.data
+        .map { it[Keys.PROGRAM_START_EPOCH] }
+
+    val syncSecret: Flow<String?> = context.dataStore.data
+        .map { it[Keys.SYNC_SECRET] }
+
+    val syncUrl: Flow<String?> = context.dataStore.data
+        .map { it[Keys.SYNC_URL] }
+
+    val syncTs: Flow<Long> = context.dataStore.data
+        .map { it[Keys.SYNC_TS] ?: 0L }
+
+    /** JSON-encoded exercise swaps map (e.g. {"Bench Press":"DB Press"}). */
+    val swapsJson: Flow<String> = context.dataStore.data
+        .map { it[Keys.SWAPS] ?: "{}" }
 
     // --- Active workout state ---
 
@@ -96,6 +116,26 @@ class WorkoutState @Inject constructor(
 
     suspend fun setNearbyEquipment(ids: Set<String>) {
         context.dataStore.edit { it[Keys.NEARBY_EQUIPMENT] = ids }
+    }
+
+    suspend fun setProgramStartEpoch(epoch: Long) {
+        context.dataStore.edit { it[Keys.PROGRAM_START_EPOCH] = epoch }
+    }
+
+    suspend fun setSyncSecret(secret: String) {
+        context.dataStore.edit { it[Keys.SYNC_SECRET] = secret }
+    }
+
+    suspend fun setSyncUrl(url: String) {
+        context.dataStore.edit { it[Keys.SYNC_URL] = url }
+    }
+
+    suspend fun setSyncTs(ts: Long) {
+        context.dataStore.edit { it[Keys.SYNC_TS] = ts }
+    }
+
+    suspend fun setSwapsJson(json: String) {
+        context.dataStore.edit { it[Keys.SWAPS] = json }
     }
 
     suspend fun startWorkout(workoutKey: String) {

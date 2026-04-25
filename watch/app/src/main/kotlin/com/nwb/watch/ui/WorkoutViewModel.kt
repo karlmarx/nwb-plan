@@ -6,6 +6,7 @@ import com.nwb.watch.coaching.HapticEngine
 import com.nwb.watch.coaching.TempoTracker
 import com.nwb.watch.coaching.VoiceCoach
 import com.nwb.watch.data.ExerciseRepository
+import com.nwb.watch.data.SyncClient
 import com.nwb.watch.data.WorkoutScheduler
 import com.nwb.watch.data.WorkoutState
 import com.nwb.watch.data.model.Exercise
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -44,6 +46,7 @@ class WorkoutViewModel @Inject constructor(
     private val scheduler: WorkoutScheduler,
     private val repository: ExerciseRepository,
     private val workoutState: WorkoutState,
+    private val syncClient: SyncClient,
     private val voiceCoach: VoiceCoach,
     private val hapticEngine: HapticEngine,
     private val tempoTracker: TempoTracker,
@@ -85,6 +88,12 @@ class WorkoutViewModel @Inject constructor(
 
     init {
         voiceCoach.initialize()
+        // Pull remote state on app open
+        viewModelScope.launch { syncClient.pull() }
+    }
+
+    private fun syncPush() {
+        viewModelScope.launch { syncClient.push() }
     }
 
     val currentExercise: Exercise?
@@ -108,6 +117,7 @@ class WorkoutViewModel @Inject constructor(
             }
         }
         hapticEngine.doubleTap()
+        syncPush()
     }
 
     fun completeSet() {
@@ -216,6 +226,7 @@ class WorkoutViewModel @Inject constructor(
         }
         voiceCoach.announceWorkoutComplete(state.workoutTitle)
         hapticEngine.workoutComplete()
+        syncPush()
     }
 
     fun endWorkout() {
@@ -225,6 +236,7 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             workoutState.endWorkout()
         }
+        syncPush()
     }
 
     fun toggleTts() {
@@ -241,6 +253,40 @@ class WorkoutViewModel @Inject constructor(
             workoutState.setHapticsEnabled(!current)
         }
         hapticEngine.enabled = !current
+    }
+
+    fun setCurrentWeek(week: Int) {
+        val startDate = scheduler.startDateForWeek(week, LocalDate.now())
+        viewModelScope.launch {
+            workoutState.setProgramStartEpoch(startDate.toEpochDay())
+        }
+        syncPush()
+    }
+
+    /** Manual sync — pull then push. Returns true if successful. */
+    suspend fun syncNow(): Boolean {
+        return try {
+            syncClient.pull()
+            syncClient.push()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /** Whether sync credentials are configured. */
+    fun hasSyncCredentials(): Boolean {
+        val secret = kotlinx.coroutines.runBlocking { workoutState.syncSecret.first() }
+        val url = kotlinx.coroutines.runBlocking { workoutState.syncUrl.first() }
+        return !secret.isNullOrBlank() && !url.isNullOrBlank()
+    }
+
+    /** Set sync URL and secret (called from ADB helper or future pairing UI). */
+    fun setSyncConfig(url: String, secret: String) {
+        viewModelScope.launch {
+            workoutState.setSyncUrl(url)
+            workoutState.setSyncSecret(secret)
+        }
     }
 
     fun readAloud(text: String) {
