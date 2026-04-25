@@ -1,11 +1,20 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import Badge from "@/components/badge";
 import { Exercise, EQUIPMENT } from "@/lib/exercises";
+
+// Set tracker is a client-only component (touches localStorage on hydrate);
+// disabling SSR avoids a Turbopack chunk-init order issue when it's eagerly
+// imported into the SSR'd workout-view bundle.
+const SetTracker = dynamic(() => import("@/components/set-tracker"), {
+  ssr: false,
+});
 import { EXERCISE_TO_DIAGRAM } from "@/components/diagrams";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+import type { WorkoutLogHook } from "@/lib/use-workout-log";
 
 interface ExerciseRowProps {
   name: string;
@@ -21,6 +30,7 @@ interface ExerciseRowProps {
   equipment: Record<string, boolean>;
   variantSetupCues?: string[];
   variantLabel?: string;
+  variantId?: string;
   /**
    * Requires override from the active machine variant. When present it
    * replaces `ex.requires` for the equipment-chip display so the chips
@@ -31,6 +41,8 @@ interface ExerciseRowProps {
   addComplementSlot?: React.ReactNode;
   /** Small top-right action button (opens edit sheet). Hidden if omitted. */
   showActionButton?: boolean;
+  /** When provided, the in-app set tracker renders inside the expanded panel. */
+  log?: WorkoutLogHook;
 }
 
 export default function ExerciseRow({
@@ -47,9 +59,11 @@ export default function ExerciseRow({
   equipment,
   variantSetupCues,
   variantLabel,
+  variantId,
   variantRequires,
   addComplementSlot,
   showActionButton = true,
+  log,
 }: ExerciseRowProps) {
   const longPressHandlers = useLongPress(
     () => onLongPress?.(),
@@ -163,11 +177,11 @@ export default function ExerciseRow({
       {/* Expanded details */}
       {isExpanded && (
         <div className="section-content px-3.5 pb-4">
-          {/* Sets / Reps / Rest stats — first so it's the action-focused header */}
+          {/* Sets / Reps / Rest stats — prescribed target */}
           <div className="flex gap-4 mb-3 py-2.5 border-b border-border">
             <div>
               <div className="text-[10px] text-text-muted uppercase tracking-wider font-medium">
-                Sets &times; Reps
+                Target
               </div>
               <div className="text-base font-bold text-accent tabular-nums mt-0.5">
                 {s[0]} &times; {s[1]}
@@ -184,6 +198,19 @@ export default function ExerciseRow({
               </div>
             )}
           </div>
+
+          {/* In-app set tracker (live logging) */}
+          {log && (
+            <SetTracker
+              exerciseId={ex.id}
+              exerciseName={name}
+              variantId={variantId}
+              defaultRest={ex.rest}
+              prescribedReps={s[1]}
+              log={log}
+              onStartTimer={onStartTimer}
+            />
+          )}
 
           {/* Diagram buttons — directly under sets/reps for fastest access */}
           {EXERCISE_TO_DIAGRAM[ex.id] && (
