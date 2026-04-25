@@ -69,7 +69,7 @@ function NumStepper({
         value={value}
         onChange={(ev) => onChange(ev.target.value.replace(/[^0-9.]/g, ""))}
         placeholder={hint && hint.length > 0 ? hint : "0"}
-        className="flex-1 min-w-0 px-1 py-2 text-center text-base font-bold tabular-nums bg-transparent text-text placeholder:text-text-dim focus:outline-none"
+        className="flex-1 min-w-[48px] w-full px-1 py-2 text-center text-base font-bold tabular-nums bg-transparent text-text placeholder:text-text-dim focus:outline-none"
         style={{ color: value ? "var(--color-text)" : undefined }}
         aria-label={label}
       />
@@ -330,41 +330,50 @@ export default function SetTracker({
       ) : null}
 
       <div className="px-3 pb-3">
-        <div className="grid grid-cols-[auto_1fr_auto_1fr_auto] gap-2 items-center">
-          <span className="text-[11px] font-bold text-text-dim w-6 text-center tabular-nums">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold text-text-dim w-5 text-center tabular-nums shrink-0">
             {sets.length + 1}
           </span>
 
-          <NumStepper
-            value={draftWeight}
-            onChange={setDraftWeight}
-            onMinus={() => adjustWeight(-5)}
-            onPlus={() => adjustWeight(5)}
-            label="lbs"
-          />
+          <div className="flex-1 min-w-0">
+            <NumStepper
+              value={draftWeight}
+              onChange={setDraftWeight}
+              onMinus={() => adjustWeight(-5)}
+              onPlus={() => adjustWeight(5)}
+              label="lbs"
+            />
+          </div>
 
-          <span className="text-text-muted text-sm">×</span>
+          <span className="text-text-muted text-sm shrink-0">×</span>
 
-          <NumStepper
-            value={draftReps}
-            onChange={setDraftReps}
-            onMinus={() => adjustReps(-1)}
-            onPlus={() => adjustReps(1)}
-            label="reps"
-            hint={prescribedReps}
-          />
-
-          <button
-            onClick={handleLogSet}
-            disabled={!draftReps && !draftWeight}
-            data-testid="log-set"
-            className="min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center font-bold text-base disabled:opacity-40"
-            style={{ background: "var(--color-safe)", color: "#000" }}
-            aria-label="Log set"
-          >
-            ✓
-          </button>
+          <div className="flex-1 min-w-0">
+            <NumStepper
+              value={draftReps}
+              onChange={setDraftReps}
+              onMinus={() => adjustReps(-1)}
+              onPlus={() => adjustReps(1)}
+              label="reps"
+              hint={prescribedReps}
+            />
+          </div>
         </div>
+
+        <button
+          onClick={handleLogSet}
+          disabled={!draftReps && !draftWeight}
+          data-testid="log-set"
+          className="w-full mt-2 min-h-[44px] rounded-lg flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-wide disabled:opacity-40"
+          style={{ background: "var(--color-safe)", color: "#000" }}
+          aria-label="Log set"
+        >
+          <span>✓</span>
+          <span>
+            Log set {draftWeight ? `${draftWeight}lb` : ""}
+            {draftWeight && draftReps ? " × " : ""}
+            {draftReps || ""}
+          </span>
+        </button>
 
         <input
           type="text"
