@@ -700,6 +700,217 @@ export function StabBallHamCurlRight({ t }: AnimProps) {
   );
 }
 
+// Prone hip extension (bent-knee, floor) — NWB bridge/thrust alternative.
+// Side view: head at left, hips mid. Right knee bent 90° (sole toward ceiling);
+// the hip extends to drive the right heel up. Left leg flat and passive.
+export function ProneHipExtensionRight({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const hold = phase > 0.4 && phase < 0.6 ? 1 : lift;
+
+  const floorY = 220;
+  const matY = floorY - 2;
+
+  // Prone torso on mat
+  const hdX = 95, hdY = floorY - 12;
+  const shX = 140, shY = floorY - 9;
+  const hipX = 215, hipY = floorY - 9;
+
+  // Left leg — extends to the right, flat on mat, passive red dashed
+  const lKneeX = hipX + 48, lKneeY = floorY - 6;
+  const lFootX = hipX + 95, lFootY = floorY - 4;
+
+  // Right leg — thigh lifts off mat via hip extension; shin stays at 90° knee bend
+  const thighLen = 46;
+  const shinLen = 40;
+  const maxTheta = 0.5; // ~28° at peak
+  const theta = hold * maxTheta;
+  const rKneeX = hipX + thighLen * Math.cos(theta);
+  const rKneeY = hipY - thighLen * Math.sin(theta);
+  // Shin is perpendicular to thigh, pointing toward ceiling at rest
+  const rFootX = rKneeX - shinLen * Math.sin(theta);
+  const rFootY = rKneeY - shinLen * Math.cos(theta);
+
+  // Ghost of resting position (thigh flat, shin vertical) for reference
+  const ghostKneeX = hipX + thighLen, ghostKneeY = hipY;
+  const ghostFootX = ghostKneeX, ghostFootY = ghostKneeY - shinLen;
+
+  return (
+    <g>
+      {/* Floor + mat */}
+      <Floor y={floorY} />
+      <rect x={60} y={matY - 2} width={300} height="5" rx="2" fill="#1a2636" opacity="0.7" />
+
+      {/* Head (side view, face turned down toward mat) */}
+      <circle cx={hdX} cy={hdY} r="12" fill="none" stroke={C.body} strokeWidth="2.5" />
+      {/* Stacked-hand pad under forehead */}
+      <rect x={hdX - 16} y={hdY + 6} width="28" height="5" rx="2" fill={C.body} opacity="0.35" />
+
+      {/* Torso prone on mat */}
+      <line x1={hdX + 10} y1={hdY + 2} x2={shX} y2={shY} stroke={C.body} strokeWidth="4" strokeLinecap="round" />
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      {/* Hip joint marker */}
+      <circle cx={hipX} cy={hipY} r="4" fill={C.body} />
+
+      {/* Left leg — passive, flat on mat, red dashed */}
+      <line x1={hipX - 3} y1={hipY + 2} x2={lKneeX} y2={lKneeY} stroke={C.leftLeg} strokeWidth="4" strokeLinecap="round" strokeDasharray="6,3" opacity="0.6" />
+      <line x1={lKneeX} y1={lKneeY} x2={lFootX} y2={lFootY} stroke={C.leftLeg} strokeWidth="3.5" strokeLinecap="round" strokeDasharray="6,3" opacity="0.6" />
+      <ellipse cx={lFootX + 4} cy={lFootY + 1} rx="6" ry="3" fill="none" stroke={C.leftLeg} strokeWidth="1.5" strokeDasharray="3,2" opacity="0.5" />
+      <text x={lFootX + 14} y={lFootY + 4} fontSize="10" fill={C.leftLeg} fontFamily="monospace">L passive</text>
+
+      {/* Ghost of starting position — faint outline */}
+      <line x1={hipX} y1={hipY} x2={ghostKneeX} y2={ghostKneeY} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.12" />
+      <line x1={ghostKneeX} y1={ghostKneeY} x2={ghostFootX} y2={ghostFootY} stroke={C.body} strokeWidth="4" strokeLinecap="round" opacity="0.12" />
+
+      {/* Right leg — thigh (active) */}
+      <line x1={hipX} y1={hipY} x2={rKneeX} y2={rKneeY} stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      {/* Right leg — shin staying perpendicular to thigh (90° knee bend) */}
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY} stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      {/* Heel — what lifts toward ceiling */}
+      <circle cx={rFootX} cy={rFootY} r="4.5" fill={C.active} />
+      {/* Sole plate (foot flat, sole pointing up) — short perpendicular segment at foot */}
+      <line
+        x1={rFootX - 7 * Math.cos(theta)}
+        y1={rFootY + 7 * Math.sin(theta)}
+        x2={rFootX + 7 * Math.cos(theta)}
+        y2={rFootY - 7 * Math.sin(theta)}
+        stroke={C.active}
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
+      {/* Glute activation glow at hip */}
+      <circle cx={hipX + 4} cy={hipY - 4} r="12" fill={C.active} opacity={hold * 0.35} />
+
+      {/* Heel-to-ceiling arrow + SQUEEZE cue at peak */}
+      {hold > 0.25 && (
+        <>
+          <line x1={rFootX + 14} y1={rFootY + 2} x2={rFootX + 14} y2={rFootY - 20} stroke={C.active} strokeWidth="1.5" strokeDasharray="3,2" />
+          <polygon
+            points={`${rFootX + 10},${rFootY - 16} ${rFootX + 14},${rFootY - 24} ${rFootX + 18},${rFootY - 16}`}
+            fill={C.active}
+          />
+          <text x={rFootX + 22} y={rFootY - 14} fontSize="9" fontWeight="bold" fill={C.active} fontFamily="monospace">heel ↑</text>
+        </>
+      )}
+      {hold > 0.5 && (
+        <text x={hipX - 30} y={hipY - 22} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">SQUEEZE</text>
+      )}
+
+      {/* Labels */}
+      <text x={rKneeX + 6} y={rKneeY + 2} fontSize="10" fontWeight="bold" fill={C.active} fontFamily="monospace">R</text>
+      <text x={hipX - 40} y={hipY + 14} fontSize="8" fill={C.label} fontFamily="monospace">hip neutral</text>
+      <text x={hdX - 18} y={hdY - 16} fontSize="8" fill={C.label} fontFamily="monospace">prone</text>
+    </g>
+  );
+}
+
+// Side-lying hip abduction — lie on RIGHT (healthy) side, lift LEFT leg.
+// Left glute med reconditioning in a fully NWB position. Leg stays in line
+// with (or slightly behind) the torso; toes forward; hips stacked vertically.
+export function SideLyingHipAbductionLeft({ t }: AnimProps) {
+  const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
+  const lift = Math.sin(phase * Math.PI * 0.5);
+  const hold = phase > 0.4 && phase < 0.6 ? 1 : lift;
+
+  const floorY = 200;
+  // Pillow under head (right side is down)
+  const pillowX = 72, pillowY = 175, pillowW = 48, pillowH = 11;
+  // Head rests on pillow (side-view profile)
+  const hdX = 100, hdY = 163;
+  // Shoulder & torso (horizontal along mat)
+  const shX = 123, shY = 175;
+  const hipX = 240, hipY = 183;
+
+  // Bottom (right) leg — on the floor, passive. Straight line hip → knee → foot
+  const rKneeX = 300, rKneeY = 194;
+  const rFootX = 352, rFootY = 197;
+
+  // Top (left) leg — animates from level (in line with torso) up to ~40° abduction.
+  // Hip pivot sits just above the bottom hip (legs stacked).
+  const topHipX = hipX, topHipY = hipY - 4;
+  const thighLen = 58, shinLen = 52;
+  const maxTheta = 0.72; // ~41° at peak
+  const theta = hold * maxTheta;
+  const lKneeX = topHipX + thighLen * Math.cos(theta);
+  const lKneeY = topHipY - thighLen * Math.sin(theta);
+  const lFootX = lKneeX + shinLen * Math.cos(theta);
+  const lFootY = lKneeY - shinLen * Math.sin(theta);
+
+  return (
+    <g>
+      {/* Floor + mat */}
+      <Floor y={floorY} />
+      <rect x={40} y={floorY - 2} width={320} height="4" rx="2" fill="#1a2636" opacity="0.7" />
+
+      {/* Pillow */}
+      <rect x={pillowX} y={pillowY} width={pillowW} height={pillowH} rx="5" fill={C.equipLight} opacity="0.55" />
+      <text x={pillowX + pillowW / 2} y={pillowY + pillowH + 9} textAnchor="middle" fontSize="7" fill={C.label} fontFamily="monospace">pillow</text>
+
+      {/* Head (profile) */}
+      <circle cx={hdX} cy={hdY} r="11" fill="none" stroke={C.body} strokeWidth="2.5" />
+      {/* Neck */}
+      <line x1={hdX + 8} y1={hdY + 7} x2={shX - 3} y2={shY - 2} stroke={C.body} strokeWidth="3" strokeLinecap="round" />
+
+      {/* Torso */}
+      <line x1={shX} y1={shY} x2={hipX} y2={hipY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+
+      {/* Top arm resting along front of torso */}
+      <line x1={shX + 10} y1={shY - 2} x2={shX + 55} y2={shY - 10} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+      <line x1={shX + 55} y1={shY - 10} x2={shX + 95} y2={shY + 4} stroke={C.body} strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+
+      {/* Hip stacking indicator — vertical dashed line between the two hip pivots */}
+      <line x1={hipX} y1={topHipY - 4} x2={hipX} y2={hipY + 10} stroke={C.active} strokeWidth="1" strokeDasharray="3,2" opacity="0.6" />
+      <text x={hipX - 2} y={hipY + 22} textAnchor="end" fontSize="7" fill={C.active} fontFamily="monospace" opacity="0.75">stacked</text>
+
+      {/* Bottom (right) leg — passive, on floor */}
+      <line x1={hipX + 3} y1={hipY + 2} x2={rKneeX} y2={rKneeY} stroke={C.body} strokeWidth="5" strokeLinecap="round" />
+      <line x1={rKneeX} y1={rKneeY} x2={rFootX} y2={rFootY} stroke={C.body} strokeWidth="4.5" strokeLinecap="round" />
+      <ellipse cx={rFootX + 5} cy={rFootY + 1} rx="7" ry="3" fill={C.body} opacity="0.85" />
+      <text x={rFootX + 14} y={rFootY + 4} fontSize="9" fill={C.label} fontFamily="monospace">R floor</text>
+
+      {/* Ghost of left leg at rest (in line with torso) */}
+      <line x1={topHipX} y1={topHipY} x2={topHipX + thighLen} y2={topHipY} stroke={C.active} strokeWidth="4" strokeLinecap="round" opacity="0.13" />
+      <line x1={topHipX + thighLen} y1={topHipY} x2={topHipX + thighLen + shinLen} y2={topHipY} stroke={C.active} strokeWidth="4" strokeLinecap="round" opacity="0.13" />
+
+      {/* Top (left) leg — active, lifting. Green = active in app convention */}
+      <line x1={topHipX} y1={topHipY} x2={lKneeX} y2={lKneeY} stroke={C.active} strokeWidth="6" strokeLinecap="round" />
+      <line x1={lKneeX} y1={lKneeY} x2={lFootX} y2={lFootY} stroke={C.active} strokeWidth="5" strokeLinecap="round" />
+      {/* Foot — toes forward (pointing in +x), NOT up */}
+      <ellipse
+        cx={lFootX + 6 * Math.cos(theta)}
+        cy={lFootY - 6 * Math.sin(theta)}
+        rx="6"
+        ry="3"
+        fill={C.active}
+        transform={`rotate(${-theta * 180 / Math.PI} ${lFootX} ${lFootY})`}
+      />
+      <text x={lFootX + 14} y={lFootY - 4} fontSize="9" fontWeight="bold" fill={C.active} fontFamily="monospace">L</text>
+
+      {/* Glute med activation glow at top hip */}
+      <circle cx={topHipX + 4} cy={topHipY - 6} r="12" fill={C.active} opacity={hold * 0.35} />
+      {hold > 0.45 && (
+        <text x={topHipX - 54} y={topHipY - 18} fontSize="9" fontWeight="bold" fill={C.active} fontFamily="monospace">glute med</text>
+      )}
+
+      {/* Abduction arc arrow */}
+      <path
+        d={`M ${topHipX + 40} ${topHipY + 2} Q ${topHipX + 55} ${topHipY - 40} ${topHipX + 20} ${topHipY - 55}`}
+        fill="none"
+        stroke={C.active}
+        strokeWidth="1.5"
+        strokeDasharray="4,3"
+        opacity="0.55"
+      />
+      <text x={topHipX + 6} y={topHipY - 40} fontSize="8" fill={C.active} fontFamily="monospace" opacity="0.85">abduct</text>
+      <text x={topHipX + 6} y={topHipY - 28} fontSize="8" fill={C.active} fontFamily="monospace" opacity="0.85">30\u201345\u00B0</text>
+
+      {/* Form cues */}
+      <text x={200} y={22} fontSize="9" fill={C.label} fontFamily="monospace" textAnchor="middle">toes forward \u00B7 slightly behind neutral \u00B7 hips stacked</text>
+    </g>
+  );
+}
+
 export const GLUTE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   g1: GluteBridge,
   g2: BandedClamshell,
@@ -711,4 +922,6 @@ export const GLUTE_ANIMS: Record<string, React.ComponentType<AnimProps>> = {
   g8: HackSquatRight,
   g9: LowBoxStepUpRight,
   g10: StabBallHamCurlRight,
+  g11: ProneHipExtensionRight,
+  g12: SideLyingHipAbductionLeft,
 };

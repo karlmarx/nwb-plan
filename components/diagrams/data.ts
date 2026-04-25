@@ -108,6 +108,56 @@ export const EXERCISES: ExerciseDiagram[] = [
     equipment: ["Stability Ball"],
   },
 
+  // ── LEFT-OBLIQUE LOADED / SEATED BLOCK ──
+  {
+    id: "r8", category: "core", name: "Seated Cable Chop (Low-to-High)",
+    target: "Left Obliques (Rotation + Diagonal Flexion)",
+    cues: [
+      "Sit sideways on bench, LEFT HIP facing the low pulley.",
+      "Right foot flat; LEFT leg propped passively on knee scooter — zero bracing.",
+      "Rope in both hands at left hip. Chop diagonally up-and-across above right shoulder.",
+      "Rotation comes from thoracic spine — pelvis stays square. Exhale on the chop.",
+    ],
+    safetyNote: "Left leg is a parked log on the scooter. If it drifts toward flexion, lighten the cable.",
+    equipment: ["Cable Stack", "Bench", "Knee Scooter"],
+  },
+  {
+    id: "r9", category: "core", name: "Seated Pallof Press with Rotation",
+    target: "Left Obliques (Anti-Rotation + Concentric Rotation)",
+    cues: [
+      "Seated on bench, cable anchor on the LEFT at sternum height.",
+      "Press handle straight out to full extension.",
+      "Slowly rotate torso AWAY from stack (to the right), pause 3s, return.",
+      "Left leg stays passive on scooter — zero stabilizer firing.",
+    ],
+    safetyNote: "Rotation is the work — the press is just setup. If the left hip flexor engages, lighten the cable.",
+    equipment: ["Cable Stack", "Bench", "Knee Scooter"],
+  },
+  {
+    id: "r10", category: "core", name: "Seated Single-Side Suitcase Iso-Hold (R)",
+    target: "Left Obliques + Left QL (Anti-Lateral Flexion)",
+    cues: [
+      "Upright on bench, feet flat, spine neutral, shoulders over hips.",
+      "Heavy DB in RIGHT hand only, hanging at side. LEFT hand empty.",
+      "Hold. Shoulders level. Do NOT let the weight tip you right.",
+      "Left leg passive on floor or scooter — no planting for leverage.",
+    ],
+    safetyNote: "Progress weight weekly, not duration. If the torso tips right, drop weight — you've exceeded left-side iso capacity.",
+    equipment: ["Dumbbell", "Bench"],
+  },
+  {
+    id: "r11", category: "core", name: "Side Plank + DB Thread-the-Needle (R Side Down)",
+    target: "Left Obliques (Rotation Under Load)",
+    cues: [
+      "RIGHT forearm on bench (easier) or floor (harder). Body in straight diagonal line.",
+      "LEFT LEG STACKED PASSIVELY on right — not lifted, not abducted.",
+      "Light DB in LEFT (top) hand. Press toward ceiling, thread under torso, return.",
+      "Left leg stays stacked and quiet throughout — if it lifts, iliopsoas is cheating in.",
+    ],
+    safetyNote: "Right side bears all weight. Left side entirely unloaded. Drop DB and reset if left leg drifts.",
+    equipment: ["Dumbbell", "Bench"],
+  },
+
   // ── SUPINE → core tab ──
   {
     id: "s1", category: "core", name: "Cross-Body Reach",
@@ -422,6 +472,28 @@ export const EXERCISES: ExerciseDiagram[] = [
     ],
     safetyNote: "Smoother contraction than heavy RDLs. Zero spinal load.",
     equipment: ["Stability Ball"],
+  },
+  {
+    id: "g11", category: "legs", name: "Prone Hip Extension (R)",
+    target: "Glute Max / Hip Extension — NWB bridge-thrust alt",
+    cues: [
+      "Face down on mat. RIGHT knee bent 90° — sole toward ceiling.",
+      "Left leg flat on the floor, fully passive.",
+      "Squeeze RIGHT glute to lift heel straight toward ceiling. Pause 1s at top.",
+      "Lower with control. Keep the knee bent the whole time — only the hip moves.",
+    ],
+    safetyNote: "Feel it in the glute, not the low back. If the lumbar compensates, reduce ROM. Left hip stays in neutral extension — zero iliopsoas risk. NWB-safe substitute for SL Glute Bridge & SL Hip Thrust.",
+  },
+  {
+    id: "g12", category: "legs", name: "Side-Lying Hip Abduction (L)",
+    target: "Left Glute Medius / Hip Abduction",
+    cues: [
+      "Lie on the RIGHT (healthy) side. Head on pillow. Legs stacked and straight.",
+      "Lift the LEFT leg up and slightly back — in line with the torso, NOT forward.",
+      "Pause 1–2s at ~30–45° of abduction. Lower with control.",
+      "Toes pointing forward throughout — internal rotation (toes up) shuts glute med off.",
+    ],
+    safetyNote: "Hips stacked vertically — don't let the top hip roll backward (TFL/hip flexors take over). Leg slightly BEHIND neutral keeps left iliopsoas silent. Zero weight bearing on the left leg; it moves freely in space. Stop at any groin or anterior hip sensation.",
   },
 
   // ── TRX → split: pull (t3 row), core (others) ──
