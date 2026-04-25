@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { loadState, saveState } from "@/lib/storage";
 import {
   EX,
@@ -43,6 +44,13 @@ import ComplementPicker, {
 } from "@/components/complement-picker";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+
+// Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
+// avoids a Turbopack chunk-init order issue when the tracker is bundled into
+// the SSR'd workout-view tree.
+const SetTracker = dynamic(() => import("@/components/set-tracker"), {
+  ssr: false,
+});
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -1487,7 +1495,7 @@ export default function WorkoutView() {
             ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
 
           return (
-            <div key={origName}>
+            <div key={origName} data-exercise-name={exName}>
               {/* Swap indicator */}
               {exName !== origName && (
                 <div className="text-[10px] text-text-muted px-3 flex items-center gap-1">
@@ -3172,6 +3180,26 @@ export default function WorkoutView() {
                 <div className="text-white/75 text-[14px] leading-relaxed">{item.ex.nwbCues}</div>
               </div>
 
+              {/* In-app set tracker — primary action surface in play mode.
+                  `key` re-keys on exercise change so the draft state, prefill,
+                  and inputs reset cleanly when navigating between focus items. */}
+              <div className="mb-4">
+                <SetTracker
+                  key={item.ex.id}
+                  exerciseId={item.ex.id}
+                  exerciseName={item.name}
+                  variantId={
+                    item.ex.machineVariants?.find(
+                      (v) => v.id === machineSelections[item.name],
+                    )?.id
+                  }
+                  defaultRest={item.ex.rest}
+                  prescribedReps={s[1]}
+                  log={log}
+                  onStartTimer={(sec) => setTimer(sec)}
+                />
+              </div>
+
               <div
                 className="mb-4 rounded-2xl p-4"
                 style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
@@ -3386,7 +3414,14 @@ export default function WorkoutView() {
         />
       )}
 
-      {/* Add-exercise picker — "＋ Add exercise" button opens this */}
+      {/* Add-exercise picker — "＋ Add exercise" button opens this.
+          The picker itself is intentionally lean (search + tap-to-add). To
+          let the user log a set immediately on the new exercise without a
+          separate tap to expand it, we (a) make sure the workout section is
+          open, (b) auto-expand the freshly added row, and (c) scroll it
+          into view. The picker auto-closes on add (existing behavior), so
+          when the user lands back on the today view the new ExerciseRow is
+          already expanded with SetTracker visible at the top of its panel. */}
       {addPickerFor && (() => {
         const wk = addPickerFor;
         const w = WORKOUTS[wk];
@@ -3402,7 +3437,39 @@ export default function WorkoutView() {
           <AddExercisePicker
             currentExercises={current}
             preferredCategory={preferred}
-            onAdd={(name) => addExerciseToWorkout(wk, name)}
+            onAdd={(name) => {
+              addExerciseToWorkout(wk, name);
+              // Ensure the workout section is open so the row is visible.
+              setOpenSections((prev) =>
+                prev[wk] ? prev : { ...prev, [wk]: true },
+              );
+              // Auto-expand the new exercise row so its SetTracker is
+              // immediately tappable. Note: getExName(wk, name) === name
+              // for freshly added exercises (no swap mapping yet).
+              setExpandedEx((prev) =>
+                prev[name] ? prev : { ...prev, [name]: true },
+              );
+              // Scroll the new row into view after the picker closes.
+              // Each row in renderWorkout is tagged with data-exercise-name
+              // so we can find it deterministically without a ref. The
+              // double rAF gives React a tick to paint the new addition +
+              // expanded panel before we scroll.
+              if (typeof window !== "undefined") {
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    const el = document.querySelector(
+                      `[data-exercise-name="${CSS.escape(name)}"]`,
+                    );
+                    if (el && "scrollIntoView" in el) {
+                      (el as HTMLElement).scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+                    }
+                  });
+                });
+              }
+            }}
             onClose={() => setAddPickerFor(null)}
           />
         );
