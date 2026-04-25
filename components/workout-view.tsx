@@ -24,7 +24,6 @@ import type { Exercise } from "@/lib/exercises";
 import { computeCurrentPhase } from "@/lib/program";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
-import RemovedRow from "@/components/removed-row";
 import Callout from "@/components/callout";
 import RestTimer from "@/components/rest-timer";
 import ProgressClock from "@/components/progress-clock";
@@ -164,35 +163,6 @@ const CARDIO_SCHEDULE = [
   ["Fri", "Arm Ergo HIIT", "Ropes Tabata", "~400"],
   ["Sat", "SkiErg Long 40m", "Boxing 15m", "~500"],
   ["Sun", "Light Arm Ergo 20m", "Rest", "~100"],
-];
-
-// ===== INJURY DATA =====
-const INJURIES = [
-  {
-    n: "L Hip Stress Fracture",
-    c: "var(--color-danger)",
-    r: "Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side. This drives ALL exercise modifications.",
-  },
-  {
-    n: "Bilateral FAI + Labral Tears",
-    c: "var(--color-warning)",
-    r: "Cam-type impingement both hips. Anterosuperior labral tear. Keep hip flexion under 90\u00B0.",
-  },
-  {
-    n: "Bilateral Hamstring Tendinosis",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 no discrete tear. Not restricting programming.",
-  },
-  {
-    n: "L4-L5 DDD",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 not restricting programming. Good form is sufficient.",
-  },
-  {
-    n: "R Hip Labral Tear (mild)",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 small anterosuperior tear. Not restricting programming.",
-  },
 ];
 
 // ===== OVERLOAD RULES =====
@@ -535,29 +505,6 @@ const EQUIPMENT_CORE_BLOCKS: {
       "Typewriter R-Leg Raises",
       "R-Leg Toes-to-Bar",
     ],
-  },
-];
-
-const REMOVED_CORE = [
-  {
-    name: "Active Straight Leg Raises",
-    reason:
-      "Hip flexor contraction compresses femoral neck stress fracture. NEVER do these.",
-  },
-  {
-    name: "Hanging Leg Raises",
-    reason:
-      "Deep hip flexion + massive hip flexor force = fracture danger.",
-  },
-  {
-    name: "Standard Navasana / V-Ups / Tuck-Ups",
-    reason:
-      "Bilateral hip flexor activation. Use Modified Navasana (parallette press) instead.",
-  },
-  {
-    name: "Standard Bird-Dog (quadruped)",
-    reason:
-      "Left knee at 90\u00B0 hip flexion approaches FAI limit + loads femoral neck. Use Prone Bench version instead. Quadruped needs PT clearance.",
   },
 ];
 
@@ -1387,26 +1334,6 @@ export default function WorkoutView() {
           if (items.length > 0) setFocusState({ items, index: 0 });
         }}
       >
-        {/* Hevy link */}
-        {hevyId && (
-          <div className="mb-3">
-            <a
-              href={`https://hevy.com/routine/${hevyId}`}
-              target="_blank"
-              rel="noopener"
-              onClick={(ev) => ev.stopPropagation()}
-              className="block text-center rounded-xl text-sm font-semibold no-underline min-h-[48px] leading-[48px] transition-colors duration-150"
-              style={{
-                padding: "0 12px",
-                background: "#a78bfa15",
-                border: "1px solid #a78bfa33",
-                color: "#a78bfa",
-              }}
-            >
-              Open in HEVY
-            </a>
-          </div>
-        )}
 
         {/* NWB Yoga link (Recovery only) */}
         {workoutKey === "Recovery" && (
@@ -1554,15 +1481,6 @@ export default function WorkoutView() {
           <span className="text-base leading-none">＋</span>
           Add exercise
         </button>
-
-        {/* Removed exercises */}
-        {w.removed.length > 0 && (
-          <div className="mt-2.5 pt-2.5 border-t border-border">
-            {w.removed.map((r) => (
-              <RemovedRow key={r.name} name={r.name} reason={r.reason} />
-            ))}
-          </div>
-        )}
 
         {/* Core finishers */}
         {CORE_FINISHERS[workoutKey] && (
@@ -2176,17 +2094,6 @@ export default function WorkoutView() {
           the final 10-15 seconds of each set. If you finish the set
           comfortably, move up an amp level.
         </Callout>
-
-        <Section
-          title="Removed Exercises"
-          icon={"\uD83D\uDEAB"}
-          isOpen={!!openSections["danger-core"]}
-          onToggle={() => toggleSection("danger-core")}
-        >
-          {REMOVED_CORE.map((r) => (
-            <RemovedRow key={r.name} name={r.name} reason={r.reason} />
-          ))}
-        </Section>
       </div>
     );
   }
@@ -2478,35 +2385,6 @@ export default function WorkoutView() {
   function renderSafetyTab() {
     return (
       <div>
-        {/* Injury Status */}
-        <Section
-          title="Injury Status (MRI 3/11/2026)"
-          icon={"\uD83E\uDE7B"}
-          isOpen={!!openSections["injuries"]}
-          onToggle={() => toggleSection("injuries")}
-        >
-          {INJURIES.map((inj, i) => (
-            <div
-              key={`inj-${i}`}
-              className="rounded-lg mb-1.5"
-              style={{
-                padding: 12,
-                background: "var(--color-card)",
-                borderLeft: `3px solid ${inj.c}`,
-              }}
-            >
-              <div
-                className="font-bold text-[13px]"
-                style={{ color: inj.c }}
-              >
-                {inj.n}
-              </div>
-              <div className="text-[11px] mt-1 text-text-dim leading-relaxed">
-                {inj.r}
-              </div>
-            </div>
-          ))}
-        </Section>
 
         {/* Absolute Stop Signals */}
         <Section
@@ -2856,7 +2734,7 @@ export default function WorkoutView() {
           </div>
         </div>
         <div className="text-xs text-text-muted mt-1.5 tracking-wide">
-          NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 6 Weeks
+          NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 8 Weeks
         </div>
       </div>
 
