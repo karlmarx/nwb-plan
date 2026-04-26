@@ -37,6 +37,11 @@ export interface ExerciseConstraints {
   requiresWeightBearing: boolean;
 }
 
+export interface ExerciseMuscles {
+  primary: string[];
+  secondary?: string[];
+}
+
 export interface VariantSuperset {
   title: string;
   sets: string;
@@ -78,6 +83,7 @@ export interface Exercise {
   amp?: string[];
   sets: [string, string][];
   constraints: ExerciseConstraints;
+  muscles: ExerciseMuscles;
   machineVariants?: MachineVariant[];
 }
 
@@ -115,6 +121,7 @@ interface ExerciseRow {
   amp: string[] | null;
   sets: [string, string][];
   constraints: ExerciseConstraints;
+  muscles: ExerciseMuscles;
 }
 
 interface VariantRow {
@@ -147,6 +154,7 @@ function rowToExercise(
     swaps: row.swaps,
     sets: row.sets,
     constraints: row.constraints,
+    muscles: row.muscles,
   };
 
   if (row.visual != null) ex.visual = row.visual;
@@ -188,7 +196,7 @@ export async function getAllExercises(): Promise<Exercise[]> {
   const exRes = await sql<ExerciseRow>`
     SELECT id, name, category, rest_seconds, setup, execution, nwb_cues,
            why, safety, visual, diagram, tempo, phase, tier, cable_superset,
-           requires, swaps, amp, sets, constraints
+           requires, swaps, amp, sets, constraints, muscles
     FROM exercises
     ORDER BY category, name
   `;
@@ -220,7 +228,7 @@ export async function getExerciseById(id: string): Promise<Exercise | null> {
   const exRes = await sql<ExerciseRow>`
     SELECT id, name, category, rest_seconds, setup, execution, nwb_cues,
            why, safety, visual, diagram, tempo, phase, tier, cable_superset,
-           requires, swaps, amp, sets, constraints
+           requires, swaps, amp, sets, constraints, muscles
     FROM exercises
     WHERE id = ${id}
     LIMIT 1
@@ -251,7 +259,7 @@ export async function createExercise(data: ExerciseInput): Promise<Exercise> {
     INSERT INTO exercises (
       id, name, category, rest_seconds, setup, execution, nwb_cues, why,
       safety, visual, diagram, tempo, phase, tier, cable_superset,
-      requires, swaps, amp, sets, constraints
+      requires, swaps, amp, sets, constraints, muscles
     ) VALUES (
       ${data.id},
       ${data.name},
@@ -272,7 +280,8 @@ export async function createExercise(data: ExerciseInput): Promise<Exercise> {
       ${JSON.stringify(data.swaps)}::jsonb,
       ${data.amp ? JSON.stringify(data.amp) : null}::jsonb,
       ${JSON.stringify(data.sets)}::jsonb,
-      ${JSON.stringify(data.constraints)}::jsonb
+      ${JSON.stringify(data.constraints)}::jsonb,
+      ${JSON.stringify(data.muscles)}::jsonb
     )
     ON CONFLICT (id) DO UPDATE SET
       name           = EXCLUDED.name,
@@ -293,7 +302,8 @@ export async function createExercise(data: ExerciseInput): Promise<Exercise> {
       swaps          = EXCLUDED.swaps,
       amp            = EXCLUDED.amp,
       sets           = EXCLUDED.sets,
-      constraints    = EXCLUDED.constraints
+      constraints    = EXCLUDED.constraints,
+      muscles        = EXCLUDED.muscles
   `;
 
   // Replace the variants set — simplest correct semantics.  At ~5 variants
