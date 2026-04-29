@@ -1026,7 +1026,7 @@ export const PWB_ADDITIONS: Record<string, Exercise> = {
     why: "Skill-ceiling gymnastic isometric. Iliopsoas + lower abs + triceps + scapular depressors all maxed. Builds toward V-sit, manna, and tuck planche transitions.",
     safety: "caution",
     phaseUnlock: PWB,
-    swaps: ["L-Sit Hold (R Leg Extended) (parallettes)", "Captain's Chair Knee Raise (Bilateral)"],
+    swaps: ["Parallette L-Sit", "Captain's Chair Knee Raise (Bilateral)"],
     amp: [
       "BASE: Tuck L-Sit (knees to chest, hips off floor), 3x10s.",
       "AMP 1: Advanced Tuck L-Sit (shins parallel to floor, knees bent 90deg), 3x10s.",
