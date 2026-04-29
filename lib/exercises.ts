@@ -3299,4 +3299,10 @@ export const PHASES: Phase[] = [
     color: "#f97316",
     desc: "Maximum safe output. Heavy singles. Pre-weight-bearing.",
   },
+  {
+    weeks: "7-8",
+    name: "PWB Prep",
+    color: "#10b981",
+    desc: "Partial weight bearing transition. PT-guided progression. New exercises being added.",
+  },
 ];

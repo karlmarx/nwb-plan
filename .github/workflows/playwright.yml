@@ -82,6 +82,7 @@ jobs:
       - name: Run Playwright tests
         env:
           AUTH_TRUST_HOST: "true"
+          EXERCISE_API_TOKEN: "ci-test-token-deadbeef"
         run: |
           npm run start &
           SERVER_PID=$!

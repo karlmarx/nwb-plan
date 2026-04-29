@@ -9,15 +9,16 @@
  */
 export const PROG_START = new Date("2026-03-17T16:00:00Z");
 
-/** 6 weeks in ms. */
-export const PROG_DURATION = 42 * 24 * 60 * 60 * 1000;
+/** 8 weeks in ms. */
+export const PROG_DURATION = 56 * 24 * 60 * 60 * 1000;
 
 /**
- * Which phase index (0, 1, 2) maps to today's calendar week.
+ * Which phase index (0, 1, 2, 3) maps to today's calendar week.
  *  - phase 0 → weeks 1-2 (Foundation)
  *  - phase 1 → weeks 3-4 (Build)
  *  - phase 2 → weeks 5-6 (Peak)
- * Clamps to [0, 2] so dates outside the 6-week window still resolve.
+ *  - phase 3 → weeks 7-8 (PWB Prep — partial weight bearing transition)
+ * Clamps to [0, 3] so dates outside the 8-week window still resolve.
  */
 export function computeCurrentPhase(now: Date = new Date()): number {
   const elapsed = now.getTime() - PROG_START.getTime();
@@ -25,5 +26,6 @@ export function computeCurrentPhase(now: Date = new Date()): number {
   const week = Math.floor(elapsed / (7 * 24 * 60 * 60 * 1000)) + 1;
   if (week <= 2) return 0;
   if (week <= 4) return 1;
-  return 2;
+  if (week <= 6) return 2;
+  return 3;
 }
