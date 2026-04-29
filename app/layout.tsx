@@ -8,7 +8,7 @@ const fontLink = "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wgh
 
 export const metadata: Metadata = {
   title: "Femur Fracture Fitness",
-  description: "MRI-Adjusted Non-Weight-Bearing Push/Pull/Legs Training Protocol",
+  description: "Non-Weight-Bearing Push/Pull/Legs Training Protocol",
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.svg",
