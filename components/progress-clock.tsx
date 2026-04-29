@@ -1,12 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { PROG_START, PROG_DURATION } from "@/lib/program";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  DEFAULT_PROGRAM_PHASES,
+  ProgramPhase,
+  activePhase,
+  phaseDayNumber,
+  phaseDurationMs,
+  phaseElapsedMs,
+  phaseProgressFraction,
+  parsePhases,
+} from "@/lib/program";
 import { PHASES } from "@/lib/exercises";
+import { loadState, saveState } from "@/lib/storage";
 
-const PROG_END = new Date(PROG_START.getTime() + PROG_DURATION);
+const STORAGE_KEY = "nwb_programPhases";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
-const WEEK_MS = 7 * DAY_MS;
 
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -30,12 +40,33 @@ function fmtDate(d: Date): string {
   });
 }
 
+function loadPhases(): ProgramPhase[] {
+  // loadState returns the raw JSON-parsed object (Dates are strings until rehydrated).
+  const raw = loadState<unknown>(STORAGE_KEY, null);
+  const parsed = parsePhases(raw);
+  if (parsed && parsed.length > 0) return parsed;
+  // First-run fallback: write defaults so future sessions are stable.
+  if (typeof window !== "undefined") {
+    saveState(STORAGE_KEY, DEFAULT_PROGRAM_PHASES);
+  }
+  return DEFAULT_PROGRAM_PHASES;
+}
+
 export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
   const [now, setNow] = useState(() => new Date());
-  const [countdown, setCountdown] = useState(false);
   const [flash, setFlash] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  // Phases come from localStorage with sensible defaults. Memoized so we
+  // don't reparse JSON every render. (The user can mutate phases by
+  // editing localStorage; a future settings UI may surface this.)
+  const phases = useMemo(loadPhases, []);
+  const active = useMemo(() => activePhase(phases), [phases]);
+  const prior = useMemo(
+    () => phases.filter((p) => p.id !== active.id && p.status === "completed"),
+    [phases, active.id],
+  );
 
   // Tick every second
   useEffect(() => {
@@ -52,15 +83,16 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const elapsed = now.getTime() - PROG_START.getTime();
-  const remaining = PROG_END.getTime() - now.getTime();
-  const progress = Math.min(1, Math.max(0, elapsed / PROG_DURATION));
+  const elapsed = phaseElapsedMs(active, now);
+  const duration = phaseDurationMs(active);
+  const progress = phaseProgressFraction(active, now);
   const pct = Math.round(progress * 100);
-  const weekNum = Math.min(6, Math.floor(elapsed / WEEK_MS) + 1);
-  const totalDayNum = Math.min(42, Math.floor(elapsed / DAY_MS) + 1);
-  const daysRemaining = Math.max(0, Math.ceil(remaining / DAY_MS));
+  const dayNum = phaseDayNumber(active, now);
+  const dayCapped = Math.min(active.durationDays, dayNum);
+  const reached = elapsed >= duration;
 
-  const t = fmt(countdown ? remaining : elapsed);
+  // Big counter always counts UP (elapsed since active phase start).
+  const t = fmt(elapsed);
 
   // Color shifts: green (0-33%) -> blue (33-66%) -> amber (66-100%)
   const clr =
@@ -74,18 +106,15 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
   const clrHex =
     progress < 0.33 ? "#10b981" : progress < 0.66 ? "#38bdf8" : "#f59e0b";
 
-  const pctDisplay = countdown
-    ? 100 - pct + "% remaining"
-    : pct + "% complete";
+  const headerLabel = reached
+    ? `${active.name} target reached · Day ${dayNum}`
+    : `${active.name} · Day ${dayCapped} of ${active.durationDays}`;
+
+  const pctDisplay = reached ? "target reached" : pct + "% complete";
 
   function openDetail() {
     if (minimized) setMinimized(false);
     setDetailOpen(true);
-  }
-
-  function flashToggle(e: React.MouseEvent) {
-    e.stopPropagation();
-    setCountdown((v) => !v);
     setFlash(true);
     setTimeout(() => setFlash(false), 300);
   }
@@ -104,7 +133,7 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
           onClick={openDetail}
           className="relative cursor-pointer"
           style={{ width: size, height: size }}
-          title={`${countdown ? "Remaining" : "Elapsed"}: ${t.d}d ${pad(t.h)}h ${pad(t.m)}m · ${pctDisplay} · tap for details`}
+          title={`${active.longName} · Day ${dayNum} · ${pctDisplay} · tap for details`}
         >
           <svg width={size} height={size} className="block" style={{ transform: "rotate(-90deg)" }}>
             <circle
@@ -126,25 +155,24 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-[10px] font-extrabold leading-none" style={{ color: clr }}>
-              W{weekNum}
+              {active.name}
             </span>
             <span className="text-[8px] font-bold text-text-muted leading-none mt-0.5">
-              D{totalDayNum}
+              D{dayNum}
             </span>
           </div>
         </div>
         {detailOpen && (
           <ProgressDetailModal
             now={now}
+            active={active}
+            prior={prior}
             elapsed={elapsed}
-            remaining={remaining}
+            duration={duration}
             progress={progress}
             pct={pct}
-            weekNum={weekNum}
-            totalDayNum={totalDayNum}
-            daysRemaining={daysRemaining}
-            countdown={countdown}
-            setCountdown={setCountdown}
+            dayNum={dayNum}
+            reached={reached}
             clr={clr}
             clrHex={clrHex}
             onClose={() => setDetailOpen(false)}
@@ -171,7 +199,7 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
             className="text-[11px] font-bold"
             style={{ color: clr }}
           >
-            W{weekNum} &middot; D{totalDayNum}
+            {active.name} &middot; D{dayNum}
           </span>
           <span
             className="text-[11px] text-text-muted tabular-nums"
@@ -179,23 +207,22 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
             {t.d > 0
               ? t.d + "d " + pad(t.h) + "h " + pad(t.m) + "m"
               : pad(t.h) + ":" + pad(t.m) + ":" + pad(t.s)}
-            {" \u00B7 "}
+            {" · "}
             {pctDisplay}
           </span>
-          <span className="text-[10px] text-text-muted">{"\u24D8"}</span>
+          <span className="text-[10px] text-text-muted">{"ⓘ"}</span>
         </div>
         {detailOpen && (
           <ProgressDetailModal
             now={now}
+            active={active}
+            prior={prior}
             elapsed={elapsed}
-            remaining={remaining}
+            duration={duration}
             progress={progress}
             pct={pct}
-            weekNum={weekNum}
-            totalDayNum={totalDayNum}
-            daysRemaining={daysRemaining}
-            countdown={countdown}
-            setCountdown={setCountdown}
+            dayNum={dayNum}
+            reached={reached}
             clr={clr}
             clrHex={clrHex}
             onClose={() => setDetailOpen(false)}
@@ -236,29 +263,29 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
               className="text-[10px] font-bold uppercase tracking-wide"
               style={{ color: clr }}
             >
-              {progress >= 1
-                ? "Program Complete"
-                : `Week ${weekNum} \u00B7 Day ${totalDayNum} of 42`}
+              {headerLabel}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
+            {/* Prior-phase badges (e.g. NWB complete) */}
+            {prior.map((p) => (
+              <span
+                key={p.id}
+                data-testid={`prior-phase-${p.id}`}
+                className="text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5"
+                style={{
+                  background: (p.color ?? "#a78bfa") + "18",
+                  border: `1px solid ${(p.color ?? "#a78bfa")}44`,
+                  color: p.color ?? "#a78bfa",
+                }}
+                title={`${p.longName} complete · ${p.durationDays}d`}
+              >
+                {p.name} done
+              </span>
+            ))}
             <span className="text-[9px] text-text-muted uppercase tracking-wide">
-              {countdown ? "remaining" : "elapsed"}
+              elapsed
             </span>
-            <button
-              data-testid="progress-toggle"
-              onClick={flashToggle}
-              aria-label="Toggle elapsed / remaining"
-              className="rounded text-[9px] font-bold cursor-pointer font-[inherit]"
-              style={{
-                padding: "2px 7px",
-                background: clrHex + "22",
-                border: `1px solid ${clrHex}44`,
-                color: clr,
-              }}
-            >
-              {countdown ? "\u2193" : "\u2191"}
-            </button>
           </div>
         </div>
 
@@ -320,15 +347,14 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
       {detailOpen && (
         <ProgressDetailModal
           now={now}
+          active={active}
+          prior={prior}
           elapsed={elapsed}
-          remaining={remaining}
+          duration={duration}
           progress={progress}
           pct={pct}
-          weekNum={weekNum}
-          totalDayNum={totalDayNum}
-          daysRemaining={daysRemaining}
-          countdown={countdown}
-          setCountdown={setCountdown}
+          dayNum={dayNum}
+          reached={reached}
           clr={clr}
           clrHex={clrHex}
           onClose={() => setDetailOpen(false)}
@@ -342,36 +368,36 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
 
 interface DetailProps {
   now: Date;
+  active: ProgramPhase;
+  prior: ProgramPhase[];
   elapsed: number;
-  remaining: number;
+  duration: number;
   progress: number;
   pct: number;
-  weekNum: number;
-  totalDayNum: number;
-  daysRemaining: number;
-  countdown: boolean;
-  setCountdown: (v: boolean | ((prev: boolean) => boolean)) => void;
+  dayNum: number;
+  reached: boolean;
   clr: string;
   clrHex: string;
   onClose: () => void;
 }
 
 function ProgressDetailModal({
+  active,
+  prior,
   elapsed,
-  remaining,
   pct,
-  weekNum,
-  totalDayNum,
-  daysRemaining,
-  countdown,
-  setCountdown,
+  dayNum,
+  reached,
   clr,
   clrHex,
   onClose,
 }: DetailProps) {
-  const t = fmt(countdown ? remaining : elapsed);
-  const startStr = fmtDate(PROG_START);
-  const endStr = fmtDate(PROG_END);
+  const t = fmt(elapsed);
+  const startStr = fmtDate(active.startDate);
+  const targetEnd = new Date(
+    active.startDate.getTime() + active.durationDays * DAY_MS,
+  );
+  const targetEndStr = fmtDate(targetEnd);
 
   return (
     <div
@@ -407,10 +433,11 @@ function ProgressDetailModal({
               className="text-[10px] font-bold uppercase tracking-wider"
               style={{ color: clr }}
             >
-              Femur Fracture Fitness
+              {active.longName}
             </div>
             <div className="text-sm font-semibold text-text">
-              Week {weekNum} &middot; Day {totalDayNum} of 42
+              Day {dayNum} of {active.durationDays}
+              {reached && " · target reached"}
             </div>
           </div>
           <button
@@ -428,7 +455,7 @@ function ProgressDetailModal({
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-4 pb-6 pt-3">
-          {/* Big number + toggle */}
+          {/* Big number — count-up only */}
           <div
             className="rounded-xl p-3 mb-4"
             style={{
@@ -438,19 +465,18 @@ function ProgressDetailModal({
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: clr }}>
-                {countdown ? "time remaining" : "time elapsed"}
+                time in this phase
               </span>
-              <button
-                onClick={() => setCountdown((v) => !v)}
-                className="rounded text-[10px] font-bold cursor-pointer font-[inherit] px-2 py-1"
+              <span
+                className="text-[10px] font-bold rounded px-2 py-1"
                 style={{
                   background: clrHex + "22",
                   border: `1px solid ${clrHex}44`,
                   color: clr,
                 }}
               >
-                Show {countdown ? "elapsed" : "remaining"}
-              </button>
+                {active.name}
+              </span>
             </div>
             <div className="flex items-baseline gap-2 tabular-nums" style={{ color: clr }}>
               <span className="text-3xl font-extrabold" style={{ letterSpacing: "-1px" }}>
@@ -471,59 +497,98 @@ function ProgressDetailModal({
               <span className="text-[10px] uppercase font-bold text-text-muted">s</span>
             </div>
             <div className="mt-2 text-[11px] text-text-muted">
-              {countdown
-                ? `${daysRemaining} days left · ${100 - pct}% remaining`
-                : `Day ${totalDayNum} of 42 · ${pct}% complete`}
+              Day {dayNum} of {active.durationDays} · {pct}% of phase target
             </div>
           </div>
 
-          {/* Phase breakdown */}
-          <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-            Phases
-          </div>
-          <div className="space-y-1.5 mb-4">
-            {PHASES.map((p, i) => {
-              const weekStart = i * 2 + 1;
-              const weekEnd = weekStart + 1;
-              const isCurrent = weekNum >= weekStart && weekNum <= weekEnd;
-              const isPast = weekNum > weekEnd;
-              return (
-                <div
-                  key={p.name}
-                  className="rounded-xl p-3"
-                  style={{
-                    background: isCurrent ? p.color + "18" : "var(--color-bg)",
-                    border: `1px solid ${isCurrent ? p.color + "66" : "var(--color-border)"}`,
-                    opacity: isPast ? 0.55 : 1,
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span
-                      className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+          {/* Rehab phase history */}
+          {prior.length > 0 && (
+            <>
+              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                Phase history
+              </div>
+              <div className="space-y-1.5 mb-4">
+                {prior.map((p) => {
+                  const pColor = p.color ?? "#a78bfa";
+                  const pEnd = new Date(
+                    p.startDate.getTime() + p.durationDays * DAY_MS,
+                  );
+                  return (
+                    <div
+                      key={p.id}
+                      data-testid={`prior-phase-card-${p.id}`}
+                      className="rounded-xl p-3"
                       style={{
-                        background: p.color + "22",
-                        border: `1px solid ${p.color}44`,
-                        color: p.color,
+                        background: "var(--color-bg)",
+                        border: "1px solid var(--color-border)",
+                        opacity: 0.75,
                       }}
                     >
-                      WK {p.weeks}
-                    </span>
-                    <span className="text-sm font-semibold" style={{ color: p.color }}>
-                      {p.name}
-                    </span>
-                    {isCurrent && (
-                      <span className="ml-auto text-[10px] font-bold" style={{ color: p.color }}>
-                        ● current
-                      </span>
-                    )}
-                    {isPast && (
-                      <span className="ml-auto text-[10px] text-text-muted">done</span>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-text-dim leading-snug">{p.desc}</div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span
+                          className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                          style={{
+                            background: pColor + "22",
+                            border: `1px solid ${pColor}44`,
+                            color: pColor,
+                          }}
+                        >
+                          {p.name}
+                        </span>
+                        <span className="text-sm font-semibold" style={{ color: pColor }}>
+                          {p.longName}
+                        </span>
+                        <span className="ml-auto text-[10px] text-text-muted">
+                          completed
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-text-dim leading-snug">
+                        {fmtDate(p.startDate)} → {fmtDate(pEnd)} · {p.durationDays}d
+                      </div>
+                      {p.desc && (
+                        <div className="text-[11px] text-text-dim leading-snug mt-1">
+                          {p.desc}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* Workout-content phase breakdown (Foundation / Build / Peak / PWB Prep) */}
+          <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+            Workout phases
+          </div>
+          <div className="space-y-1.5 mb-4">
+            {PHASES.map((p) => (
+              <div
+                key={p.name}
+                className="rounded-xl p-3"
+                style={{
+                  background: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span
+                    className="text-[9px] font-extrabold rounded px-1.5 py-0.5"
+                    style={{
+                      background: p.color + "22",
+                      border: `1px solid ${p.color}44`,
+                      color: p.color,
+                    }}
+                  >
+                    WK {p.weeks}
+                  </span>
+                  <span className="text-sm font-semibold" style={{ color: p.color }}>
+                    {p.name}
+                  </span>
                 </div>
-              );
-            })}
+                <div className="text-[11px] text-text-dim leading-snug">{p.desc}</div>
+              </div>
+            ))}
           </div>
 
           {/* Dates + stats */}
@@ -537,10 +602,12 @@ function ProgressDetailModal({
               border: "1px solid var(--color-border)",
             }}
           >
-            <StatCell label="Start" value={startStr} />
-            <StatCell label="End" value={endStr} />
-            <StatCell label="Days done" value={`${totalDayNum} / 42`} />
-            <StatCell label="Days left" value={`${daysRemaining}`} />
+            <StatCell label="Phase" value={active.longName} />
+            <StatCell label="Status" value={reached ? "target reached" : "active"} />
+            <StatCell label="Started" value={startStr} />
+            <StatCell label="Target end" value={targetEndStr} />
+            <StatCell label="Day" value={`${dayNum} / ${active.durationDays}`} />
+            <StatCell label="Progress" value={`${pct}%`} />
           </div>
         </div>
       </div>
