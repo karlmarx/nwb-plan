@@ -45,6 +45,7 @@ import ComplementPicker, {
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
 import HevyImportPanel from "@/components/hevy-import-panel";
+import RehabTab from "@/components/rehab-tab";
 
 // Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
 // avoids a Turbopack chunk-init order issue when the tracker is bundled into
@@ -69,10 +70,15 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio"];
+// Visual tab order. "Rehab" is rendered between "Workout" and "Upper" but
+// uses a non-sequential canonical state index (REHAB_TAB_INDEX below) so
+// existing localStorage values and tests for Upper/Lower/Core/Cardio/Safety
+// (indices 1-5) remain stable.
+const TABS = ["Workout", "Rehab", "Upper", "Lower", "Core", "Cardio"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
+  "PT exercises by rehab phase",
   "Push + Pull exercise library",
   "Legs + Recovery exercise library",
   "Core exercises by body part",
@@ -89,6 +95,10 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
       <rect x="19" y="9" width="3" height="6" rx="1" />
       <rect x="5" y="11" width="14" height="2" rx="1" />
     </>
+  ),
+  Rehab: (
+    // Heart-pulse line — PT/rehab block
+    <path d="M4 12h4l2-5 4 10 2-5h4" />
   ),
   Upper: (
     // Up arrow — upper body library
@@ -121,6 +131,20 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
 const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
 const HISTORY_TAB_INDEX = 7;
+// Rehab tab uses a non-sequential canonical state index so existing
+// localStorage `nwb_tab` values for Today/Upper/Lower/Core/Cardio/Safety/
+// Gear/History (0-7) remain stable. Visual order in TABS still places
+// "Rehab" between "Workout" and "Upper".
+const REHAB_TAB_INDEX = 9;
+// Maps the visible tab label (TABS array) to the canonical tab state index.
+const TAB_INDEX_BY_NAME: Record<string, number> = {
+  Workout: 0,
+  Rehab: REHAB_TAB_INDEX,
+  Upper: 1,
+  Lower: 2,
+  Core: 3,
+  Cardio: 4,
+};
 
 const DAY_NAMES = [
   "Monday",
@@ -658,7 +682,7 @@ export default function WorkoutView() {
   const pillInitialized = useRef(false);
 
   useLayoutEffect(() => {
-    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history, 9 rehab
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -2556,6 +2580,9 @@ export default function WorkoutView() {
     case HISTORY_TAB_INDEX:
       content = <HistoryView />;
       break;
+    case REHAB_TAB_INDEX:
+      content = <RehabTab />;
+      break;
   }
 
   const todayColor = getWorkoutForDay(selectedDay).c;
@@ -2713,15 +2740,21 @@ export default function WorkoutView() {
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
-          const isActive = tab === i;
+          // Map visual position → canonical state index (Rehab is out-of-band).
+          const stateIdx = TAB_INDEX_BY_NAME[t] ?? i;
+          const isActive = tab === stateIdx;
           return (
             <button
               key={t}
-              ref={(el) => { tabRefs.current[i] = el; }}
+              ref={(el) => {
+                // Store ref at canonical state index so pillPos lookup works
+                // for the out-of-band Rehab tab (state idx 9).
+                tabRefs.current[stateIdx] = el;
+              }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               aria-label={t}
-              onClick={() => setTab(i)}
+              onClick={() => setTab(stateIdx)}
               className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
