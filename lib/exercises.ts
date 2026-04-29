@@ -44,6 +44,8 @@ export interface ExerciseMuscles {
   secondary?: string[];
 }
 
+import type { MovementTag } from "@/lib/condition-types";
+
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;
   maxHipFlexion: number;
@@ -96,6 +98,13 @@ export interface Exercise {
   cableSuperset?: boolean;
   constraints: ExerciseConstraints;
   muscles: ExerciseMuscles;
+  /**
+   * Biomechanical demands of this exercise. When populated, exercises become
+   * filterable per-condition via `isAllowedForCondition()` in
+   * `lib/condition-filter.ts`. Optional during the migration: untagged
+   * exercises default to "allowed" so existing behavior is unchanged.
+   */
+  movementTags?: MovementTag[];
 }
 
 export interface EquipmentItem {
