@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getAnthropicClient } from "@/lib/anthropic";
-import { SYSTEM_PROMPT } from "./system-prompt";
+import { fnsfLeft } from "@/lib/conditions/fnsf-left";
+import { buildSystemPrompt } from "./system-prompt";
 
 interface SuggestRequestBody {
   exercise: string;
@@ -43,7 +44,7 @@ Suggest ONE complement exercise I can do without leaving this area.`;
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(fnsfLeft),
       messages: [
         {
           role: "user",
