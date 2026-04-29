@@ -44,7 +44,7 @@ export interface ExerciseMuscles {
   secondary?: string[];
 }
 
-import type { MovementTag } from "@/lib/condition-types";
+import type { MovementTag } from "./condition-types";
 
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;

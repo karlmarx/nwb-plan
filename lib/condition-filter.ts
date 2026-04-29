@@ -9,8 +9,8 @@
 // untagged majority.
 // =============================================================================
 
-import type { Condition, MovementTag } from "@/lib/condition-types";
-import type { Exercise } from "@/lib/exercises";
+import type { Condition, MovementTag } from "./condition-types";
+import type { Exercise } from "./exercises";
 
 export interface ConditionFilterResult {
   allowed: boolean;
