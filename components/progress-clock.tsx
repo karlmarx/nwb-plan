@@ -90,7 +90,7 @@ export default function ProgressClock({ compact }: { compact?: boolean } = {}) {
     setTimeout(() => setFlash(false), 300);
   }
 
-  // ===== COMPACT RING (v2) =====
+  // ===== COMPACT RING =====
   if (compact) {
     const size = 44;
     const strokeW = 3.5;
