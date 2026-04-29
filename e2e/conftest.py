@@ -32,10 +32,15 @@ def pytest_configure(config):
     if not os.path.exists(".next"):
         subprocess.run(["npm", "run", "build"], check=True)
 
+    # Drop stdout/stderr to /dev/null so the OS pipe buffer can never fill up
+    # and block the Next.js server. (Previously these were subprocess.PIPE which
+    # we never read — after ~30 tests the kernel buffer would fill, Next.js
+    # would block on its next console.log, and every subsequent page.goto
+    # would time out at 30s. ~3000s of cascading timeouts wallclock.)
     _server_proc = subprocess.Popen(
         ["npm", "run", "start"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
     # Wait for server to be ready (up to 30s)
