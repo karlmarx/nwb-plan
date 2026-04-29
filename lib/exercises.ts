@@ -1,5 +1,49 @@
 // ===== TYPE DEFINITIONS =====
 
+/**
+ * CANONICAL MUSCLE VOCABULARY
+ * --------------------------
+ * Standardized muscle names used across the exercise library.
+ * Lowercase, English, anatomically common names. Stay within this list
+ * when adding/editing exercises so the workout overview stays consistent.
+ *
+ * CHEST + SHOULDERS
+ *   pectoralis major, pectoralis minor, anterior deltoid, lateral deltoid,
+ *   posterior deltoid, serratus anterior, rotator cuff
+ *
+ * BACK
+ *   latissimus dorsi, trapezius, lower trapezius, rhomboids, erector spinae,
+ *   teres major
+ *
+ * ARMS
+ *   biceps brachii, brachialis, brachioradialis, triceps brachii, forearm flexors,
+ *   forearm extensors
+ *
+ * CORE
+ *   rectus abdominis, internal obliques, external obliques, transverse abdominis,
+ *   quadratus lumborum, hip flexors, iliopsoas
+ *
+ * HIPS + GLUTES
+ *   gluteus maximus, gluteus medius, gluteus minimus, hip adductors, hip abductors,
+ *   hip external rotators
+ *
+ * LEGS
+ *   quadriceps, rectus femoris, vastus medialis, hamstrings, biceps femoris,
+ *   semitendinosus, gastrocnemius, soleus, tibialis anterior
+ *
+ * USAGE NOTE
+ *   - `primary` = the main movers (target muscles).
+ *   - `secondary` = significant assistors / stabilizers worth listing for the user.
+ *   - For NWB rehab moves, the rehab target (e.g. gluteus medius for clamshells)
+ *     belongs in `primary`.
+ *   - Prefer broad names ("quadriceps") over single heads, except where a head
+ *     is specifically loaded (e.g. "rectus femoris" for hip-flexion work).
+ */
+export interface ExerciseMuscles {
+  primary: string[];
+  secondary?: string[];
+}
+
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;
   maxHipFlexion: number;
@@ -51,6 +95,7 @@ export interface Exercise {
   machineVariants?: MachineVariant[];
   cableSuperset?: boolean;
   constraints: ExerciseConstraints;
+  muscles: ExerciseMuscles;
 }
 
 export interface EquipmentItem {
@@ -180,6 +225,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major", "triceps brachii"],
+      secondary: ["anterior deltoid"],
+    },
   },
 
   "Incline DB Bench Press": {
@@ -199,6 +248,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 45,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["pectoralis major", "anterior deltoid"],
+      secondary: ["triceps brachii"],
     },
   },
 
@@ -220,6 +273,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["pectoralis major", "triceps brachii"],
+      secondary: ["anterior deltoid"],
     },
   },
 
@@ -266,6 +323,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major", "triceps brachii"],
+      secondary: ["anterior deltoid"],
+    },
   },
 
   "Seated DB OH Press": {
@@ -287,6 +348,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["anterior deltoid", "lateral deltoid"],
+      secondary: ["triceps brachii", "trapezius"],
+    },
   },
 
   "Seated Arnold Press": {
@@ -307,6 +372,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["anterior deltoid", "lateral deltoid", "posterior deltoid"],
+      secondary: ["triceps brachii", "trapezius"],
     },
   },
 
@@ -374,6 +443,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major", "lateral deltoid"],
+      secondary: ["anterior deltoid", "triceps brachii", "trapezius"],
+    },
   },
 
   "Lying Skull Crushers": {
@@ -394,6 +467,9 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["triceps brachii"],
     },
   },
 
@@ -417,6 +493,9 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["triceps brachii"],
+    },
   },
 
   "Tricep Rope Pushdown": {
@@ -438,6 +517,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["triceps brachii"],
+      secondary: ["forearm flexors"],
     },
   },
 
@@ -461,6 +544,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major"],
+      secondary: ["anterior deltoid"],
+    },
   },
 
   "Mechanical Drop Set (Press)": {
@@ -481,6 +568,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["pectoralis major", "anterior deltoid"],
+      secondary: ["triceps brachii"],
     },
   },
 
@@ -507,6 +598,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["anterior deltoid", "pectoralis major"],
+      secondary: ["triceps brachii", "internal obliques", "external obliques"],
     },
   },
 
@@ -564,6 +659,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["triceps brachii", "pectoralis major"],
+      secondary: ["anterior deltoid"],
+    },
   },
 
   "Pseudo Planche Push-Up": {
@@ -585,6 +684,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["anterior deltoid", "pectoralis major", "serratus anterior"],
+      secondary: ["triceps brachii", "rectus abdominis"],
+    },
   },
 
   "Parallette L-Sit": {
@@ -605,6 +708,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["triceps brachii", "anterior deltoid"],
+      secondary: ["pectoralis minor", "rectus abdominis"],
+    },
   },
 
   "Machine Shoulder Press": {
@@ -624,6 +731,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["anterior deltoid", "lateral deltoid"],
+      secondary: ["triceps brachii", "trapezius"],
     },
   },
 
@@ -646,6 +757,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["lateral deltoid"],
+      secondary: ["trapezius"],
+    },
   },
 
   "DB Tricep Kickback": {
@@ -665,6 +780,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["triceps brachii"],
+      secondary: ["posterior deltoid"],
     },
   },
 
@@ -686,6 +805,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major", "anterior deltoid"],
+      secondary: ["triceps brachii", "serratus anterior", "rectus abdominis"],
+    },
   },
 
   "TRX Tricep Extension": {
@@ -706,6 +829,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["triceps brachii"],
+      secondary: ["anterior deltoid", "pectoralis major"],
+    },
   },
 
   "Band Chest Press (Seated)": {
@@ -725,6 +852,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["pectoralis major"],
+      secondary: ["anterior deltoid", "triceps brachii"],
     },
   },
 
@@ -796,6 +927,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["posterior deltoid", "biceps brachii", "rhomboids", "teres major"],
+    },
   },
 
   "Neutral Grip Pulldown": {
@@ -817,6 +952,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "brachialis", "teres major", "rhomboids"],
+    },
   },
 
   "Weighted Pull-Up": {
@@ -836,6 +975,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "rhomboids", "teres major", "forearm flexors"],
     },
   },
 
@@ -857,6 +1000,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "forearm flexors", "rhomboids", "teres major"],
+    },
   },
 
   "Chest-Supported DB Row": {
@@ -877,6 +1024,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["latissimus dorsi", "rhomboids", "trapezius"],
+      secondary: ["posterior deltoid", "biceps brachii"],
     },
   },
 
@@ -935,6 +1086,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi", "rhomboids"],
+      secondary: ["trapezius", "posterior deltoid", "biceps brachii"],
+    },
   },
 
   "One-Arm Cable Row": {
@@ -989,6 +1144,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi", "rhomboids"],
+      secondary: ["trapezius", "posterior deltoid", "biceps brachii", "internal obliques", "external obliques"],
+    },
   },
 
   "Seated Face Pulls": {
@@ -1011,6 +1170,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["posterior deltoid", "rotator cuff"],
+      secondary: ["trapezius", "rhomboids"],
+    },
   },
 
   "Reverse Fly": {
@@ -1030,6 +1193,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["posterior deltoid"],
+      secondary: ["rhomboids", "trapezius", "rotator cuff"],
     },
   },
 
@@ -1087,6 +1254,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["biceps brachii"],
+      secondary: ["brachialis", "forearm flexors"],
+    },
   },
 
   "Hammer Curls": {
@@ -1107,6 +1278,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["brachialis", "brachioradialis"],
+      secondary: ["biceps brachii", "forearm flexors"],
+    },
   },
 
   "Incline DB Curl": {
@@ -1126,6 +1301,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["biceps brachii"],
+      secondary: ["brachialis", "forearm flexors"],
     },
   },
 
@@ -1148,6 +1327,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "rhomboids", "teres major", "forearm flexors"],
+    },
   },
 
   "TRX Row (Seated)": {
@@ -1167,6 +1350,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["latissimus dorsi", "rhomboids"],
+      secondary: ["trapezius", "posterior deltoid", "biceps brachii"],
     },
   },
 
@@ -1188,6 +1375,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["posterior deltoid", "rotator cuff"],
+      secondary: ["trapezius", "rhomboids"],
+    },
   },
 
   "TRX Curl": {
@@ -1207,6 +1398,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["biceps brachii"],
+      secondary: ["brachialis", "forearm flexors"],
     },
   },
 
@@ -1228,6 +1423,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "teres major", "rhomboids"],
+    },
   },
 
   "Band Pulldown": {
@@ -1247,6 +1446,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["latissimus dorsi"],
+      secondary: ["biceps brachii", "rhomboids", "teres major"],
     },
   },
 
@@ -1268,6 +1471,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi", "rhomboids"],
+      secondary: ["trapezius", "posterior deltoid", "biceps brachii"],
+    },
   },
 
   "Cable Curl": {
@@ -1288,6 +1495,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["biceps brachii"],
+      secondary: ["brachialis", "forearm flexors"],
     },
   },
 
@@ -1343,6 +1554,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["posterior deltoid"],
+      secondary: ["rhomboids", "trapezius", "rotator cuff"],
     },
   },
 
@@ -1421,6 +1636,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["quadriceps", "gluteus maximus"],
+      secondary: ["hamstrings", "hip adductors", "gastrocnemius"],
+    },
   },
 
   "Hack Squat (Right)": {
@@ -1476,6 +1695,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["quadriceps", "gluteus maximus"],
+      secondary: ["hamstrings", "hip adductors", "gastrocnemius"],
     },
   },
 
@@ -1553,6 +1776,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["quadriceps"],
+      secondary: ["rectus femoris"],
+    },
   },
 
   "SL Glute Bridge (Right)": {
@@ -1572,6 +1799,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["gluteus maximus"],
+      secondary: ["hamstrings", "erector spinae"],
     },
   },
 
@@ -1593,6 +1824,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["gluteus maximus"],
+      secondary: ["hamstrings", "erector spinae"],
     },
   },
 
@@ -1639,6 +1874,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["gluteus maximus"],
+      secondary: ["hamstrings"],
+    },
   },
 
   "Side-Lying Hip Abduction (Left)": {
@@ -1682,6 +1921,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["gluteus medius"],
+      secondary: ["gluteus minimus", "hip abductors"],
     },
   },
 
@@ -1756,6 +1999,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["hamstrings"],
+      secondary: ["gastrocnemius", "biceps femoris"],
+    },
   },
 
   "Stab Ball Ham Curl (Right)": {
@@ -1775,6 +2022,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["hamstrings", "gluteus maximus"],
+      secondary: ["gastrocnemius"],
     },
   },
 
@@ -1796,6 +2047,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["quadriceps", "gluteus maximus"],
+      secondary: ["hamstrings", "gastrocnemius"],
+    },
   },
 
   "Nordic Ham Curl": {
@@ -1815,6 +2070,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["hamstrings"],
+      secondary: ["biceps femoris", "semitendinosus", "gastrocnemius"],
     },
   },
 
@@ -1836,6 +2095,9 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["gastrocnemius", "soleus"],
+    },
   },
 
   "Isometric Quad Sets (Left)": {
@@ -1855,6 +2117,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["quadriceps"],
+      secondary: ["rectus femoris", "vastus medialis"],
     },
   },
 
@@ -1876,6 +2142,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["tibialis anterior"],
+      secondary: ["gastrocnemius", "soleus"],
+    },
   },
 
   "Banded Clamshells": {
@@ -1895,6 +2165,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["gluteus medius"],
+      secondary: ["hip external rotators", "gluteus minimus"],
     },
   },
 
@@ -1921,6 +2195,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["hip adductors"],
+      secondary: ["adductors"],
+    },
   },
 
   "Seated Hip Abduction — Band": {
@@ -1946,6 +2224,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["gluteus medius"],
+      secondary: ["gluteus minimus", "hip abductors"],
+    },
   },
 
   "TRX Ham Curl (Right)": {
@@ -1966,6 +2248,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["hamstrings", "gluteus maximus"],
+      secondary: ["gastrocnemius"],
+    },
   },
 
   "TRX SL Glute Bridge (Right)": {
@@ -1985,6 +2271,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["gluteus maximus"],
+      secondary: ["hamstrings", "erector spinae"],
     },
   },
 
@@ -2014,6 +2304,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "erector spinae"],
+    },
   },
 
   "Plank Knee Tuck (R only)": {
@@ -2039,6 +2333,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "hip flexors"],
     },
   },
 
@@ -2066,6 +2364,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["anterior deltoid", "pectoralis major", "serratus anterior"],
+    },
   },
 
   "Spiderman Plank (R only)": {
@@ -2091,6 +2393,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "transverse abdominis"],
     },
   },
 
@@ -2118,6 +2424,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "hip flexors"],
+    },
   },
 
   "Dead Bug (R Leg Only)": {
@@ -2143,6 +2453,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["transverse abdominis", "rectus abdominis"],
+      secondary: ["internal obliques", "external obliques"],
     },
   },
 
@@ -2170,6 +2484,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "hip flexors"],
+    },
   },
 
   "Body Saw (Sliders)": {
@@ -2195,6 +2513,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques"],
     },
   },
 
@@ -2224,6 +2546,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["transverse abdominis", "rectus abdominis"],
+    },
   },
 
   "Pallof Overhead Reach": {
@@ -2250,6 +2576,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["transverse abdominis", "serratus anterior"],
+    },
   },
 
   "Bird-Dog (Prone Bench)": {
@@ -2275,6 +2605,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["erector spinae", "transverse abdominis"],
+      secondary: ["gluteus maximus", "internal obliques", "external obliques"],
     },
   },
 
@@ -2305,6 +2639,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["external obliques", "quadratus lumborum"],
+      secondary: ["internal obliques", "transverse abdominis", "hip abductors"],
+    },
   },
 
   "Side Plank (L Oblique Bias \u2014 R Side Down)": {
@@ -2332,6 +2670,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["quadratus lumborum", "transverse abdominis"],
+    },
   },
 
   "Suitcase Hold (Seated)": {
@@ -2357,6 +2699,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["quadratus lumborum", "external obliques"],
+      secondary: ["internal obliques", "transverse abdominis"],
     },
   },
 
@@ -2386,6 +2732,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "transverse abdominis"],
+    },
   },
 
   "Cable Woodchop (Seated)": {
@@ -2411,6 +2761,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["transverse abdominis", "erector spinae"],
     },
   },
 
@@ -2438,6 +2792,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "hip flexors"],
+    },
   },
 
   "Stir the Pot": {
@@ -2463,6 +2821,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 0,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["transverse abdominis", "external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "erector spinae"],
     },
   },
 
@@ -2490,6 +2852,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["rectus abdominis"],
+      secondary: ["transverse abdominis", "internal obliques"],
+    },
   },
 
   // ==================== CARDIO EXERCISES ====================
@@ -2513,6 +2879,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["anterior deltoid", "triceps brachii"],
+      secondary: ["biceps brachii", "latissimus dorsi", "trapezius"],
+    },
   },
 
   "Seated Battle Ropes": {
@@ -2533,6 +2903,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["anterior deltoid", "lateral deltoid"],
+      secondary: ["trapezius", "biceps brachii", "triceps brachii", "transverse abdominis"],
     },
   },
 
@@ -2555,6 +2929,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["latissimus dorsi", "triceps brachii"],
+      secondary: ["rectus abdominis", "anterior deltoid", "trapezius"],
+    },
   },
 
   "Arms-Only Echo Bike": {
@@ -2576,6 +2954,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["anterior deltoid", "triceps brachii"],
+      secondary: ["biceps brachii", "pectoralis major", "trapezius"],
+    },
   },
 
   "SL Slider Row": {
@@ -2596,6 +2978,10 @@ export const EX: Record<string, Exercise> = {
       requiresIliopsoas: false,
       maxHipFlexion: 90,
       requiresWeightBearing: false,
+    },
+    muscles: {
+      primary: ["latissimus dorsi", "quadriceps"],
+      secondary: ["erector spinae", "internal obliques", "external obliques", "hamstrings"],
     },
   },
 
@@ -2619,6 +3005,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 0,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["pectoralis major", "latissimus dorsi"],
+      secondary: ["anterior deltoid", "trapezius"],
+    },
   },
 
   "T-Spine Mobility": {
@@ -2639,6 +3029,10 @@ export const EX: Record<string, Exercise> = {
       maxHipFlexion: 90,
       requiresWeightBearing: false,
     },
+    muscles: {
+      primary: ["erector spinae"],
+      secondary: ["trapezius", "internal obliques", "external obliques"],
+    },
   },
 
   // ==================== CAPTAIN'S CHAIR CORE ====================
@@ -2658,6 +3052,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Dead Bug (R Leg Only)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rectus abdominis", "hip flexors"],
+      secondary: ["internal obliques", "external obliques"],
+    },
   },
 
   "Captain's Chair Knee-to-Elbow (Right)": {
@@ -2675,6 +3073,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Bicycle Crunch (R Leg Only)", "Cable Woodchop (Seated)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["rectus abdominis", "hip flexors"],
+    },
   },
 
   // ==================== PARALLEL BARS CORE ====================
@@ -2694,6 +3096,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Wheelbarrow Hold"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["triceps brachii", "anterior deltoid"],
+      secondary: ["pectoralis minor", "transverse abdominis", "serratus anterior"],
+    },
   },
 
   "Weight Shift Hold (Parallel Bars)": {
@@ -2711,6 +3117,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Suitcase Hold (Seated)", "Side Plank (R Side Down)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "quadratus lumborum"],
+      secondary: ["internal obliques", "transverse abdominis", "anterior deltoid"],
+    },
   },
 
   // ==================== BARBELL CORE ====================
@@ -2735,6 +3145,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Full extension both legs, 5s eccentric.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "erector spinae"],
+    },
   },
 
   "Barbell Rollout (R-Knee)": {
@@ -2751,6 +3165,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Body Saw (Sliders)", "Forearm Plank Saw"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["anterior deltoid", "latissimus dorsi", "internal obliques"],
+    },
   },
 
   "Body Saw (Barbell)": {
@@ -2767,6 +3185,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Body Saw (Sliders)", "Forearm Plank Saw"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["internal obliques", "external obliques", "anterior deltoid"],
+    },
   },
 
   "Human Flag Progressions": {
@@ -2788,6 +3210,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Full flag, max holds.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "latissimus dorsi"],
+      secondary: ["internal obliques", "quadratus lumborum", "anterior deltoid"],
+    },
   },
 
   "Eccentric Body Levers": {
@@ -2805,6 +3231,10 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Barbell Rollout (R-Knee)", "Dragon Flags"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: true },
+    muscles: {
+      primary: ["rectus abdominis", "transverse abdominis"],
+      secondary: ["anterior deltoid", "latissimus dorsi", "erector spinae"],
+    },
   },
 
   "Hollow Body Inverted Rows": {
@@ -2821,6 +3251,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Hollow Body Hold", "Chest-Supported DB Row"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["latissimus dorsi", "rectus abdominis"],
+      secondary: ["rhomboids", "biceps brachii", "transverse abdominis"],
+    },
   },
 
   // ==================== HANGING CORE (PULL-UP BAR) ====================
@@ -2844,6 +3278,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Full front lever, max holds.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["latissimus dorsi", "rectus abdominis"],
+      secondary: ["posterior deltoid", "transverse abdominis", "teres major"],
+    },
   },
 
   "Windshield Wipers (R-Leg)": {
@@ -2860,6 +3298,10 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Russian Twist (Seated Bench)", "Cable Woodchop (Seated)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "hip flexors"],
+    },
   },
 
   "1-Arm Hang + R Knee Drive": {
@@ -2876,6 +3318,10 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Pallof Press (Seated)", "Bird-Dog (Prone Bench)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["hip flexors", "forearm flexors", "transverse abdominis"],
+    },
   },
 
   "Front Lever Raises": {
@@ -2893,6 +3339,10 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Front Lever", "Dragon Flags"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["latissimus dorsi", "rectus abdominis"],
+      secondary: ["posterior deltoid", "transverse abdominis", "teres major"],
+    },
   },
 
   "Typewriter R-Leg Raises": {
@@ -2909,6 +3359,10 @@ export const EX: Record<string, Exercise> = {
     safety: "caution",
     swaps: ["Windshield Wipers (R-Leg)", "Bicycle Crunch (R Leg Only)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["rectus abdominis", "hip flexors"],
+    },
   },
 
   "R-Leg Toes-to-Bar": {
@@ -2925,6 +3379,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Captain's Chair SLR (Right)", "Dead Bug (R Leg Only)"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 80, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rectus abdominis", "hip flexors"],
+      secondary: ["external obliques", "internal obliques"],
+    },
   },
 
   // ── PRONE HAM CURL MACHINE CORE (same machine, core supersets) ──
@@ -2943,6 +3401,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone T-Raise", "Prone W-Raise"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["lower trapezius"],
+      secondary: ["serratus anterior", "posterior deltoid"],
+    },
   },
 
   "Prone T-Raise": {
@@ -2959,6 +3421,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone Y-Raise", "Prone W-Raise"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["trapezius", "rhomboids"],
+      secondary: ["posterior deltoid"],
+    },
   },
 
   "Prone W-Raise": {
@@ -2975,6 +3441,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone Y-Raise", "Prone T-Raise"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["rotator cuff"],
+      secondary: ["lower trapezius", "posterior deltoid"],
+    },
   },
 
   "Prone Trunk Extension": {
@@ -2991,6 +3461,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone Iso Hold", "Prone Lateral Trunk Raise"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["erector spinae"],
+      secondary: ["gluteus maximus", "trapezius"],
+    },
   },
 
   "Prone Iso Hold": {
@@ -3007,6 +3481,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone Trunk Extension", "Prone Lateral Trunk Raise"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["erector spinae"],
+      secondary: ["transverse abdominis", "gluteus maximus"],
+    },
   },
 
   "Prone Lateral Trunk Raise": {
@@ -3023,6 +3501,10 @@ export const EX: Record<string, Exercise> = {
     safety: "safe",
     swaps: ["Prone Trunk Extension", "Prone Iso Hold"],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["quadratus lumborum", "external obliques"],
+      secondary: ["internal obliques", "erector spinae"],
+    },
   },
 
   // ==================== LEFT-OBLIQUE LOADED / SEATED BLOCK ====================
@@ -3047,6 +3529,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Heavy cable + 3-second top hold + 4-count return. Expect failure at rep 8-9.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 85, requiresWeightBearing: false },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["rectus abdominis", "transverse abdominis", "anterior deltoid"],
+    },
   },
 
   "Seated Pallof Press with Rotation": {
@@ -3069,6 +3555,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Heavy cable + 5-second pause + slow overhead reach from the rotated position. Expect failure at rep 6-7.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 85, requiresWeightBearing: false },
+    muscles: {
+      primary: ["internal obliques", "external obliques"],
+      secondary: ["transverse abdominis", "rectus abdominis"],
+    },
   },
 
   "Seated Single-Side Suitcase Iso-Hold (R)": {
@@ -3091,6 +3581,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Heavy DB + slow 2-second diagonal reaches with the empty left hand forward/up (perturbations), 45s. Expect trembling by 30s.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 85, requiresWeightBearing: false },
+    muscles: {
+      primary: ["quadratus lumborum", "external obliques"],
+      secondary: ["internal obliques", "transverse abdominis"],
+    },
   },
 
   "Right-Side-Down Side Plank + DB Thread-the-Needle": {
@@ -3113,6 +3607,10 @@ export const EX: Record<string, Exercise> = {
       "AMP 2: Forearm on floor, 15lb DB + 3-second pause under the torso. Expect failure around rep 6.",
     ],
     constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: false },
+    muscles: {
+      primary: ["external obliques", "internal obliques"],
+      secondary: ["quadratus lumborum", "transverse abdominis"],
+    },
   },
 };
 
