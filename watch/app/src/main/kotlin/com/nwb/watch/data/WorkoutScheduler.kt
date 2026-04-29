@@ -13,7 +13,7 @@ private val DEFAULT_PROGRAM_START: LocalDate = LocalDate.of(2026, 3, 17)
 
 /**
  * Determines today's workout and current training phase based on
- * the 7-day schedule rotation and 6-week program timeline.
+ * the 7-day schedule rotation and 8-week program timeline.
  *
  * Stateless — the start date comes from DataStore via [WorkoutState].
  * Callers read the stored epoch, resolve it with [programStartDate],
@@ -41,17 +41,24 @@ class WorkoutScheduler @Inject constructor(
     fun programDay(today: LocalDate, startDate: LocalDate): Int =
         ChronoUnit.DAYS.between(startDate, today).toInt().coerceAtLeast(0)
 
-    /** Current week number (1-indexed, capped at 6). */
+    /** Current week number (1-indexed, capped at 8). */
     fun currentWeek(today: LocalDate, startDate: LocalDate): Int =
-        (programDay(today, startDate) / 7 + 1).coerceIn(1, 6)
+        (programDay(today, startDate) / 7 + 1).coerceIn(1, 8)
 
-    /** Current phase index (0 = Foundation, 1 = Build, 2 = Peak). */
+    /**
+     * Current phase index. Mirrors `lib/program.ts` `computeCurrentPhase`:
+     *  - 0 = Foundation (weeks 1-2)
+     *  - 1 = Build (weeks 3-4)
+     *  - 2 = Peak (weeks 5-6)
+     *  - 3 = PWB Prep (weeks 7-8)
+     */
     fun currentPhaseIndex(today: LocalDate, startDate: LocalDate): Int {
         val week = currentWeek(today, startDate)
         return when {
             week <= 2 -> 0
             week <= 4 -> 1
-            else -> 2
+            week <= 6 -> 2
+            else -> 3
         }
     }
 
@@ -86,9 +93,9 @@ class WorkoutScheduler @Inject constructor(
             currentPhaseIndex(today, startDate),
         )
 
-    /** Total program progress as a fraction (0.0 to 1.0). */
+    /** Total program progress as a fraction (0.0 to 1.0). 8 weeks = 56 days. */
     fun programProgress(today: LocalDate, startDate: LocalDate): Float =
-        (programDay(today, startDate).toFloat() / 42f).coerceIn(0f, 1f)
+        (programDay(today, startDate).toFloat() / 56f).coerceIn(0f, 1f)
 
     /**
      * Given a target week number, compute the start date that would
@@ -96,7 +103,7 @@ class WorkoutScheduler @Inject constructor(
      * past Monday, and each earlier week subtracts 7 days.
      */
     fun startDateForWeek(week: Int, today: LocalDate = LocalDate.now()): LocalDate {
-        val clamped = week.coerceIn(1, 6)
+        val clamped = week.coerceIn(1, 8)
         return findNearestPastMonday(today).minusWeeks((clamped - 1).toLong())
     }
 }
