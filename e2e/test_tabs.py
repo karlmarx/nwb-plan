@@ -18,10 +18,10 @@ def test_all_tabs_clickable(app_page: Page):
 def test_active_tab_styling(app_page: Page):
     """Active tab gets the `tab-active` class while inactive tabs do not.
 
-    (We used to compare getComputedStyle(el).color, but v2 icon-only tabs
+    (We used to compare getComputedStyle(el).color, but icon-only tabs
     have no text node and the color cascade lands on the SVG stroke, so
     both buttons report identical computed `color`. The class marker is
-    the canonical signal regardless of UI version.)"""
+    the canonical signal.)"""
     click_tab(app_page, "upper")
     upper_btn = app_page.get_by_test_id("tab-upper")
     workout_btn = app_page.get_by_test_id("tab-workout")
