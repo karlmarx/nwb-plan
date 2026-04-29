@@ -120,6 +120,9 @@ export default function ExerciseRow({
             {ex.safety === "caution" && (
               <Badge color="var(--color-warning)">MODIFIED</Badge>
             )}
+            {ex.phaseUnlock === "PWB-2026-04" && (
+              <Badge color="var(--color-accent)">PWB</Badge>
+            )}
             {ex.phase != null && phase < ex.phase && (
               <Badge color="var(--color-text-muted)">
                 Wk {ex.phase * 2 + 1}+

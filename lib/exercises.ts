@@ -45,6 +45,7 @@ export interface ExerciseMuscles {
 }
 
 import type { MovementTag } from "./condition-types";
+import { PWB_ADDITIONS } from "./exercises-pwb";
 
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;
@@ -105,6 +106,13 @@ export interface Exercise {
    * exercises default to "allowed" so existing behavior is unchanged.
    */
   movementTags?: MovementTag[];
+  /**
+   * Phase availability marker. Undefined = always available (NWB-safe).
+   * "PWB-2026-04" = unlocked by 2026-04-29 doctor clearance (toe-touch
+   * weight-bearing on left + crutches; bilateral lower-body work allowed).
+   * UI renders a "PWB" badge for entries with this marker set.
+   */
+  phaseUnlock?: string;
 }
 
 export interface EquipmentItem {
@@ -3622,6 +3630,10 @@ export const EX: Record<string, Exercise> = {
     },
   },
 };
+
+// Merge PWB-2026-04 additions (40 new push/pull/core/lower exercises unlocked
+// by the 2026-04-29 doctor clearance). Each carries phaseUnlock="PWB-2026-04".
+Object.assign(EX, PWB_ADDITIONS);
 
 // ===== WORKOUT STRUCTURE =====
 

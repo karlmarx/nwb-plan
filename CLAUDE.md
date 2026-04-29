@@ -84,10 +84,13 @@ WorkoutView (main shell, all state, 7 tabs: Today/Upper/Lower/Core/Cardio/Equip/
 - Base workout fully offline; AI suggestions show offline indicator
 - Desktop: responsive font-size scaling (no zoom hack)
 
-## Key Constraints
+## Key Constraints (2026-04-29 doctor clearance — PWB phase)
 
-- ZERO left leg weight bearing (femoral neck stress fracture)
-- ZERO left iliopsoas activation (no left hip flexion against gravity)
-- Hip flexion <90° both sides (bilateral FAI + labral tears)
-- No swimming
-- The AI system prompt in `app/api/suggest/system-prompt.ts` enforces all safety constraints
+- **Toe-touch weight-bearing on left** with crutches; walks normally around the house otherwise
+- Bilateral lower-body work allowed (hamstring curl, leg extension, hip thrust both legs)
+- **NO left squat, NO left leg press** (no axial compression through the left femoral neck)
+- Core unrestricted
+- Cardio: recumbent bike, swim, canoe OK; **NO rowing erg** (Concept2 etc.)
+- **Hip flexion fully unrestricted** — the FAI / labral concern has been retired by the doctor
+- Iliopsoas restriction lifted entirely (left hip flexion against gravity is now permitted)
+- The AI system prompt in `app/api/suggest/system-prompt.ts` reads constraints from the condition pack at `lib/conditions/fnsf-left.ts` — update both when constraints change.
