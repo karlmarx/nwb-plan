@@ -56,6 +56,7 @@ async function migrate() {
       swaps: ex.swaps,
       sets: ex.sets,
       constraints: ex.constraints,
+      muscles: ex.muscles,
     };
     if (ex.visual !== undefined) input.visual = ex.visual;
     if (ex.diagram !== undefined) input.diagram = ex.diagram;
