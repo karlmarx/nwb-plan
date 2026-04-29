@@ -51,26 +51,23 @@ export const fnsfLeft: Condition = {
   },
 
   constraints: {
+    // 2026-04-29 doctor clearance: hip flexion fully unrestricted (FAI/labral
+    // concerns retired); iliopsoas restriction lifted; swimming OK.
+    // Globally forbidden are only the things that still axially load the left
+    // femoral neck or cause high impact. PWB-phase unlockTags below relax the
+    // weight-bearing tags for the current rehab stage.
     forbiddenTags: [
-      "iliopsoas_recruitment_high",
-      "hip_flexion_loaded_against_gravity",
-      "hip_flexion_over_90",
-      "deep_hip_flexion",
-      "end_range_internal_rotation",
+      "ground_reaction_force_high",
+      "cardio_running",
       "weight_bearing_unilateral",
       "weight_bearing_bilateral",
-      "ground_reaction_force_high",
-      "cardio_swimming",
-      "cardio_running",
     ],
     cautionTags: [
-      "hip_flexion_45_to_90",
       "single_leg_balance",
       "loaded_hip_abduction",
       "loaded_hip_adduction",
     ],
     romLimits: {
-      hip_flexion_max_deg: 90,
       knee_flexion_left_open_chain_max_deg: 130,
     },
     stopSignals: [

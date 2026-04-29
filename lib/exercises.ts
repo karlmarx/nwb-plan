@@ -188,6 +188,7 @@ export const EQUIPMENT: Record<string, EquipmentItem> = {
   rower: { name: "Rowing Machine", icon: "\u{1F6A3}", category: "cardio" },
   armBike: { name: "Arm Ergometer", icon: "\u{1F6B4}", category: "cardio" },
   echoBike: { name: "Echo/Assault Bike", icon: "\u{1F300}", category: "cardio" },
+  recumbentBike: { name: "Recumbent Bike", icon: "\u{1F6B2}", category: "cardio" },
   bench: { name: "Adj. Weight Bench", icon: "\u{1F6CB}\uFE0F", category: "basic" },
   plyobox: { name: "Plyo Box", icon: "\u{1F4E6}", category: "basic" },
   stabball: { name: "Stability Ball", icon: "\u26BD", category: "basic" },
