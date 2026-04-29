@@ -75,6 +75,10 @@ CREATE TABLE IF NOT EXISTS exercises (
   -- Safety constraints object: { requiresIliopsoas, maxHipFlexion, requiresWeightBearing }
   constraints     JSONB NOT NULL,
 
+  -- Muscle targeting: { primary: string[], secondary?: string[] }
+  -- primary = main movers; secondary = significant assistors/stabilizers.
+  muscles         JSONB NOT NULL DEFAULT '{"primary":[]}'::jsonb,
+
   -- Audit
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -86,6 +90,8 @@ CREATE INDEX IF NOT EXISTS exercises_phase_idx    ON exercises (phase);
 -- GIN on `requires` so a future query like "find exercises that need cables"
 -- is cheap.  Cost is small for 80 rows; future-proofs the API.
 CREATE INDEX IF NOT EXISTS exercises_requires_gin ON exercises USING GIN (requires);
+-- GIN on `muscles` for queries like "show all exercises targeting gluteus medius".
+CREATE INDEX IF NOT EXISTS exercises_muscles_idx  ON exercises USING GIN (muscles);
 
 -- ---- machine_variants -----------------------------------------------------
 
