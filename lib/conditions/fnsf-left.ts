@@ -51,26 +51,23 @@ export const fnsfLeft: Condition = {
   },
 
   constraints: {
+    // 2026-04-29 doctor clearance: hip flexion fully unrestricted (FAI/labral
+    // concerns retired); iliopsoas restriction lifted; swimming OK.
+    // Globally forbidden are only the things that still axially load the left
+    // femoral neck or cause high impact. PWB-phase unlockTags below relax the
+    // weight-bearing tags for the current rehab stage.
     forbiddenTags: [
-      "iliopsoas_recruitment_high",
-      "hip_flexion_loaded_against_gravity",
-      "hip_flexion_over_90",
-      "deep_hip_flexion",
-      "end_range_internal_rotation",
+      "ground_reaction_force_high",
+      "cardio_running",
       "weight_bearing_unilateral",
       "weight_bearing_bilateral",
-      "ground_reaction_force_high",
-      "cardio_swimming",
-      "cardio_running",
     ],
     cautionTags: [
-      "hip_flexion_45_to_90",
       "single_leg_balance",
       "loaded_hip_abduction",
       "loaded_hip_adduction",
     ],
     romLimits: {
-      hip_flexion_max_deg: 90,
       knee_flexion_left_open_chain_max_deg: 130,
     },
     stopSignals: [
@@ -81,9 +78,11 @@ export const fnsfLeft: Condition = {
       "Mechanical clicking with hip flexion",
     ],
     hardContraindications: [
-      "PRIMARY: Left femoral neck compression-side stress fracture — strict NWB, ZERO left iliopsoas activation. Iliopsoas generates 57-70% of femoral neck strain. Any left hip flexion against gravity is PROHIBITED.",
-      "SECONDARY: Bilateral cam-type FAI + anterosuperior labral tears — hip flexion capped <90° both sides, no deep squats, no end-range hip flexion.",
-      "Swimming prohibited.",
+      "PRIMARY: Left femoral neck compression-side stress fracture — PWB phase as of 2026-04-29. Toe-touch weight-bearing on the LEFT with crutches; the patient walks normally around the house. Bilateral lower-body work is now permitted.",
+      "NO left-side squat, NO left-side leg press — these still axially compress the left femoral neck and remain prohibited.",
+      "NO rowing erg (Concept2 / similar). Recumbent bike, swimming, and canoeing are OK.",
+      "Hip flexion is fully unrestricted: the FAI + labral concerns have been retired by the doctor. The iliopsoas restriction is lifted — left hip flexion against gravity is now permitted.",
+      "Core work is unrestricted.",
       "Patient is very fit — strong upper body, experienced yoga practitioner.",
     ],
   },
@@ -210,6 +209,8 @@ export const fnsfLeft: Condition = {
   // The SAFE / PROHIBITED block lives here as prose because it's
   // condition-specific framing the AI prompt needs verbatim. Future moves
   // may derive these lines from forbiddenTags / cautionTags directly.
-  aiPromptFragment: `SAFE: Right-side weight bearing exercises, left knee extension/hamstring curls (open chain, seated/reclined), upper body work, core work without hip flexion.
-PROHIBITED: Any left leg raises, left knee drives, left hip flexion, crow pose, tuck planche, swimming.`,
+  aiPromptFragment: `PHASE: Partial weight bearing (PWB) as of 2026-04-29. Toe-touch left leg with crutches; bilateral lower-body machine work is now allowed.
+SAFE: Bilateral leg curl, leg extension, hip thrust (both feet), hip abduction/adduction machines, seated calf raise, 45-deg back extension. Recumbent bike, swimming, canoeing. Bilateral hanging leg raise, captain's chair knee raise, hollow body, V-up, bicycle crunch, L-sit. Half-kneeling and tall-kneeling work on a padded mat. Cable crossover and standing landmine press with the left foot in a toe-touch kickstand position. Upper-body work is unrestricted.
+PROHIBITED: Left-side squat patterns, left-side leg press patterns (axial compression on the left femoral neck). Rowing erg (Concept2). Pushing off the left foot under load — left foot is balance-only in standing or staggered-stance work.
+HIP FLEXION: Fully unrestricted. The previous <90deg cap and iliopsoas activation ban are both retired.`,
 };

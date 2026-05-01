@@ -45,6 +45,7 @@ export interface ExerciseMuscles {
 }
 
 import type { MovementTag } from "./condition-types";
+import { PWB_ADDITIONS } from "./exercises-pwb";
 
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;
@@ -105,6 +106,13 @@ export interface Exercise {
    * exercises default to "allowed" so existing behavior is unchanged.
    */
   movementTags?: MovementTag[];
+  /**
+   * Phase availability marker. Undefined = always available (NWB-safe).
+   * "PWB-2026-04" = unlocked by 2026-04-29 doctor clearance (toe-touch
+   * weight-bearing on left + crutches; bilateral lower-body work allowed).
+   * UI renders a "PWB" badge for entries with this marker set.
+   */
+  phaseUnlock?: string;
 }
 
 export interface EquipmentItem {
@@ -180,6 +188,7 @@ export const EQUIPMENT: Record<string, EquipmentItem> = {
   rower: { name: "Rowing Machine", icon: "\u{1F6A3}", category: "cardio" },
   armBike: { name: "Arm Ergometer", icon: "\u{1F6B4}", category: "cardio" },
   echoBike: { name: "Echo/Assault Bike", icon: "\u{1F300}", category: "cardio" },
+  recumbentBike: { name: "Recumbent Bike", icon: "\u{1F6B2}", category: "cardio" },
   bench: { name: "Adj. Weight Bench", icon: "\u{1F6CB}\uFE0F", category: "basic" },
   plyobox: { name: "Plyo Box", icon: "\u{1F4E6}", category: "basic" },
   stabball: { name: "Stability Ball", icon: "\u26BD", category: "basic" },
@@ -3623,6 +3632,10 @@ export const EX: Record<string, Exercise> = {
   },
 };
 
+// Merge PWB-2026-04 additions (40 new push/pull/core/lower exercises unlocked
+// by the 2026-04-29 doctor clearance). Each carries phaseUnlock="PWB-2026-04".
+Object.assign(EX, PWB_ADDITIONS);
+
 // ===== WORKOUT STRUCTURE =====
 
 export const WORKOUTS: Record<string, Workout> = {
@@ -3633,11 +3646,15 @@ export const WORKOUTS: Record<string, Workout> = {
     hevy: "https://hevy.com/routine/T2lMXhz4NFS",
     exercises: [
       "Barbell Floor Press",
+      "Flat DB Bench Press (PWB)",
       "Seated DB OH Press",
+      "Half-Kneeling Landmine Press",
+      "Z-Press",
       "Incline DB Press + Lat Raises",
       "Lying Skull Crushers",
       "Pseudo Planche Push-Up",
       "McGill Curl-Up",
+      "Hollow Body Hold (Bilateral)",
     ],
     removed: [
       { name: "Standing OHP", reason: "Requires bilateral stance" },
@@ -3653,10 +3670,14 @@ export const WORKOUTS: Record<string, Workout> = {
       "DB Floor Press",
       "Mechanical Drop Set (Press)",
       "Landmine Press (seated)",
+      "Seated Cable Shoulder Press",
       "Cable Chest Fly",
+      "Cable Crossover (PWB)",
+      "Single-Arm Cable Chest Press (Standing)",
       "Tricep Rope Pushdown",
       "Parallette L-Sit",
       "Side Plank (R Side Down)",
+      "V-Up (Bilateral)",
     ],
     removed: [],
   },
@@ -3667,10 +3688,14 @@ export const WORKOUTS: Record<string, Workout> = {
     hevy: "https://hevy.com/routine/c91UqmMdwz7",
     exercises: [
       "Chest-Supported DB Row",
+      "Chest-Supported Landmine Row",
+      "Inverted Row (Barbell in Rack)",
+      "Chin-Up (Supinated)",
       "Lat Pulldown (Wide)",
       "Seated Face Pulls",
       "Preacher Curls",
       "Pallof Press (Seated)",
+      "Tall-Kneeling Pallof Press",
     ],
     removed: [
       {
@@ -3687,12 +3712,16 @@ export const WORKOUTS: Record<string, Workout> = {
     hevy: "https://hevy.com/routine/J1rggKx4PIk",
     exercises: [
       "Neutral Grip Pulldown",
+      "Straight-Arm Pulldown",
       "Mechanical Drop Set (Pull)",
       "One-Arm Cable Row",
+      "Single-Arm DB Row (Bench-Supported)",
       "Reverse Fly",
+      "Dead Hang + Scapular Pull-Up",
       "Hammer Curls",
       "Incline DB Curl",
       "Bird-Dog (Prone Bench)",
+      "Bicycle Crunch (Bilateral)",
     ],
     removed: [],
   },
@@ -3704,13 +3733,17 @@ export const WORKOUTS: Record<string, Workout> = {
     exercises: [
       "SL Leg Press (Right)",
       "SL Leg Extension (Right)",
+      "Bilateral Leg Extension",
       "SL Glute Bridge (Right)",
+      "Bilateral Hip Thrust",
       "Banded Clamshells",
+      "Bilateral Hip Abduction (Machine)",
       "Seated Hip Abduction \u2014 Band",
       "Seated Hip Adduction \u2014 Band",
       "Isometric Quad Sets (Left)",
       "Ankle Pumps (Left)",
       "Dead Bug (R Leg Only)",
+      "Reverse Crunch (Bilateral)",
     ],
     removed: [
       { name: "Pistol Squats", reason: "Deep hip flexion damages labrum" },
@@ -3728,10 +3761,14 @@ export const WORKOUTS: Record<string, Workout> = {
     exercises: [
       "Low-Box Step-Up (Right)",
       "SL Hip Thrust (Right)",
+      "B-Stance Hip Thrust (Right-Dominant)",
       "Prone Ham Curl (Right)",
+      "Bilateral Seated Leg Curl",
       "Nordic Ham Curl",
+      "45° Back Extension (Hyperextension)",
       "Standing Calf Raise (R)",
       "Stir the Pot",
+      "Captain's Chair Knee Raise (Bilateral)",
     ],
     removed: [
       {
