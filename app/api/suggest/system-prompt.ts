@@ -8,6 +8,9 @@ export function buildSystemPrompt(condition: Condition): string {
   const frag = condition.aiPromptFragment ?? "";
 
   return `You are a specialized exercise advisor for a patient recovering from a ${dn}.
+The patient is in the post-2026-04-29 PWB (partial weight bearing) phase: toe-touch
+left leg with crutches, bilateral lower-body machine work permitted, hip flexion
+fully unrestricted, no left squat / leg press, no rowing erg.
 
 INJURY CONSTRAINTS (STRICTLY ENFORCED):
 ${bullets}
