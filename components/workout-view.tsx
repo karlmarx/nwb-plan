@@ -42,6 +42,7 @@ import ComplementPicker, {
   encodeSuppId,
   type ComplementId,
 } from "@/components/complement-picker";
+import { PT_EXERCISES } from "@/lib/pt-exercises";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
 import HevyImportPanel from "@/components/hevy-import-panel";
@@ -1059,6 +1060,21 @@ export default function WorkoutView() {
             removable: true,
             complementId: id,
           });
+        } else if (decoded.kind === "pt") {
+          const pt = PT_EXERCISES[decoded.value];
+          if (!pt) continue;
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "PT",
+            color: "#34d399",
+            title: pt.name,
+            sets: pt.sets,
+            instruction: pt.execution,
+            safety: pt.ptCues,
+            removable: true,
+            complementId: id,
+          });
         }
       }
 
@@ -1343,6 +1359,16 @@ export default function WorkoutView() {
                   sets: m.sets,
                   instruction: m.instruction,
                   safety: m.safety,
+                });
+              } else if (decoded.kind === "pt") {
+                const pt = PT_EXERCISES[decoded.value];
+                if (!pt) continue;
+                supps.push({
+                  type: "leftleg",
+                  name: pt.name,
+                  sets: pt.sets,
+                  instruction: pt.execution,
+                  safety: pt.ptCues,
                 });
               }
             }
