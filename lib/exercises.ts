@@ -61,6 +61,15 @@ export interface VariantSuperset {
   note?: string;
 }
 
+/**
+ * Per-variant suitability tier within an exercise's swap picker.
+ * - "preferred": 1:1 swap with the primary movement
+ * - "secondary": works with modification (e.g. one-leg-only bracing)
+ * - "conditional": only safe under specific equipment conditions; UI surfaces
+ *   the `caveat` text as a warning tooltip
+ */
+export type VariantStatus = "preferred" | "secondary" | "conditional";
+
 export interface MachineVariant {
   id: string;
   label: string;
@@ -74,6 +83,9 @@ export interface MachineVariant {
    * Used for cases like a Rogue barbell variant of a DB-default exercise.
    */
   requires?: string[];
+  status?: VariantStatus;
+  /** Safety note surfaced as a warning tooltip when status === "conditional". */
+  caveat?: string;
 }
 
 export interface Exercise {
@@ -1031,13 +1043,88 @@ export const EX: Record<string, Exercise> = {
     category: "pull",
     sets: [["4", "6-8"], ["4", "8-10"], ["4", "6-8"]],
     rest: 120,
-    setup: "Set incline bench to 30-45\u00B0. Lie face-down with chest on the pad. Arms hang straight down holding dumbbells.",
+    setup: "Set incline bench to 30-45\u00B0. Lie face-down with chest on the pad. Arms hang straight down holding dumbbells. If the DB rack is occupied, switch to one of the chest-pad row machines listed below.",
     execution: "Row weights upward, pulling to lower ribcage. Squeeze shoulder blades hard at the top. Lower slowly.",
-    nwbCues: "SAFEST exercise in the program \u2014 chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively.",
+    nwbCues: "SAFEST exercise in the program \u2014 chest support eliminates ALL spinal loading. Go heavy with confidence. Legs hang passively. DO NOT substitute with: standing T-bar / landmine row, bent-over barbell row, Pendlay row, single-arm DB row with the LEFT knee on the bench, or inverted / TRX rows \u2014 all require bilateral hip hinge or load the left leg.",
     why: "Heavy horizontal row with zero spine load. Chest support means pure back isolation. Go heavy.",
     safety: "safe",
     swaps: ["Seated Cable Row", "TRX Row (Seated)", "Band Row (Seated)"],
     visual: "      O\n    / | \\_[]\n   /  |\n======|======== (Bench)",
+    machineVariants: [
+      {
+        id: "incline_db_bench",
+        label: "Incline DB + Bench",
+        icon: "\u{1F4AA}",
+        description: "Primary movement — dumbbells on a chest-supported incline bench",
+        status: "preferred",
+        setupCues: [
+          "Incline bench set to 30-45°, lie face-down with chest on the pad",
+          "Arms hang straight down with dumbbells, both legs passive",
+          "Row to lower ribcage, squeeze shoulder blades hard at the top",
+        ],
+      },
+      {
+        id: "hammer_iso_lateral_row",
+        label: "Hammer Strength Iso-Lateral Row",
+        icon: "\u{1F3CB}️",
+        description: "Plate-loaded chest-pad row with independent handles per arm",
+        status: "preferred",
+        setupCues: [
+          "Seated facing the chest pad, plates loaded evenly on the horizontal pegs",
+          "Chest pad and seat take all torso load — both legs stay passive, no bracing",
+          "Run bilateral or unilateral (one arm at a time) — unilateral adds anti-rotation work",
+        ],
+      },
+      {
+        id: "selectorized_chest_pad_row",
+        label: "Selectorized Chest-Pad Row",
+        icon: "\u{1F4CC}",
+        description: "Cybex / Life Fitness pin-loaded seated row with chest pad",
+        status: "preferred",
+        setupCues: [
+          "Seated facing the chest pad, pin-select the working weight",
+          "Chest pad supports the torso — both legs passive, identical setup to Hammer Strength",
+          "Faster load changes than plate-loaded; usually a lower max weight — plan reps accordingly",
+        ],
+      },
+      {
+        id: "seated_cable_row_bilateral",
+        label: "Seated Cable Row",
+        icon: "⚖️",
+        description: "Cable row from a bench with V-handle, wide bar, or rope — right-foot-only bracing",
+        status: "secondary",
+        setupCues: [
+          "Sit on the bench, hinge from the hips, scoot back so hip flexion stays under 90°",
+          "Brace ONLY the right foot on the platform — left leg hangs free off the side or rests passively with zero load",
+          "Watch for instinctive bilateral foot bracing under heavy load — cap the weight if you catch yourself pushing through the left foot",
+        ],
+      },
+      {
+        id: "single_arm_seated_cable_row",
+        label: "Single-Arm Seated Cable Row",
+        icon: "⚖️",
+        description: "Single D-handle cable row — unilateral, naturally caps load",
+        status: "secondary",
+        setupCues: [
+          "Same setup as the bilateral cable row — right foot on the platform, left leg passive",
+          "Single D-handle, one arm at a time — the lighter load helps prevent left-foot bracing under fatigue",
+          "Better lat stretch than bilateral; keep the torso square, do not rotate toward the pulling side",
+        ],
+      },
+      {
+        id: "chest_supported_tbar_row",
+        label: "Chest-Supported T-Bar Row",
+        icon: "⚠️",
+        description: "Plate-loaded chest-pad T-bar — ONLY if the machine has a kneeling pad",
+        status: "conditional",
+        caveat: "Only use this machine if it has a kneeling pad: park the right knee on the pad, left leg dangles free. If the machine is foot-plate-only, SKIP IT — the bilateral leg-bracing demand under heavy load is too high. Standing T-bar / landmine T-bar variants are NOT NWB-safe (bilateral hip hinge) and must be excluded entirely.",
+        setupCues: [
+          "Verify the machine has a kneeling pad before loading — if foot-plate-only, abort and pick a different variant",
+          "Right knee on the kneeling pad, left leg hanging free off the side — zero load through the left leg",
+          "Chest on the pad takes torso load; row to lower ribs, no hip drive",
+        ],
+      },
+    ],
     constraints: {
       requiresIliopsoas: false,
       maxHipFlexion: 0,

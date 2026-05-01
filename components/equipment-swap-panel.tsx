@@ -244,6 +244,20 @@ export default function EquipmentSwapPanel({
                       <div className="grid grid-cols-2 gap-2">
                         {variants.map((variant) => {
                           const isSelected = selectedVariantId === variant.id;
+                          const isConditional = variant.status === "conditional";
+                          const statusLabel =
+                            variant.status === "preferred"
+                              ? "Preferred"
+                              : variant.status === "secondary"
+                                ? "Backup"
+                                : isConditional
+                                  ? "Conditional"
+                                  : null;
+                          const statusColor = isConditional
+                            ? "var(--color-warning)"
+                            : variant.status === "secondary"
+                              ? "var(--color-warning)"
+                              : "var(--color-safe)";
                           return (
                             <button
                               key={variant.id}
@@ -252,6 +266,11 @@ export default function EquipmentSwapPanel({
                                 ev.stopPropagation();
                                 onSelectVariant?.(variant.id);
                               }}
+                              title={
+                                isConditional && variant.caveat
+                                  ? `⚠ ${variant.caveat}`
+                                  : undefined
+                              }
                               className="rounded-lg p-3 text-left cursor-pointer font-[inherit] min-h-[64px] transition-colors duration-150"
                               style={{
                                 background: isSelected
@@ -260,9 +279,23 @@ export default function EquipmentSwapPanel({
                                 border: isSelected
                                   ? "2px solid var(--color-accent)"
                                   : "1px solid var(--color-border)",
+                                borderLeft: isConditional
+                                  ? "3px solid var(--color-warning)"
+                                  : undefined,
                               }}
                             >
-                              <div className="text-lg mb-1">{variant.icon}</div>
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="text-lg">{variant.icon}</span>
+                                {isConditional && (
+                                  <span
+                                    aria-label="Conditional safety warning"
+                                    className="text-sm"
+                                    style={{ color: "var(--color-warning)" }}
+                                  >
+                                    {"⚠️"}
+                                  </span>
+                                )}
+                              </div>
                               <div
                                 className="text-[12px] font-semibold mb-0.5"
                                 style={{
@@ -276,6 +309,36 @@ export default function EquipmentSwapPanel({
                               <div className="text-[10px] text-text-dim leading-snug">
                                 {variant.description}
                               </div>
+                              {statusLabel && (
+                                <div
+                                  className="mt-1.5 inline-block text-[9px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5"
+                                  style={{
+                                    background: cssAlpha(statusColor, 13),
+                                    color: statusColor,
+                                  }}
+                                >
+                                  {statusLabel}
+                                </div>
+                              )}
+                              {isConditional && variant.caveat && isSelected && (
+                                <div
+                                  className="mt-2 text-[10px] leading-snug rounded p-2"
+                                  style={{
+                                    background: cssAlpha(
+                                      "var(--color-warning)",
+                                      13,
+                                    ),
+                                    color: "var(--color-warning)",
+                                    border: `1px solid ${cssAlpha(
+                                      "var(--color-warning)",
+                                      27,
+                                    )}`,
+                                  }}
+                                >
+                                  <strong>{"⚠️ Safety:"}</strong>{" "}
+                                  {variant.caveat}
+                                </div>
+                              )}
                             </button>
                           );
                         })}
