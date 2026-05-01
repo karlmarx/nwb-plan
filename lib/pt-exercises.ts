@@ -728,3 +728,37 @@ export function groupPTByCategory(
   }
   return out;
 }
+
+/**
+ * Categories that surface as inline "left-leg conditioning" supplements
+ * under main lifts. Excludes closed-chain-bilateral, step-work, balance,
+ * and gait-drills — those are standalone Rehab-tab work, not interleaved.
+ */
+const LEFT_LEG_CONDITIONING_CATEGORIES: PTCategory[] = [
+  "glute-activation",
+  "quad-activation",
+  "hip-rotator",
+  "calf",
+];
+
+const LEFT_LEG_CONDITIONING_SIDES: PTSide[] = [
+  "left",
+  "bilateral",
+  "weight-shifted-left",
+];
+
+/**
+ * Phase-appropriate PT exercises suitable for inline interleaving with main
+ * lifts (left-leg conditioning supplements). Filters PT_EXERCISES by:
+ *   - phase ∈ current rehab phase
+ *   - category ∈ glute / quad / hip-rotator / calf
+ *   - side loads the left or both legs (no pure right-side drills)
+ */
+export function getLeftLegConditioningPT(phase: RehabPhase): PTExercise[] {
+  return Object.values(PT_EXERCISES).filter(
+    (ex) =>
+      ex.phase.includes(phase) &&
+      LEFT_LEG_CONDITIONING_CATEGORIES.includes(ex.category) &&
+      LEFT_LEG_CONDITIONING_SIDES.includes(ex.side),
+  );
+}

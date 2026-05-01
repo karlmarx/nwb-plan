@@ -11,16 +11,23 @@ import {
   type NearbySuperset,
   type MobilitySupplement,
 } from "@/lib/supplements";
+import {
+  getLeftLegConditioningPT,
+  type RehabPhase,
+} from "@/lib/pt-exercises";
+import { loadState } from "@/lib/storage";
 import { cssAlpha } from "@/lib/css-utils";
 
 /**
- * A complement the user can add to an exercise. There are four kinds:
+ * A complement the user can add to an exercise. There are five kinds:
  *  - "nearby"   — one of NEARBY_SUPERSETS (needs nearby equipment)
  *  - "supp"     — a left-leg supplement (looked up in SUPPLEMENT_EX by name)
  *  - "core"     — a core drill from SUPPLEMENT_CORE for the current workout day
  *                 (also looked up in SUPPLEMENT_EX by name; distinct kind so it
  *                 can render with a CORE label + region color)
  *  - "mobility" — a zero-equipment mobility / stretch / breathing drill
+ *  - "pt"       — a phase-gated PT exercise from PT_EXERCISES (left-leg
+ *                 conditioning surface; filtered by current nwb_pt_phase)
  */
 export type ComplementId = string;
 
@@ -38,9 +45,12 @@ export function encodeCoreId(name: string): ComplementId {
 export function encodeMobilityId(m: MobilitySupplement): ComplementId {
   return `mob${SEP}${m.id}`;
 }
+export function encodePTId(ptId: string): ComplementId {
+  return `pt${SEP}${ptId}`;
+}
 
 export function decodeComplement(id: ComplementId): {
-  kind: "nearby" | "supp" | "core" | "mobility";
+  kind: "nearby" | "supp" | "core" | "mobility" | "pt";
   value: string;
   sub?: string;
 } {
@@ -55,6 +65,9 @@ export function decodeComplement(id: ComplementId): {
   }
   if (kind === "core") {
     return { kind: "core", value: rest.join(sep) };
+  }
+  if (kind === "pt") {
+    return { kind: "pt", value: rest.join(sep) };
   }
   return { kind: "supp", value: rest.join(sep) };
 }
@@ -152,7 +165,12 @@ export default function ComplementPicker({
 }: ComplementPickerProps) {
   const activeSet = useMemo(() => new Set(activeIds), [activeIds]);
 
-  const { nearbyAvail, suppAvail, coreAvail, coreSubtitle, mobilityAvail } = useMemo(() => {
+  const ptPhase = useMemo<RehabPhase>(
+    () => loadState<RehabPhase>("nwb_pt_phase", "TTWB"),
+    [],
+  );
+
+  const { nearbyAvail, suppAvail, ptAvail, coreAvail, coreSubtitle, mobilityAvail } = useMemo(() => {
     const inUseIds = new Set(
       exerciseRequires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean),
     );
@@ -169,6 +187,8 @@ export default function ComplementPicker({
       name: string;
       data: (typeof SUPPLEMENT_EX)[string];
     }>;
+
+    const ptAvail = getLeftLegConditioningPT(ptPhase);
 
     const coreDay = workoutKey ? SUPPLEMENT_CORE[workoutKey] : null;
     const coreAvail = (coreDay?.exercises ?? [])
@@ -188,12 +208,13 @@ export default function ComplementPicker({
       m.appliesTo.includes(exerciseCategory as "push" | "pull" | "legs" | "core" | "cardio"),
     );
 
-    return { nearbyAvail, suppAvail, coreAvail, coreSubtitle, mobilityAvail };
-  }, [exerciseRequires, exerciseCategory, workoutKey, nearbySelections]);
+    return { nearbyAvail, suppAvail, ptAvail, coreAvail, coreSubtitle, mobilityAvail };
+  }, [exerciseRequires, exerciseCategory, workoutKey, nearbySelections, ptPhase]);
 
   const hasAny =
     nearbyAvail.length > 0 ||
     suppAvail.length > 0 ||
+    ptAvail.length > 0 ||
     coreAvail.length > 0 ||
     mobilityAvail.length > 0;
 
@@ -329,6 +350,35 @@ export default function ComplementPicker({
                       title={name}
                       sets={`${sets[0]}\u00D7${sets[1]}`}
                       description={data.execution}
+                      active={activeSet.has(id)}
+                      onClick={() => onToggle(id)}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {ptAvail.length > 0 && (
+            <>
+              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                PT \u2014 Left-leg conditioning ({ptAvail.length})
+              </div>
+              <div className="text-[10px] text-text-muted mb-2 leading-snug">
+                Phase: <strong>{ptPhase}</strong> &mdash; phase-gated PT
+                progression. Switch phase from the Rehab tab.
+              </div>
+              <div className="space-y-1.5 mb-4">
+                {ptAvail.map((ex) => {
+                  const id = encodePTId(ex.id);
+                  return (
+                    <ComplementButton
+                      key={id}
+                      label="PT"
+                      color="#34d399"
+                      title={ex.name}
+                      sets={ex.sets}
+                      description={ex.execution}
                       active={activeSet.has(id)}
                       onClick={() => onToggle(id)}
                     />
