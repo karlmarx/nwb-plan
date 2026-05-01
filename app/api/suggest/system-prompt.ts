@@ -1,13 +1,21 @@
-export const SYSTEM_PROMPT = `You are a specialized exercise advisor for a patient recovering from a left femoral neck compression-side stress fracture.
+import type { Condition } from "@/lib/condition-types";
+
+export function buildSystemPrompt(condition: Condition): string {
+  const dn = condition.metadata.displayName.toLowerCase();
+  const bullets = condition.constraints.hardContraindications
+    .map((s) => `- ${s}`)
+    .join("\n");
+  const frag = condition.aiPromptFragment ?? "";
+
+  return `You are a specialized exercise advisor for a patient recovering from a ${dn}.
+The patient is in the post-2026-04-29 PWB (partial weight bearing) phase: toe-touch
+left leg with crutches, bilateral lower-body machine work permitted, hip flexion
+fully unrestricted, no left squat / leg press, no rowing erg.
 
 INJURY CONSTRAINTS (STRICTLY ENFORCED):
-- PRIMARY: Left femoral neck compression-side stress fracture — strict NWB, ZERO left iliopsoas activation. Iliopsoas generates 57-70% of femoral neck strain. Any left hip flexion against gravity is PROHIBITED.
-- SECONDARY: Bilateral cam-type FAI + anterosuperior labral tears — hip flexion capped <90° both sides, no deep squats, no end-range hip flexion.
-- Swimming prohibited.
-- Patient is very fit — strong upper body, experienced yoga practitioner.
+${bullets}
 
-SAFE: Right-side weight bearing exercises, left knee extension/hamstring curls (open chain, seated/reclined), upper body work, core work without hip flexion.
-PROHIBITED: Any left leg raises, left knee drives, left hip flexion, crow pose, tuck planche, swimming.
+${frag}
 
 YOUR TASK: Given the user's current machine + nearby equipment, suggest ONE complement exercise (core, left leg maintenance, or mobility) that:
 1. Can be done WITHOUT leaving the current equipment area (max 2-3 steps)
@@ -26,3 +34,4 @@ RESPONSE FORMAT: JSON only, no markdown.
   "equipment_rationale": "How nearby equipment enables this without moving",
   "safety_rationale": "Why safe for injury profile"
 }`;
+}

@@ -45,6 +45,7 @@ import ComplementPicker, {
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
 import HevyImportPanel from "@/components/hevy-import-panel";
+import RehabTab from "@/components/rehab-tab";
 
 // Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
 // avoids a Turbopack chunk-init order issue when the tracker is bundled into
@@ -69,10 +70,15 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio"];
+// Visual tab order. "Rehab" is rendered between "Workout" and "Upper" but
+// uses a non-sequential canonical state index (REHAB_TAB_INDEX below) so
+// existing localStorage values and tests for Upper/Lower/Core/Cardio/Safety
+// (indices 1-5) remain stable.
+const TABS = ["Workout", "Rehab", "Upper", "Lower", "Core", "Cardio"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
+  "PT exercises by rehab phase",
   "Push + Pull exercise library",
   "Legs + Recovery exercise library",
   "Core exercises by body part",
@@ -89,6 +95,10 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
       <rect x="19" y="9" width="3" height="6" rx="1" />
       <rect x="5" y="11" width="14" height="2" rx="1" />
     </>
+  ),
+  Rehab: (
+    // Heart-pulse line — PT/rehab block
+    <path d="M4 12h4l2-5 4 10 2-5h4" />
   ),
   Upper: (
     // Up arrow — upper body library
@@ -121,6 +131,20 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
 const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
 const HISTORY_TAB_INDEX = 7;
+// Rehab tab uses a non-sequential canonical state index so existing
+// localStorage `nwb_tab` values for Today/Upper/Lower/Core/Cardio/Safety/
+// Gear/History (0-7) remain stable. Visual order in TABS still places
+// "Rehab" between "Workout" and "Upper".
+const REHAB_TAB_INDEX = 9;
+// Maps the visible tab label (TABS array) to the canonical tab state index.
+const TAB_INDEX_BY_NAME: Record<string, number> = {
+  Workout: 0,
+  Rehab: REHAB_TAB_INDEX,
+  Upper: 1,
+  Lower: 2,
+  Core: 3,
+  Cardio: 4,
+};
 
 const DAY_NAMES = [
   "Monday",
@@ -573,7 +597,6 @@ export default function WorkoutView() {
     if (typeof window === "undefined") return "dark";
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
-  const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
   const [fontSize, setFontSize] = useState(() => loadState<number>("nwb_font_size", 16));
 
   // Edit sheet (swap / machine / move / remove) — opened via long-press or ⋮ button
@@ -652,15 +675,14 @@ export default function WorkoutView() {
     return () => window.removeEventListener("keydown", handler);
   }, [focusState]);
 
-  // ----- Sliding tab pill (v2) -----
+  // ----- Sliding tab pill -----
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [pillPos, setPillPos] = useState({ left: 0, width: 0 });
   const pillInitialized = useRef(false);
 
   useLayoutEffect(() => {
-    if (!uiV2) { pillInitialized.current = false; return; }
-    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history, 9 rehab
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -671,7 +693,7 @@ export default function WorkoutView() {
     if (!pillInitialized.current) {
       requestAnimationFrame(() => { pillInitialized.current = true; });
     }
-  }, [tab, uiV2]);
+  }, [tab]);
 
   // ----- Persistence -----
   useEffect(() => {
@@ -712,9 +734,6 @@ export default function WorkoutView() {
     document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("nwb_theme", theme);
   }, [theme]);
-  useEffect(() => {
-    saveState("nwb_ui_v2", uiV2);
-  }, [uiV2]);
   useEffect(() => {
     saveState(dayKey, dayState);
   }, [dayState, dayKey]);
@@ -1550,11 +1569,11 @@ export default function WorkoutView() {
         <div
           data-testid="day-header"
           className="text-center mb-5 rounded-xl"
-          style={uiV2 ? {
+          style={{
             padding: "16px 12px 14px",
             background: `linear-gradient(135deg, ${selSched.c}15 0%, ${selSched.c}08 50%, transparent 100%)`,
             border: `1px solid ${selSched.c}22`,
-          } : undefined}
+          }}
         >
           <div className="text-xs text-text-muted uppercase tracking-[0.15em] font-medium">
             {isToday ? "Today \u2014 " : ""}
@@ -1673,11 +1692,9 @@ export default function WorkoutView() {
           className="w-full mb-3 rounded-xl cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
             padding: "12px 14px",
-            background: uiV2
-              ? `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 60%, transparent 100%)`
-              : accentColor + "15",
+            background: `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 60%, transparent 100%)`,
             border: `1px solid ${accentColor}33`,
-            boxShadow: uiV2 ? `0 0 16px ${accentColor}08` : "none",
+            boxShadow: `0 0 16px ${accentColor}08`,
           }}
         >
           <div className="flex items-center gap-2">
@@ -1699,94 +1716,52 @@ export default function WorkoutView() {
           {availableCount}/{totalExercises} exercises available with current equipment
         </div>
 
-        {/* Filter pills */}
+        {/* Filter pills — centered flex pills with count badges */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {uiV2 ? (
-            // v2: centered flex pills with count badge
-            <>
+          <button
+            onClick={() => setFilter(null)}
+            className="inline-flex items-center justify-content-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
+            style={{
+              padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: filter === null ? 700 : 500,
+              border: `1.5px solid ${filter === null ? accentColor + "88" : "var(--color-border)"}`,
+              background: filter === null ? accentColor + "18" : "var(--color-card)",
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+            }}
+          >
+            All
+            <span style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              background: filter === null ? accentColor + "33" : "var(--color-border)",
+              borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+              lineHeight: 1.4,
+            }}>{totalExercises}</span>
+          </button>
+          {groups.map((g) => {
+            const isActive = filter === g.key;
+            return (
               <button
-                onClick={() => setFilter(null)}
-                className="inline-flex items-center justify-content-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
+                key={g.key}
+                onClick={() => setFilter(isActive ? null : g.key)}
+                className="inline-flex items-center justify-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
                 style={{
-                  padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: filter === null ? 700 : 500,
-                  border: `1.5px solid ${filter === null ? accentColor + "88" : "var(--color-border)"}`,
-                  background: filter === null ? accentColor + "18" : "var(--color-card)",
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: isActive ? 700 : 500,
+                  border: `1.5px solid ${isActive ? g.accent + "88" : "var(--color-border)"}`,
+                  background: isActive ? g.accent + "18" : "var(--color-card)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
                 }}
               >
-                All
+                {g.icon} {g.label}
                 <span style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  background: filter === null ? accentColor + "33" : "var(--color-border)",
+                  background: isActive ? g.accent + "33" : "var(--color-border)",
                   borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
                   lineHeight: 1.4,
-                }}>{totalExercises}</span>
+                }}>{g.exercises.length}</span>
               </button>
-              {groups.map((g) => {
-                const isActive = filter === g.key;
-                return (
-                  <button
-                    key={g.key}
-                    onClick={() => setFilter(isActive ? null : g.key)}
-                    className="inline-flex items-center justify-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
-                    style={{
-                      padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: isActive ? 700 : 500,
-                      border: `1.5px solid ${isActive ? g.accent + "88" : "var(--color-border)"}`,
-                      background: isActive ? g.accent + "18" : "var(--color-card)",
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                    }}
-                  >
-                    {g.icon} {g.label}
-                    <span style={{
-                      display: "inline-flex", alignItems: "center", justifyContent: "center",
-                      background: isActive ? g.accent + "33" : "var(--color-border)",
-                      borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                      lineHeight: 1.4,
-                    }}>{g.exercises.length}</span>
-                  </button>
-                );
-              })}
-            </>
-          ) : (
-            // classic: existing pills
-            <>
-              <button
-                onClick={() => setFilter(null)}
-                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
-                style={{
-                  border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
-                  background: filter === null ? accentColor + "18" : "var(--color-card)",
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
-                  fontWeight: filter === null ? 700 : 400,
-                }}
-              >
-                All
-              </button>
-              {groups.map((g) => {
-                const isActive = filter === g.key;
-                return (
-                  <button
-                    key={g.key}
-                    onClick={() => setFilter(isActive ? null : g.key)}
-                    className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
-                    style={{
-                      border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
-                      background: isActive ? g.accent + "18" : "var(--color-card)",
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                      fontWeight: isActive ? 700 : 400,
-                    }}
-                  >
-                    {g.icon} {g.label}
-                    <span className="ml-1 text-[9px] opacity-60">
-                      {g.exercises.length}
-                    </span>
-                  </button>
-                );
-              })}
-            </>
-          )}
+            );
+          })}
         </div>
 
         {/* Exercise groups */}
@@ -1799,7 +1774,7 @@ export default function WorkoutView() {
             onToggle={() => toggleSection(`lib-${group.key}`)}
             count={group.exercises.length}
             accent={group.accent}
-            coloredBorder={uiV2}
+            coloredBorder
           >
             {group.exercises.map((name) => renderCoreExercise(name))}
           </Section>
@@ -2101,47 +2076,6 @@ export default function WorkoutView() {
   function renderEquipTab() {
     return (
       <div>
-        {/* UI v2 preview toggle */}
-        <div
-          className="flex items-center justify-between rounded-lg mb-4"
-          style={{
-            padding: "12px 14px",
-            background: uiV2 ? "#22d3ee11" : "var(--color-card)",
-            border: `1px solid ${uiV2 ? "#22d3ee44" : "var(--color-border)"}`,
-          }}
-        >
-          <div>
-            <div className="text-[13px] font-semibold text-text">New UI Preview</div>
-            <div className="text-[11px] text-text-muted mt-0.5">
-              {uiV2 ? "Active — gradient cards, color borders, sliding tabs" : "Off — using classic UI"}
-            </div>
-          </div>
-          <button
-            onClick={() => setUiV2((v) => !v)}
-            className="relative cursor-pointer border-none font-[inherit]"
-            style={{
-              width: 44, height: 24, borderRadius: 12,
-              background: uiV2 ? "#22d3ee" : "var(--color-border)",
-              transition: "background 0.2s",
-              padding: 0,
-              position: "relative",
-            }}
-            title="Toggle new UI preview"
-          >
-            <span
-              style={{
-                position: "absolute",
-                top: 3, left: uiV2 ? 23 : 3,
-                width: 18, height: 18,
-                borderRadius: "50%",
-                background: "#fff",
-                transition: "left 0.2s",
-                display: "block",
-              }}
-            />
-          </button>
-        </div>
-
         {/* Week start day picker */}
         <Section
           title="Week Start Day"
@@ -2646,6 +2580,9 @@ export default function WorkoutView() {
     case HISTORY_TAB_INDEX:
       content = <HistoryView />;
       break;
+    case REHAB_TAB_INDEX:
+      content = <RehabTab />;
+      break;
   }
 
   const todayColor = getWorkoutForDay(selectedDay).c;
@@ -2658,8 +2595,8 @@ export default function WorkoutView() {
       {/* Header */}
       <div className="pt-8 pb-5 text-center">
         <div className="flex items-center justify-center gap-2.5">
-          {/* v2: compact progress ring in header */}
-          {uiV2 && <ProgressClock compact />}
+          {/* Compact progress ring in header */}
+          <ProgressClock compact />
           <h1 data-testid="app-title" className="text-2xl font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
@@ -2738,9 +2675,6 @@ export default function WorkoutView() {
         </div>
       </div>
 
-      {/* Progress clock (classic only — v2 uses compact ring in header) */}
-      {!uiV2 && <ProgressClock />}
-
       {/* Phase selector */}
       <div className="flex gap-1.5 mb-4">
         {PHASES.map((p, i) => (
@@ -2778,8 +2712,8 @@ export default function WorkoutView() {
 
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
-        {/* v2: sliding pill indicator */}
-        {uiV2 && pillPos.width > 0 && (
+        {/* Sliding pill indicator */}
+        {pillPos.width > 0 && (
           <div
             data-testid="tab-pill"
             className="absolute top-0 bottom-0 rounded-xl pointer-events-none"
@@ -2806,20 +2740,26 @@ export default function WorkoutView() {
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
-          const isActive = tab === i;
+          // Map visual position → canonical state index (Rehab is out-of-band).
+          const stateIdx = TAB_INDEX_BY_NAME[t] ?? i;
+          const isActive = tab === stateIdx;
           return (
             <button
               key={t}
-              ref={(el) => { tabRefs.current[i] = el; }}
+              ref={(el) => {
+                // Store ref at canonical state index so pillPos lookup works
+                // for the out-of-band Rehab tab (state idx 9).
+                tabRefs.current[stateIdx] = el;
+              }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               aria-label={t}
-              onClick={() => setTab(i)}
+              onClick={() => setTab(stateIdx)}
               className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
-                background: uiV2 ? "transparent" : (isActive ? activeColor + "15" : "none"),
-                border: uiV2 ? "1px solid transparent" : `1px solid ${isActive ? activeColor + "55" : "var(--color-border)"}`,
+                background: "transparent",
+                border: "1px solid transparent",
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
@@ -2842,8 +2782,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 8) : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 33) : "var(--color-border)"}`,
+            background: "transparent",
+            border: "1px solid transparent",
             color: tab === SAFETY_TAB_INDEX ? "var(--color-warning)" : "var(--color-text-muted)",
           }}
         >
@@ -2864,8 +2804,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === HISTORY_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === HISTORY_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
+            background: "transparent",
+            border: "1px solid transparent",
             color: tab === HISTORY_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
@@ -2887,8 +2827,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
+            background: "transparent",
+            border: "1px solid transparent",
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >

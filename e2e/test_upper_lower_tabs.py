@@ -15,7 +15,7 @@ def test_upper_tab_filter_pills(app_page: Page):
     """Upper tab shows muscle group filter pills."""
     click_tab(app_page, "upper")
     content = app_page.get_by_test_id("tab-content")
-    # Use exact=False: v2 pills include a count badge after the label
+    # Use exact=False: pills include a count badge after the label
     for group in ["All", "Chest", "Shoulders", "Back", "Arms"]:
         expect(content.get_by_text(group, exact=False).first).to_be_visible()
 
@@ -43,7 +43,7 @@ def test_upper_tab_all_filter_resets(app_page: Page):
     click_tab(app_page, "upper")
     content = app_page.get_by_test_id("tab-content")
 
-    # Use exact=False: v2 pills include a count badge after the label
+    # Use exact=False: pills include a count badge after the label
     content.get_by_text("Chest", exact=False).first.click()
     app_page.wait_for_timeout(200)
     filtered_sections = content.get_by_test_id("section").count()

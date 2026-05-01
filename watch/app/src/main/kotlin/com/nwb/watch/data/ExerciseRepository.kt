@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 /**
  * Loads and caches exercise/workout/supplement data from bundled JSON resources.
- * All data is static for the 6-week program — loaded once at app start.
+ * All data is static for the 8-week program — loaded once at app start.
  */
 @Singleton
 class ExerciseRepository @Inject constructor(

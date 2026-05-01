@@ -83,10 +83,9 @@ def test_tab_bar_has_all_tabs(app_page: Page):
 
 
 def test_progress_clock_visible(app_page: Page):
-    """Progress clock renders (full clock in classic, compact ring in v2)."""
-    clock = app_page.get_by_test_id("progress-clock")
+    """Compact progress ring renders in the header."""
     ring = app_page.get_by_test_id("progress-ring")
-    assert clock.count() > 0 or ring.count() > 0, "Expected either progress-clock or progress-ring to be present"
+    assert ring.count() > 0, "Expected progress-ring to be present in the header"
 
 
 def test_no_raw_unicode_escapes(app_page: Page):

@@ -133,7 +133,7 @@ private fun WeekPicker(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
         ) {
-            (1..3).forEach { week ->
+            (1..4).forEach { week ->
                 WeekButton(week, currentWeek == week, onPick)
             }
         }
@@ -142,7 +142,7 @@ private fun WeekPicker(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
         ) {
-            (4..6).forEach { week ->
+            (5..8).forEach { week ->
                 WeekButton(week, currentWeek == week, onPick)
             }
         }
