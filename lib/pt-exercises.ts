@@ -2,28 +2,21 @@
 // LEFT-LEG PT EXERCISES — PWB-ERA SUPPLEMENT EXTENSIONS
 // ============================================================================
 //
-// Drop-in TypeScript snippets to extend `lib/supplements.ts` with the new
-// PWB-era PT exercise library. Match the existing file's style: type
-// definitions at top, exported const dicts below, plain-string dose strings,
-// "setup / execution / nwbCues" pattern preserved.
+// PT-prescribed left-leg exercise library for the post-MRI PWB rehab phase.
+// Phase-gated via PTExercise.phase[]; UI filters at render time using
+// getPTExercisesForPhase().
 //
-// IMPORTANT — SAFETY INVARIANT CHANGES:
-//   The original supplements.ts header asserts ZERO left weight bearing,
-//   ZERO left iliopsoas, hip flexion <90° both sides. The PT exercises
-//   below RELAX two of those (TTWB now allowed; iliopsoas restriction
-//   lifted by MD), but PRESERVE the FAI <90° constraint and add
-//   PHASE-GATING. The header in supplements.ts MUST be updated to reflect
-//   the new clinical reality before merging — see integration plan.
+// SAFETY INVARIANTS (post-2026-04-29 MD clearance):
+//   - TTWB now allowed (light potato-chip pressure on left foot)
+//   - Iliopsoas restriction lifted, but introduce gradually
+//   - FAI <90° hip flex constraint STILL HOLDS bilaterally
+//   - All exercises gated by phase[]; never render an exercise whose
+//     phase[] doesn't include the current phase
 //
 // CONVENTION:
-//   - All new types and consts are prefixed `PT_` to distinguish from
-//     the legacy NWB-era SUPPLEMENT_* surface.
-//   - `PTExercise.phase` is the gating flag: a UI phase-picker filters
-//     visible exercises by membership in this array.
-//   - `PTExercise.side` documents which leg the exercise loads. The four
-//     legal values are "left" | "right" | "bilateral" | "weight-shifted-left".
-//   - `frequency` is first-class because PT dosing is daily / EOD / 2-3×wk
-//     in a way that bodybuilding sets/reps strings don't capture cleanly.
+//   - All ids prefixed `pt_` to disambiguate from legacy SUPPLEMENT_*
+//   - `frequency` is first-class (PT dosing is daily / EOD / 2-3×wk)
+//   - `side` documents which leg is loaded
 //
 // ============================================================================
 
@@ -70,7 +63,7 @@ export interface PTExercise {
   sets: string;
   setup: string;
   execution: string;
-  /** PT-clinic-style cues (replaces nwbCues for the new PT surface). */
+  /** PT-clinic-style cues. */
   ptCues: string;
   /** When user is allowed to progress beyond this exercise / dose. */
   progressionCriteria: string;
@@ -176,7 +169,7 @@ const GLUTE_ACTIVATION: PTExercise[] = [
     progressionCriteria:
       "Add a mini-band above knees → progress to side-lying clam-raise (clam + simultaneous abduction).",
     evidence:
-      "research §2A, ref 11 — clamshell heavily activates TFL/anterior hip flexors per Selkowitz et al. *JOSPT* 2013, so this is a complement to side-lying abduction, not a replacement.",
+      "research §2A, ref 11 — clamshell heavily activates TFL/anterior hip flexors per Selkowitz et al. JOSPT 2013, so this is a complement to side-lying abduction, not a replacement.",
   },
   {
     id: "pt_clamshell_right",
@@ -201,10 +194,6 @@ const GLUTE_ACTIVATION: PTExercise[] = [
 // ============================================================================
 
 const QUAD_ACTIVATION: PTExercise[] = [
-  // Note: "Quad Sets", "Short Arc Quads", and "Banded Terminal Knee Extensions"
-  // already exist in SUPPLEMENT_EX — re-export here with PT framing for the
-  // PT surface. Either alias or re-key into PT_EXERCISES at integration time;
-  // see integration plan.
   {
     id: "pt_quad_set_left",
     name: "Quad Set (Left)",
