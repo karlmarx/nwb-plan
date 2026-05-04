@@ -7,7 +7,16 @@ import {
   type LoggedSet,
   type WorkoutSession,
 } from "@/lib/workout-log";
+import {
+  loadSyncState,
+  syncWorkoutSessions,
+  type SyncState,
+} from "@/lib/workout-sync";
 import { EX } from "@/lib/exercises";
+
+const AUTH_ENABLED =
+  process.env.NEXT_PUBLIC_FEATURE_AUTH === "true" ||
+  process.env.NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS === "true";
 
 /**
  * History view — shows previously completed (archived) workout sessions
@@ -20,14 +29,27 @@ import { EX } from "@/lib/exercises";
 export default function HistoryView() {
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [syncState, setSyncState] = useState<SyncState>(() => ({
+    lastSyncAt: 0,
+    lastError: null,
+    inFlight: false,
+  }));
 
   // Hydrate from localStorage on mount. We read once — when the user logs
   // a new session, they'll come back to this tab and we re-mount via the
   // tab switch which triggers a fresh read.
   useEffect(() => {
     setSessions(loadSessions());
+    setSyncState(loadSyncState());
     setHydrated(true);
   }, []);
+
+  const handleSyncNow = async () => {
+    setSyncState((s) => ({ ...s, inFlight: true }));
+    await syncWorkoutSessions();
+    setSessions(loadSessions());
+    setSyncState(loadSyncState());
+  };
 
   const ordered = useMemo(() => {
     // Reverse-chronological by endedAt (fallback startedAt for anything
@@ -66,14 +88,67 @@ export default function HistoryView() {
 
   return (
     <div data-testid="history-view" className="flex flex-col gap-3">
-      <div className="text-[11px] uppercase tracking-wider font-bold text-text-muted px-1">
-        {ordered.length} {ordered.length === 1 ? "session" : "sessions"} logged
+      <div className="flex items-center justify-between px-1">
+        <div className="text-[11px] uppercase tracking-wider font-bold text-text-muted">
+          {ordered.length} {ordered.length === 1 ? "session" : "sessions"} logged
+        </div>
+        {AUTH_ENABLED && (
+          <SyncControl state={syncState} onSync={handleSyncNow} />
+        )}
       </div>
       {ordered.map((s) => (
         <SessionCard key={s.id} session={s} allSessions={sessions} />
       ))}
     </div>
   );
+}
+
+function SyncControl({
+  state,
+  onSync,
+}: {
+  state: SyncState;
+  onSync: () => void;
+}) {
+  const label = state.inFlight
+    ? "Syncing…"
+    : state.lastError
+      ? "Sync error"
+      : state.lastSyncAt > 0
+        ? `Synced ${formatRelative(state.lastSyncAt)}`
+        : "Sync now";
+  const color = state.lastError
+    ? "#ef4444"
+    : state.inFlight
+      ? "#f59e0b"
+      : state.lastSyncAt > 0
+        ? "#10b981"
+        : "var(--color-text-dim)";
+  return (
+    <button
+      onClick={onSync}
+      disabled={state.inFlight}
+      className="text-[11px] font-semibold rounded-md px-2 py-1 cursor-pointer disabled:cursor-default"
+      style={{
+        background: "var(--color-card)",
+        border: "1px solid var(--color-border)",
+        color,
+      }}
+      title={state.lastError ?? label}
+    >
+      {label}
+    </button>
+  );
+}
+
+function formatRelative(ms: number): string {
+  const dt = Date.now() - ms;
+  const min = Math.floor(dt / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  return `${Math.floor(hr / 24)}d ago`;
 }
 
 interface SessionCardProps {
