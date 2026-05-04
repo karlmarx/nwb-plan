@@ -55,7 +55,7 @@ fun SupplementCard(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 3.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
         shape = RoundedCornerShape(10.dp),
     ) {

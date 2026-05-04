@@ -14,10 +14,13 @@ import androidx.wear.protolayout.material.Typography
 import androidx.wear.protolayout.material.layouts.PrimaryLayout
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import com.nwb.watch.data.ExerciseRepository
 import com.nwb.watch.data.WorkoutScheduler
+import com.nwb.watch.data.WorkoutState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -33,16 +36,20 @@ class WorkoutTileService : androidx.wear.tiles.TileService() {
 
     @Inject lateinit var scheduler: WorkoutScheduler
     @Inject lateinit var repository: ExerciseRepository
+    @Inject lateinit var workoutState: WorkoutState
 
     private val RESOURCES_VERSION = "1"
 
-    override fun onTileRequest(requestParams: RequestBuilders.TileRequest) =
-        runBlocking {
-            val today = java.time.LocalDate.now()
-            val title = scheduler.todayWorkoutTitle(today)
-            val phase = scheduler.currentPhase(today)
-            val week = scheduler.currentWeek(today)
-            val exerciseCount = scheduler.todayExercises(today).size
+    override fun onTileRequest(
+        requestParams: RequestBuilders.TileRequest
+    ): ListenableFuture<TileBuilders.Tile> {
+        val today = java.time.LocalDate.now()
+        val epoch = runBlocking { workoutState.programStartEpoch.first() }
+        val startDate = scheduler.programStartDate(epoch)
+        val title = scheduler.todayWorkoutTitle(today)
+        val phase = scheduler.currentPhase(today, startDate)
+        val week = scheduler.currentWeek(today, startDate)
+        val exerciseCount = scheduler.todayExercises(today, startDate).size
 
             val layout = PrimaryLayout.Builder(requestParams.deviceConfiguration)
                 .setContent(
@@ -95,15 +102,20 @@ class WorkoutTileService : androidx.wear.tiles.TileService() {
                 )
                 .build()
 
-            TileBuilders.Tile.Builder()
-                .setResourcesVersion(RESOURCES_VERSION)
-                .setTileTimeline(singleTileTimeline)
-                .setFreshnessIntervalMillis(3600000) // Refresh every hour
-                .build()
-        }
+        val tile = TileBuilders.Tile.Builder()
+            .setResourcesVersion(RESOURCES_VERSION)
+            .setTileTimeline(singleTileTimeline)
+            .setFreshnessIntervalMillis(3600000) // Refresh every hour
+            .build()
+        return Futures.immediateFuture(tile)
+    }
 
-    override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest) =
-        ResourceBuilders.Resources.Builder()
+    override fun onTileResourcesRequest(
+        requestParams: RequestBuilders.ResourcesRequest
+    ): ListenableFuture<ResourceBuilders.Resources> {
+        val resources = ResourceBuilders.Resources.Builder()
             .setVersion(RESOURCES_VERSION)
             .build()
+        return Futures.immediateFuture(resources)
+    }
 }

@@ -45,7 +45,7 @@ android {
 
 dependencies {
     // Compose for Wear OS
-    val composeWearVersion = "1.4.0"
+    val composeWearVersion = "1.6.1"
     implementation("androidx.wear.compose:compose-material3:$composeWearVersion")
     implementation("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation("androidx.wear.compose:compose-navigation:$composeWearVersion")
@@ -93,4 +93,7 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+
+    // Guava — provides Futures.immediateFuture for Tile service responses
+    implementation("com.google.guava:guava:33.3.1-android")
 }

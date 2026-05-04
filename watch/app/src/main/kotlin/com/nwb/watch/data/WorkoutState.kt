@@ -61,6 +61,9 @@ class WorkoutState @Inject constructor(
     val nearbyEquipment: Flow<Set<String>> = context.dataStore.data
         .map { it[Keys.NEARBY_EQUIPMENT] ?: emptySet() }
 
+    val programStartEpoch: Flow<Long?> = context.dataStore.data
+        .map { it[Keys.PROGRAM_START_EPOCH] }
+
     // --- Active workout state ---
 
     val activeWorkoutKey: Flow<String?> = context.dataStore.data
@@ -96,6 +99,10 @@ class WorkoutState @Inject constructor(
 
     suspend fun setNearbyEquipment(ids: Set<String>) {
         context.dataStore.edit { it[Keys.NEARBY_EQUIPMENT] = ids }
+    }
+
+    suspend fun setProgramStartEpoch(epoch: Long) {
+        context.dataStore.edit { it[Keys.PROGRAM_START_EPOCH] = epoch }
     }
 
     suspend fun startWorkout(workoutKey: String) {

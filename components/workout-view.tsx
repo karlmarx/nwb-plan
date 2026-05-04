@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { loadState, saveState } from "@/lib/storage";
 import {
   EX,
@@ -23,7 +24,6 @@ import type { Exercise } from "@/lib/exercises";
 import { computeCurrentPhase } from "@/lib/program";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
-import RemovedRow from "@/components/removed-row";
 import Callout from "@/components/callout";
 import RestTimer from "@/components/rest-timer";
 import ProgressClock from "@/components/progress-clock";
@@ -33,14 +33,27 @@ import DiagramGallery from "@/components/diagrams/gallery";
 import { EXERCISE_TO_DIAGRAM, EXERCISES as DIAGRAM_EXERCISES } from "@/components/diagrams";
 import EditExerciseSheet from "@/components/edit-exercise-sheet";
 import AddExercisePicker from "@/components/add-exercise-picker";
+import SessionBar from "@/components/session-bar";
+import HistoryView from "@/components/history-view";
+import { useWorkoutLog } from "@/lib/use-workout-log";
 import ComplementPicker, {
   decodeComplement,
   encodeNearbyId,
   encodeSuppId,
   type ComplementId,
 } from "@/components/complement-picker";
+import { PT_EXERCISES } from "@/lib/pt-exercises";
 import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
+import HevyImportPanel from "@/components/hevy-import-panel";
+import RehabTab from "@/components/rehab-tab";
+
+// Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
+// avoids a Turbopack chunk-init order issue when the tracker is bundled into
+// the SSR'd workout-view tree.
+const SetTracker = dynamic(() => import("@/components/set-tracker"), {
+  ssr: false,
+});
 
 // Conditionally import AuthButton only when feature flag is on
 const AuthButton =
@@ -58,10 +71,15 @@ const DEFAULT_HEVY: Record<string, string> = {
   "Legs B": "s5QsLGXsVAy",
 };
 
-const TABS = ["Workout", "Upper", "Lower", "Core", "Cardio"];
+// Visual tab order. "Rehab" is rendered between "Workout" and "Upper" but
+// uses a non-sequential canonical state index (REHAB_TAB_INDEX below) so
+// existing localStorage values and tests for Upper/Lower/Core/Cardio/Safety
+// (indices 1-5) remain stable.
+const TABS = ["Workout", "Rehab", "Upper", "Lower", "Core", "Cardio"];
 
 const TAB_TIPS = [
   "Today's scheduled workout",
+  "PT exercises by rehab phase",
   "Push + Pull exercise library",
   "Legs + Recovery exercise library",
   "Core exercises by body part",
@@ -78,6 +96,10 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
       <rect x="19" y="9" width="3" height="6" rx="1" />
       <rect x="5" y="11" width="14" height="2" rx="1" />
     </>
+  ),
+  Rehab: (
+    // Heart-pulse line — PT/rehab block
+    <path d="M4 12h4l2-5 4 10 2-5h4" />
   ),
   Upper: (
     // Up arrow — upper body library
@@ -106,9 +128,24 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-// Safety + Gear/config live outside the label tab strip as icon buttons
+// Safety + History + Gear/config live outside the label tab strip as icon buttons
 const SAFETY_TAB_INDEX = 5;
 const GEAR_TAB_INDEX = 6;
+const HISTORY_TAB_INDEX = 7;
+// Rehab tab uses a non-sequential canonical state index so existing
+// localStorage `nwb_tab` values for Today/Upper/Lower/Core/Cardio/Safety/
+// Gear/History (0-7) remain stable. Visual order in TABS still places
+// "Rehab" between "Workout" and "Upper".
+const REHAB_TAB_INDEX = 9;
+// Maps the visible tab label (TABS array) to the canonical tab state index.
+const TAB_INDEX_BY_NAME: Record<string, number> = {
+  Workout: 0,
+  Rehab: REHAB_TAB_INDEX,
+  Upper: 1,
+  Lower: 2,
+  Core: 3,
+  Cardio: 4,
+};
 
 const DAY_NAMES = [
   "Monday",
@@ -151,35 +188,6 @@ const CARDIO_SCHEDULE = [
   ["Fri", "Arm Ergo HIIT", "Ropes Tabata", "~400"],
   ["Sat", "SkiErg Long 40m", "Boxing 15m", "~500"],
   ["Sun", "Light Arm Ergo 20m", "Rest", "~100"],
-];
-
-// ===== INJURY DATA =====
-const INJURIES = [
-  {
-    n: "L Hip Stress Fracture",
-    c: "var(--color-danger)",
-    r: "Compression-sided medial femoral neck. Strict NWB 6+ weeks. Zero hip flexor activation on left side. This drives ALL exercise modifications.",
-  },
-  {
-    n: "Bilateral FAI + Labral Tears",
-    c: "var(--color-warning)",
-    r: "Cam-type impingement both hips. Anterosuperior labral tear. Keep hip flexion under 90\u00B0.",
-  },
-  {
-    n: "Bilateral Hamstring Tendinosis",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 no discrete tear. Not restricting programming.",
-  },
-  {
-    n: "L4-L5 DDD",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 not restricting programming. Good form is sufficient.",
-  },
-  {
-    n: "R Hip Labral Tear (mild)",
-    c: "var(--color-text-muted)",
-    r: "Minor \u2014 small anterosuperior tear. Not restricting programming.",
-  },
 ];
 
 // ===== OVERLOAD RULES =====
@@ -525,29 +533,6 @@ const EQUIPMENT_CORE_BLOCKS: {
   },
 ];
 
-const REMOVED_CORE = [
-  {
-    name: "Active Straight Leg Raises",
-    reason:
-      "Hip flexor contraction compresses femoral neck stress fracture. NEVER do these.",
-  },
-  {
-    name: "Hanging Leg Raises",
-    reason:
-      "Deep hip flexion + massive hip flexor force = fracture danger.",
-  },
-  {
-    name: "Standard Navasana / V-Ups / Tuck-Ups",
-    reason:
-      "Bilateral hip flexor activation. Use Modified Navasana (parallette press) instead.",
-  },
-  {
-    name: "Standard Bird-Dog (quadruped)",
-    reason:
-      "Left knee at 90\u00B0 hip flexion approaches FAI limit + loads femoral neck. Use Prone Bench version instead. Quadruped needs PT clearance.",
-  },
-];
-
 // ===== MAIN COMPONENT =====
 
 export default function WorkoutView() {
@@ -613,7 +598,6 @@ export default function WorkoutView() {
     if (typeof window === "undefined") return "dark";
     return (localStorage.getItem("nwb_theme") as "dark" | "light") || "dark";
   });
-  const [uiV2, setUiV2] = useState(() => loadState<boolean>("nwb_ui_v2", true));
   const [fontSize, setFontSize] = useState(() => loadState<number>("nwb_font_size", 16));
 
   // Edit sheet (swap / machine / move / remove) — opened via long-press or ⋮ button
@@ -692,15 +676,14 @@ export default function WorkoutView() {
     return () => window.removeEventListener("keydown", handler);
   }, [focusState]);
 
-  // ----- Sliding tab pill (v2) -----
+  // ----- Sliding tab pill -----
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [pillPos, setPillPos] = useState({ left: 0, width: 0 });
   const pillInitialized = useRef(false);
 
   useLayoutEffect(() => {
-    if (!uiV2) { pillInitialized.current = false; return; }
-    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear
+    const activeIdx = tab; // 0..4 word tabs, 5 safety icon, 6 gear, 7 history, 9 rehab
     const btn = tabRefs.current[activeIdx];
     const bar = tabBarRef.current;
     if (!btn || !bar) return;
@@ -711,7 +694,7 @@ export default function WorkoutView() {
     if (!pillInitialized.current) {
       requestAnimationFrame(() => { pillInitialized.current = true; });
     }
-  }, [tab, uiV2]);
+  }, [tab]);
 
   // ----- Persistence -----
   useEffect(() => {
@@ -752,9 +735,6 @@ export default function WorkoutView() {
     document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("nwb_theme", theme);
   }, [theme]);
-  useEffect(() => {
-    saveState("nwb_ui_v2", uiV2);
-  }, [uiV2]);
   useEffect(() => {
     saveState(dayKey, dayState);
   }, [dayState, dayKey]);
@@ -1080,6 +1060,21 @@ export default function WorkoutView() {
             removable: true,
             complementId: id,
           });
+        } else if (decoded.kind === "pt") {
+          const pt = PT_EXERCISES[decoded.value];
+          if (!pt) continue;
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "PT",
+            color: "#34d399",
+            title: pt.name,
+            sets: pt.sets,
+            instruction: pt.execution,
+            safety: pt.ptCues,
+            removable: true,
+            complementId: id,
+          });
         }
       }
 
@@ -1231,6 +1226,8 @@ export default function WorkoutView() {
           variantSetupCues={selectedVariant?.setupCues}
           variantLabel={selectedVariant?.label}
           variantRequires={selectedVariant?.requires}
+          variantId={selectedVariant?.id}
+          log={log}
           addComplementSlot={buildAddComplementPill(name, ex)}
         />
         {buildSupersetCards(name, ex, "__core__", null)}
@@ -1363,6 +1360,16 @@ export default function WorkoutView() {
                   instruction: m.instruction,
                   safety: m.safety,
                 });
+              } else if (decoded.kind === "pt") {
+                const pt = PT_EXERCISES[decoded.value];
+                if (!pt) continue;
+                supps.push({
+                  type: "leftleg",
+                  name: pt.name,
+                  sets: pt.sets,
+                  instruction: pt.execution,
+                  safety: pt.ptCues,
+                });
               }
             }
 
@@ -1372,26 +1379,6 @@ export default function WorkoutView() {
           if (items.length > 0) setFocusState({ items, index: 0 });
         }}
       >
-        {/* Hevy link */}
-        {hevyId && (
-          <div className="mb-3">
-            <a
-              href={`https://hevy.com/routine/${hevyId}`}
-              target="_blank"
-              rel="noopener"
-              onClick={(ev) => ev.stopPropagation()}
-              className="block text-center rounded-xl text-sm font-semibold no-underline min-h-[48px] leading-[48px] transition-colors duration-150"
-              style={{
-                padding: "0 12px",
-                background: "#a78bfa15",
-                border: "1px solid #a78bfa33",
-                color: "#a78bfa",
-              }}
-            >
-              Open in HEVY
-            </a>
-          </div>
-        )}
 
         {/* NWB Yoga link (Recovery only) */}
         {workoutKey === "Recovery" && (
@@ -1483,7 +1470,7 @@ export default function WorkoutView() {
             ex.machineVariants?.find((v) => v.id === selMachineId) ?? null;
 
           return (
-            <div key={origName}>
+            <div key={origName} data-exercise-name={exName}>
               {/* Swap indicator */}
               {exName !== origName && (
                 <div className="text-[10px] text-text-muted px-3 flex items-center gap-1">
@@ -1515,6 +1502,8 @@ export default function WorkoutView() {
                 variantSetupCues={selectedVariant?.setupCues}
                 variantLabel={selectedVariant?.label}
                 variantRequires={selectedVariant?.requires}
+                variantId={selectedVariant?.id}
+                log={log}
                 addComplementSlot={buildAddComplementPill(exName, ex, workoutKey)}
               />
               {buildSupersetCards(exName, ex, workoutKey, firstCableName)}
@@ -1537,15 +1526,6 @@ export default function WorkoutView() {
           <span className="text-base leading-none">＋</span>
           Add exercise
         </button>
-
-        {/* Removed exercises */}
-        {w.removed.length > 0 && (
-          <div className="mt-2.5 pt-2.5 border-t border-border">
-            {w.removed.map((r) => (
-              <RemovedRow key={r.name} name={r.name} reason={r.reason} />
-            ))}
-          </div>
-        )}
 
         {/* Core finishers */}
         {CORE_FINISHERS[workoutKey] && (
@@ -1589,6 +1569,8 @@ export default function WorkoutView() {
                     variantSetupCues={selectedVariant?.setupCues}
                     variantLabel={selectedVariant?.label}
                     variantRequires={selectedVariant?.requires}
+                    variantId={selectedVariant?.id}
+                    log={log}
                     addComplementSlot={buildAddComplementPill(name, ex)}
                   />
                   {buildSupersetCards(name, ex, "__finisher__", null)}
@@ -1613,11 +1595,11 @@ export default function WorkoutView() {
         <div
           data-testid="day-header"
           className="text-center mb-5 rounded-xl"
-          style={uiV2 ? {
+          style={{
             padding: "16px 12px 14px",
             background: `linear-gradient(135deg, ${selSched.c}15 0%, ${selSched.c}08 50%, transparent 100%)`,
             border: `1px solid ${selSched.c}22`,
-          } : undefined}
+          }}
         >
           <div className="text-xs text-text-muted uppercase tracking-[0.15em] font-medium">
             {isToday ? "Today \u2014 " : ""}
@@ -1736,11 +1718,9 @@ export default function WorkoutView() {
           className="w-full mb-3 rounded-xl cursor-pointer font-[inherit] text-left min-h-[44px]"
           style={{
             padding: "12px 14px",
-            background: uiV2
-              ? `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 60%, transparent 100%)`
-              : accentColor + "15",
+            background: `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 60%, transparent 100%)`,
             border: `1px solid ${accentColor}33`,
-            boxShadow: uiV2 ? `0 0 16px ${accentColor}08` : "none",
+            boxShadow: `0 0 16px ${accentColor}08`,
           }}
         >
           <div className="flex items-center gap-2">
@@ -1762,94 +1742,52 @@ export default function WorkoutView() {
           {availableCount}/{totalExercises} exercises available with current equipment
         </div>
 
-        {/* Filter pills */}
+        {/* Filter pills — centered flex pills with count badges */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {uiV2 ? (
-            // v2: centered flex pills with count badge
-            <>
+          <button
+            onClick={() => setFilter(null)}
+            className="inline-flex items-center justify-content-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
+            style={{
+              padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: filter === null ? 700 : 500,
+              border: `1.5px solid ${filter === null ? accentColor + "88" : "var(--color-border)"}`,
+              background: filter === null ? accentColor + "18" : "var(--color-card)",
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+            }}
+          >
+            All
+            <span style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              background: filter === null ? accentColor + "33" : "var(--color-border)",
+              borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
+              color: filter === null ? accentColor : "var(--color-text-muted)",
+              lineHeight: 1.4,
+            }}>{totalExercises}</span>
+          </button>
+          {groups.map((g) => {
+            const isActive = filter === g.key;
+            return (
               <button
-                onClick={() => setFilter(null)}
-                className="inline-flex items-center justify-content-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
+                key={g.key}
+                onClick={() => setFilter(isActive ? null : g.key)}
+                className="inline-flex items-center justify-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
                 style={{
-                  padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: filter === null ? 700 : 500,
-                  border: `1.5px solid ${filter === null ? accentColor + "88" : "var(--color-border)"}`,
-                  background: filter === null ? accentColor + "18" : "var(--color-card)",
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: isActive ? 700 : 500,
+                  border: `1.5px solid ${isActive ? g.accent + "88" : "var(--color-border)"}`,
+                  background: isActive ? g.accent + "18" : "var(--color-card)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
                 }}
               >
-                All
+                {g.icon} {g.label}
                 <span style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  background: filter === null ? accentColor + "33" : "var(--color-border)",
+                  background: isActive ? g.accent + "33" : "var(--color-border)",
                   borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
+                  color: isActive ? g.accent : "var(--color-text-muted)",
                   lineHeight: 1.4,
-                }}>{totalExercises}</span>
+                }}>{g.exercises.length}</span>
               </button>
-              {groups.map((g) => {
-                const isActive = filter === g.key;
-                return (
-                  <button
-                    key={g.key}
-                    onClick={() => setFilter(isActive ? null : g.key)}
-                    className="inline-flex items-center justify-center gap-1.5 font-[inherit] rounded-full cursor-pointer"
-                    style={{
-                      padding: "6px 13px", minHeight: 32, fontSize: 11.5, fontWeight: isActive ? 700 : 500,
-                      border: `1.5px solid ${isActive ? g.accent + "88" : "var(--color-border)"}`,
-                      background: isActive ? g.accent + "18" : "var(--color-card)",
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                    }}
-                  >
-                    {g.icon} {g.label}
-                    <span style={{
-                      display: "inline-flex", alignItems: "center", justifyContent: "center",
-                      background: isActive ? g.accent + "33" : "var(--color-border)",
-                      borderRadius: 10, padding: "1px 5px", fontSize: 9, fontWeight: 800,
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                      lineHeight: 1.4,
-                    }}>{g.exercises.length}</span>
-                  </button>
-                );
-              })}
-            </>
-          ) : (
-            // classic: existing pills
-            <>
-              <button
-                onClick={() => setFilter(null)}
-                className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
-                style={{
-                  border: filter === null ? `1.5px solid ${accentColor}` : "1.5px solid var(--color-border)",
-                  background: filter === null ? accentColor + "18" : "var(--color-card)",
-                  color: filter === null ? accentColor : "var(--color-text-muted)",
-                  fontWeight: filter === null ? 700 : 400,
-                }}
-              >
-                All
-              </button>
-              {groups.map((g) => {
-                const isActive = filter === g.key;
-                return (
-                  <button
-                    key={g.key}
-                    onClick={() => setFilter(isActive ? null : g.key)}
-                    className="px-2.5 py-1.5 text-[11px] font-[inherit] rounded-md cursor-pointer min-h-[36px]"
-                    style={{
-                      border: isActive ? `1.5px solid ${g.accent}` : "1.5px solid var(--color-border)",
-                      background: isActive ? g.accent + "18" : "var(--color-card)",
-                      color: isActive ? g.accent : "var(--color-text-muted)",
-                      fontWeight: isActive ? 700 : 400,
-                    }}
-                  >
-                    {g.icon} {g.label}
-                    <span className="ml-1 text-[9px] opacity-60">
-                      {g.exercises.length}
-                    </span>
-                  </button>
-                );
-              })}
-            </>
-          )}
+            );
+          })}
         </div>
 
         {/* Exercise groups */}
@@ -1862,7 +1800,7 @@ export default function WorkoutView() {
             onToggle={() => toggleSection(`lib-${group.key}`)}
             count={group.exercises.length}
             accent={group.accent}
-            coloredBorder={uiV2}
+            coloredBorder
           >
             {group.exercises.map((name) => renderCoreExercise(name))}
           </Section>
@@ -1940,6 +1878,8 @@ export default function WorkoutView() {
                   variantSetupCues={selectedVariant?.setupCues}
                   variantLabel={selectedVariant?.label}
                   variantRequires={selectedVariant?.requires}
+                  variantId={selectedVariant?.id}
+                  log={log}
                   addComplementSlot={buildAddComplementPill(k, ex)}
                 />
                 {buildSupersetCards(k, ex, "__cardio__", null)}
@@ -2155,17 +2095,6 @@ export default function WorkoutView() {
           the final 10-15 seconds of each set. If you finish the set
           comfortably, move up an amp level.
         </Callout>
-
-        <Section
-          title="Removed Exercises"
-          icon={"\uD83D\uDEAB"}
-          isOpen={!!openSections["danger-core"]}
-          onToggle={() => toggleSection("danger-core")}
-        >
-          {REMOVED_CORE.map((r) => (
-            <RemovedRow key={r.name} name={r.name} reason={r.reason} />
-          ))}
-        </Section>
       </div>
     );
   }
@@ -2173,47 +2102,6 @@ export default function WorkoutView() {
   function renderEquipTab() {
     return (
       <div>
-        {/* UI v2 preview toggle */}
-        <div
-          className="flex items-center justify-between rounded-lg mb-4"
-          style={{
-            padding: "12px 14px",
-            background: uiV2 ? "#22d3ee11" : "var(--color-card)",
-            border: `1px solid ${uiV2 ? "#22d3ee44" : "var(--color-border)"}`,
-          }}
-        >
-          <div>
-            <div className="text-[13px] font-semibold text-text">New UI Preview</div>
-            <div className="text-[11px] text-text-muted mt-0.5">
-              {uiV2 ? "Active — gradient cards, color borders, sliding tabs" : "Off — using classic UI"}
-            </div>
-          </div>
-          <button
-            onClick={() => setUiV2((v) => !v)}
-            className="relative cursor-pointer border-none font-[inherit]"
-            style={{
-              width: 44, height: 24, borderRadius: 12,
-              background: uiV2 ? "#22d3ee" : "var(--color-border)",
-              transition: "background 0.2s",
-              padding: 0,
-              position: "relative",
-            }}
-            title="Toggle new UI preview"
-          >
-            <span
-              style={{
-                position: "absolute",
-                top: 3, left: uiV2 ? 23 : 3,
-                width: 18, height: 18,
-                borderRadius: "50%",
-                background: "#fff",
-                transition: "left 0.2s",
-                display: "block",
-              }}
-            />
-          </button>
-        </div>
-
         {/* Week start day picker */}
         <Section
           title="Week Start Day"
@@ -2445,6 +2333,11 @@ export default function WorkoutView() {
             </div>
           ))}
         </Section>
+
+        {/* Hevy CSV import */}
+        <div style={{ marginTop: 8 }}>
+          <HevyImportPanel />
+        </div>
       </div>
     );
   }
@@ -2452,35 +2345,6 @@ export default function WorkoutView() {
   function renderSafetyTab() {
     return (
       <div>
-        {/* Injury Status */}
-        <Section
-          title="Injury Status (MRI 3/11/2026)"
-          icon={"\uD83E\uDE7B"}
-          isOpen={!!openSections["injuries"]}
-          onToggle={() => toggleSection("injuries")}
-        >
-          {INJURIES.map((inj, i) => (
-            <div
-              key={`inj-${i}`}
-              className="rounded-lg mb-1.5"
-              style={{
-                padding: 12,
-                background: "var(--color-card)",
-                borderLeft: `3px solid ${inj.c}`,
-              }}
-            >
-              <div
-                className="font-bold text-[13px]"
-                style={{ color: inj.c }}
-              >
-                {inj.n}
-              </div>
-              <div className="text-[11px] mt-1 text-text-dim leading-relaxed">
-                {inj.r}
-              </div>
-            </div>
-          ))}
-        </Section>
 
         {/* Absolute Stop Signals */}
         <Section
@@ -2708,6 +2572,13 @@ export default function WorkoutView() {
     );
   }
 
+  // ===== ACTIVE WORKOUT-LOG SESSION =====
+  // Must be declared BEFORE the render-tab switch — renderTodayTab() and
+  // renderWorkout() iterate exercises and pass `log` into ExerciseRow as a
+  // prop, so the const has to be initialised before those functions execute.
+  const todayWorkoutKey = getWorkoutForDay(selectedDay).t;
+  const log = useWorkoutLog(todayWorkoutKey);
+
   // ===== RENDER ACTIVE TAB =====
   let content: React.ReactNode = null;
   switch (tab) {
@@ -2732,6 +2603,12 @@ export default function WorkoutView() {
     case GEAR_TAB_INDEX:
       content = renderEquipTab();
       break;
+    case HISTORY_TAB_INDEX:
+      content = <HistoryView />;
+      break;
+    case REHAB_TAB_INDEX:
+      content = <RehabTab />;
+      break;
   }
 
   const todayColor = getWorkoutForDay(selectedDay).c;
@@ -2739,11 +2616,13 @@ export default function WorkoutView() {
   // ===== MAIN LAYOUT =====
   return (
     <div data-testid="app-container" className="app-container max-w-[600px] mx-auto px-4 pb-24 min-h-screen bg-bg">
+      <SessionBar log={log} workoutLabel={log.active?.workoutKey ?? todayWorkoutKey} />
+
       {/* Header */}
       <div className="pt-8 pb-5 text-center">
         <div className="flex items-center justify-center gap-2.5">
-          {/* v2: compact progress ring in header */}
-          {uiV2 && <ProgressClock compact />}
+          {/* Compact progress ring in header */}
+          <ProgressClock compact />
           <h1 data-testid="app-title" className="text-2xl font-extrabold tracking-tight text-text">
             Femur Fracture Fitness
           </h1>
@@ -2818,12 +2697,9 @@ export default function WorkoutView() {
           </div>
         </div>
         <div className="text-xs text-text-muted mt-1.5 tracking-wide">
-          NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 6 Weeks
+          NWB-Adjusted PPL &bull; Left Femur Stress Fracture &bull; 8 Weeks
         </div>
       </div>
-
-      {/* Progress clock (classic only — v2 uses compact ring in header) */}
-      {!uiV2 && <ProgressClock />}
 
       {/* Phase selector */}
       <div className="flex gap-1.5 mb-4">
@@ -2862,8 +2738,8 @@ export default function WorkoutView() {
 
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
-        {/* v2: sliding pill indicator */}
-        {uiV2 && pillPos.width > 0 && (
+        {/* Sliding pill indicator */}
+        {pillPos.width > 0 && (
           <div
             data-testid="tab-pill"
             className="absolute top-0 bottom-0 rounded-xl pointer-events-none"
@@ -2890,20 +2766,26 @@ export default function WorkoutView() {
         {TABS.map((t, i) => {
           const isTodayTab = i === 0;
           const activeColor = isTodayTab ? todayColor : "var(--color-accent)";
-          const isActive = tab === i;
+          // Map visual position → canonical state index (Rehab is out-of-band).
+          const stateIdx = TAB_INDEX_BY_NAME[t] ?? i;
+          const isActive = tab === stateIdx;
           return (
             <button
               key={t}
-              ref={(el) => { tabRefs.current[i] = el; }}
+              ref={(el) => {
+                // Store ref at canonical state index so pillPos lookup works
+                // for the out-of-band Rehab tab (state idx 9).
+                tabRefs.current[stateIdx] = el;
+              }}
               data-testid={`tab-${t.toLowerCase()}`}
               title={TAB_TIPS[i]}
               aria-label={t}
-              onClick={() => setTab(i)}
+              onClick={() => setTab(stateIdx)}
               className={`flex-1 min-w-0 rounded-xl text-xs font-semibold cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${isActive ? "tab-active" : ""}`}
               style={{
                 padding: "12px 4px",
-                background: uiV2 ? "transparent" : (isActive ? activeColor + "15" : "none"),
-                border: uiV2 ? "1px solid transparent" : `1px solid ${isActive ? activeColor + "55" : "var(--color-border)"}`,
+                background: "transparent",
+                border: "1px solid transparent",
                 color: isActive ? activeColor : "var(--color-text-muted)",
               }}
             >
@@ -2926,14 +2808,38 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 8) : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === SAFETY_TAB_INDEX ? cssAlpha("var(--color-warning)", 33) : "var(--color-border)"}`,
+            background: "transparent",
+            border: "1px solid transparent",
             color: tab === SAFETY_TAB_INDEX ? "var(--color-warning)" : "var(--color-text-muted)",
           }}
         >
           {/* Shield */}
           <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </button>
+        {/* History (icon) */}
+        <button
+          ref={(el) => { tabRefs.current[HISTORY_TAB_INDEX] = el; }}
+          data-testid="tab-history"
+          title="Workout history"
+          aria-label="History"
+          onClick={() => setTab(HISTORY_TAB_INDEX)}
+          className={`rounded-xl cursor-pointer font-[inherit] flex items-center justify-center transition-all duration-150 ${tab === HISTORY_TAB_INDEX ? "tab-active" : ""}`}
+          style={{
+            width: 44,
+            minWidth: 44,
+            padding: "12px 0",
+            background: "transparent",
+            border: "1px solid transparent",
+            color: tab === HISTORY_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
+          }}
+        >
+          {/* Clock with rewind arrow */}
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l3 2" />
           </svg>
         </button>
         {/* Gear / config */}
@@ -2947,8 +2853,8 @@ export default function WorkoutView() {
             width: 44,
             minWidth: 44,
             padding: "12px 0",
-            background: uiV2 ? "transparent" : (tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 8) : "none"),
-            border: uiV2 ? "1px solid transparent" : `1px solid ${tab === GEAR_TAB_INDEX ? cssAlpha("var(--color-accent)", 33) : "var(--color-border)"}`,
+            background: "transparent",
+            border: "1px solid transparent",
             color: tab === GEAR_TAB_INDEX ? "var(--color-accent)" : "var(--color-text-muted)",
           }}
         >
@@ -3151,6 +3057,26 @@ export default function WorkoutView() {
                   {"\uD83D\uDEE1\uFE0F"} NWB Safety
                 </div>
                 <div className="text-white/75 text-[14px] leading-relaxed">{item.ex.nwbCues}</div>
+              </div>
+
+              {/* In-app set tracker — primary action surface in play mode.
+                  `key` re-keys on exercise change so the draft state, prefill,
+                  and inputs reset cleanly when navigating between focus items. */}
+              <div className="mb-4">
+                <SetTracker
+                  key={item.ex.id}
+                  exerciseId={item.ex.id}
+                  exerciseName={item.name}
+                  variantId={
+                    item.ex.machineVariants?.find(
+                      (v) => v.id === machineSelections[item.name],
+                    )?.id
+                  }
+                  defaultRest={item.ex.rest}
+                  prescribedReps={s[1]}
+                  log={log}
+                  onStartTimer={(sec) => setTimer(sec)}
+                />
               </div>
 
               <div
@@ -3367,7 +3293,14 @@ export default function WorkoutView() {
         />
       )}
 
-      {/* Add-exercise picker — "＋ Add exercise" button opens this */}
+      {/* Add-exercise picker — "＋ Add exercise" button opens this.
+          The picker itself is intentionally lean (search + tap-to-add). To
+          let the user log a set immediately on the new exercise without a
+          separate tap to expand it, we (a) make sure the workout section is
+          open, (b) auto-expand the freshly added row, and (c) scroll it
+          into view. The picker auto-closes on add (existing behavior), so
+          when the user lands back on the today view the new ExerciseRow is
+          already expanded with SetTracker visible at the top of its panel. */}
       {addPickerFor && (() => {
         const wk = addPickerFor;
         const w = WORKOUTS[wk];
@@ -3383,7 +3316,39 @@ export default function WorkoutView() {
           <AddExercisePicker
             currentExercises={current}
             preferredCategory={preferred}
-            onAdd={(name) => addExerciseToWorkout(wk, name)}
+            onAdd={(name) => {
+              addExerciseToWorkout(wk, name);
+              // Ensure the workout section is open so the row is visible.
+              setOpenSections((prev) =>
+                prev[wk] ? prev : { ...prev, [wk]: true },
+              );
+              // Auto-expand the new exercise row so its SetTracker is
+              // immediately tappable. Note: getExName(wk, name) === name
+              // for freshly added exercises (no swap mapping yet).
+              setExpandedEx((prev) =>
+                prev[name] ? prev : { ...prev, [name]: true },
+              );
+              // Scroll the new row into view after the picker closes.
+              // Each row in renderWorkout is tagged with data-exercise-name
+              // so we can find it deterministically without a ref. The
+              // double rAF gives React a tick to paint the new addition +
+              // expanded panel before we scroll.
+              if (typeof window !== "undefined") {
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    const el = document.querySelector(
+                      `[data-exercise-name="${CSS.escape(name)}"]`,
+                    );
+                    if (el && "scrollIntoView" in el) {
+                      (el as HTMLElement).scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+                    }
+                  });
+                });
+              }
+            }}
             onClose={() => setAddPickerFor(null)}
           />
         );

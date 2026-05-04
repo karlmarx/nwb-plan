@@ -1,4 +1,4 @@
-"""Safety tab tests — injuries, stop signals, removed exercises."""
+"""Safety tab tests — stop signals, pool entry."""
 
 from playwright.sync_api import Page, expect
 
@@ -11,15 +11,6 @@ def test_safety_tab_has_content(app_page: Page):
     content = app_page.get_by_test_id("tab-content")
     expect(content).to_be_visible()
     assert len(content.inner_text()) > 100, "Safety tab should have substantial content"
-
-
-def test_safety_tab_injury_status(app_page: Page):
-    """Safety tab shows injury status section."""
-    click_tab(app_page, "safety")
-    content = app_page.get_by_test_id("tab-content")
-    text = content.inner_text()
-    assert "injury" in text.lower() or "mri" in text.lower(), \
-        "Safety tab should mention injury status"
 
 
 def test_safety_tab_stop_signals(app_page: Page):

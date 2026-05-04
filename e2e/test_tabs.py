@@ -16,14 +16,20 @@ def test_all_tabs_clickable(app_page: Page):
 
 
 def test_active_tab_styling(app_page: Page):
-    """Active tab has different text color than inactive tabs (works in both classic and v2)."""
+    """Active tab gets the `tab-active` class while inactive tabs do not.
+
+    (We used to compare getComputedStyle(el).color, but icon-only tabs
+    have no text node and the color cascade lands on the SVG stroke, so
+    both buttons report identical computed `color`. The class marker is
+    the canonical signal.)"""
     click_tab(app_page, "upper")
     upper_btn = app_page.get_by_test_id("tab-upper")
     workout_btn = app_page.get_by_test_id("tab-workout")
 
-    upper_color = upper_btn.evaluate("el => getComputedStyle(el).color")
-    workout_color = workout_btn.evaluate("el => getComputedStyle(el).color")
-    assert upper_color != workout_color, "Active and inactive tabs should have different text colors"
+    upper_class = upper_btn.evaluate("el => el.className")
+    workout_class = workout_btn.evaluate("el => el.className")
+    assert "tab-active" in upper_class, f"Active tab should have tab-active class; got: {upper_class}"
+    assert "tab-active" not in workout_class, f"Inactive tab should not have tab-active; got: {workout_class}"
 
 
 def test_tab_content_changes(app_page: Page):

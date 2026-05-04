@@ -41,4 +41,9 @@ export const EXERCISE_TO_DIAGRAM: Record<string, string> = {
   prone_trunk_extension:               "p10",
   prone_iso_hold:                      "p11",
   prone_lateral_trunk_raise:           "p12",
+  // ── Left-oblique loaded / seated block ──
+  seated_cable_chop_low_to_high:       "r8",
+  seated_pallof_press_with_rotation:   "r9",
+  seated_single_side_suitcase_iso_hold_r: "r10",
+  right_side_down_side_plank_db_thread_the_needle: "r11",
 };
