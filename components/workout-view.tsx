@@ -55,9 +55,15 @@ const SetTracker = dynamic(() => import("@/components/set-tracker"), {
   ssr: false,
 });
 
-// Conditionally import AuthButton only when feature flag is on
+// Conditionally import AuthButton when either auth or AI feature flag is on.
+// FEATURE_AUTH gates login + cloud sync independently of AI suggestions; the
+// older FEATURE_AI_SUGGESTIONS flag is kept for backward compat (AI requires
+// auth, so turning AI on must also surface the button).
+const AUTH_ENABLED =
+  process.env.NEXT_PUBLIC_FEATURE_AUTH === "true" ||
+  process.env.NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS === "true";
 const AuthButton =
-  process.env.NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS === "true"
+  AUTH_ENABLED
     ? React.lazy(() => import("@/components/auth-button"))
     : null;
 

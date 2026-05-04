@@ -124,6 +124,16 @@ export function endSession(active: WorkoutSession): {
   const sessions = [...loadSessions(), ended];
   saveSessions(sessions);
   saveActiveSession(null);
+  // Fire-and-forget cloud sync. No-ops gracefully when not signed in.
+  // Imported lazily to avoid a circular dep (workout-sync ← workout-log).
+  if (typeof window !== "undefined") {
+    import("./workout-sync")
+      .then((m) => m.pushSession(ended))
+      .catch(() => {
+        // Sync errors are surfaced via SyncState; localStorage write already
+        // succeeded, so the user's data is safe regardless.
+      });
+  }
   return { ended, sessions };
 }
 
