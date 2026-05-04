@@ -200,6 +200,36 @@ CREATE TABLE IF NOT EXISTS equipment (
   category  TEXT NOT NULL            -- "weights" | "machines" | "functional" | ...
 );
 
+-- ---- workout sessions (per-user logged workout history) ------------------
+--
+-- One row per finished WorkoutSession (lib/workout-log.ts). Active /
+-- in-progress sessions stay client-side until endSession() runs, then push.
+-- Conflict policy: last-write-wins per session id, by `updated_at`.
+--
+-- Modelling: the full WorkoutSession (including LoggedExercise[] / LoggedSet[])
+-- lives in `data` JSONB. We never query "all sets above 200lbs across users"
+-- — the only query is "give me this user's history" — so denormalising into
+-- session/exercise/set tables would add three joins for zero benefit and
+-- destroy ordering invariants. The hot scalars (`workout_key`, `started_at`,
+-- `ended_at`) are mirrored as columns so the history index doesn't have to
+-- crack the JSONB on every read.
+--
+-- equipment_photos are intentionally OUT — base64 dataURLs would balloon
+-- the JSONB. They stay localStorage-only until we add object storage.
+CREATE TABLE IF NOT EXISTS workout_sessions (
+  id           TEXT PRIMARY KEY,        -- session.id from client (s-<base36>-<rand>)
+  user_id      TEXT NOT NULL,           -- session.user.email
+  workout_key  TEXT NOT NULL,           -- "Push A", "Legs B", "Freestyle", ...
+  started_at   BIGINT NOT NULL,         -- epoch ms (matches client shape)
+  ended_at     BIGINT,                  -- epoch ms; null only for resync edge cases
+  data         JSONB NOT NULL,          -- full WorkoutSession blob
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS workout_sessions_user_started_idx
+  ON workout_sessions (user_id, started_at DESC);
+
 -- ---- updated_at trigger ---------------------------------------------------
 
 CREATE OR REPLACE FUNCTION set_updated_at()
@@ -213,6 +243,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS exercises_updated_at        ON exercises;
 DROP TRIGGER IF EXISTS machine_variants_updated_at ON machine_variants;
 DROP TRIGGER IF EXISTS workouts_updated_at         ON workouts;
+DROP TRIGGER IF EXISTS workout_sessions_updated_at ON workout_sessions;
 
 CREATE TRIGGER exercises_updated_at
   BEFORE UPDATE ON exercises
@@ -224,4 +255,8 @@ CREATE TRIGGER machine_variants_updated_at
 
 CREATE TRIGGER workouts_updated_at
   BEFORE UPDATE ON workouts
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER workout_sessions_updated_at
+  BEFORE UPDATE ON workout_sessions
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
