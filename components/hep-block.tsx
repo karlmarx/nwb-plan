@@ -108,24 +108,37 @@ function HEPRow({
     ? `${ex.sets} × ${ex.reps ?? "—"} · ${ex.holdSeconds}s hold`
     : `${ex.sets} × ${ex.reps ?? "—"}`;
 
+  const handleRowClick = () => onToggle();
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
     <div
       data-testid={`hep-row-${ex.id}`}
-      className="flex flex-wrap items-center gap-2 py-1.5"
+      role="button"
+      tabIndex={0}
+      aria-label={done ? `Uncheck ${ex.name}` : `Check ${ex.name}`}
+      onClick={handleRowClick}
+      onKeyDown={handleRowKeyDown}
+      className={`flex flex-wrap items-center gap-2 py-1.5 cursor-pointer rounded transition-opacity${done ? " opacity-60 bg-emerald-500/5" : ""}`}
     >
-      <button
+      {/* Checkbox — purely visual; the parent row handles the toggle */}
+      <div
         data-testid={`hep-checkbox-${ex.id}`}
-        onClick={onToggle}
-        aria-label={done ? `Uncheck ${ex.name}` : `Check ${ex.name}`}
-        className="w-5 h-5 rounded border flex items-center justify-center cursor-pointer"
+        aria-hidden="true"
+        className="w-7 h-7 rounded border flex items-center justify-center flex-shrink-0"
         style={{
           background: done ? "#34d399" : "transparent",
           borderColor: done ? "#34d399" : "var(--color-border)",
           color: done ? "#0a0a0a" : "transparent",
         }}
       >
-        {done ? "✓" : ""}
-      </button>
+        <span className="text-base leading-none select-none">{done ? "✓" : ""}</span>
+      </div>
       <span className="font-semibold flex-1 text-sm">{ex.name}</span>
       {!compact && (
         <span className="text-xs text-text-dim">{setsReps}</span>
@@ -138,13 +151,17 @@ function HEPRow({
           rel="noopener noreferrer"
           className="text-xs"
           aria-label={`Video for ${ex.name}`}
+          onClick={(e) => e.stopPropagation()}
         >
           ▶
         </a>
       )}
       <button
         data-testid={`hep-info-${ex.id}`}
-        onClick={() => setShowInfo((v) => !v)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowInfo((v) => !v);
+        }}
         aria-label={`Instructions for ${ex.name}`}
         className="text-xs text-text-dim cursor-pointer"
       >
@@ -153,7 +170,7 @@ function HEPRow({
       {showInfo && (
         <div
           data-testid={`hep-instructions-${ex.id}`}
-          className="basis-full text-xs text-text-dim pl-7 pt-1"
+          className="basis-full text-xs text-text-dim pl-9 pt-1"
         >
           {ex.instructions}
         </div>
