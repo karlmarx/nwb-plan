@@ -13,11 +13,13 @@ The existing `lib/pt-exercises.ts` library is a phase-gated PWB rehab supplement
 
 ## Goals
 
-1. A single canonical, always-visible "Daily Required HEP" block on the Today tab — collapsed by default, expands inline.
-2. A compact one-line-per-exercise strip rendered at the end of every workout view, sharing completion state with the Today block.
-3. Per-exercise per-day completion tracking, persisted in localStorage by date.
-4. Append-only friendly data shape so a new HEP entry next week is a one-line file edit.
-5. Optional video link rendered as a `▶ Video` icon per row (HEP2GO QR code URL when available).
+1. A collapsed-by-default "Daily Required HEP" pill on the Today tab — expands inline to show full per-row list.
+2. A full-width "Daily HEP" block on the Rehab tab — natural home for PT-flavored content, shows the same full per-row list expanded by default.
+3. A compact one-line-per-exercise strip rendered at the end of every workout view.
+4. All three surfaces share completion state — check off once, all three update.
+5. Per-exercise per-day completion tracking, persisted in localStorage by date.
+6. Append-only friendly data shape so a new HEP entry next week is a one-line file edit.
+7. Optional video link rendered as a `▶ Video` icon per row (HEP2GO QR code URL when available).
 
 ## Non-goals
 
@@ -78,17 +80,19 @@ export function getActiveHEP(): HEPExercise[];
 
 #### `components/hep-block.tsx`
 
-The Today-tab block. One component, three render modes:
+The shared HEP component. One file, three render modes:
 
-- `mode="full"` — collapsed pill at top of Today tab, expands inline to show the full per-row list.
-- `mode="strip"` — compact single-line-per-exercise strip rendered at the end of each workout.
-- (Internal) row component shared by both modes.
+- `mode="pill"` — collapsed pill (Today tab). Expands inline to show full per-row list.
+- `mode="full"` — full-width block (Rehab tab). Always expanded.
+- `mode="strip"` — compact one-line-per-exercise strip (end of each workout).
+- (Internal) row component shared by all three modes.
 
 API:
 
 ```tsx
-<HEPBlock mode="full" />                   // Today tab
-<HEPBlock mode="strip" workoutKey="Push A" /> // end-of-workout
+<HEPBlock mode="pill" />                       // Today tab
+<HEPBlock mode="full" />                       // Rehab tab
+<HEPBlock mode="strip" workoutKey="Push A" />  // end-of-workout
 ```
 
 State source: `useHEPCompletion()` hook (defined inside this component file or in a sibling) that reads/writes `localStorage["nwb_hep_done_<YYYY-MM-DD>"]: string[]` (array of HEP ids done today).
@@ -97,13 +101,13 @@ State source: `useHEPCompletion()` hook (defined inside this component file or i
 
 #### `components/workout-view.tsx`
 
-- Render `<HEPBlock mode="full" />` near the top of the Today tab — directly under the workout header, above the exercise list.
+- Render `<HEPBlock mode="pill" />` near the top of the Today tab — directly under the workout header, above the exercise list.
 - Render `<HEPBlock mode="strip" workoutKey={…} />` at the bottom of the workout body for every workout (Today/Push/Pull/Legs/Freestyle), after the last exercise but before the footer/cross-education panel.
 - No state owned in `workout-view.tsx` for HEP — `HEPBlock` self-manages its localStorage hook.
 
-#### `app/page.tsx` (or wherever the Today tab content is composed)
+#### `components/rehab-tab.tsx`
 
-If composition is delegated outside `workout-view.tsx`, ensure `<HEPBlock mode="full" />` lands above the per-day workout view. (Likely no edit needed if `workout-view.tsx` owns the Today tab — verify during implementation.)
+- Render `<HEPBlock mode="full" />` at the top of the Rehab tab content area, above the existing phase-gated PT progression. The "Daily HEP" block is the new permanent header section; the existing Rehab content stays intact below.
 
 ## Data flow
 
@@ -117,14 +121,15 @@ If composition is delegated outside `workout-view.tsx`, ensure `<HEPBlock mode="
                     │ getActiveHEP()           │  filters retiredOn
                     └────────────┬─────────────┘
                                  │
-              ┌──────────────────┴──────────────────┐
-              │                                     │
-   ┌──────────▼───────────┐              ┌──────────▼───────────┐
-   │ <HEPBlock mode=full> │              │ <HEPBlock mode=strip>│
-   │  Today tab pill      │              │ end of every workout │
-   └──────────┬───────────┘              └──────────┬───────────┘
-              │                                     │
-              └────────────────┬────────────────────┘
+         ┌─────────────────────┼─────────────────────┐
+         │                     │                     │
+┌────────▼───────────┐ ┌───────▼────────────┐ ┌──────▼───────────────┐
+│ <HEPBlock          │ │ <HEPBlock          │ │ <HEPBlock            │
+│  mode=pill>        │ │  mode=full>        │ │  mode=strip>         │
+│ Today tab          │ │ Rehab tab (top)    │ │ end of every workout │
+└────────┬───────────┘ └───────┬────────────┘ └──────┬───────────────┘
+         │                     │                     │
+         └─────────────────────┼─────────────────────┘
                                │
                     ┌──────────▼─────────────┐
                     │ useHEPCompletion()     │  shared hook
@@ -137,7 +142,7 @@ Single source of truth — the shared hook means tapping a checkbox in the Today
 
 ## UX
 
-### Today-tab block (collapsed default)
+### Today-tab pill (collapsed default)
 
 - Pill: rounded rectangle near top of Today tab, single line.
   - Left: "🏥 HEP — 3/6 done today"
@@ -146,16 +151,23 @@ Single source of truth — the shared hook means tapping a checkbox in the Today
   - Row layout (left → right): checkbox · name (bold) · "3 × 10" or "3 × 10 · 5s hold" · `▶ Video` icon (only if `videoUrl` set) · `ℹ` info icon (taps reveal `instructions` inline)
   - Row tap on info expands instructions inline below the row, second tap collapses.
   - Row checkbox toggles `done` for that exercise on today's date.
-- Color: subtle neutral, not loud. The Rehab tab is the loud thing; HEP is a quiet floor.
+- Color: subtle neutral, quiet floor. Doesn't compete with the workout content.
+
+### Rehab-tab full block (always expanded)
+
+- Renders at the top of the Rehab tab body, above the existing phase-gated PT progression.
+- Header: "Daily Required HEP — 3/6 done today"
+- Same row layout as the expanded Today pill (checkbox · name · sets/reps · ▶ video · ℹ instructions). Always expanded — no collapse toggle here, this surface IS the canonical detailed view.
+- Visually distinct from the existing Rehab content below (different background tint or a divider) so the user reads it as "your daily floor" vs "phase-gated supplements."
 
 ### End-of-workout strip
 
 - Header: "Don't forget — Daily HEP · 3/6 done"
 - Compact rows, one per exercise:
   - Tiny checkbox · name · `▶` icon (if video available)
-  - No reps/sets shown (saves space — Today block has the full info)
+  - No reps/sets shown (saves space — Today/Rehab blocks have the full info)
   - Tap a row → expands instructions inline below, same as Today block
-- Renders at the end of every workout view (Push A, Pull A, Legs B, Freestyle, Today). Does NOT render in Rehab tab (that surface has its own PT) or in Equipment / Safety / History tabs.
+- Renders at the end of every workout view (Push A, Pull A, Legs B, Freestyle, Today). Does NOT render in Equipment / Safety / History tabs.
 
 ### Completion tracking
 
@@ -193,10 +205,11 @@ All seeded with `prescribedOn: "2026-05-06"`. Instructions copied from the print
 
 1. **Data layer** — write `lib/hep-exercises.ts` with seed data and `getActiveHEP()`. Tests for the helper.
 2. **Hook** — `useHEPCompletion()` with localStorage date-keyed persistence. Unit tests for the hook.
-3. **Component, full mode** — `<HEPBlock mode="full" />` with collapsed pill + expanded list. Visual check in Today tab.
-4. **Component, strip mode** — extend the same component with `mode="strip"`. Wire into `workout-view.tsx` workout-body render.
-5. **E2E tests** — both surfaces.
-6. **Manual smoke** — Karl checks Safari mobile + adds video URLs after scanning QR codes.
+3. **Component, pill mode** — `<HEPBlock mode="pill" />` with collapsed pill + expanded list. Wire into Today tab in `workout-view.tsx`. Visual check.
+4. **Component, full mode** — extend with `mode="full"` (same row layout, always expanded). Wire into `components/rehab-tab.tsx` at top of body.
+5. **Component, strip mode** — extend with `mode="strip"`. Wire into workout-body render in `workout-view.tsx`.
+6. **E2E tests** — three surfaces, plus completion-sync test (check off in pill, see it reflected in strip).
+7. **Manual smoke** — Karl checks Safari mobile across Today / Rehab / mid-workout + adds video URLs after scanning QR codes.
 
 ## Open questions
 
