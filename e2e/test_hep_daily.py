@@ -67,3 +67,42 @@ def test_hep_pill_checkbox_toggles_completion(app_page: Page):
     expect(app_page.get_by_test_id("hep-block-pill")).to_have_attribute(
         "data-hep-done", "1",
     )
+
+
+# ---------------------------------------------------------------------------
+# Rehab tab — always-expanded full block
+# ---------------------------------------------------------------------------
+
+def test_hep_full_block_renders_on_rehab_tab(app_page: Page):
+    """Full block renders at the top of the Rehab tab, always expanded."""
+    click_tab(app_page, "rehab")
+    app_page.wait_for_selector("[data-testid='rehab-tab']", timeout=8000)
+
+    full = app_page.get_by_test_id("hep-block-full")
+    expect(full).to_be_visible()
+    expect(full).to_have_attribute("data-hep-total", "6")
+
+    # All six rows should be visible immediately (no toggle).
+    for ex_id in [
+        "hep_prone_hip_extension",
+        "hep_hip_abduction_sidelying",
+        "hep_straight_leg_raise",
+        "hep_bridging_ball_squeeze",
+        "hep_isometric_hip_er_prone_ball",
+        "hep_band_sidelying_clamshell",
+    ]:
+        expect(app_page.get_by_test_id(f"hep-row-{ex_id}")).to_be_visible()
+
+
+def test_hep_full_block_above_phase_picker(app_page: Page):
+    """The full block sits above the existing rehab-phase-picker."""
+    click_tab(app_page, "rehab")
+    app_page.wait_for_selector("[data-testid='rehab-tab']", timeout=8000)
+
+    full_box = app_page.get_by_test_id("hep-block-full").bounding_box()
+    picker_box = app_page.get_by_test_id("rehab-phase-picker").bounding_box()
+    assert full_box is not None and picker_box is not None
+    assert full_box["y"] < picker_box["y"], (
+        f"HEP full block should be above the phase picker "
+        f"(full y={full_box['y']}, picker y={picker_box['y']})"
+    )

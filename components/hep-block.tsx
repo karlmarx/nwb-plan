@@ -205,10 +205,40 @@ export default function HEPBlock({ mode, workoutKey }: HEPBlockProps) {
     );
   }
 
-  // full and strip modes implemented in Tasks 4 and 5
+  if (mode === "full") {
+    return (
+      <div
+        data-testid="hep-block-full"
+        data-hep-total={completion.totalCount}
+        data-hep-done={completion.doneCount}
+        className="rounded-xl border my-4 px-3 py-3"
+        style={{
+          borderColor: "var(--color-border)",
+          background: "var(--color-card)",
+        }}
+      >
+        <div className="text-sm font-semibold mb-2">
+          🏥 Daily Required HEP — {completion.doneCount}/{completion.totalCount} done today
+        </div>
+        <div className="border-t pt-2" style={{ borderColor: "var(--color-border)" }}>
+          {exercises.map((ex) => (
+            <HEPRow
+              key={ex.id}
+              ex={ex}
+              done={completion.isDone(ex.id)}
+              onToggle={() => completion.toggle(ex.id)}
+              compact={false}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // strip mode implemented in Task 5
   return (
     <div
-      data-testid={mode === "strip" ? `hep-strip-${workoutKey ?? "unknown"}` : `hep-block-${mode}`}
+      data-testid={`hep-strip-${workoutKey ?? "unknown"}`}
       data-hep-total={completion.totalCount}
       data-hep-done={completion.doneCount}
     />
