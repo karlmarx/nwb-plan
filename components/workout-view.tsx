@@ -47,6 +47,7 @@ import { useLongPress } from "@/lib/use-long-press";
 import { cssAlpha } from "@/lib/css-utils";
 import HevyImportPanel from "@/components/hevy-import-panel";
 import RehabTab from "@/components/rehab-tab";
+import HEPBlock from "@/components/hep-block";
 
 // Set tracker: same client-only pattern used in ExerciseRow. Disabling SSR
 // avoids a Turbopack chunk-init order issue when the tracker is bundled into
@@ -1666,6 +1667,9 @@ export default function WorkoutView() {
             );
           })}
         </div>
+
+        {/* Daily HEP pill */}
+        <HEPBlock mode="pill" />
 
         {/* Selected workout */}
         {WORKOUTS[selSched.t] && renderWorkout(selSched.t)}
