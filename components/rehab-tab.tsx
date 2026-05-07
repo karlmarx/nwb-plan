@@ -13,6 +13,7 @@ import {
   type PTCategory,
   type RehabPhase,
 } from "@/lib/pt-exercises";
+import HEPBlock from "@/components/hep-block";
 
 // ===== PHASE METADATA =====
 
@@ -288,6 +289,7 @@ export default function RehabTab() {
 
   return (
     <div data-testid="rehab-tab">
+      <HEPBlock mode="full" />
       <Callout type="info">
         <span className="font-semibold">Rehab block.</span> Phase-gated PT
         exercises from your prescribed left-leg progression. Daily / EOD dosing
