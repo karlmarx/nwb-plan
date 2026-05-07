@@ -29,12 +29,9 @@ def _storage_key() -> str:
 # Today tab — collapsed pill
 # ---------------------------------------------------------------------------
 
-def test_hep_pill_renders_on_today_tab(page: Page):
+def test_hep_pill_renders_on_today_tab(app_page: Page):
     """Pill renders at the top of the Today tab with correct count."""
-    page.goto("http://localhost:3000")
-    page.wait_for_selector("[data-testid='day-header']", timeout=8000)
-
-    pill = page.get_by_test_id("hep-block-pill")
+    pill = app_page.get_by_test_id("hep-block-pill")
     expect(pill).to_be_visible()
 
     # Count should match the seeded HEP_EXERCISES length (6 as of May 6).
@@ -42,37 +39,31 @@ def test_hep_pill_renders_on_today_tab(page: Page):
     expect(pill).to_have_attribute("data-hep-done", "0")
 
 
-def test_hep_pill_starts_collapsed_and_expands(page: Page):
+def test_hep_pill_starts_collapsed_and_expands(app_page: Page):
     """Pill is collapsed by default; clicking it expands the row list."""
-    page.goto("http://localhost:3000")
-    page.wait_for_selector("[data-testid='day-header']", timeout=8000)
-
-    pill = page.get_by_test_id("hep-block-pill")
+    pill = app_page.get_by_test_id("hep-block-pill")
     expect(pill).to_have_attribute("data-hep-expanded", "false")
 
     # Rows should not be visible while collapsed.
-    expect(page.get_by_test_id("hep-row-hep_prone_hip_extension")).to_have_count(0)
+    expect(app_page.get_by_test_id("hep-row-hep_prone_hip_extension")).to_have_count(0)
 
-    page.get_by_test_id("hep-pill-toggle").click()
+    app_page.get_by_test_id("hep-pill-toggle").click()
 
     expect(pill).to_have_attribute("data-hep-expanded", "true")
-    expect(page.get_by_test_id("hep-row-hep_prone_hip_extension")).to_be_visible()
+    expect(app_page.get_by_test_id("hep-row-hep_prone_hip_extension")).to_be_visible()
 
 
-def test_hep_pill_checkbox_toggles_completion(page: Page):
+def test_hep_pill_checkbox_toggles_completion(app_page: Page):
     """Tapping a row checkbox marks it done and updates the count."""
-    page.goto("http://localhost:3000")
-    page.wait_for_selector("[data-testid='day-header']", timeout=8000)
+    app_page.get_by_test_id("hep-pill-toggle").click()
+    app_page.get_by_test_id("hep-checkbox-hep_prone_hip_extension").click()
 
-    page.get_by_test_id("hep-pill-toggle").click()
-    page.get_by_test_id("hep-checkbox-hep_prone_hip_extension").click()
-
-    pill = page.get_by_test_id("hep-block-pill")
+    pill = app_page.get_by_test_id("hep-block-pill")
     expect(pill).to_have_attribute("data-hep-done", "1")
 
     # Reload and verify persistence.
-    page.reload()
-    page.wait_for_selector("[data-testid='day-header']", timeout=8000)
-    expect(page.get_by_test_id("hep-block-pill")).to_have_attribute(
+    app_page.reload()
+    app_page.wait_for_selector("[data-testid='day-header']", timeout=8000)
+    expect(app_page.get_by_test_id("hep-block-pill")).to_have_attribute(
         "data-hep-done", "1",
     )

@@ -111,7 +111,7 @@ function HEPRow({
   return (
     <div
       data-testid={`hep-row-${ex.id}`}
-      className="flex items-center gap-2 py-1.5"
+      className="flex flex-wrap items-center gap-2 py-1.5"
     >
       <button
         data-testid={`hep-checkbox-${ex.id}`}
