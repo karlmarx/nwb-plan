@@ -1586,6 +1586,9 @@ export default function WorkoutView() {
             })}
           </div>
         )}
+
+        {/* Daily HEP reminder strip */}
+        <HEPBlock mode="strip" workoutKey={workoutKey} />
       </Section>
     );
   }
