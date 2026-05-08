@@ -55,8 +55,7 @@ export function encodeLibId(exerciseName: string): ComplementId {
 
 export function encodeTextId(text: string): ComplementId {
   // base64 keeps the SEP delimiter safe even if the user types pipes
-  if (typeof btoa === "function") return `text${SEP}${btoa(text)}`;
-  return `text${SEP}${Buffer.from(text, "utf-8").toString("base64")}`;
+  return `text${SEP}${btoa(text)}`;
 }
 
 export function decodeComplement(id: ComplementId): {
@@ -86,10 +85,7 @@ export function decodeComplement(id: ComplementId): {
     const encoded = rest.join(sep);
     let decoded = encoded;
     try {
-      decoded =
-        typeof atob === "function"
-          ? atob(encoded)
-          : Buffer.from(encoded, "base64").toString("utf-8");
+      decoded = atob(encoded);
     } catch {
       decoded = encoded;
     }
