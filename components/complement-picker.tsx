@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   NEARBY_SUPERSETS,
   SUPPLEMENT_LEFT_LEG,
@@ -17,6 +17,7 @@ import {
 } from "@/lib/pt-exercises";
 import { loadState } from "@/lib/storage";
 import { cssAlpha } from "@/lib/css-utils";
+import { EX } from "@/lib/exercises";
 
 /**
  * A complement the user can add to an exercise. There are seven kinds:
@@ -413,12 +414,33 @@ export default function ComplementPicker({
     return { nearbyAvail, suppAvail, ptAvail, coreAvail, coreSubtitle, mobilityAvail };
   }, [exerciseRequires, exerciseCategory, workoutKey, nearbySelections, ptPhase]);
 
-  const hasAny =
-    nearbyAvail.length > 0 ||
-    suppAvail.length > 0 ||
-    ptAvail.length > 0 ||
-    coreAvail.length > 0 ||
-    mobilityAvail.length > 0;
+  const catalogNames = useMemo(() => Object.keys(EX), []);
+  const catalogLookup = useMemo(() => EX as unknown as SearchInputs["catalogLookup"], []);
+
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState<Set<ComplementSource>>(() => new Set());
+
+  const results = useMemo(
+    () =>
+      searchComplements(query, filters, {
+        nearbyAvail,
+        suppAvail,
+        coreAvail,
+        ptAvail: ptAvail.map((p) => ({
+          id: p.id,
+          name: p.name,
+          sets: p.sets,
+          execution: p.execution,
+        })),
+        mobilityAvail,
+        catalogNames,
+        catalogLookup,
+      }),
+    [query, filters, nearbyAvail, suppAvail, coreAvail, ptAvail, mobilityAvail, catalogNames, catalogLookup],
+  );
+
+  // useEffect reserved for Task 7 (custom-text mode)
+  void useEffect;
 
   return (
     <div
@@ -471,164 +493,43 @@ export default function ComplementPicker({
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-4 pb-6 pt-3">
-          {!hasAny && (
+          <input
+            data-testid="complement-search"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search complements..."
+            className="w-full mb-3 px-3 py-2 rounded-lg text-sm font-[inherit]"
+            style={{
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+            }}
+          />
+
+          {results.length === 0 && (
             <div className="text-[12px] text-text-muted py-3 leading-relaxed">
-              Nothing in reach right now. Open the edit sheet and select nearby
-              equipment, or try adding generic quad sets below.
+              {query
+                ? `No matches for "${query}".`
+                : "Nothing in reach right now. Open the edit sheet and select nearby equipment, or try adding generic quad sets below."}
             </div>
           )}
 
-          {coreAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                Core ({coreAvail.length})
+          <div className="space-y-1.5">
+            {results.map((r) => (
+              <div data-testid="complement-result" key={r.id}>
+                <ComplementButton
+                  label={r.label}
+                  color={r.color}
+                  title={r.title}
+                  sets={r.sets}
+                  description={r.description}
+                  active={activeSet.has(r.id)}
+                  onClick={() => onToggle(r.id)}
+                />
               </div>
-              {coreSubtitle && (
-                <div className="text-[10px] text-text-muted mb-2 leading-snug">
-                  {coreSubtitle} &mdash; day-specific core routine for{" "}
-                  {workoutKey}.
-                </div>
-              )}
-              <div className="space-y-1.5 mb-4">
-                {coreAvail.map(({ name, region, data }) => {
-                  const id = encodeCoreId(name);
-                  const sets = data.sets[0];
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label={region.toUpperCase()}
-                      color="#f97316"
-                      title={name}
-                      sets={`${sets[0]}\u00D7${sets[1]}`}
-                      description={data.execution}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {nearbyAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                In reach ({nearbyAvail.length})
-              </div>
-              <div className="space-y-1.5 mb-4">
-                {nearbyAvail.map((ns) => {
-                  const id = encodeNearbyId(ns);
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label="NEARBY"
-                      color="#14b8a6"
-                      title={ns.title}
-                      sets={ns.sets}
-                      description={ns.instruction}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {suppAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                Left-leg rehab ({suppAvail.length})
-              </div>
-              <div className="space-y-1.5 mb-4">
-                {suppAvail.map(({ name, data }) => {
-                  const id = encodeSuppId(name);
-                  const sets = data.sets[0];
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label="L-LEG"
-                      color="#14b8a6"
-                      title={name}
-                      sets={`${sets[0]}\u00D7${sets[1]}`}
-                      description={data.execution}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {ptAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                PT \u2014 Left-leg conditioning ({ptAvail.length})
-              </div>
-              <div className="text-[10px] text-text-muted mb-2 leading-snug">
-                Phase: <strong>{ptPhase}</strong> &mdash; phase-gated PT
-                progression. Switch phase from the Rehab tab.
-              </div>
-              <div className="space-y-1.5 mb-4">
-                {ptAvail.map((ex) => {
-                  const id = encodePTId(ex.id);
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label="PT"
-                      color="#34d399"
-                      title={ex.name}
-                      sets={ex.sets}
-                      description={ex.execution}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {mobilityAvail.length > 0 && (
-            <>
-              <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                Mobility &amp; stretches ({mobilityAvail.length})
-              </div>
-              <div className="text-[10px] text-text-muted mb-2 leading-snug">
-                Zero equipment — do these right on the machine you&rsquo;re using.
-              </div>
-              <div className="space-y-1.5">
-                {mobilityAvail.map((m) => {
-                  const id = encodeMobilityId(m);
-                  const color =
-                    m.kind === "breathing"
-                      ? "#8b5cf6"
-                      : m.kind === "stretch"
-                        ? "#f59e0b"
-                        : "#0ea5e9";
-                  const label =
-                    m.kind === "breathing"
-                      ? "BREATH"
-                      : m.kind === "stretch"
-                        ? "STRETCH"
-                        : "MOBILITY";
-                  return (
-                    <ComplementButton
-                      key={id}
-                      label={label}
-                      color={color}
-                      title={m.name}
-                      sets={m.sets}
-                      description={m.instruction}
-                      active={activeSet.has(id)}
-                      onClick={() => onToggle(id)}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
         </div>
 
         {/* Footer */}
