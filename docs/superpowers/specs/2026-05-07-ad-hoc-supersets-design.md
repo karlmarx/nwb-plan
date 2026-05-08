@@ -25,7 +25,7 @@ This feature adds catalog search and free-text complements, and at the same time
 5. Empty search shows a curated default list (the existing five sections, just rendered as flat cards in source order).
 6. Add a "Custom text" toggle that swaps the search input for a single-line text input + Save button. Saves a free-text complement.
 7. Two new `ComplementId` kinds and encode/decode functions:
-   - `lib|<exercise-id>` — references an entry in `EX` by its `id`
+   - `lib|<exercise-name>` — references an entry in `EX` by its display-name key (e.g. `lib|Barbell Floor Press`). The `EX` Record is keyed by display name, not by the `Exercise.id` snake_case field.
    - `text|<base64-encoded-string>` — embeds the user's free-text inline (so it round-trips through localStorage)
 8. Both new complement kinds render under the exercise the same way existing complements do — a card below the exercise row. `lib` complements use the catalog data (sets/reps from `EX[id]`); `text` complements render as a thin card with just the typed string + a check.
 
@@ -59,8 +59,8 @@ Two new `ComplementId` kinds appended to the existing union:
 
 ```ts
 // components/complement-picker.tsx
-export function encodeLibId(exId: string): ComplementId {
-  return `lib${SEP}${exId}`;
+export function encodeLibId(exerciseName: string): ComplementId {
+  return `lib${SEP}${exerciseName}`;
 }
 
 export function encodeTextId(text: string): ComplementId {
@@ -73,7 +73,7 @@ export function decodeComplement(id: ComplementId): {
   sub?: string;
 } {
   // existing decoder, plus:
-  // - "lib" → returns the exercise id (call site looks up in EX)
+  // - "lib" → returns the exercise name (call site looks up in EX)
   // - "text" → returns base64-decoded user string
 }
 ```

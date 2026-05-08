@@ -23,19 +23,23 @@ def test_picker_has_search_and_results(app_page: Page):
 
 
 def test_filter_chip_narrows_results(app_page: Page):
-    """Activating a single filter chip removes results from other sources."""
+    """Activating a single filter chip narrows results to that source only."""
     open_picker_for_first_exercise(app_page)
-    # Establish baseline: at least one non-catalog row exists
     pre_count = app_page.get_by_test_id("complement-result").count()
-    assert pre_count > 0
+    assert pre_count > 0, "expected baseline complements on a fresh state"
 
-    # Activate the Nearby chip — only NEARBY-labeled rows should remain
-    app_page.get_by_test_id("filter-chip-nearby").click()
+    # Activate the Core chip — only CORE-labeled rows should remain
+    app_page.get_by_test_id("filter-chip-core").click()
     rows = app_page.get_by_test_id("complement-result")
-    # Every visible result row's label badge must say NEARBY
-    for i in range(rows.count()):
-        badge = rows.nth(i).locator("span", has_text="NEARBY")
-        expect(badge).to_be_visible()
+    post_count = rows.count()
+    assert post_count > 0, "expected core complements on the default workout"
+    assert post_count <= pre_count, "core filter should not add results"
+    # Every visible result row's label must indicate a core region (not e.g. NEARBY/CATALOG/PT)
+    forbidden_labels = ["NEARBY", "CATALOG", "PT", "L-LEG", "MOBILITY", "STRETCH", "BREATH"]
+    for i in range(post_count):
+        text = rows.nth(i).inner_text()
+        for bad in forbidden_labels:
+            assert bad not in text, f"row {i} contained forbidden label {bad}: {text}"
 
 
 def test_search_finds_catalog_exercise(app_page: Page):
