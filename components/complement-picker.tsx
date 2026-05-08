@@ -94,6 +94,184 @@ export function decodeComplement(id: ComplementId): {
   return { kind: "supp", value: rest.join(sep) };
 }
 
+// ── Search helpers ───────────────────────────────────────────────────────
+
+export type ComplementSource =
+  | "catalog"
+  | "nearby"
+  | "supp"
+  | "core"
+  | "mobility"
+  | "pt";
+
+export interface SearchResult {
+  id: ComplementId;
+  source: ComplementSource;
+  /** Short uppercase label shown on the chip (NEARBY / CATALOG / etc.). */
+  label: string;
+  /** Source accent color (matches existing color scheme). */
+  color: string;
+  /** Display title — exercise name or supplement name. */
+  title: string;
+  /** "3×10" or similar; empty string if not applicable. */
+  sets: string;
+  /** First line of execution / instruction. */
+  description: string;
+}
+
+interface SearchInputs {
+  nearbyAvail: NearbySuperset[];
+  suppAvail: Array<{ name: string; data: (typeof SUPPLEMENT_EX)[string] }>;
+  coreAvail: Array<{
+    name: string;
+    region: string;
+    data: (typeof SUPPLEMENT_EX)[string];
+  }>;
+  ptAvail: Array<{ id: string; name: string; sets: string; execution: string }>;
+  mobilityAvail: MobilitySupplement[];
+  /** All exercise display-names from EX (only searched when query is non-empty). */
+  catalogNames: string[];
+  /** EX lookup so we can build sets/description for catalog hits. */
+  catalogLookup: Record<string, { name: string; sets: [string, string][]; execution?: string }>;
+}
+
+const SOURCE_META: Record<ComplementSource, { label: string; color: string }> = {
+  catalog: { label: "CATALOG", color: "#3b82f6" },
+  nearby: { label: "NEARBY", color: "#14b8a6" },
+  supp: { label: "L-LEG", color: "#14b8a6" },
+  core: { label: "CORE", color: "#f97316" },
+  mobility: { label: "MOBILITY", color: "#0ea5e9" },
+  pt: { label: "PT", color: "#34d399" },
+};
+
+export function searchComplements(
+  query: string,
+  filters: Set<ComplementSource>,
+  inputs: SearchInputs,
+): SearchResult[] {
+  const q = query.trim().toLowerCase();
+  const results: SearchResult[] = [];
+
+  const want = (s: ComplementSource) => filters.size === 0 || filters.has(s);
+
+  if (want("nearby")) {
+    for (const ns of inputs.nearbyAvail) {
+      results.push({
+        id: encodeNearbyId(ns),
+        source: "nearby",
+        label: SOURCE_META.nearby.label,
+        color: SOURCE_META.nearby.color,
+        title: ns.title,
+        sets: ns.sets,
+        description: ns.instruction,
+      });
+    }
+  }
+
+  if (want("supp")) {
+    for (const { name, data } of inputs.suppAvail) {
+      const s = data.sets[0];
+      results.push({
+        id: encodeSuppId(name),
+        source: "supp",
+        label: SOURCE_META.supp.label,
+        color: SOURCE_META.supp.color,
+        title: name,
+        sets: `${s[0]}×${s[1]}`,
+        description: data.execution,
+      });
+    }
+  }
+
+  if (want("core")) {
+    for (const { name, region, data } of inputs.coreAvail) {
+      const s = data.sets[0];
+      results.push({
+        id: encodeCoreId(name),
+        source: "core",
+        label: region.toUpperCase(),
+        color: SOURCE_META.core.color,
+        title: name,
+        sets: `${s[0]}×${s[1]}`,
+        description: data.execution,
+      });
+    }
+  }
+
+  if (want("pt")) {
+    for (const ex of inputs.ptAvail) {
+      results.push({
+        id: encodePTId(ex.id),
+        source: "pt",
+        label: SOURCE_META.pt.label,
+        color: SOURCE_META.pt.color,
+        title: ex.name,
+        sets: ex.sets,
+        description: ex.execution,
+      });
+    }
+  }
+
+  if (want("mobility")) {
+    for (const m of inputs.mobilityAvail) {
+      const color =
+        m.kind === "breathing"
+          ? "#8b5cf6"
+          : m.kind === "stretch"
+            ? "#f59e0b"
+            : SOURCE_META.mobility.color;
+      const label =
+        m.kind === "breathing"
+          ? "BREATH"
+          : m.kind === "stretch"
+            ? "STRETCH"
+            : SOURCE_META.mobility.label;
+      results.push({
+        id: encodeMobilityId(m),
+        source: "mobility",
+        label,
+        color,
+        title: m.name,
+        sets: m.sets,
+        description: m.instruction,
+      });
+    }
+  }
+
+  // Catalog only surfaces when the user has typed something, OR when the
+  // catalog filter is the only one active (so they explicitly opted into
+  // browsing the full catalog without a query).
+  const catalogOnly = filters.size === 1 && filters.has("catalog");
+  if (want("catalog") && (q.length > 0 || catalogOnly)) {
+    for (const name of inputs.catalogNames) {
+      const data = inputs.catalogLookup[name];
+      if (!data) continue;
+      const s = data.sets[0];
+      results.push({
+        id: encodeLibId(name),
+        source: "catalog",
+        label: SOURCE_META.catalog.label,
+        color: SOURCE_META.catalog.color,
+        title: name,
+        sets: s ? `${s[0]}×${s[1]}` : "",
+        description: data.execution ?? "",
+      });
+    }
+  }
+
+  if (q.length === 0) return results;
+
+  // Substring match on title; exact-prefix matches sort before substring matches.
+  const filtered = results.filter((r) => r.title.toLowerCase().includes(q));
+  filtered.sort((a, b) => {
+    const aPrefix = a.title.toLowerCase().startsWith(q) ? 0 : 1;
+    const bPrefix = b.title.toLowerCase().startsWith(q) ? 0 : 1;
+    if (aPrefix !== bPrefix) return aPrefix - bPrefix;
+    return a.title.localeCompare(b.title);
+  });
+  return filtered;
+}
+
 // ── Shared button for all complement types ──────────────────────────────
 
 interface ComplementButtonProps {
