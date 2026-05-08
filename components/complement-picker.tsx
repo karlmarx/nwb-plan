@@ -419,6 +419,8 @@ export default function ComplementPicker({
 
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Set<ComplementSource>>(() => new Set());
+  const [customMode, setCustomMode] = useState(false);
+  const [customText, setCustomText] = useState("");
 
   const results = useMemo(
     () =>
@@ -490,83 +492,150 @@ export default function ComplementPicker({
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-4 pb-6 pt-3">
-          <input
-            data-testid="complement-search"
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search complements..."
-            className="w-full mb-3 px-3 py-2 rounded-lg text-sm font-[inherit]"
-            style={{
-              background: "var(--color-bg)",
-              border: "1px solid var(--color-border)",
-              color: "var(--color-text)",
-            }}
-          />
+          {!customMode && (
+            <>
+              <input
+                data-testid="complement-search"
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search complements..."
+                className="w-full mb-3 px-3 py-2 rounded-lg text-sm font-[inherit]"
+                style={{
+                  background: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                }}
+              />
 
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {([
-              ["all", "All"],
-              ["catalog", "Catalog"],
-              ["nearby", "Nearby"],
-              ["supp", "L-Leg"],
-              ["core", "Core"],
-              ["mobility", "Mobility"],
-              ["pt", "PT"],
-            ] as const).map(([key, label]) => {
-              const isAll = key === "all";
-              const active = isAll
-                ? filters.size === 0
-                : filters.has(key as ComplementSource);
-              return (
-                <button
-                  key={key}
-                  data-testid={`filter-chip-${key}`}
-                  onClick={() => {
-                    if (isAll) {
-                      setFilters(new Set());
-                    } else {
-                      setFilters(new Set([key as ComplementSource]));
-                    }
-                  }}
-                  className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-1 cursor-pointer font-[inherit]"
-                  style={{
-                    background: active
-                      ? "var(--color-accent)22"
-                      : "var(--color-bg)",
-                    border: `1px solid ${active ? "var(--color-accent)" : "var(--color-border)"}`,
-                    color: active ? "var(--color-accent)" : "var(--color-text-muted)",
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {([
+                  ["all", "All"],
+                  ["catalog", "Catalog"],
+                  ["nearby", "Nearby"],
+                  ["supp", "L-Leg"],
+                  ["core", "Core"],
+                  ["mobility", "Mobility"],
+                  ["pt", "PT"],
+                ] as const).map(([key, label]) => {
+                  const isAll = key === "all";
+                  const active = isAll
+                    ? filters.size === 0
+                    : filters.has(key as ComplementSource);
+                  return (
+                    <button
+                      key={key}
+                      data-testid={`filter-chip-${key}`}
+                      onClick={() => {
+                        if (isAll) {
+                          setFilters(new Set());
+                        } else {
+                          setFilters(new Set([key as ComplementSource]));
+                        }
+                      }}
+                      className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-1 cursor-pointer font-[inherit]"
+                      style={{
+                        background: active
+                          ? "var(--color-accent)22"
+                          : "var(--color-bg)",
+                        border: `1px solid ${active ? "var(--color-accent)" : "var(--color-border)"}`,
+                        color: active ? "var(--color-accent)" : "var(--color-text-muted)",
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
 
-          {results.length === 0 && (
-            <div className="text-[12px] text-text-muted py-3 leading-relaxed">
-              {query
-                ? `No matches for "${query}".`
-                : "Nothing in reach right now. Open the edit sheet and select nearby equipment, or try adding generic quad sets below."}
-            </div>
+              <button
+                data-testid="custom-text-toggle"
+                onClick={() => setCustomMode(true)}
+                className="mb-3 text-[11px] font-bold rounded-full px-2.5 py-1 cursor-pointer font-[inherit]"
+                style={{
+                  background: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                + Custom text
+              </button>
+
+              {results.length === 0 && (
+                <div className="text-[12px] text-text-muted py-3 leading-relaxed">
+                  {query
+                    ? `No matches for "${query}".`
+                    : "Nothing in reach right now. Open the edit sheet and select nearby equipment, or try adding generic quad sets below."}
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                {results.map((r) => (
+                  <div data-testid="complement-result" key={r.id}>
+                    <ComplementButton
+                      label={r.label}
+                      color={r.color}
+                      title={r.title}
+                      sets={r.sets}
+                      description={r.description}
+                      active={activeSet.has(r.id)}
+                      onClick={() => onToggle(r.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
-          <div className="space-y-1.5">
-            {results.map((r) => (
-              <div data-testid="complement-result" key={r.id}>
-                <ComplementButton
-                  label={r.label}
-                  color={r.color}
-                  title={r.title}
-                  sets={r.sets}
-                  description={r.description}
-                  active={activeSet.has(r.id)}
-                  onClick={() => onToggle(r.id)}
+          {customMode && (
+            <div data-testid="custom-text-form">
+              <div className="flex gap-2 mb-3">
+                <input
+                  data-testid="custom-text-input"
+                  type="text"
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Type your superset..."
+                  autoFocus
+                  className="flex-1 px-3 py-2 rounded-lg text-sm font-[inherit]"
+                  style={{
+                    background: "var(--color-bg)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                  }}
                 />
+                <button
+                  data-testid="custom-text-save"
+                  onClick={() => {
+                    const trimmed = customText.trim();
+                    if (!trimmed) return;
+                    onToggle(encodeTextId(trimmed));
+                    setCustomText("");
+                    setCustomMode(false);
+                    onClose();
+                  }}
+                  className="px-3 rounded-lg text-sm font-bold cursor-pointer font-[inherit]"
+                  style={{
+                    background: "var(--color-accent)22",
+                    border: "1px solid var(--color-accent)",
+                    color: "var(--color-accent)",
+                  }}
+                >
+                  Save
+                </button>
               </div>
-            ))}
-          </div>
+              <button
+                data-testid="custom-text-cancel"
+                onClick={() => {
+                  setCustomMode(false);
+                  setCustomText("");
+                }}
+                className="text-[11px] text-text-muted cursor-pointer font-[inherit]"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
