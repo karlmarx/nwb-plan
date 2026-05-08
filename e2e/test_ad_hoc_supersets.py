@@ -83,3 +83,30 @@ def test_remove_custom_text(app_page: Page):
     expect(card).to_be_visible()
     card.get_by_role("button", name="Remove complement").click()
     expect(app_page.get_by_test_id("superset-card").filter(has_text="My custom move")).to_have_count(0)
+
+
+def test_complement_persistence(app_page: Page):
+    """A lib complement and a text complement both survive a page reload."""
+    open_picker_for_first_exercise(app_page)
+
+    # Add a lib complement
+    app_page.get_by_test_id("complement-search").fill("bench")
+    catalog_rows = app_page.get_by_test_id("complement-result").filter(has_text="CATALOG")
+    catalog_title = catalog_rows.first.locator("span.text-sm").inner_text()
+    catalog_rows.first.click()
+
+    # Switch to custom-text and add one
+    app_page.get_by_test_id("custom-text-toggle").click()
+    app_page.get_by_test_id("custom-text-input").fill("Persisted custom move")
+    app_page.get_by_test_id("custom-text-save").click()
+
+    # Reload
+    app_page.reload()
+    app_page.wait_for_selector("[data-testid='app-container']", timeout=15000)
+
+    # Both cards still visible (re-expand the first row first)
+    first_row = app_page.get_by_test_id("exercise-row").first
+    first_row.click()
+    cards = app_page.get_by_test_id("superset-card")
+    expect(cards.filter(has_text=catalog_title).first).to_be_visible()
+    expect(cards.filter(has_text="Persisted custom move").first).to_be_visible()
