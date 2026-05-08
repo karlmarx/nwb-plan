@@ -1082,6 +1082,33 @@ export default function WorkoutView() {
             removable: true,
             complementId: id,
           });
+        } else if (decoded.kind === "lib") {
+          const data = EX[decoded.value];
+          if (!data) continue;
+          const s = data.sets[0];
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "CATALOG",
+            color: "#3b82f6",
+            title: decoded.value,
+            sets: s ? `${s[0]}×${s[1]}` : "",
+            instruction: data.execution ?? "",
+            removable: true,
+            complementId: id,
+          });
+        } else if (decoded.kind === "text") {
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "CUSTOM",
+            color: "#71717a",
+            title: decoded.value,
+            sets: "",
+            instruction: "",
+            removable: true,
+            complementId: id,
+          });
         }
       }
 
@@ -1376,6 +1403,25 @@ export default function WorkoutView() {
                   sets: pt.sets,
                   instruction: pt.execution,
                   safety: pt.ptCues,
+                });
+              } else if (decoded.kind === "lib") {
+                const data = EX[decoded.value];
+                if (!data) continue;
+                const s = data.sets[0];
+                supps.push({
+                  type: "leftleg",
+                  name: decoded.value,
+                  sets: s ? `${s[0]}×${s[1]}` : "",
+                  instruction: data.execution ?? "",
+                  safety: "",
+                });
+              } else if (decoded.kind === "text") {
+                supps.push({
+                  type: "leftleg",
+                  name: decoded.value,
+                  sets: "",
+                  instruction: "",
+                  safety: "",
                 });
               }
             }
