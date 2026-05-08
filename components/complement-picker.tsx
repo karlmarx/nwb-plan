@@ -19,7 +19,7 @@ import { loadState } from "@/lib/storage";
 import { cssAlpha } from "@/lib/css-utils";
 
 /**
- * A complement the user can add to an exercise. There are five kinds:
+ * A complement the user can add to an exercise. There are seven kinds:
  *  - "nearby"   — one of NEARBY_SUPERSETS (needs nearby equipment)
  *  - "supp"     — a left-leg supplement (looked up in SUPPLEMENT_EX by name)
  *  - "core"     — a core drill from SUPPLEMENT_CORE for the current workout day
@@ -28,6 +28,8 @@ import { cssAlpha } from "@/lib/css-utils";
  *  - "mobility" — a zero-equipment mobility / stretch / breathing drill
  *  - "pt"       — a phase-gated PT exercise from PT_EXERCISES (left-leg
  *                 conditioning surface; filtered by current nwb_pt_phase)
+ *  - "lib"      — any catalog exercise looked up in EX by display name
+ *  - "text"     — free-form user text (base64-encoded payload)
  */
 export type ComplementId = string;
 
