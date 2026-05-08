@@ -1097,6 +1097,18 @@ export default function WorkoutView() {
             removable: true,
             complementId: id,
           });
+        } else if (decoded.kind === "text") {
+          cards.push({
+            key: id,
+            kind: "leftleg",
+            label: "CUSTOM",
+            color: "#71717a",
+            title: decoded.value,
+            sets: "",
+            instruction: "",
+            removable: true,
+            complementId: id,
+          });
         }
       }
 
@@ -1401,6 +1413,14 @@ export default function WorkoutView() {
                   name: decoded.value,
                   sets: s ? `${s[0]}×${s[1]}` : "",
                   instruction: data.execution ?? "",
+                  safety: "",
+                });
+              } else if (decoded.kind === "text") {
+                supps.push({
+                  type: "leftleg",
+                  name: decoded.value,
+                  sets: "",
+                  instruction: "",
                   safety: "",
                 });
               }

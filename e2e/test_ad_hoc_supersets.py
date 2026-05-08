@@ -60,3 +60,26 @@ def test_add_lib_complement(app_page: Page):
     # The first exercise row now has a superset-card with that title
     cards = app_page.get_by_test_id("superset-card")
     expect(cards.filter(has_text=title).first).to_be_visible()
+
+
+def test_add_custom_text_complement(app_page: Page):
+    """Custom-text save creates a card with the typed string under the exercise."""
+    open_picker_for_first_exercise(app_page)
+    app_page.get_by_test_id("custom-text-toggle").click()
+    app_page.get_by_test_id("custom-text-input").fill("Cossack squat 3x8")
+    app_page.get_by_test_id("custom-text-save").click()
+    expect(app_page.get_by_test_id("complement-picker")).not_to_be_visible()
+    cards = app_page.get_by_test_id("superset-card")
+    expect(cards.filter(has_text="Cossack squat 3x8").first).to_be_visible()
+
+
+def test_remove_custom_text(app_page: Page):
+    """Tapping the × on a custom-text card removes it from the workout."""
+    open_picker_for_first_exercise(app_page)
+    app_page.get_by_test_id("custom-text-toggle").click()
+    app_page.get_by_test_id("custom-text-input").fill("My custom move")
+    app_page.get_by_test_id("custom-text-save").click()
+    card = app_page.get_by_test_id("superset-card").filter(has_text="My custom move").first
+    expect(card).to_be_visible()
+    card.get_by_role("button", name="Remove complement").click()
+    expect(app_page.get_by_test_id("superset-card").filter(has_text="My custom move")).to_have_count(0)
