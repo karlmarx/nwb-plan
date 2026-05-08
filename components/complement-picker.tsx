@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   NEARBY_SUPERSETS,
   SUPPLEMENT_LEFT_LEG,
@@ -438,9 +438,6 @@ export default function ComplementPicker({
       }),
     [query, filters, nearbyAvail, suppAvail, coreAvail, ptAvail, mobilityAvail, catalogNames, catalogLookup],
   );
-
-  // useEffect reserved for Task 7 (custom-text mode)
-  void useEffect;
 
   return (
     <div
