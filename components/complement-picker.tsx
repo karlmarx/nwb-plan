@@ -373,7 +373,7 @@ export default function ComplementPicker({
     [],
   );
 
-  const { nearbyAvail, suppAvail, ptAvail, coreAvail, coreSubtitle, mobilityAvail } = useMemo(() => {
+  const { nearbyAvail, suppAvail, ptAvail, coreAvail, mobilityAvail } = useMemo(() => {
     const inUseIds = new Set(
       exerciseRequires.map((r) => EQUIP_TO_NEARBY[r]).filter(Boolean),
     );
@@ -404,14 +404,13 @@ export default function ComplementPicker({
       region: string;
       data: (typeof SUPPLEMENT_EX)[string];
     }>;
-    const coreSubtitle = coreDay?.subtitle ?? "";
 
     const mobilityAvail = MOBILITY_SUPPLEMENTS.filter((m) =>
       m.appliesTo.includes("all") ||
       m.appliesTo.includes(exerciseCategory as "push" | "pull" | "legs" | "core" | "cardio"),
     );
 
-    return { nearbyAvail, suppAvail, ptAvail, coreAvail, coreSubtitle, mobilityAvail };
+    return { nearbyAvail, suppAvail, ptAvail, coreAvail, mobilityAvail };
   }, [exerciseRequires, exerciseCategory, workoutKey, nearbySelections, ptPhase]);
 
   const catalogNames = useMemo(() => Object.keys(EX), []);
