@@ -504,6 +504,46 @@ export default function ComplementPicker({
             }}
           />
 
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {([
+              ["all", "All"],
+              ["catalog", "Catalog"],
+              ["nearby", "Nearby"],
+              ["supp", "L-Leg"],
+              ["core", "Core"],
+              ["mobility", "Mobility"],
+              ["pt", "PT"],
+            ] as const).map(([key, label]) => {
+              const isAll = key === "all";
+              const active = isAll
+                ? filters.size === 0
+                : filters.has(key as ComplementSource);
+              return (
+                <button
+                  key={key}
+                  data-testid={`filter-chip-${key}`}
+                  onClick={() => {
+                    if (isAll) {
+                      setFilters(new Set());
+                    } else {
+                      setFilters(new Set([key as ComplementSource]));
+                    }
+                  }}
+                  className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-1 cursor-pointer font-[inherit]"
+                  style={{
+                    background: active
+                      ? "var(--color-accent)22"
+                      : "var(--color-bg)",
+                    border: `1px solid ${active ? "var(--color-accent)" : "var(--color-border)"}`,
+                    color: active ? "var(--color-accent)" : "var(--color-text-muted)",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
           {results.length === 0 && (
             <div className="text-[12px] text-text-muted py-3 leading-relaxed">
               {query
