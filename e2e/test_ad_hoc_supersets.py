@@ -36,3 +36,12 @@ def test_filter_chip_narrows_results(app_page: Page):
     for i in range(rows.count()):
         badge = rows.nth(i).locator("span", has_text="NEARBY")
         expect(badge).to_be_visible()
+
+
+def test_search_finds_catalog_exercise(app_page: Page):
+    """Typing 'bench' surfaces a CATALOG-labeled result from EX."""
+    open_picker_for_first_exercise(app_page)
+    app_page.get_by_test_id("complement-search").fill("bench")
+    rows = app_page.get_by_test_id("complement-result")
+    catalog_rows = rows.filter(has_text="CATALOG")
+    expect(catalog_rows.first).to_be_visible()
