@@ -45,3 +45,18 @@ def test_search_finds_catalog_exercise(app_page: Page):
     rows = app_page.get_by_test_id("complement-result")
     catalog_rows = rows.filter(has_text="CATALOG")
     expect(catalog_rows.first).to_be_visible()
+
+
+def test_add_lib_complement(app_page: Page):
+    """Tapping a CATALOG result adds a lib-kind card under the parent exercise."""
+    open_picker_for_first_exercise(app_page)
+    app_page.get_by_test_id("complement-search").fill("bench")
+    catalog_rows = app_page.get_by_test_id("complement-result").filter(has_text="CATALOG")
+    first = catalog_rows.first
+    title = first.locator("span.text-sm").inner_text()  # exercise name
+    first.click()
+    # Close picker — scope to complement-picker to avoid strict-mode violation
+    app_page.get_by_test_id("complement-picker").get_by_role("button", name="Done").click()
+    # The first exercise row now has a superset-card with that title
+    cards = app_page.get_by_test_id("superset-card")
+    expect(cards.filter(has_text=title).first).to_be_visible()
