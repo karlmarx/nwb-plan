@@ -41,6 +41,65 @@ export function createRoutine(apiKey: string, routine: HevyRoutine) {
   return hevyCall("create-routine", apiKey, { routine });
 }
 
+export function listWorkouts(
+  apiKey: string,
+  page: number = 1,
+  pageSize: number = 10
+) {
+  return hevyCall("list-workouts", apiKey, { page, pageSize });
+}
+
+export function listExerciseTemplates(
+  apiKey: string,
+  page: number = 1,
+  pageSize: number = 100
+) {
+  return hevyCall("list-exercise-templates", apiKey, { page, pageSize });
+}
+
+/**
+ * Pull every page of workout history from Hevy. Calls onProgress after each
+ * page so the UI can show a progress indicator.
+ */
+export async function fetchAllWorkouts(
+  apiKey: string,
+  onProgress?: (current: number, total: number) => void
+): Promise<HevyWorkout[]> {
+  const all: HevyWorkout[] = [];
+  let page = 1;
+  let totalPages = 1;
+  do {
+    const data = await listWorkouts(apiKey, page, 10);
+    if (Array.isArray(data.workouts)) all.push(...(data.workouts as HevyWorkout[]));
+    totalPages = data.page_count ?? totalPages;
+    onProgress?.(page, totalPages);
+    page += 1;
+  } while (page <= totalPages);
+  return all;
+}
+
+/**
+ * Pull every page of the user's exercise template catalog. Used to detect
+ * which titles in workout history are user-created (`is_custom: true`).
+ */
+export async function fetchAllExerciseTemplates(
+  apiKey: string,
+  onProgress?: (current: number, total: number) => void
+): Promise<HevyExerciseTemplate[]> {
+  const all: HevyExerciseTemplate[] = [];
+  let page = 1;
+  let totalPages = 1;
+  do {
+    const data = await listExerciseTemplates(apiKey, page, 100);
+    if (Array.isArray(data.exercise_templates))
+      all.push(...(data.exercise_templates as HevyExerciseTemplate[]));
+    totalPages = data.page_count ?? totalPages;
+    onProgress?.(page, totalPages);
+    page += 1;
+  } while (page <= totalPages);
+  return all;
+}
+
 // ── Types ────────────────────────────────────────────────────
 export interface HevySet {
   index: number;
@@ -62,6 +121,22 @@ export interface HevyRoutine {
   title: string;
   notes: string;
   exercises: HevyExercise[];
+}
+
+export interface HevyWorkout {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  exercises: HevyExercise[];
+}
+
+export interface HevyExerciseTemplate {
+  id: string;
+  title: string;
+  type?: string;
+  primary_muscle_group?: string;
+  is_custom?: boolean;
 }
 
 export interface ExerciseMapping {
