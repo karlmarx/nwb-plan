@@ -1,0 +1,72 @@
+name: Auto-alias preview.nfit.93.fyi
+
+# Repoints the movable preview alias to whichever feature branch was most
+# recently built. Skips main (has its own domain nfit.93.fyi) and dev (has
+# its own dev.nfit.93.fyi auto-alias). Last writer wins — when two branches
+# push at once, the latest successful Vercel deploy claims the alias.
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+concurrency:
+  group: preview-alias
+  # don't cancel — let later runs win serially. Aliasing is idempotent.
+  cancel-in-progress: false
+
+jobs:
+  alias:
+    name: Repoint preview.nfit.93.fyi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Wait for Vercel deployment to be READY
+        id: wait
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          PROJECT: nwb-plan
+          TEAM: karlmarxs-projects
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "Waiting for Vercel deployment of $SHA..."
+          for i in $(seq 1 30); do
+            JSON=$(curl -sS "https://api.vercel.com/v6/deployments?app=$PROJECT&limit=10&teamSlug=$TEAM" \
+              -H "Authorization: Bearer $VERCEL_TOKEN")
+            URL=$(echo "$JSON" | jq -r --arg SHA "$SHA" '
+              .deployments[]
+              | select(.meta.githubCommitSha == $SHA)
+              | .url' | head -n1)
+            STATE=$(echo "$JSON" | jq -r --arg SHA "$SHA" '
+              .deployments[]
+              | select(.meta.githubCommitSha == $SHA)
+              | .state' | head -n1)
+            echo "[$i/30] sha=$SHA state=${STATE:-none} url=${URL:-none}"
+            if [ "$STATE" = "READY" ] && [ -n "$URL" ]; then
+              echo "deployment_url=https://$URL" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if [ "$STATE" = "ERROR" ] || [ "$STATE" = "CANCELED" ]; then
+              echo "Deployment failed (state=$STATE) — skipping alias"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "Timed out waiting for deployment — skipping alias"
+
+      - name: Alias preview.nfit.93.fyi
+        if: steps.wait.outputs.deployment_url != ''
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.wait.outputs.deployment_url }}
+        run: |
+          set -euo pipefail
+          echo "Aliasing preview.nfit.93.fyi → $DEPLOYMENT_URL"
+          npx -y vercel@latest alias "$DEPLOYMENT_URL" preview.nfit.93.fyi \
+            --token "$VERCEL_TOKEN" \
+            --scope karlmarxs-projects \
+            --yes
