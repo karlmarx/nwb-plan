@@ -473,7 +473,7 @@ export default function ComplementPicker({
               Add complement
             </div>
             <div className="text-sm font-semibold text-text">
-              Equipment-aware rehab &amp; core suggestions
+              Search the catalog, pick a curated suggestion, or type your own
             </div>
           </div>
           <button

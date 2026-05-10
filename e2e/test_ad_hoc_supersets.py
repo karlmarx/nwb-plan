@@ -23,18 +23,23 @@ def test_picker_has_search_and_results(app_page: Page):
 
 
 def test_filter_chip_narrows_results(app_page: Page):
-    """Activating a single filter chip narrows results to that source only."""
+    """Activating a single filter chip narrows results to that source only.
+
+    Day-agnostic: post-filter count must be STRICTLY less than pre-filter
+    (the filter must remove something), regardless of whether the chosen
+    source has any entries today. On Sunday/Recovery, Core is empty — going
+    from N pre to 0 post still proves narrowing works.
+    """
     open_picker_for_first_exercise(app_page)
     pre_count = app_page.get_by_test_id("complement-result").count()
     assert pre_count > 0, "expected baseline complements on a fresh state"
 
-    # Activate the Core chip — only CORE-labeled rows should remain
+    # Activate the Core chip — only CORE-labeled rows should remain (or none)
     app_page.get_by_test_id("filter-chip-core").click()
     rows = app_page.get_by_test_id("complement-result")
     post_count = rows.count()
-    assert post_count > 0, "expected core complements on the default workout"
-    assert post_count <= pre_count, "core filter should not add results"
-    # Every visible result row's label must indicate a core region (not e.g. NEARBY/CATALOG/PT)
+    assert post_count < pre_count, "core filter should narrow results (drop other sources)"
+    # If any rows survived, every one must be CORE-labeled — not NEARBY/CATALOG/PT/etc.
     forbidden_labels = ["NEARBY", "CATALOG", "PT", "L-LEG", "MOBILITY", "STRETCH", "BREATH"]
     for i in range(post_count):
         text = rows.nth(i).inner_text()

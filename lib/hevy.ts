@@ -1,14 +1,15 @@
-// Browser-side Hevy client — all calls go through /api/hevy proxy
+// Browser-side Hevy client — all calls go through /api/hevy proxy.
+// The Hevy API key lives server-side; the browser never sees it. Auth on the
+// proxy endpoint is admin-only via NextAuth session.
 
 async function hevyCall(
   action: string,
-  apiKey: string,
   params: Record<string, unknown> = {}
 ) {
   const res = await fetch("/api/hevy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, apiKey, ...params }),
+    body: JSON.stringify({ action, ...params }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -17,28 +18,82 @@ async function hevyCall(
   return res.json();
 }
 
-export function searchExercises(apiKey: string, query: string) {
-  return hevyCall("search-exercises", apiKey, { query });
+export async function getHevyStatus(): Promise<{ configured: boolean }> {
+  const res = await fetch("/api/hevy");
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) return { configured: false };
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
 }
 
-export function listRoutines(apiKey: string) {
-  return hevyCall("list-routines", apiKey);
+export function searchExercises(query: string) {
+  return hevyCall("search-exercises", { query });
 }
 
-export function getRoutine(apiKey: string, routineId: string) {
-  return hevyCall("get-routine", apiKey, { routineId });
+export function listRoutines() {
+  return hevyCall("list-routines");
 }
 
-export function updateRoutine(
-  apiKey: string,
-  routineId: string,
-  routine: HevyRoutine
-) {
-  return hevyCall("update-routine", apiKey, { routineId, routine });
+export function getRoutine(routineId: string) {
+  return hevyCall("get-routine", { routineId });
 }
 
-export function createRoutine(apiKey: string, routine: HevyRoutine) {
-  return hevyCall("create-routine", apiKey, { routine });
+export function updateRoutine(routineId: string, routine: HevyRoutine) {
+  return hevyCall("update-routine", { routineId, routine });
+}
+
+export function createRoutine(routine: HevyRoutine) {
+  return hevyCall("create-routine", { routine });
+}
+
+export function listWorkouts(page: number = 1, pageSize: number = 10) {
+  return hevyCall("list-workouts", { page, pageSize });
+}
+
+export function listExerciseTemplates(page: number = 1, pageSize: number = 100) {
+  return hevyCall("list-exercise-templates", { page, pageSize });
+}
+
+/**
+ * Pull every page of workout history from Hevy. Calls onProgress after each
+ * page so the UI can show a progress indicator.
+ */
+export async function fetchAllWorkouts(
+  onProgress?: (current: number, total: number) => void
+): Promise<HevyWorkout[]> {
+  const all: HevyWorkout[] = [];
+  let page = 1;
+  let totalPages = 1;
+  do {
+    const data = await listWorkouts(page, 10);
+    if (Array.isArray(data.workouts)) all.push(...(data.workouts as HevyWorkout[]));
+    totalPages = data.page_count ?? totalPages;
+    onProgress?.(page, totalPages);
+    page += 1;
+  } while (page <= totalPages);
+  return all;
+}
+
+/**
+ * Pull every page of the user's exercise template catalog. Used to detect
+ * which titles in workout history are user-created (`is_custom: true`).
+ */
+export async function fetchAllExerciseTemplates(
+  onProgress?: (current: number, total: number) => void
+): Promise<HevyExerciseTemplate[]> {
+  const all: HevyExerciseTemplate[] = [];
+  let page = 1;
+  let totalPages = 1;
+  do {
+    const data = await listExerciseTemplates(page, 100);
+    if (Array.isArray(data.exercise_templates))
+      all.push(...(data.exercise_templates as HevyExerciseTemplate[]));
+    totalPages = data.page_count ?? totalPages;
+    onProgress?.(page, totalPages);
+    page += 1;
+  } while (page <= totalPages);
+  return all;
 }
 
 // ── Types ────────────────────────────────────────────────────
@@ -62,6 +117,22 @@ export interface HevyRoutine {
   title: string;
   notes: string;
   exercises: HevyExercise[];
+}
+
+export interface HevyWorkout {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  exercises: HevyExercise[];
+}
+
+export interface HevyExerciseTemplate {
+  id: string;
+  title: string;
+  type?: string;
+  primary_muscle_group?: string;
+  is_custom?: boolean;
 }
 
 export interface ExerciseMapping {

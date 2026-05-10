@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useMemo } from "react";
+import { useEffect } from "react";
 import { loadState, saveState } from "@/lib/storage";
 import { EX, WORKOUTS } from "@/lib/exercises";
 import type { Exercise } from "@/lib/exercises";
@@ -10,18 +11,21 @@ import {
   updateRoutine,
   createRoutine,
   buildHevyRoutine,
+  fetchAllWorkouts,
+  fetchAllExerciseTemplates,
+  getHevyStatus,
   type ExerciseMapping,
+  type HevyExerciseTemplate,
 } from "@/lib/hevy";
+import { HEVY_NAME_MAP } from "@/lib/hevy-name-map";
 
 // ═══════════════════════════════════════════════════════════════
 // Exercise Mapper — search Hevy templates, map to app exercises
 // ═══════════════════════════════════════════════════════════════
 function ExerciseMapper({
-  apiKey,
   exerciseMap,
   onMapChange,
 }: {
-  apiKey: string;
   exerciseMap: Record<string, ExerciseMapping>;
   onMapChange: (name: string, mapping: ExerciseMapping | null) => void;
 }) {
@@ -42,15 +46,11 @@ function ExerciseMapper({
   const mapped = appExercises.filter((n) => exerciseMap[n]);
 
   async function doSearch(name: string) {
-    if (!apiKey) {
-      setError("Enter API key first");
-      return;
-    }
     setSearching(true);
     setError("");
     setActiveTarget(name);
     try {
-      const data = await searchExercises(apiKey, name);
+      const data = await searchExercises(name);
       setResults(data.exercise_templates || []);
     } catch (e: any) {
       setError(e.message);
@@ -184,7 +184,6 @@ function RoutineRow({
   workoutKey,
   hevyRoutineId,
   exercises,
-  apiKey,
   phase,
   exerciseMap,
   onRoutineIdChange,
@@ -192,7 +191,6 @@ function RoutineRow({
   workoutKey: string;
   hevyRoutineId: string | undefined;
   exercises: string[];
-  apiKey: string;
   phase: number;
   exerciseMap: Record<string, ExerciseMapping>;
   onRoutineIdChange: (key: string, id: string) => void;
@@ -207,11 +205,6 @@ function RoutineRow({
   const totalCount = exercises.filter((n) => EX[n]).length;
 
   async function sync() {
-    if (!apiKey) {
-      setMsg("No API key");
-      setStatus("error");
-      return;
-    }
     const unmapped = exercises.filter((n) => EX[n] && !exerciseMap[n]);
     if (unmapped.length > 0) {
       setMsg(
@@ -232,10 +225,10 @@ function RoutineRow({
         EX as any
       );
       if (hevyRoutineId) {
-        await updateRoutine(apiKey, hevyRoutineId, routine);
+        await updateRoutine(hevyRoutineId, routine);
         setMsg("Updated");
       } else {
-        const res = await createRoutine(apiKey, routine);
+        const res = await createRoutine(routine);
         const newId = res?.routine?.id;
         if (newId) onRoutineIdChange(workoutKey, newId);
         setMsg("Created");
@@ -307,6 +300,240 @@ function RoutineRow({
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Exercise Audit — diff Hevy history against EX + HEVY_NAME_MAP
+// ═══════════════════════════════════════════════════════════════
+interface AuditBucket {
+  /** Exercise title as it appears in Hevy (preserved casing from first occurrence). */
+  title: string;
+  /** How many sets across all workouts logged this title. */
+  count: number;
+  /** Hevy template id observed for this title. */
+  templateId: string;
+  /** Whether the Hevy template is user-created (Karl made it). */
+  isCustom: boolean;
+}
+
+interface AuditResult {
+  totalWorkouts: number;
+  mapped: AuditBucket[];
+  unmapped: AuditBucket[];
+  custom: AuditBucket[];
+}
+
+function HevyAudit() {
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState<{
+    phase: "workouts" | "templates" | "done";
+    current: number;
+    total: number;
+  } | null>(null);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<AuditResult | null>(null);
+
+  async function runAudit() {
+    setRunning(true);
+    setError("");
+    setResult(null);
+    try {
+      // Step 1: pull all workouts.
+      setProgress({ phase: "workouts", current: 0, total: 1 });
+      const workouts = await fetchAllWorkouts((cur, tot) =>
+        setProgress({ phase: "workouts", current: cur, total: tot })
+      );
+
+      // Step 2: pull the user's exercise template catalog so we can flag custom entries.
+      setProgress({ phase: "templates", current: 0, total: 1 });
+      const templates = await fetchAllExerciseTemplates((cur, tot) =>
+        setProgress({ phase: "templates", current: cur, total: tot })
+      );
+      const templateById = new Map<string, HevyExerciseTemplate>();
+      for (const t of templates) templateById.set(t.id, t);
+
+      // Aggregate exercise titles + counts from workout history.
+      const agg = new Map<string, AuditBucket>();
+      for (const w of workouts) {
+        for (const ex of w.exercises ?? []) {
+          const key = ex.title.toLowerCase().trim().replace(/\s+/g, " ");
+          const tmpl = templateById.get(ex.exercise_template_id);
+          const setCount = ex.sets?.length ?? 1;
+          const existing = agg.get(key);
+          if (existing) {
+            existing.count += setCount;
+          } else {
+            agg.set(key, {
+              title: ex.title,
+              count: setCount,
+              templateId: ex.exercise_template_id,
+              isCustom: tmpl?.is_custom === true,
+            });
+          }
+        }
+      }
+
+      // Bucket each entry. "Mapped" = HEVY_NAME_MAP knows the lowercased title.
+      // "Custom" = Hevy template flagged is_custom (Karl made it). Custom entries
+      // are surfaced in their own bucket regardless of mapping status — Karl wants
+      // those in front of him so he can decide whether to add them to EX.
+      const mapped: AuditBucket[] = [];
+      const unmapped: AuditBucket[] = [];
+      const custom: AuditBucket[] = [];
+      for (const [key, bucket] of agg) {
+        if (bucket.isCustom) {
+          custom.push(bucket);
+        } else if (HEVY_NAME_MAP[key]) {
+          mapped.push(bucket);
+        } else {
+          unmapped.push(bucket);
+        }
+      }
+      // Sort by count desc — most-logged first.
+      const byCount = (a: AuditBucket, b: AuditBucket) => b.count - a.count;
+      mapped.sort(byCount);
+      unmapped.sort(byCount);
+      custom.sort(byCount);
+
+      setResult({ totalWorkouts: workouts.length, mapped, unmapped, custom });
+      setProgress({ phase: "done", current: 1, total: 1 });
+    } catch (e: any) {
+      setError(e.message || "Audit failed.");
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-text-muted mb-3 leading-relaxed">
+        Pulls every workout from Hevy and diffs the exercise titles against
+        the static name map (<code className="text-[10px]">lib/hevy-name-map.ts</code>)
+        and the EX catalog. Custom (user-created) entries are bucketed
+        separately — those are the ones most likely worth adding to{" "}
+        <code className="text-[10px]">lib/exercises.ts</code>.
+      </p>
+
+      <button
+        onClick={runAudit}
+        disabled={running}
+        className="px-3 py-2 rounded-lg text-xs font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border"
+        style={{
+          background: running ? "var(--color-bg)" : "var(--color-accent-dim)",
+          borderColor: "var(--color-accent)",
+          color: "var(--color-accent)",
+        }}
+      >
+        {running ? "Running…" : "Run audit"}
+      </button>
+
+      {progress && (
+        <div className="text-[11px] text-text-muted mt-2">
+          {progress.phase === "workouts" &&
+            `Pulling workouts: page ${progress.current} / ${progress.total}`}
+          {progress.phase === "templates" &&
+            `Pulling exercise templates: page ${progress.current} / ${progress.total}`}
+          {progress.phase === "done" && "Done."}
+        </div>
+      )}
+
+      {error && (
+        <div className="text-xs text-danger mt-2 px-2.5 py-1.5 rounded-md bg-danger-bg border border-danger-border">
+          {error}
+        </div>
+      )}
+
+      {result && (
+        <div className="mt-4 space-y-4">
+          <div className="text-[11px] text-text-muted">
+            {result.totalWorkouts} workouts · {result.mapped.length} mapped ·{" "}
+            <span className="text-warning">
+              {result.unmapped.length} unmapped
+            </span>{" "}
+            ·{" "}
+            <span className="text-accent">
+              {result.custom.length} custom
+            </span>
+          </div>
+
+          <AuditList
+            label="⭐ Custom (user-created)"
+            color="var(--color-accent)"
+            buckets={result.custom}
+            emptyMessage="None — you haven't created any exercises in Hevy."
+          />
+
+          <AuditList
+            label="❌ Unmapped (stock Hevy templates not in HEVY_NAME_MAP)"
+            color="var(--color-warning)"
+            buckets={result.unmapped}
+            emptyMessage="Every stock Hevy template you've used is mapped."
+          />
+
+          <AuditList
+            label="✅ Mapped"
+            color="var(--color-safe)"
+            buckets={result.mapped}
+            emptyMessage="No mapped entries yet."
+            collapsedByDefault
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AuditList({
+  label,
+  color,
+  buckets,
+  emptyMessage,
+  collapsedByDefault = false,
+}: {
+  label: string;
+  color: string;
+  buckets: AuditBucket[];
+  emptyMessage: string;
+  collapsedByDefault?: boolean;
+}) {
+  const [open, setOpen] = useState(!collapsedByDefault);
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full px-3 py-2 text-left text-xs font-bold cursor-pointer flex items-center justify-between"
+        style={{ color, background: "var(--color-card)" }}
+      >
+        <span>
+          {label} ({buckets.length})
+        </span>
+        <span className="text-text-muted">{open ? "▾" : "▸"}</span>
+      </button>
+      {open && (
+        <div className="px-3 py-2 max-h-[320px] overflow-y-auto">
+          {buckets.length === 0 ? (
+            <div className="text-[11px] text-text-muted italic">
+              {emptyMessage}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {buckets.map((b) => (
+                <div
+                  key={b.templateId + b.title}
+                  className="flex items-center justify-between text-[11px]"
+                >
+                  <span className="text-text">{b.title}</span>
+                  <span className="text-text-muted tabular-nums ml-3">
+                    {b.count} sets
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Main Admin Hevy Page
 // ═══════════════════════════════════════════════════════════════
 export default function AdminHevyPage() {
@@ -314,10 +541,6 @@ export default function AdminHevyPage() {
   const userRole = (session?.user as any)?.role;
   const isAdmin = userRole === "admin";
 
-  const [apiKey, setApiKey] = useState(() =>
-    loadState("nwb_hevy_api_key", "")
-  );
-  const [showKey, setShowKey] = useState(false);
   const [exerciseMap, setExerciseMap] = useState<
     Record<string, ExerciseMapping>
   >(() => loadState("nwb_hevy_exercise_map", {}));
@@ -325,12 +548,25 @@ export default function AdminHevyPage() {
     loadState("nwb_hevy_ids", {})
   );
   const [phase, setPhase] = useState(() => loadState("nwb_phase", 0));
-  const [activeSection, setActiveSection] = useState<"sync" | "map">("sync");
+  const [activeSection, setActiveSection] = useState<"sync" | "map" | "audit">(
+    "sync"
+  );
 
-  function saveKey(k: string) {
-    setApiKey(k);
-    saveState("nwb_hevy_api_key", k);
-  }
+  // Server-side env-var status. Drives the "configured" badge + lets us warn
+  // before a user clicks anything that would 503.
+  const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!isAdmin) return;
+    getHevyStatus()
+      .then((s) => setKeyConfigured(s.configured))
+      .catch(() => setKeyConfigured(false));
+    // One-time migration: clear the orphaned localStorage key from when the
+    // API key lived browser-side. Removes Karl's actual Hevy secret from
+    // his device on first visit after this refactor lands.
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("nwb_hevy_api_key");
+    }
+  }, [isAdmin]);
 
   function updateMapping(name: string, mapping: ExerciseMapping | null) {
     const next = { ...exerciseMap };
@@ -399,42 +635,38 @@ export default function AdminHevyPage() {
           </span>
         </div>
 
-        {/* API Key */}
+        {/* API Key — now server-side */}
         <div className="bg-card border border-border rounded-xl p-4 mb-4">
           <div className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
             Hevy API Key
           </div>
-          <div className="flex gap-2">
-            <input
-              type={showKey ? "text" : "password"}
-              value={apiKey}
-              onChange={(e) => saveKey(e.target.value)}
-              placeholder="Paste API key from hevy.com/settings?developer"
-              className="flex-1 px-2.5 py-2 rounded-lg bg-bg border text-text text-xs outline-none"
-              style={{
-                borderColor: apiKey
-                  ? "var(--color-safe)"
-                  : "var(--color-border)",
-              }}
-            />
-            <button
-              onClick={() => setShowKey(!showKey)}
-              className="px-2.5 py-1.5 rounded-lg text-xs border border-border text-text-muted bg-transparent cursor-pointer"
-            >
-              {showKey ? "🙈" : "👁"}
-            </button>
-          </div>
-          <div className="text-[10px] text-text-muted mt-1.5">
-            Requires Hevy Pro. Get key at{" "}
-            <a
-              href="https://hevy.com/settings?developer"
-              target="_blank"
-              rel="noopener"
-              className="text-accent"
-            >
-              hevy.com/settings?developer
-            </a>
-          </div>
+          {keyConfigured === null && (
+            <div className="text-xs text-text-muted">Checking…</div>
+          )}
+          {keyConfigured === true && (
+            <div className="text-xs text-safe flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-safe" />
+              Configured server-side ({"`"}HEVY_API_KEY{"`"} env var). Browser never sees the key.
+            </div>
+          )}
+          {keyConfigured === false && (
+            <div className="text-xs text-danger leading-relaxed">
+              <div className="font-bold mb-1">Not configured.</div>
+              Set <code className="text-[10px]">HEVY_API_KEY</code> in Vercel
+              project settings (Production + Preview), then redeploy. For local
+              dev, add it to <code className="text-[10px]">.env.local</code>.
+              Get a key at{" "}
+              <a
+                href="https://hevy.com/settings?developer"
+                target="_blank"
+                rel="noopener"
+                className="text-accent"
+              >
+                hevy.com/settings?developer
+              </a>
+              .
+            </div>
+          )}
         </div>
 
         {/* Phase selector */}
@@ -474,8 +706,9 @@ export default function AdminHevyPage() {
         <div className="flex mb-4 rounded-lg overflow-hidden border border-border">
           {(
             [
-              ["sync", "⚡ Sync Routines"],
-              ["map", "🗺 Exercise Mapping"],
+              ["sync", "⚡ Sync"],
+              ["map", "🗺 Map"],
+              ["audit", "🔍 Audit"],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -518,7 +751,6 @@ export default function AdminHevyPage() {
                   workoutKey={key}
                   hevyRoutineId={hevyIds[key]}
                   exercises={w.exercises}
-                  apiKey={apiKey}
                   phase={phase}
                   exerciseMap={exerciseMap}
                   onRoutineIdChange={handleRoutineIdChange}
@@ -530,11 +762,12 @@ export default function AdminHevyPage() {
 
         {activeSection === "map" && (
           <ExerciseMapper
-            apiKey={apiKey}
             exerciseMap={exerciseMap}
             onMapChange={updateMapping}
           />
         )}
+
+        {activeSection === "audit" && <HevyAudit />}
       </div>
     </div>
   );

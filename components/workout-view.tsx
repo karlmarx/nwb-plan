@@ -2962,6 +2962,19 @@ export default function WorkoutView() {
             <path d="M12,20 C11,14 10,8 12,3 C14,8 13,14 12,20Z M12,20 C9,15 7,10 9,5 C12,9 12,14 12,20Z M12,20 C15,15 17,10 15,5 C12,9 12,14 12,20Z M12,20 C8,16 5,12 6,7 C9,11 11,15 12,20Z M12,20 C16,16 19,12 18,7 C15,11 13,15 12,20Z"/>
           </svg>
         </a>
+        <a
+          href="https://pwbpb.93.fyi"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-muted"
+          title="Stationary Pickleball Drills"
+        >
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
+            <ellipse cx="9" cy="11" rx="5.5" ry="7" />
+            <rect x="11.5" y="15" width="2" height="6" rx="1" transform="rotate(-25 12.5 18)" />
+            <circle cx="18" cy="6.5" r="2" opacity="0.7" />
+          </svg>
+        </a>
       </div>
 
       {/* Rest timer overlay */}
@@ -3025,6 +3038,14 @@ export default function WorkoutView() {
                     className="text-accent text-xs font-medium"
                   >
                     NWB Yoga &rarr;
+                  </a>
+                  <a
+                    href="https://pwbpb.93.fyi"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent text-xs font-medium"
+                  >
+                    Pickleball Drills &rarr;
                   </a>
                 </div>
               </div>
