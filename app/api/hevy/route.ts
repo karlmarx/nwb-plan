@@ -58,6 +58,26 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case "list-workouts": {
+        const page = params.page ?? 1;
+        const pageSize = params.pageSize ?? 10;
+        res = await fetch(
+          `${HEVY_BASE}/workouts?page=${page}&pageSize=${pageSize}`,
+          { headers }
+        );
+        break;
+      }
+
+      case "list-exercise-templates": {
+        const page = params.page ?? 1;
+        const pageSize = params.pageSize ?? 100;
+        res = await fetch(
+          `${HEVY_BASE}/exercise_templates?page=${page}&pageSize=${pageSize}`,
+          { headers }
+        );
+        break;
+      }
+
       default:
         return NextResponse.json(
           { error: `Unknown action: ${action}` },
