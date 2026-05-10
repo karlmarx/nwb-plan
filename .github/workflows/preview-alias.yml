@@ -68,5 +68,4 @@ jobs:
           echo "Aliasing preview.nfit.93.fyi → $DEPLOYMENT_URL"
           npx -y vercel@latest alias "$DEPLOYMENT_URL" preview.nfit.93.fyi \
             --token "$VERCEL_TOKEN" \
-            --scope karlmarxs-projects \
-            --yes
+            --scope karlmarxs-projects
