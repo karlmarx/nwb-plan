@@ -5,6 +5,17 @@ import type { Exercise, MachineVariant } from "@/lib/exercises";
 import { EX, EQUIPMENT, isExerciseAvailable } from "@/lib/exercises";
 import { cssAlpha } from "@/lib/css-utils";
 
+/**
+ * Resolve a variant's effective equipment requirements. Variants may override
+ * the parent exercise's `requires` (e.g. a Smith-machine variant of a DB lift)
+ * — when they don't, they inherit the parent's. Used by the swap panel so that
+ * cross-equipment variants render under their actual equipment group instead
+ * of being lumped under the parent's primary.
+ */
+function variantRequires(variant: MachineVariant, parent: Exercise): string[] {
+  return variant.requires ?? parent.requires;
+}
+
 // ── Equipment category mapping ──────────────────────────────────────────
 
 interface EquipCategoryInfo {
@@ -23,6 +34,9 @@ const EQUIP_CATEGORIES: Record<string, EquipCategoryInfo> = {
   pecdeck: { label: "Pec Deck / Fly Machine", icon: "🦋", order: 7 },
   dipMachine: { label: "Dip Machine", icon: "⬇️", order: 8 },
   preacher: { label: "Preacher Bench", icon: "💺", order: 9 },
+  rowMachine: { label: "Row Machine (Chest-Pad)", icon: "🏋️", order: 8 },
+  tbar: { label: "T-Bar / Landmine Row", icon: "🔩", order: 8 },
+  smith: { label: "Smith Machine", icon: "🛠️", order: 8 },
   barbell: { label: "Barbell", icon: "🏋️", order: 9 },
   dumbbells: { label: "Dumbbells", icon: "💪", order: 10 },
   ezbar: { label: "EZ-Bar", icon: "🔩", order: 11 },
@@ -69,6 +83,8 @@ interface EquipmentGroup {
   icon: string;
   order: number;
   options: SwapOption[];
+  /** Machine variants that should render under this group (filtered by effective requires). */
+  variants: MachineVariant[];
   hasCurrentExercise: boolean;
 }
 
@@ -101,42 +117,56 @@ export default function EquipmentSwapPanel({
   const groups = useMemo(() => {
     const groupMap = new Map<string, EquipmentGroup>();
 
-    const currentKey = getPrimaryEquipKey(currentExercise.requires);
-    const currentCat = getCategoryInfo(currentKey);
-    groupMap.set(currentKey, {
-      key: currentKey,
-      label: currentCat.label,
-      icon: currentCat.icon,
-      order: currentCat.order,
-      options: [
-        { name: currentName, ex: currentExercise, isCurrent: true },
-      ],
-      hasCurrentExercise: true,
-    });
-
-    const availableSwaps = (currentExercise.swaps ?? []).filter(
-      (sw) => !workoutExercises.includes(sw) || sw === currentName,
-    );
-
-    for (const swapName of availableSwaps) {
-      const swapEx = EX[swapName];
-      if (!swapEx) continue;
-
-      const equipKey = getPrimaryEquipKey(swapEx.requires);
-      const cat = getCategoryInfo(equipKey);
-
-      if (!groupMap.has(equipKey)) {
-        groupMap.set(equipKey, {
+    /** Get-or-create a group keyed by primary equipment. */
+    function ensureGroup(equipKey: string): EquipmentGroup {
+      let group = groupMap.get(equipKey);
+      if (!group) {
+        const cat = getCategoryInfo(equipKey);
+        group = {
           key: equipKey,
           label: cat.label,
           icon: cat.icon,
           order: cat.order,
           options: [],
+          variants: [],
           hasCurrentExercise: false,
-        });
+        };
+        groupMap.set(equipKey, group);
       }
+      return group;
+    }
 
-      const group = groupMap.get(equipKey)!;
+    // Seed the current exercise's group with the exercise itself.
+    const currentKey = getPrimaryEquipKey(currentExercise.requires);
+    const currentGroup = ensureGroup(currentKey);
+    currentGroup.options.push({
+      name: currentName,
+      ex: currentExercise,
+      isCurrent: true,
+    });
+    currentGroup.hasCurrentExercise = true;
+
+    // Distribute machine variants into groups by their effective requires.
+    // Variants that share the parent's primary equipment land in the current
+    // group; cross-equipment variants (Smith machine variant of a DB lift,
+    // cable variant of a chest-supported row, etc.) get their own group.
+    for (const variant of currentExercise.machineVariants ?? []) {
+      const variantKey = getPrimaryEquipKey(
+        variantRequires(variant, currentExercise),
+      );
+      const group = ensureGroup(variantKey);
+      group.variants.push(variant);
+    }
+
+    // Swap candidates (other named exercises).
+    const availableSwaps = (currentExercise.swaps ?? []).filter(
+      (sw) => !workoutExercises.includes(sw) || sw === currentName,
+    );
+    for (const swapName of availableSwaps) {
+      const swapEx = EX[swapName];
+      if (!swapEx) continue;
+      const equipKey = getPrimaryEquipKey(swapEx.requires);
+      const group = ensureGroup(equipKey);
       if (!group.options.some((o) => o.name === swapName)) {
         group.options.push({ name: swapName, ex: swapEx, isCurrent: false });
       }
@@ -149,11 +179,12 @@ export default function EquipmentSwapPanel({
     });
   }, [currentName, currentExercise, workoutExercises]);
 
-  const variants = currentExercise.machineVariants;
-  const hasVariantsOrSwaps =
-    (groups.length > 1) ||
-    (groups[0]?.options.length > 1) ||
-    (variants && variants.length > 0);
+  const hasVariantsOrSwaps = groups.some(
+    (g) =>
+      g.options.length > 0 || g.variants.length > 0,
+  ) && (groups.length > 1 ||
+    groups[0]?.options.length > 1 ||
+    groups[0]?.variants.length > 0);
 
   if (!hasVariantsOrSwaps) return null;
 
@@ -171,10 +202,7 @@ export default function EquipmentSwapPanel({
               o.ex.requires.length > 0 && !isExerciseAvailable(o.ex, equipment),
           );
 
-          // Count includes variants for the current group
-          const totalCount =
-            group.options.length +
-            (group.hasCurrentExercise && variants ? variants.length : 0);
+          const totalCount = group.options.length + group.variants.length;
 
           return (
             <div
@@ -235,14 +263,16 @@ export default function EquipmentSwapPanel({
               {/* Expanded options */}
               {isExpanded && (
                 <div className="px-3 pb-3 space-y-1.5">
-                  {/* Machine variants (only in the current equipment group) */}
-                  {group.hasCurrentExercise && variants && variants.length > 0 && (
+                  {/* Machine variants — bucketed under their effective equipment group */}
+                  {group.variants.length > 0 && (
                     <div>
                       <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1.5">
-                        Machine type at your station
+                        {group.hasCurrentExercise
+                          ? "Machine type at your station"
+                          : "Alternate station — same exercise"}
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        {variants.map((variant) => {
+                        {group.variants.map((variant) => {
                           const isSelected = selectedVariantId === variant.id;
                           const isConditional = variant.status === "conditional";
                           const statusLabel =
@@ -347,7 +377,7 @@ export default function EquipmentSwapPanel({
                   )}
 
                   {/* Separator if we have both variants and swap options */}
-                  {group.hasCurrentExercise && variants && variants.length > 0 && group.options.length > 0 && (
+                  {group.variants.length > 0 && group.options.length > 0 && (
                     <div className="border-t border-border my-1" />
                   )}
 
