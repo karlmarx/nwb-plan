@@ -44,8 +44,11 @@ __pycache__/
 # screenshots
 screenshot-*.png
 
-# claude
-.claude/
+# claude — ignore per-developer state, but track the shared hook + settings
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/hooks/**
 
 # typescript
 *.tsbuildinfo
