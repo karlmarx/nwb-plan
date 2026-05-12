@@ -24,13 +24,13 @@ Output lands in `dist/`:
 | File | Purpose |
 | --- | --- |
 | `export-plan.ts` | Imports `EX`, `WORKOUTS`, `SCHED`, `DEFAULT_PROGRAM_PHASES` and writes the flat plan JSON consumed by `nwb_to_epub.py`. |
-| `snapshot_diagrams.py` | Boots a Playwright/Chromium against a running Next server and saves the `<svg>` rendered at `/_diagrams/<id>?t=0.5` for every diagram in `components/diagrams/`. |
+| `snapshot_diagrams.py` | Boots a Playwright/Chromium against a running Next server and saves the `<svg>` rendered at `/diagram-snapshot/<id>?t=0.5` for every diagram in `components/diagrams/`. |
 | `nwb_to_epub.py` | Reads the plan JSON, rasterises the snapshotted SVGs to grayscale PNGs, and emits an ePub3 file. |
 | `build-ebook.sh` | Orchestrator: runs `next build` + `next start`, runs the three above in order, then invokes `ebook-convert` for the PDF. |
 
-The snapshot route lives at `app/_diagrams/[id]/page.tsx` — it renders
-one diagram component at a pinned `t` with no chrome. It is intentionally
-not linked anywhere in the main app.
+The snapshot route lives at `app/diagram-snapshot/[id]/page.tsx` — it
+renders one diagram component at a pinned `t` with no chrome. It is
+intentionally not linked anywhere in the main app.
 
 ## Local install
 

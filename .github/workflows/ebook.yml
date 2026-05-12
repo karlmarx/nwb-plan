@@ -8,7 +8,7 @@ on:
     branches: [main, dev]
     paths:
       - 'scripts/**'
-      - 'app/_diagrams/**'
+      - 'app/diagram-snapshot/**'
       - 'components/diagrams/**'
       - 'lib/exercises*.ts'
       - 'lib/program.ts'

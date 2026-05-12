@@ -8,9 +8,10 @@
 """Snapshot every exercise diagram into a static SVG file.
 
 Boots the Next dev/start server externally (the orchestrator handles
-that), then navigates to ``/_diagrams/<id>?t=0.5`` for every diagram ID
-referenced from ``components/diagrams`` and serialises the rendered
-``<svg id="diagram-snapshot">`` element to ``dist/diagrams/<id>.svg``.
+that), then navigates to ``/diagram-snapshot/<id>?t=0.5`` for every
+diagram ID referenced from ``components/diagrams`` and serialises the
+rendered ``<svg id="diagram-snapshot">`` element to
+``dist/diagrams/<id>.svg``.
 
 The diagrams are pure functional React components that take a single
 ``t`` prop in [0, 1] — pinning ``t=0.5`` yields the mid-point pose, which
@@ -66,7 +67,7 @@ async def snapshot_one(page, base_url: str, diagram_id: str, out_dir: Path) -> b
     Returns True on success, False on any error (404, missing element,
     etc.) so the caller can summarise failures without aborting.
     """
-    url = urljoin(base_url + "/", f"_diagrams/{diagram_id}?t=0.5")
+    url = urljoin(base_url + "/", f"diagram-snapshot/{diagram_id}?t=0.5")
     try:
         response = await page.goto(url, wait_until="networkidle")
     except Exception as exc:
