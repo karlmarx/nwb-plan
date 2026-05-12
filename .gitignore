@@ -56,3 +56,6 @@ next-env.d.ts
 
 # nanobanana
 nanobanana-output/
+
+# ebook build output
+/dist/
