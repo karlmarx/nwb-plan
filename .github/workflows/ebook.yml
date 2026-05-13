@@ -76,6 +76,30 @@ jobs:
           AUTH_TRUST_HOST: "true"
         run: bash scripts/build-ebook.sh
 
+      - name: Dump logs on failure
+        if: failure()
+        run: |
+          {
+            echo
+            echo "## Failure diagnostics"
+            echo
+            for f in dist/.phase-*.log dist/.next-server.log dist/.ebook-convert.log; do
+              if [[ -s "$f" ]]; then
+                echo "### \`$f\` (last 60 lines)"
+                echo
+                echo '```'
+                tail -60 "$f"
+                echo '```'
+                echo
+              fi
+            done
+            echo "### \`ls dist\`"
+            echo
+            echo '```'
+            ls -la dist 2>/dev/null || echo "(no dist directory)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Summary
         run: |
           echo "## Ebook artifacts" >> "$GITHUB_STEP_SUMMARY"

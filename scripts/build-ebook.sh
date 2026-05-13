@@ -39,12 +39,40 @@ fi
 
 phase() {
   local label="$1"; shift
-  local start end elapsed
+  local slug="${label// /-}"
+  slug="${slug//\//-}"
+  local logfile="$DIST/.phase-${slug}.log"
+  local start end elapsed rc
+  : > "$logfile"
   start=$(date +%s)
   echo "[build-ebook] ▶ $label" >&2
-  "$@"
+
+  # Run the command, capture combined output to logfile while still streaming
+  # to stderr (so it's visible in raw CI logs too). PIPESTATUS[0] gives us
+  # the command's exit code, ignoring tee.
+  set +e
+  ( "$@" ) 2>&1 | tee "$logfile" >&2
+  rc=${PIPESTATUS[0]}
+  set -e
+
   end=$(date +%s)
   elapsed=$((end - start))
+
+  if [[ $rc -ne 0 ]]; then
+    echo "[build-ebook] ✗ $label FAILED (rc=$rc) after ${elapsed}s" >&2
+    if [[ "$SUMMARY_FILE" != "/dev/null" ]]; then
+      {
+        echo
+        echo "### ✗ FAILED: \`$label\` (exit $rc, after ${elapsed}s)"
+        echo
+        echo '```'
+        tail -60 "$logfile"
+        echo '```'
+      } >> "$SUMMARY_FILE"
+    fi
+    return $rc
+  fi
+
   echo "[build-ebook] ◀ $label finished in ${elapsed}s" >&2
   if [[ "$SUMMARY_FILE" != "/dev/null" ]]; then
     printf "| %s | %ss |\n" "$label" "$elapsed" >> "$SUMMARY_FILE"
