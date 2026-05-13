@@ -193,6 +193,9 @@ export const EQUIPMENT: Record<string, EquipmentItem> = {
   dipMachine: { name: "Dip Machine", icon: "\u2B07\uFE0F", category: "machines" },
   preacher: { name: "Preacher Bench", icon: "\u{1F4BA}", category: "machines" },
   hamcurl: { name: "Ham Curl Machine", icon: "\u{1F9B5}", category: "machines" },
+  rowMachine: { name: "Row Machine (Chest-Pad)", icon: "\u{1F3CB}️", category: "machines" },
+  tbar: { name: "T-Bar / Landmine Row", icon: "\u{1F529}", category: "machines" },
+  smith: { name: "Smith Machine", icon: "\u{1F6E0}️", category: "machines" },
   pullupbar: { name: "Pull-Up Bar", icon: "\u{1FA9C}", category: "functional" },
   rings: { name: "Gymnastic Rings", icon: "\u2B55", category: "functional" },
   battleRopes: { name: "Battle Ropes", icon: "\u{1FAA2}", category: "cardio" },
@@ -921,6 +924,7 @@ export const EX: Record<string, Exercise> = {
         label: "Free Cable + Bar",
         icon: "\u2696\uFE0F",
         description: "Standard cable station with a wide lat pulldown bar attachment",
+        requires: ["cables"],
         setupCues: [
           "Attach wide bar to high pulley",
           "Sit on bench or floor below the cable",
@@ -932,6 +936,7 @@ export const EX: Record<string, Exercise> = {
         label: "Free Cable + V-Bar",
         icon: "\u2696\uFE0F",
         description: "Cable station with V-bar for neutral-grip lat pulldown variation",
+        requires: ["cables"],
         setupCues: [
           "Attach V-bar handle to high pulley",
           "Sit below cable, lean back slightly",
@@ -943,6 +948,7 @@ export const EX: Record<string, Exercise> = {
         label: "Band at Rack",
         icon: "\u{1F380}",
         description: "Heavy resistance band looped over a high point on a power rack",
+        requires: ["bands"],
         setupCues: [
           "Loop band over top of rack or pull-up bar",
           "Sit on the floor or a low bench below the band",
@@ -1069,6 +1075,7 @@ export const EX: Record<string, Exercise> = {
         icon: "\u{1F3CB}️",
         description: "Plate-loaded chest-pad row with independent handles per arm",
         status: "preferred",
+        requires: ["rowMachine"],
         setupCues: [
           "Seated facing the chest pad, plates loaded evenly on the horizontal pegs",
           "Chest pad and seat take all torso load — both legs stay passive, no bracing",
@@ -1081,6 +1088,7 @@ export const EX: Record<string, Exercise> = {
         icon: "\u{1F4CC}",
         description: "Cybex / Life Fitness pin-loaded seated row with chest pad",
         status: "preferred",
+        requires: ["rowMachine"],
         setupCues: [
           "Seated facing the chest pad, pin-select the working weight",
           "Chest pad supports the torso — both legs passive, identical setup to Hammer Strength",
@@ -1093,6 +1101,7 @@ export const EX: Record<string, Exercise> = {
         icon: "⚖️",
         description: "Cable row from a bench with V-handle, wide bar, or rope — right-foot-only bracing",
         status: "secondary",
+        requires: ["cables", "bench"],
         setupCues: [
           "Sit on the bench, hinge from the hips, scoot back so hip flexion stays under 90°",
           "Brace ONLY the right foot on the platform — left leg hangs free off the side or rests passively with zero load",
@@ -1105,6 +1114,7 @@ export const EX: Record<string, Exercise> = {
         icon: "⚖️",
         description: "Single D-handle cable row — unilateral, naturally caps load",
         status: "secondary",
+        requires: ["cables", "bench"],
         setupCues: [
           "Same setup as the bilateral cable row — right foot on the platform, left leg passive",
           "Single D-handle, one arm at a time — the lighter load helps prevent left-foot bracing under fatigue",
@@ -1117,6 +1127,7 @@ export const EX: Record<string, Exercise> = {
         icon: "⚠️",
         description: "Plate-loaded chest-pad T-bar — ONLY if the machine has a kneeling pad",
         status: "conditional",
+        requires: ["tbar"],
         caveat: "Only use this machine if it has a kneeling pad: park the right knee on the pad, left leg dangles free. If the machine is foot-plate-only, SKIP IT — the bilateral leg-bracing demand under heavy load is too high. Standing T-bar / landmine T-bar variants are NOT NWB-safe (bilateral hip hinge) and must be excluded entirely.",
         setupCues: [
           "Verify the machine has a kneeling pad before loading — if foot-plate-only, abort and pick a different variant",
