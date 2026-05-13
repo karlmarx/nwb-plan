@@ -390,15 +390,15 @@ def _default_stylesheet() -> epub.EpubItem:
     )
 
 
-def _wrap_xhtml(title: str, body: str) -> str:
+def _wrap_xhtml(title: str, body: str) -> bytes:
     """Wrap a body fragment in a minimal XHTML document.
 
-    Args:
-        title: Page ``<title>``.
-        body: HTML body fragment.
-
-    Returns:
-        Full XHTML string with the default stylesheet linked.
+    Returns ``bytes``, not ``str``: ebooklib 0.20's ``EpubHtml.get_body_content``
+    parses ``content`` with lxml's ``fromstring`` which silently returns empty
+    bytes when handed a ``str``. That empty body cascades into a
+    ``lxml.etree.ParserError: Document is empty`` from the nav builder. The
+    bug is reproducible with ``EpubHtml(...).content = "<html>...</html>"`` —
+    only the bytes form survives ebooklib's round-trip.
     """
     return f"""<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE html>
@@ -411,7 +411,7 @@ def _wrap_xhtml(title: str, body: str) -> str:
 {body}
 </body>
 </html>
-"""
+""".encode("utf-8")
 
 
 def _esc(text: str) -> str:
