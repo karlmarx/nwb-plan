@@ -54,15 +54,17 @@ freshness_check() {
 }
 
 install_deps() {
-  # `npm install` is faster than `npm ci` for re-runs because it uses the
-  # cached node_modules. CI still uses `npm ci` for strict reproducibility.
+  # Use `npm ci` to match CI exactly. It refuses to touch package-lock.json
+  # when versions drift, so a stale node_modules can never silently rewrite
+  # the lockfile from under the user. If the lockfile is in sync (the common
+  # case), it's only marginally slower than `npm install`.
   if [ -f package-lock.json ]; then
-    echo "npm:      installing..."
-    npm install --no-audit --no-fund --silent >/dev/null 2>&1 || {
-      echo "npm:      FAILED (rerun manually: npm install)"
-      return 0
-    }
-    echo "npm:      ok"
+    echo "npm:      installing (ci)..."
+    if npm ci --no-audit --no-fund --silent >/dev/null 2>&1; then
+      echo "npm:      ok"
+    else
+      echo "npm:      FAILED (rerun manually: npm ci)"
+    fi
   fi
 }
 

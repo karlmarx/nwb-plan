@@ -23,6 +23,34 @@ PORT="${PORT:-3737}"
 BASE_URL="http://127.0.0.1:${PORT}"
 SERVER_PID=""
 
+# Per-step wall-clock timing. Writes to stderr (visible in raw CI logs) and
+# also to $GITHUB_STEP_SUMMARY when running on Actions, so timings show up on
+# the PR check page even if the raw logs are gated behind auth.
+SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+
+if [[ "$SUMMARY_FILE" != "/dev/null" ]]; then
+  {
+    echo "## build-ebook timings"
+    echo
+    echo "| step | wall time |"
+    echo "|---|---|"
+  } >> "$SUMMARY_FILE"
+fi
+
+phase() {
+  local label="$1"; shift
+  local start end elapsed
+  start=$(date +%s)
+  echo "[build-ebook] ▶ $label" >&2
+  "$@"
+  end=$(date +%s)
+  elapsed=$((end - start))
+  echo "[build-ebook] ◀ $label finished in ${elapsed}s" >&2
+  if [[ "$SUMMARY_FILE" != "/dev/null" ]]; then
+    printf "| %s | %ss |\n" "$label" "$elapsed" >> "$SUMMARY_FILE"
+  fi
+}
+
 cleanup() {
   if [[ -n "$SERVER_PID" ]] && kill -0 "$SERVER_PID" 2>/dev/null; then
     echo "[build-ebook] stopping Next server (pid $SERVER_PID)"
@@ -34,51 +62,55 @@ trap cleanup EXIT
 
 mkdir -p "$DIST" "$DIST/diagrams"
 
-echo "[build-ebook] step 1/5 — exporting plan.json"
-npx tsx scripts/export-plan.ts --out "$DIST/plan.json"
+phase "1/5 export plan.json" \
+  npx tsx scripts/export-plan.ts --out "$DIST/plan.json"
 
-echo "[build-ebook] step 2/5 — building Next so we can serve the snapshot route"
-npm run build >/dev/null
+phase "2/5 next build" \
+  bash -c 'npm run build >/dev/null'
 
-echo "[build-ebook] step 3/5 — starting Next server on port $PORT"
-PORT="$PORT" npx next start -p "$PORT" >"$DIST/.next-server.log" 2>&1 &
-SERVER_PID=$!
+start_server() {
+  PORT="$PORT" npx next start -p "$PORT" >"$DIST/.next-server.log" 2>&1 &
+  SERVER_PID=$!
 
-# Wait for the server to answer. Cap at ~60s so a wedged build fails loudly.
-for i in $(seq 1 60); do
-  if curl -fsS "$BASE_URL" >/dev/null 2>&1; then
-    echo "[build-ebook] Next ready after ${i}s"
-    break
-  fi
-  if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-    echo "[build-ebook] Next server exited early — see $DIST/.next-server.log" >&2
-    exit 1
-  fi
-  sleep 1
-done
+  for i in $(seq 1 60); do
+    if curl -fsS "$BASE_URL" >/dev/null 2>&1; then
+      echo "[build-ebook]   server ready after ${i}s" >&2
+      return 0
+    fi
+    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+      echo "[build-ebook] Next server exited early — see $DIST/.next-server.log" >&2
+      tail -50 "$DIST/.next-server.log" >&2 || true
+      return 1
+    fi
+    sleep 1
+  done
 
-if ! curl -fsS "$BASE_URL" >/dev/null 2>&1; then
   echo "[build-ebook] Next never became ready — see $DIST/.next-server.log" >&2
-  exit 1
-fi
+  tail -50 "$DIST/.next-server.log" >&2 || true
+  return 1
+}
 
-echo "[build-ebook] step 4/5 — snapshotting diagrams"
-uv run scripts/snapshot_diagrams.py \
+phase "3/5 next start (warmup)" start_server
+
+phase "4/5 snapshot diagrams" \
+  uv run scripts/snapshot_diagrams.py \
   --base-url "$BASE_URL" \
   --out "$DIST/diagrams"
 
-echo "[build-ebook] step 5/5 — generating ePub"
-uv run scripts/nwb_to_epub.py \
+phase "5/5 generate ePub" \
+  uv run scripts/nwb_to_epub.py \
   "$DIST/plan.json" \
   --out "$DIST/nwb-plan.epub" \
   --asset-root "$DIST"
 
 if command -v ebook-convert >/dev/null 2>&1; then
-  echo "[build-ebook] generating PDF via ebook-convert"
-  ebook-convert "$DIST/nwb-plan.epub" "$DIST/nwb-plan.pdf" \
-    --pdf-page-numbers \
-    --paper-size letter \
-    >"$DIST/.ebook-convert.log" 2>&1
+  run_ebook_convert() {
+    ebook-convert "$DIST/nwb-plan.epub" "$DIST/nwb-plan.pdf" \
+      --pdf-page-numbers \
+      --paper-size letter \
+      >"$DIST/.ebook-convert.log" 2>&1
+  }
+  phase "6/6 ebook-convert PDF" run_ebook_convert
 else
   echo "[build-ebook] WARNING: ebook-convert not found — skipping PDF" >&2
 fi

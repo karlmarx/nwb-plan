@@ -35,8 +35,18 @@ jobs:
 
       - uses: astral-sh/setup-uv@v6
 
+      - name: Init timing summary
+        run: |
+          {
+            echo "## CI step timings"
+            echo
+            echo "| step | wall time |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install system dependencies (Cairo + Calibre)
         run: |
+          t0=$(date +%s)
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libcairo2 \
@@ -46,13 +56,19 @@ jobs:
             libffi-dev \
             shared-mime-info \
             calibre
+          echo "| apt install (cairo+calibre) | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install Node dependencies
-        run: npm ci
+        run: |
+          t0=$(date +%s)
+          npm ci
+          echo "| npm ci | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install Playwright Chromium
         run: |
+          t0=$(date +%s)
           uv run --python 3.14 --with playwright python -m playwright install chromium --with-deps
+          echo "| playwright install (with deps) | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build ebook
         env:
