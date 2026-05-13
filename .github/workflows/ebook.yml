@@ -19,6 +19,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     name: Build ePub + PDF
@@ -78,10 +82,13 @@ jobs:
 
       - name: Dump logs on failure
         if: failure()
+        id: dump_logs
         run: |
+          DIAG_FILE="$RUNNER_TEMP/diagnostics.md"
           {
+            echo "## Failure diagnostics — Build ePub + PDF"
             echo
-            echo "## Failure diagnostics"
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             echo
             for f in dist/.phase-*.log dist/.next-server.log dist/.ebook-convert.log; do
               if [[ -s "$f" ]]; then
@@ -98,7 +105,20 @@ jobs:
             echo '```'
             ls -la dist 2>/dev/null || echo "(no dist directory)"
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          } > "$DIAG_FILE"
+          cat "$DIAG_FILE" >> "$GITHUB_STEP_SUMMARY"
+          echo "diag_file=$DIAG_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Post diagnostics as PR comment
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DIAG_FILE: ${{ steps.dump_logs.outputs.diag_file }}
+        run: |
+          if [[ -f "$DIAG_FILE" ]]; then
+            gh pr comment "$PR_NUMBER" --body-file "$DIAG_FILE"
+          fi
 
       - name: Summary
         run: |
