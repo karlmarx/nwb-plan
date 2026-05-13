@@ -2,7 +2,12 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
-#   "playwright>=1.49",
+#   # Pinned exactly. The CI workflow's `playwright install` step must use the
+#   # same pin (.github/workflows/ebook.yml) — otherwise the two uv envs can
+#   # resolve to different Playwright versions, which want different Chromium
+#   # revisions, and the script crashes at `chromium.launch()` because the
+#   # binary at the version it expects was never downloaded.
+#   "playwright==1.59.0",
 # ]
 # ///
 """Snapshot every exercise diagram into a static SVG file.
