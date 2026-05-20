@@ -1,0 +1,153 @@
+name: Ebook
+
+on:
+  push:
+    branches: [main, dev]
+    tags: ['v*']
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'scripts/**'
+      - 'app/diagram-snapshot/**'
+      - 'components/diagrams/**'
+      - 'lib/exercises*.ts'
+      - 'lib/program.ts'
+      - '.github/workflows/ebook.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build ePub + PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Init timing summary
+        run: |
+          {
+            echo "## CI step timings"
+            echo
+            echo "| step | wall time |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install system dependencies (Cairo + Calibre)
+        run: |
+          t0=$(date +%s)
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            calibre
+          echo "| apt install (cairo+calibre) | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Node dependencies
+        run: |
+          t0=$(date +%s)
+          npm ci
+          echo "| npm ci | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Playwright Chromium
+        run: |
+          t0=$(date +%s)
+          # Version must match the pin in scripts/snapshot_diagrams.py — see
+          # comment there for why. Otherwise the script's PEP-723 venv resolves
+          # to a different Playwright + Chromium revision than what this step
+          # installed, and the snapshot loop crashes at launch.
+          uv run --python 3.14 --with "playwright==1.59.0" python -m playwright install chromium --with-deps
+          echo "| playwright install (with deps) | $(( $(date +%s) - t0 ))s |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build ebook
+        env:
+          NEXT_PUBLIC_FEATURE_AI_SUGGESTIONS: "false"
+          AUTH_TRUST_HOST: "true"
+        run: bash scripts/build-ebook.sh
+
+      - name: Dump logs on failure
+        if: failure()
+        id: dump_logs
+        run: |
+          DIAG_FILE="$RUNNER_TEMP/diagnostics.md"
+          {
+            echo "## Failure diagnostics — Build ePub + PDF"
+            echo
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            for f in dist/.phase-*.log dist/.next-server.log dist/.ebook-convert.log; do
+              if [[ -s "$f" ]]; then
+                echo "### \`$f\` (last 60 lines)"
+                echo
+                echo '```'
+                tail -60 "$f"
+                echo '```'
+                echo
+              fi
+            done
+            echo "### \`ls dist\`"
+            echo
+            echo '```'
+            ls -la dist 2>/dev/null || echo "(no dist directory)"
+            echo '```'
+          } > "$DIAG_FILE"
+          cat "$DIAG_FILE" >> "$GITHUB_STEP_SUMMARY"
+          echo "diag_file=$DIAG_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Post diagnostics as PR comment
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DIAG_FILE: ${{ steps.dump_logs.outputs.diag_file }}
+        run: |
+          if [[ -f "$DIAG_FILE" ]]; then
+            gh pr comment "$PR_NUMBER" --body-file "$DIAG_FILE"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Ebook artifacts" >> "$GITHUB_STEP_SUMMARY"
+          ls -lh dist/nwb-plan.* 2>/dev/null | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Diagram snapshots: $(ls dist/diagrams 2>/dev/null | wc -l)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: nwb-plan-ebook
+          path: |
+            dist/nwb-plan.epub
+            dist/nwb-plan.pdf
+          retention-days: 30
+
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/nwb-plan.epub
+            dist/nwb-plan.pdf
+          fail_on_unmatched_files: false
+          draft: false
+          generate_release_notes: true
