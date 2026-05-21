@@ -46,6 +46,7 @@ export interface ExerciseMuscles {
 
 import type { MovementTag } from "./condition-types";
 import { PWB_ADDITIONS } from "./exercises-pwb";
+import { FWB_ADDITIONS } from "./exercises-fwb";
 
 export interface ExerciseConstraints {
   requiresIliopsoas: boolean;
@@ -3733,6 +3734,11 @@ export const EX: Record<string, Exercise> = {
 // Merge PWB-2026-04 additions (40 new push/pull/core/lower exercises unlocked
 // by the 2026-04-29 doctor clearance). Each carries phaseUnlock="PWB-2026-04".
 Object.assign(EX, PWB_ADDITIONS);
+
+// Merge FWB-2026-05 additions: 4 bilateral PT-supervised lower-body movements
+// unlocked by the 2026-05 PT progression to standing weight-bearing.
+// Each carries phaseUnlock="FWB-2026-05".
+Object.assign(EX, FWB_ADDITIONS);
 
 // ===== WORKOUT STRUCTURE =====
 
