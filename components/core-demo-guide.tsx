@@ -1,19 +1,47 @@
-// @ts-nocheck
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPES
+   ═══════════════════════════════════════════════════════════════ */
+
+type CategoryKey = "supine" | "trx" | "arm";
+
+interface Category {
+  key: CategoryKey;
+  label: string;
+}
+
+interface Exercise {
+  id: string;
+  cat: CategoryKey;
+  name: string;
+  cue: string;
+  safety: string;
+  position?: string;
+  equipment?: string;
+  detail?: boolean;
+}
+
+/** Props passed to every diagram-renderer function.
+ *  `t` is the animation progress in [0, 1). */
+interface AnimProps {
+  t: number;
+}
+
+type AnimFn = (props: AnimProps) => React.JSX.Element;
 
 /* ═══════════════════════════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════════════════════════ */
 
-const CATEGORIES = [
+const CATEGORIES: Category[] = [
   { key: "supine", label: "Supine" },
   { key: "trx", label: "TRX Core" },
   { key: "arm", label: "Arm Bal Prep" },
 ];
 
-const EXERCISES = [
+const EXERCISES: Exercise[] = [
   // ── SUPINE OBLIQUE ──
   {
     id: "s1", cat: "supine", name: "Cross-Body Reach",
@@ -130,7 +158,11 @@ const EXERCISES = [
 
 const SL = { cx: 200, hipY: 200, shY: 130, hdY: 105 };
 
-const Floor = ({ y = 215 }) => (
+interface FloorProps {
+  y?: number;
+}
+
+const Floor = ({ y = 215 }: FloorProps) => (
   <line x1="40" y1={y} x2="360" y2={y} stroke="#333" strokeWidth="1" strokeDasharray="4,4" />
 );
 
@@ -150,7 +182,12 @@ const RightLegFlat = () => (
   </g>
 );
 
-const Anchor = ({ x, y }) => (
+interface AnchorProps {
+  x: number;
+  y: number;
+}
+
+const Anchor = ({ x, y }: AnchorProps) => (
   <g>
     <rect x={x - 3} y={y - 30} width="6" height="30" fill="#555" rx="2" />
     <rect x={x - 12} y={y - 32} width="24" height="6" fill="#666" rx="2" />
@@ -158,11 +195,24 @@ const Anchor = ({ x, y }) => (
   </g>
 );
 
-const Strap = ({ x1, y1, x2, y2 }) => (
+interface StrapProps {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+const Strap = ({ x1, y1, x2, y2 }: StrapProps) => (
   <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#f39c12" strokeWidth="2" strokeDasharray="6,3" />
 );
 
-const Pbar = ({ x, y, h = 50 }) => (
+interface PbarProps {
+  x: number;
+  y: number;
+  h?: number;
+}
+
+const Pbar = ({ x, y, h = 50 }: PbarProps) => (
   <g>
     <rect x={x - 2} y={y - h} width="4" height={h} fill="#888" rx="1" />
     <rect x={x - 10} y={y - h - 3} width="20" height="6" fill="#aaa" rx="2" />
@@ -174,7 +224,7 @@ const Pbar = ({ x, y, h = 50 }) => (
    SUPINE ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */
 
-function CrossBodyReach({ t }) {
+function CrossBodyReach({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : (t - 0.5) / 0.5;
   const side = t < 0.5 ? "right" : "left";
   const reach = Math.sin(phase * Math.PI);
@@ -204,7 +254,7 @@ function CrossBodyReach({ t }) {
   );
 }
 
-function SupineSideBend({ t }) {
+function SupineSideBend({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : (t - 0.5) / 0.5;
   const side = t < 0.5 ? "right" : "left";
   const bend = Math.sin(phase * Math.PI);
@@ -233,7 +283,7 @@ function SupineSideBend({ t }) {
   );
 }
 
-function KneeDropOblique({ t }) {
+function KneeDropOblique({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const drop = phase * 55;
   const { cx, hipY, shY, hdY } = SL;
@@ -260,7 +310,7 @@ function KneeDropOblique({ t }) {
   );
 }
 
-function DeadBugRight({ t }) {
+function DeadBugRight({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const ext = Math.sin(phase * Math.PI * 0.5);
   const { cx, hipY, shY, hdY } = SL;
@@ -285,7 +335,7 @@ function DeadBugRight({ t }) {
    TRX ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */
 
-function TRXPallofPress({ t }) {
+function TRXPallofPress({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const press = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220, anchorX = 320, anchorY = 60;
@@ -309,7 +359,7 @@ function TRXPallofPress({ t }) {
   );
 }
 
-function TRXStandingRollout({ t }) {
+function TRXStandingRollout({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const lean = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220, anchorX = 80, anchorY = 60;
@@ -333,7 +383,7 @@ function TRXStandingRollout({ t }) {
   );
 }
 
-function TRXSingleArmRow({ t }) {
+function TRXSingleArmRow({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const pull = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220, anchorX = 320, anchorY = 60;
@@ -358,7 +408,7 @@ function TRXSingleArmRow({ t }) {
   );
 }
 
-function TRXKneelingRollout({ t }) {
+function TRXKneelingRollout({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const roll = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220, anchorX = 80, anchorY = 50, kneeX = 220;
@@ -382,7 +432,7 @@ function TRXKneelingRollout({ t }) {
   );
 }
 
-function TRXKneelingChop({ t }) {
+function TRXKneelingChop({ t }: AnimProps) {
   const angle = Math.sin(t * Math.PI * 2) * 0.9;
   const floorY = 220, anchorX = 80, anchorY = 50, kneeX = 220;
   const hipX = 210, hipY = 165, shX = 200, shY = 125;
@@ -406,7 +456,7 @@ function TRXKneelingChop({ t }) {
   );
 }
 
-function TRXBodySaw({ t }) {
+function TRXBodySaw({ t }: AnimProps) {
   const rock = Math.sin(t * Math.PI * 2);
   const floorY = 200, anchorX = 340, anchorY = 80;
   const elbX = 100, elbY = floorY - 5;
@@ -432,7 +482,7 @@ function TRXBodySaw({ t }) {
   );
 }
 
-function TRXSidePlank({ t }) {
+function TRXSidePlank({ t }: AnimProps) {
   const breathe = Math.sin(t * Math.PI * 4) * 0.15;
   const floorY = 210, anchorX = 340, anchorY = 80;
   const elbX = 140, elbY = floorY - 5;
@@ -464,7 +514,16 @@ function TRXSidePlank({ t }) {
    ═══════════════════════════════════════════════════════════════ */
 
 // helper: draw fig-4 hooked left leg behind right calf
-function Fig4Hook({ hipX, hipY, rKneeX, rKneeY, rCalfMidX, rCalfMidY }) {
+interface Fig4HookProps {
+  hipX: number;
+  hipY: number;
+  rKneeX: number;
+  rKneeY: number;
+  rCalfMidX: number;
+  rCalfMidY: number;
+}
+
+function Fig4Hook({ hipX, hipY, rKneeX, rKneeY, rCalfMidX, rCalfMidY }: Fig4HookProps) {
   // left thigh goes from hip down and slightly behind right knee
   const lKneeX = rKneeX - 5;
   const lKneeY = rKneeY + 8;
@@ -480,7 +539,7 @@ function Fig4Hook({ hipX, hipY, rKneeX, rKneeY, rCalfMidX, rCalfMidY }) {
   );
 }
 
-function TRXKneeTuckFig4({ t }) {
+function TRXKneeTuckFig4({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const tuck = Math.sin(phase * Math.PI * 0.5);
   const floorY = 200, anchorX = 340, anchorY = 80;
@@ -516,7 +575,7 @@ function TRXKneeTuckFig4({ t }) {
   );
 }
 
-function TRXBodySawFig4({ t }) {
+function TRXBodySawFig4({ t }: AnimProps) {
   const rock = Math.sin(t * Math.PI * 2);
   const floorY = 200, anchorX = 340, anchorY = 80;
   const elbX = 100, elbY = floorY - 5;
@@ -544,7 +603,7 @@ function TRXBodySawFig4({ t }) {
   );
 }
 
-function LSitKneeTuck({ t }) {
+function LSitKneeTuck({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const tuck = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220;
@@ -587,7 +646,7 @@ function LSitKneeTuck({ t }) {
   );
 }
 
-function LSitHold({ t }) {
+function LSitHold({ t }: AnimProps) {
   // subtle sway
   const sway = Math.sin(t * Math.PI * 3) * 2;
   const floorY = 220;
@@ -625,7 +684,7 @@ function LSitHold({ t }) {
   );
 }
 
-function TuckPlancheLean({ t }) {
+function TuckPlancheLean({ t }: AnimProps) {
   const phase = t < 0.5 ? t / 0.5 : 1 - (t - 0.5) / 0.5;
   const lean = Math.sin(phase * Math.PI * 0.5);
   const floorY = 220;
@@ -669,7 +728,7 @@ function TuckPlancheLean({ t }) {
   );
 }
 
-function SupportProtraction({ t }) {
+function SupportProtraction({ t }: AnimProps) {
   const pulse = Math.sin(t * Math.PI * 4) * 0.5 + 0.5; // 0→1 pulsing
   const floorY = 220;
   const lBarX = 165, rBarX = 235;
@@ -709,7 +768,7 @@ function SupportProtraction({ t }) {
    ANIMATION MAP
    ═══════════════════════════════════════════════════════════════ */
 
-const ANIM_MAP = {
+const ANIM_MAP: Record<string, AnimFn> = {
   s1: CrossBodyReach, s2: SupineSideBend, s3: KneeDropOblique, s5: DeadBugRight,
   t1: TRXPallofPress, t2: TRXStandingRollout, t3: TRXSingleArmRow,
   t4: TRXKneelingRollout, t5: TRXKneelingChop, t6: TRXBodySaw, t7: TRXSidePlank,
@@ -722,14 +781,14 @@ const ANIM_MAP = {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function NWBCoreGuide() {
-  const [cat, setCat] = useState("supine");
-  const [active, setActive] = useState("s1");
-  const [t, setT] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [cat, setCat] = useState<CategoryKey>("supine");
+  const [active, setActive] = useState<string>("s1");
+  const [t, setT] = useState<number>(0);
+  const [paused, setPaused] = useState<boolean>(false);
 
   useEffect(() => {
     if (paused) return;
-    const iv = setInterval(() => setT(p => (p + 0.006) % 1), 25);
+    const iv = setInterval(() => setT((p: number) => (p + 0.006) % 1), 25);
     return () => clearInterval(iv);
   }, [paused]);
 
@@ -741,7 +800,11 @@ export default function NWBCoreGuide() {
 
   const catExercises = EXERCISES.filter(e => e.cat === cat);
   const ex = EXERCISES.find(e => e.id === active);
-  const AnimComponent = ANIM_MAP[active];
+  const AnimComponent: AnimFn | undefined = ANIM_MAP[active];
+
+  // `active` is always seeded from an exercise id, but guard so TS can narrow
+  // and we never render against a stale id during a category transition.
+  if (!ex) return null;
 
   return (
     <div style={{
