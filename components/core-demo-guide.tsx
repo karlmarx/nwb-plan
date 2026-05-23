@@ -768,7 +768,7 @@ function SupportProtraction({ t }: AnimProps) {
    ANIMATION MAP
    ═══════════════════════════════════════════════════════════════ */
 
-const ANIM_MAP: Record<string, AnimFn> = {
+const ANIM_MAP: Record<string, AnimFn | undefined> = {
   s1: CrossBodyReach, s2: SupineSideBend, s3: KneeDropOblique, s5: DeadBugRight,
   t1: TRXPallofPress, t2: TRXStandingRollout, t3: TRXSingleArmRow,
   t4: TRXKneelingRollout, t5: TRXKneelingChop, t6: TRXBodySaw, t7: TRXSidePlank,
