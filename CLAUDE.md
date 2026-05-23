@@ -84,13 +84,14 @@ WorkoutView (main shell, all state, 7 tabs: Today/Upper/Lower/Core/Cardio/Equip/
 - Base workout fully offline; AI suggestions show offline indicator
 - Desktop: responsive font-size scaling (no zoom hack)
 
-## Key Constraints (2026-04-29 doctor clearance — PWB phase)
+## Key Constraints (2026-05 PT progression — FWB phase)
 
-- **Toe-touch weight-bearing on left** with crutches; walks normally around the house otherwise
-- Bilateral lower-body work allowed (hamstring curl, leg extension, hip thrust both legs)
-- **NO left squat, NO left leg press** (no axial compression through the left femoral neck)
-- Core unrestricted
-- Cardio: recumbent bike, swim, canoe OK; **NO rowing erg** (Concept2 etc.)
-- **Hip flexion fully unrestricted** — the FAI / labral concern has been retired by the doctor
-- Iliopsoas restriction lifted entirely (left hip flexion against gravity is now permitted)
+- **Full bilateral weight-bearing** under PT load monitoring. The PWB-phase "toe-touch on left" rule is retired; both feet share load in standing patterns.
+- **Bilateral squat, leg press, RDL, and calf raise are PERMITTED at PT-prescribed sub-maximal loads.** Typical early-FWB load is 40-60% of pre-injury bilateral capacity; PT progresses week-by-week.
+- **Isolated single-leg LEFT squat / LEFT leg press remains off the table** — bilateral only on the left side. The right-leg-only variants from PWB stay in the library as fallbacks.
+- Core unrestricted.
+- Cardio: recumbent bike, swim, canoe OK; **NO rowing erg** (Concept2 etc.).
+- **Hip flexion fully unrestricted** — the FAI / labral concern has been retired by the doctor.
+- Iliopsoas restriction lifted entirely.
+- New FWB exercises live in `lib/exercises-fwb.ts` (parallel to `lib/exercises-pwb.ts`); they're `Object.assign`-merged into the main `EX` dictionary at the bottom of `lib/exercises.ts`. The FWB phase entry is in `lib/conditions/fnsf-left.ts` under `program.phases[]`.
 - The AI system prompt in `app/api/suggest/system-prompt.ts` reads constraints from the condition pack at `lib/conditions/fnsf-left.ts` — update both when constraints change.

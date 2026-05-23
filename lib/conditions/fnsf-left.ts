@@ -78,8 +78,8 @@ export const fnsfLeft: Condition = {
       "Mechanical clicking with hip flexion",
     ],
     hardContraindications: [
-      "PRIMARY: Left femoral neck compression-side stress fracture — PWB phase as of 2026-04-29. Toe-touch weight-bearing on the LEFT with crutches; the patient walks normally around the house. Bilateral lower-body work is now permitted.",
-      "NO left-side squat, NO left-side leg press — these still axially compress the left femoral neck and remain prohibited.",
+      "PRIMARY: Left femoral neck compression-side stress fracture — FWB phase as of 2026-05 (PT progression). Bilateral standing weight-bearing is now permitted under PT load monitoring. The single-leg-only rehab patterns from the PWB phase remain available as fallbacks.",
+      "Bilateral squat, leg press, RDL, and calf raise are PERMITTED at PT-prescribed (sub-maximal) loads. Single-leg LEFT squat and LEFT leg press in isolation remain off the table — bilateral only on the left side, with PT supervising the load progression.",
       "NO rowing erg (Concept2 / similar). Recumbent bike, swimming, and canoeing are OK.",
       "Hip flexion is fully unrestricted: the FAI + labral concerns have been retired by the doctor. The iliopsoas restriction is lifted — left hip flexion against gravity is now permitted.",
       "Core work is unrestricted.",
@@ -118,6 +118,15 @@ export const fnsfLeft: Condition = {
           "Partial weight bearing transition. PT-guided progression. New exercises being added.",
         durationDays: 14,
         color: "#10b981",
+        unlockTags: ["weight_bearing_bilateral", "weight_bearing_unilateral"],
+      },
+      {
+        id: "fnsf_phase_fwb",
+        name: "FWB",
+        description:
+          "Full weight bearing return. Bilateral standing patterns under PT load monitoring. RDLs, leg press, TRX squat, calf raises bilateral at sub-maximal loads.",
+        durationDays: 28,
+        color: "#facc15",
         unlockTags: ["weight_bearing_bilateral", "weight_bearing_unilateral"],
       },
     ],
@@ -209,8 +218,9 @@ export const fnsfLeft: Condition = {
   // The SAFE / PROHIBITED block lives here as prose because it's
   // condition-specific framing the AI prompt needs verbatim. Future moves
   // may derive these lines from forbiddenTags / cautionTags directly.
-  aiPromptFragment: `PHASE: Partial weight bearing (PWB) as of 2026-04-29. Toe-touch left leg with crutches; bilateral lower-body machine work is now allowed.
-SAFE: Bilateral leg curl, leg extension, hip thrust (both feet), hip abduction/adduction machines, seated calf raise, 45-deg back extension. Recumbent bike, swimming, canoeing. Bilateral hanging leg raise, captain's chair knee raise, hollow body, V-up, bicycle crunch, L-sit. Half-kneeling and tall-kneeling work on a padded mat. Cable crossover and standing landmine press with the left foot in a toe-touch kickstand position. Upper-body work is unrestricted.
-PROHIBITED: Left-side squat patterns, left-side leg press patterns (axial compression on the left femoral neck). Rowing erg (Concept2). Pushing off the left foot under load — left foot is balance-only in standing or staggered-stance work.
-HIP FLEXION: Fully unrestricted. The previous <90deg cap and iliopsoas activation ban are both retired.`,
+  aiPromptFragment: `PHASE: Full weight bearing (FWB) as of 2026-05. Bilateral standing weight-bearing is now permitted under PT supervision; the 4-week FWB block is dedicated to grooving symmetric bilateral patterns at sub-maximal load. PWB-phase single-leg exercises remain available as fallbacks.
+SAFE: Bilateral RDL with kettlebell, bilateral leg press at PT-prescribed loads, TRX-assisted bilateral squat, bilateral standing calf raise. All PWB-phase exercises (bilateral leg curl, leg extension, hip thrust, hip abduction/adduction machines, half-kneeling and tall-kneeling press, cable crossover with kickstand). Recumbent bike, swimming, canoeing. All core work. Upper-body work is unrestricted.
+PROHIBITED: Rowing erg (Concept2 / similar). Single-leg ISOLATED left squat / left leg press — bilateral only on the left side. PT explicitly caps load on every new bilateral pattern; do not chase pre-injury numbers.
+HIP FLEXION: Fully unrestricted. The previous <90deg cap and iliopsoas activation ban are both retired.
+PT LOAD CAP: When the user asks about weight for any FWB-phase bilateral exercise (RDL KB, bilateral leg press, TRX squat, calf raise), default to "PT-prescribed sub-maximal load" rather than a number. Typical early-FWB loads are 40-60% of pre-injury bilateral capacity; PT updates this week-by-week.`,
 };
