@@ -73,16 +73,35 @@ export interface ProgramPhase {
 }
 
 /**
+ * The Full Weight-Bearing phase. As of 2026-05 the PT progression moved
+ * Karl from PWB to bilateral standing weight-bearing under load monitoring
+ * (see CLAUDE.md "Key Constraints" and the `fnsf_phase_fwb` entry in
+ * lib/conditions/fnsf-left.ts). Color matches the condition pack's FWB phase.
+ */
+export const FWB_PHASE: ProgramPhase = {
+  id: "fwb",
+  name: "FWB",
+  longName: "Full Weight Bearing",
+  startDate: new Date("2026-05-13T16:00:00Z"),
+  durationDays: 28,
+  status: "active",
+  color: "#facc15",
+  desc: "Full weight-bearing return. Bilateral standing patterns (KB RDL, leg press, TRX squat, calf raises) under PT load monitoring at sub-maximal loads.",
+};
+
+/**
  * Default rehab program phases.
  *
  * - NWB: original 8-week non-weight-bearing protocol — completed.
- * - PWB: 6-week partial-weight-bearing extension — active, started
- *   2026-04-29 (positive medical update green-lit weight bearing).
+ * - PWB: partial-weight-bearing extension — completed; started 2026-04-29
+ *   and progressed faster than the planned 6 weeks (PT advanced to FWB on
+ *   2026-05-13, ~2 weeks in).
+ * - FWB: full weight-bearing return — active as of 2026-05-13.
  *
  * On first load (no `nwb_programPhases` key in storage), the
- * `ProgressClock` writes this array. Existing users who never had a
- * persisted phase array get the same defaults — there is no v1 schema to
- * migrate from since `PROG_START` was previously a hardcoded constant.
+ * `ProgressClock` writes this array. Users with a persisted phase array
+ * from before FWB existed are migrated forward by `ensureFwbPhase` so the
+ * clock advances without manual localStorage surgery.
  */
 export const DEFAULT_PROGRAM_PHASES: ProgramPhase[] = [
   {
@@ -100,12 +119,31 @@ export const DEFAULT_PROGRAM_PHASES: ProgramPhase[] = [
     name: "PWB",
     longName: "Partial Weight Bearing",
     startDate: new Date("2026-04-29T16:00:00Z"),
-    durationDays: 42,
-    status: "active",
+    durationDays: 14,
+    status: "completed",
     color: "#10b981",
-    desc: "6-week partial-weight-bearing rehab. PT-guided progression.",
+    desc: "Partial-weight-bearing rehab. PT-guided progression; advanced to FWB ahead of the planned 6-week window.",
   },
+  FWB_PHASE,
 ];
+
+/**
+ * Forward-migrate a persisted phases array to include the FWB phase.
+ *
+ * Returns the array unchanged (same reference) when an `fwb` phase is
+ * already present, so callers can cheaply detect a no-op and skip the
+ * localStorage write. Otherwise marks any currently-active phase as
+ * completed and appends the active FWB phase. Idempotent.
+ */
+export function ensureFwbPhase(phases: ProgramPhase[]): ProgramPhase[] {
+  if (phases.some((p) => p.id === FWB_PHASE.id)) return phases;
+  return [
+    ...phases.map((p) =>
+      p.status === "active" ? { ...p, status: "completed" as const } : p,
+    ),
+    FWB_PHASE,
+  ];
+}
 
 /**
  * Find the currently-active phase. If multiple phases are marked active

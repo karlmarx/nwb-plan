@@ -5,6 +5,7 @@ import {
   DEFAULT_PROGRAM_PHASES,
   ProgramPhase,
   activePhase,
+  ensureFwbPhase,
   phaseDayNumber,
   phaseDurationMs,
   phaseElapsedMs,
@@ -44,7 +45,14 @@ function loadPhases(): ProgramPhase[] {
   // loadState returns the raw JSON-parsed object (Dates are strings until rehydrated).
   const raw = loadState<unknown>(STORAGE_KEY, null);
   const parsed = parsePhases(raw);
-  if (parsed && parsed.length > 0) return parsed;
+  if (parsed && parsed.length > 0) {
+    // Forward-migrate arrays persisted before the FWB phase existed.
+    const migrated = ensureFwbPhase(parsed);
+    if (migrated !== parsed && typeof window !== "undefined") {
+      saveState(STORAGE_KEY, migrated);
+    }
+    return migrated;
+  }
   // First-run fallback: write defaults so future sessions are stable.
   if (typeof window !== "undefined") {
     saveState(STORAGE_KEY, DEFAULT_PROGRAM_PHASES);
