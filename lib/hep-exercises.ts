@@ -107,6 +107,46 @@ export const HEP_EXERCISES: HEPExercise[] = [
     side: "left",
     prescribedOn: "2026-05-06",
   },
+  {
+    id: "hep_calf_raise",
+    name: "Calf Raise",
+    instructions:
+      "Stand with feet hip-width on a flat surface, fingertips on a rail or counter for balance. Press up onto the balls of both feet, lifting your heels as high as possible. Hold briefly at the top, then lower with control until heels touch the floor. Keep weight even between both feet.",
+    sets: 3,
+    reps: 10,
+    side: "bilateral",
+    prescribedOn: "2026-05-13",
+  },
+  {
+    id: "hep_bilateral_leg_press",
+    name: "Bilateral Leg Press",
+    instructions:
+      "Set up on a leg press machine with both feet placed shoulder-width on the platform. Brace your core, then lower the platform under control until knees reach roughly 90° (keep hips below 90° of flexion). Press back to near-lockout without snapping the knees. Keep weight evenly distributed between both legs — do not let the right side dominate.",
+    sets: 3,
+    reps: 10,
+    side: "bilateral",
+    prescribedOn: "2026-05-13",
+  },
+  {
+    id: "hep_kb_rdl",
+    name: "Kettlebell Romanian Deadlift (RDL)",
+    instructions:
+      "Stand with feet hip-width, holding a kettlebell in front of your thighs with both hands. Keeping a soft bend in the knees and a flat back, hinge at the hips to lower the kettlebell along the front of your legs until you feel a stretch in the hamstrings. Drive through both heels and squeeze the glutes to return to standing. Keep weight even between both feet.",
+    sets: 3,
+    reps: 10,
+    side: "bilateral",
+    prescribedOn: "2026-05-13",
+  },
+  {
+    id: "hep_trx_squat",
+    name: "TRX Squat",
+    instructions:
+      "Face the TRX anchor and hold a handle in each hand at chest height with elbows close to the ribs. Step back until the straps are taut and stand with feet hip-width. Sit back and down into a squat, letting the straps unload some of your bodyweight as needed. Drive through both heels to stand. Keep weight even between both feet and knees tracking over toes.",
+    sets: 3,
+    reps: 10,
+    side: "bilateral",
+    prescribedOn: "2026-05-13",
+  },
 ];
 
 /** Active HEP exercises — excludes anything with `retiredOn` set. */

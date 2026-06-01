@@ -34,8 +34,8 @@ def test_hep_pill_renders_on_today_tab(app_page: Page):
     pill = app_page.get_by_test_id("hep-block-pill")
     expect(pill).to_be_visible()
 
-    # Count should match the seeded HEP_EXERCISES length (6 as of May 6).
-    expect(pill).to_have_attribute("data-hep-total", "6")
+    # Count should match the seeded HEP_EXERCISES length (10 as of May 13).
+    expect(pill).to_have_attribute("data-hep-total", "10")
     expect(pill).to_have_attribute("data-hep-done", "0")
 
 
@@ -82,9 +82,9 @@ def test_hep_full_block_renders_on_rehab_tab(app_page: Page):
 
     full = app_page.get_by_test_id("hep-block-full")
     expect(full).to_be_visible()
-    expect(full).to_have_attribute("data-hep-total", "6")
+    expect(full).to_have_attribute("data-hep-total", "10")
 
-    # All six rows should be visible immediately (no toggle).
+    # All ten rows should be visible immediately (no toggle).
     for ex_id in [
         "hep_prone_hip_extension",
         "hep_hip_abduction_sidelying",
@@ -92,6 +92,10 @@ def test_hep_full_block_renders_on_rehab_tab(app_page: Page):
         "hep_bridging_ball_squeeze",
         "hep_isometric_hip_er_prone_ball",
         "hep_band_sidelying_clamshell",
+        "hep_calf_raise",
+        "hep_bilateral_leg_press",
+        "hep_kb_rdl",
+        "hep_trx_squat",
     ]:
         expect(app_page.get_by_test_id(f"hep-row-{ex_id}")).to_be_visible()
 
@@ -119,7 +123,7 @@ def test_hep_strip_renders_at_end_of_today_workout(app_page: Page):
     # Today's workoutKey can vary by day-of-week — assert at least one strip exists.
     strips = app_page.locator("[data-testid^='hep-strip-']")
     expect(strips.first).to_be_visible()
-    expect(strips.first).to_have_attribute("data-hep-total", "6")
+    expect(strips.first).to_have_attribute("data-hep-total", "10")
 
 
 def test_hep_strip_completion_syncs_with_pill(app_page: Page):
