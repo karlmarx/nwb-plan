@@ -21,7 +21,7 @@ import {
   MOBILITY_SUPPLEMENTS,
 } from "@/lib/supplements";
 import type { Exercise } from "@/lib/exercises";
-import { computeCurrentPhase } from "@/lib/program";
+import { computeCurrentPhase, isContentProgramComplete } from "@/lib/program";
 import Section from "@/components/section";
 import ExerciseRow from "@/components/exercise-row";
 import Callout from "@/components/callout";
@@ -545,10 +545,17 @@ const EQUIPMENT_CORE_BLOCKS: {
 export default function WorkoutView() {
   // ----- State -----
   const [tab, setTab] = useState(() => loadState<number>("nwb_tab", 0));
-  // Phase is derived from the program start date — always opens on the
-  // week that matches the calendar. Tapping a pill temporarily overrides
-  // within the session but doesn't persist; next mount re-syncs.
-  const [phase, setPhase] = useState(() => computeCurrentPhase());
+  // Phase is derived from the program start date — opens on the week that
+  // matches the calendar. Once the 8-week content program is complete (FWB
+  // era), it opens deselected (`null`) since the week-1–8 phases no longer
+  // apply. Tapping a pill overrides within the session but doesn't persist;
+  // next mount re-syncs.
+  const [phase, setPhase] = useState<number | null>(() =>
+    isContentProgramComplete() ? null : computeCurrentPhase(),
+  );
+  // Effective phase for exercise gating + set-scheme indexing: when no tab is
+  // selected (FWB era) everything is unlocked, so fall back to the last phase.
+  const effPhase = phase ?? PHASES.length - 1;
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     () => {
       const sd = loadState<number>("nwb_startDay", 0);
@@ -1242,7 +1249,7 @@ export default function WorkoutView() {
         <ExerciseRow
           name={name}
           ex={ex}
-          phase={phase}
+          phase={effPhase}
           isExpanded={!!expandedEx[name]}
           onToggle={() => toggleEx(name)}
           onLongPress={() =>
@@ -1309,7 +1316,7 @@ export default function WorkoutView() {
               const exItem = EX[nm];
               return { orig, name: nm, ex: exItem };
             })
-            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || phase >= exItem.phase));
+            .filter(({ ex: exItem }) => exItem && (exItem.phase == null || effPhase >= exItem.phase));
 
           // Build focus items with supplements attached (auto + user-opted-in only)
           const items: FocusItem[] = activeExercises.map(({ name: nm, ex: exItem }) => {
@@ -1513,7 +1520,7 @@ export default function WorkoutView() {
           const exName = getExName(workoutKey, origName);
           const ex = EX[exName];
           if (!ex) return null;
-          if (ex.phase != null && phase < ex.phase) return null;
+          if (ex.phase != null && effPhase < ex.phase) return null;
           const unavail = !isAvailable(exName);
           const isExp = !!expandedEx[exName];
 
@@ -1541,7 +1548,7 @@ export default function WorkoutView() {
               <ExerciseRow
                 name={exName}
                 ex={ex}
-                phase={phase}
+                phase={effPhase}
                 isExpanded={isExp}
                 onToggle={() => toggleEx(exName)}
                 onLongPress={() =>
@@ -1604,7 +1611,7 @@ export default function WorkoutView() {
                   <ExerciseRow
                     name={name}
                     ex={ex}
-                    phase={phase}
+                    phase={effPhase}
                     isExpanded={!!expandedEx[name]}
                     onToggle={() => toggleEx(name)}
                     onLongPress={() =>
@@ -1919,7 +1926,7 @@ export default function WorkoutView() {
                 <ExerciseRow
                   name={k}
                   ex={ex}
-                  phase={phase}
+                  phase={effPhase}
                   isExpanded={!!expandedEx[k]}
                   onToggle={() => toggleEx(k)}
                   onLongPress={() =>
@@ -2761,7 +2768,7 @@ export default function WorkoutView() {
       </div>
 
       {/* Phase selector */}
-      <div className="flex gap-1.5 mb-4">
+      <div className={`flex gap-1.5 ${phase === null ? "mb-1.5" : "mb-4"}`}>
         {PHASES.map((p, i) => (
           <div
             key={i}
@@ -2794,6 +2801,21 @@ export default function WorkoutView() {
           </div>
         ))}
       </div>
+
+      {/* FWB era: the 8-week content phases no longer apply, so no tab is
+          selected. A note explains the deselected state. */}
+      {phase === null && (
+        <div
+          data-testid="phase-selector-fwb-note"
+          className="text-[10px] text-text-muted mb-4 px-1 leading-snug"
+        >
+          <span className="font-semibold" style={{ color: "#facc15" }}>
+            FWB
+          </span>{" "}
+          — base 8-week program complete. Phases above are kept for reference;
+          tap one to preview its set scheme.
+        </div>
+      )}
 
       {/* Tab bar */}
       <div ref={tabBarRef} data-testid="tab-bar" className="relative flex gap-1 mb-5 items-stretch">
@@ -3059,7 +3081,7 @@ export default function WorkoutView() {
         const { items, index } = focusState;
         const item = items[index];
         if (!item) return null;
-        const s = item.ex.sets[phase] ?? item.ex.sets[0];
+        const s = item.ex.sets[effPhase] ?? item.ex.sets[0];
         return (
           <div
             className="fixed inset-0 z-[250] flex flex-col"

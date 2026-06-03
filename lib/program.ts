@@ -44,6 +44,19 @@ export function computeCurrentPhase(now: Date = new Date()): number {
   return 3;
 }
 
+/**
+ * True once the 8-week training-content program (Foundation → PWB Prep) is
+ * behind us — i.e. week > 8, which is the FWB era. In this state the Today-tab
+ * phase selector deselects: the week-1–8 content phases no longer apply, so no
+ * tab is highlighted rather than pinning to the final "PWB Prep" tab.
+ */
+export function isContentProgramComplete(now: Date = new Date()): boolean {
+  const elapsed = now.getTime() - PROG_START.getTime();
+  if (elapsed < 0) return false;
+  const week = Math.floor(elapsed / (7 * 24 * 60 * 60 * 1000)) + 1;
+  return week > 8;
+}
+
 // ===== Rehab program phases (NWB / PWB / ...) =====
 
 /**
