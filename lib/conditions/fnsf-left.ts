@@ -22,7 +22,7 @@ export const fnsfLeft: Condition = {
     shortDescription:
       "Compression-side femoral neck stress fracture in the left hip, with secondary FAI + labral involvement.",
     longDescription:
-      "8-week non-weight-bearing-to-PWB progression for a compression-side stress fracture of the left femoral neck. Iliopsoas activation drives 57-70% of femoral neck strain so left hip flexion against gravity is prohibited. Comorbid bilateral cam-type FAI and anterosuperior labral tears cap hip flexion <90° both sides; deep flexion and end-range internal rotation are also out. Designed for a fit, strong-upper-body practitioner.",
+      "Recovery program for a compression-side stress fracture of the left femoral neck, now in the FWB (full weight-bearing) phase: as of 2026-05 the patient is fully cleared for unrestricted resistance training, with FWB lifts (squat, leg press, single/double-leg KB RDL, BFR bridges) part of PT. The earlier NWB/PWB restrictions — left-side axial-loading ban, hip-flexion cap, iliopsoas restriction — are all retired. Designed for a fit, strong-upper-body practitioner.",
     primaryRegion: "hip",
     secondaryRegions: ["lumbar_spine", "core"],
     requiresClinicianApproval: true,
@@ -33,6 +33,7 @@ export const fnsfLeft: Condition = {
       "femoral neck",
       "NWB",
       "PWB",
+      "FWB",
       "FAI",
       "labral tear",
     ],
@@ -51,38 +52,21 @@ export const fnsfLeft: Condition = {
   },
 
   constraints: {
-    // 2026-04-29 doctor clearance: hip flexion fully unrestricted (FAI/labral
-    // concerns retired); iliopsoas restriction lifted; swimming OK.
-    // Globally forbidden are only the things that still axially load the left
-    // femoral neck or cause high impact. PWB-phase unlockTags below relax the
-    // weight-bearing tags for the current rehab stage.
-    forbiddenTags: [
-      "ground_reaction_force_high",
-      "cardio_running",
-      "weight_bearing_unilateral",
-      "weight_bearing_bilateral",
-    ],
-    cautionTags: [
-      "single_leg_balance",
-      "loaded_hip_abduction",
-      "loaded_hip_adduction",
-    ],
-    romLimits: {
-      knee_flexion_left_open_chain_max_deg: 130,
-    },
+    // 2026-05 FWB clearance: full weight-bearing, fully cleared for
+    // unrestricted resistance training. Every prior NWB/PWB movement ban is
+    // retired — FWB lifts (squat, leg press, single + double-leg KB RDL, BFR
+    // glute bridges) are already part of PT. No movement tags are forbidden
+    // or cautioned at this stage; the FWB phase below unlocks the rest.
+    forbiddenTags: [],
+    cautionTags: [],
+    romLimits: {},
     stopSignals: [
-      "Groin pain at any new load",
-      "Anterior hip click or catch",
-      "Trendelenburg gait when bilateral standing returns",
-      "Night pain after a session",
-      "Mechanical clicking with hip flexion",
+      "Sharp or localized pain in the left hip/groin during a lift — stop the set (not the session) and reassess load",
     ],
     hardContraindications: [
-      "PRIMARY: Left femoral neck compression-side stress fracture — FWB phase as of 2026-05 (PT progression). Bilateral standing weight-bearing is now permitted under PT load monitoring. The single-leg-only rehab patterns from the PWB phase remain available as fallbacks.",
-      "Bilateral squat, leg press, RDL, and calf raise are PERMITTED at PT-prescribed (sub-maximal) loads. Single-leg LEFT squat and LEFT leg press in isolation remain off the table — bilateral only on the left side, with PT supervising the load progression.",
-      "NO rowing erg (Concept2 / similar). Recumbent bike, swimming, and canoeing are OK.",
-      "Hip flexion is fully unrestricted: the FAI + labral concerns have been retired by the doctor. The iliopsoas restriction is lifted — left hip flexion against gravity is now permitted.",
-      "Core work is unrestricted.",
+      "Full weight-bearing (FWB) and fully cleared for unrestricted resistance training as of 2026-05. No exercise is off-limits — squat, leg press, single- and double-leg kettlebell RDL, BFR glute bridges, and bilateral loading on the LEFT are all part of the current PT program.",
+      "The earlier NWB/PWB restrictions (no left squat/leg press, no axial loading on the left, toe-touch only, hip-flexion cap, iliopsoas ban, no rowing erg, sub-maximal/PT-capped loads) are ALL retired. Do not reintroduce them or hedge suggestions around them, and do not cap load — progress like any healthy lifter.",
+      "Progress load by feel and PT guidance; no special accommodations required.",
       "Patient is very fit — strong upper body, experienced yoga practitioner.",
     ],
   },
@@ -124,8 +108,8 @@ export const fnsfLeft: Condition = {
         id: "fnsf_phase_fwb",
         name: "FWB",
         description:
-          "Full weight bearing return. Bilateral standing patterns under PT load monitoring. RDLs, leg press, TRX squat, calf raises bilateral at sub-maximal loads.",
-        durationDays: 28,
+          "Full weight bearing — unrestricted resistance training. Squat, leg press, single/double-leg KB RDL, BFR bridges, calf raises — all part of PT, train like a healthy lifter.",
+        durationDays: 42,
         color: "#facc15",
         unlockTags: ["weight_bearing_bilateral", "weight_bearing_unilateral"],
       },
@@ -215,12 +199,16 @@ export const fnsfLeft: Condition = {
     accentColor: "#0a0f1a",
   },
 
+  // One-line phase summary — single source of truth for the prompt's phase
+  // line so it can't drift from the constraints (it used to be hardcoded in
+  // system-prompt.ts as well).
+  phaseSummary:
+    "The patient is in the FWB (full weight-bearing) phase, fully cleared for unrestricted resistance training as of 2026-05. Every prior weight-bearing and hip-flexion restriction is retired — squat, leg press, single/double-leg RDL, BFR bridges, and bilateral left-side loading are all permitted, with no load cap.",
+
   // The SAFE / PROHIBITED block lives here as prose because it's
-  // condition-specific framing the AI prompt needs verbatim. Future moves
-  // may derive these lines from forbiddenTags / cautionTags directly.
-  aiPromptFragment: `PHASE: Full weight bearing (FWB) as of 2026-05. Bilateral standing weight-bearing is now permitted under PT supervision; the 4-week FWB block is dedicated to grooving symmetric bilateral patterns at sub-maximal load. PWB-phase single-leg exercises remain available as fallbacks.
-SAFE: Bilateral RDL with kettlebell, bilateral leg press at PT-prescribed loads, TRX-assisted bilateral squat, bilateral standing calf raise. All PWB-phase exercises (bilateral leg curl, leg extension, hip thrust, hip abduction/adduction machines, half-kneeling and tall-kneeling press, cable crossover with kickstand). Recumbent bike, swimming, canoeing. All core work. Upper-body work is unrestricted.
-PROHIBITED: Rowing erg (Concept2 / similar). Single-leg ISOLATED left squat / left leg press — bilateral only on the left side. PT explicitly caps load on every new bilateral pattern; do not chase pre-injury numbers.
-HIP FLEXION: Fully unrestricted. The previous <90deg cap and iliopsoas activation ban are both retired.
-PT LOAD CAP: When the user asks about weight for any FWB-phase bilateral exercise (RDL KB, bilateral leg press, TRX squat, calf raise), default to "PT-prescribed sub-maximal load" rather than a number. Typical early-FWB loads are 40-60% of pre-injury bilateral capacity; PT updates this week-by-week.`,
+  // condition-specific framing the AI prompt needs verbatim.
+  aiPromptFragment: `PHASE: Full weight bearing (FWB), fully cleared for unrestricted resistance training (2026-05). Train the patient like a healthy, fit lifter.
+SAFE: Everything. Bilateral and single-leg loading on BOTH sides, squat, leg press, single- and double-leg kettlebell RDL, BFR glute bridges, hinge/deadlift patterns, all machines, free weights, and standing work. Rowing erg, recumbent bike, swimming, canoeing all fine. Core and upper body unrestricted.
+PROHIBITED: Nothing on movement grounds, and no load cap. Apply normal form and effort judgment only — a set stops on sharp localized left-hip pain, not on any standing categorical ban.
+HIP FLEXION: Fully unrestricted.`,
 };

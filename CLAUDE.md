@@ -84,14 +84,12 @@ WorkoutView (main shell, all state, 7 tabs: Today/Upper/Lower/Core/Cardio/Equip/
 - Base workout fully offline; AI suggestions show offline indicator
 - Desktop: responsive font-size scaling (no zoom hack)
 
-## Key Constraints (2026-05 PT progression — FWB phase)
+## Key Constraints (2026-05 full clearance — FWB phase)
 
-- **Full bilateral weight-bearing** under PT load monitoring. The PWB-phase "toe-touch on left" rule is retired; both feet share load in standing patterns.
-- **Bilateral squat, leg press, RDL, and calf raise are PERMITTED at PT-prescribed sub-maximal loads.** Typical early-FWB load is 40-60% of pre-injury bilateral capacity; PT progresses week-by-week.
-- **Isolated single-leg LEFT squat / LEFT leg press remains off the table** — bilateral only on the left side. The right-leg-only variants from PWB stay in the library as fallbacks.
-- Core unrestricted.
-- Cardio: recumbent bike, swim, canoe OK; **NO rowing erg** (Concept2 etc.).
-- **Hip flexion fully unrestricted** — the FAI / labral concern has been retired by the doctor.
-- Iliopsoas restriction lifted entirely.
-- New FWB exercises live in `lib/exercises-fwb.ts` (parallel to `lib/exercises-pwb.ts`); they're `Object.assign`-merged into the main `EX` dictionary at the bottom of `lib/exercises.ts`. The FWB phase entry is in `lib/conditions/fnsf-left.ts` under `program.phases[]`.
-- The AI system prompt in `app/api/suggest/system-prompt.ts` reads constraints from the condition pack at `lib/conditions/fnsf-left.ts` — update both when constraints change.
+- **Full weight-bearing, fully cleared for unrestricted resistance training.** Karl has been FWB for weeks; FWB lifts are already part of PT. Train like a healthy, fit lifter.
+- **No exercise is off-limits and there is NO load cap.** Squat, leg press, single- AND double-leg KB RDL, BFR glute bridges, bilateral loading on the LEFT — all cleared and in the program.
+- **Every prior NWB/PWB restriction is RETIRED**: no-left-squat/leg-press, axial-loading ban, toe-touch, hip-flexion cap, iliopsoas restriction, no-rowing-erg, and the sub-maximal/PT-capped-load framing are all gone. Do not reintroduce them or hedge around them.
+- Hip flexion fully unrestricted; core unrestricted.
+- Only standing safety net: stop a set (not the session) on sharp/localized left-hip pain.
+- New FWB exercises live in `lib/exercises-fwb.ts` (parallel to `lib/exercises-pwb.ts`); they're `Object.assign`-merged into the main `EX` dictionary at the bottom of `lib/exercises.ts`, carry `phaseUnlock: "FWB-2026-05"` (renders an "FWB" badge), and are slotted into Legs A/B. The FWB phase is in `lib/program.ts` (`FWB_PHASE`, the ProgressClock) and in `lib/conditions/fnsf-left.ts` under `program.phases[]`.
+- The AI system prompt in `app/api/suggest/system-prompt.ts` reads the phase line + constraints from the condition pack at `lib/conditions/fnsf-left.ts` (`phaseSummary`, `hardContraindications`, `aiPromptFragment`) — update the pack only; the prompt no longer hardcodes the phase.

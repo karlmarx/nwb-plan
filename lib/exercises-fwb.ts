@@ -1,18 +1,17 @@
 // ============================================================================
-// FWB (Full Weight-Bearing) phase additions — PT-supervised bilateral movements
+// FWB (Full Weight-Bearing) phase additions
 // ----------------------------------------------------------------------------
-// 2026-05 PT clearance: progression from PWB to bilateral standing weight-
-// bearing under PT load monitoring. The "NO left squat / NO left leg press"
-// rules from the PWB phase relax to "bilateral OK at PT-prescribed loads."
+// 2026-05 full clearance: full weight-bearing, unrestricted resistance
+// training. These are the FWB lifts that are part of the PT program — squat,
+// leg press, single- and double-leg kettlebell RDL, BFR glute bridges, calf
+// raises. No left/right asymmetry restriction and NO load cap remain;
+// bilateral and single-leg loading on BOTH sides is cleared. Train like a
+// healthy, fit lifter — progress load by feel and PT guidance.
 //
-// Every entry below carries `phaseUnlock: "FWB-2026-05"` and a `ptSupervised`
-// safety note. Loads are deliberately capped relative to the patient's old
-// pre-injury numbers — PT prescribes the exact percentage; the prose here just
-// flags that "lower weight" is the expected rule.
-//
-// Pattern matches lib/exercises-pwb.ts: this file exports FWB_ADDITIONS and is
-// `Object.assign`-merged into the main EX dictionary at the bottom of
-// lib/exercises.ts.
+// Every entry carries `phaseUnlock: "FWB-2026-05"` so the UI renders an "FWB"
+// badge. Pattern matches lib/exercises-pwb.ts: this file exports FWB_ADDITIONS
+// and is `Object.assign`-merged into the main EX dictionary at the bottom of
+// lib/exercises.ts. None of the existing entries in lib/exercises.ts change.
 // ============================================================================
 
 import type { Exercise } from "./exercises";
@@ -20,96 +19,83 @@ import type { Exercise } from "./exercises";
 const FWB: "FWB-2026-05" = "FWB-2026-05";
 
 export const FWB_ADDITIONS: Record<string, Exercise> = {
-  // ==================== LEGS ====================
+  // ==================== QUAD / SQUAT ====================
 
-  "RDL (Kettlebell, Bilateral)": {
-    id: "rdl_kb_bilateral",
-    name: "RDL (Kettlebell, Bilateral)",
-    requires: ["kettlebell"],
+  "Bilateral Squat": {
+    id: "squat_bilateral_fwb",
+    name: "Bilateral Squat",
+    requires: ["barbell"],
     category: "legs",
-    sets: [["3", "10-12"], ["3", "8-10"], ["3", "6-8"]],
-    rest: 90,
+    sets: [["3", "6-8"], ["3", "6-8"], ["3", "8-10"]],
+    rest: 150,
     tempo: "3-1-1",
     setup:
-      "Stand bilateral, feet hip-width. Hold one moderate-weight kettlebell at the hips with both hands (suitcase grip if using two KBs of equal weight, one per hand). Soft knee bend, neutral spine, ribs stacked over pelvis. Crutches parked within reach but not in use during the set.",
+      "Bar on the upper traps (high-bar) or rear delts (low-bar) in a rack, safeties set just below depth. Feet shoulder-width, toes slightly out, weight even across both feet. Brace, big breath in.",
     execution:
-      "Hinge at the hips, pushing the bar/KB straight down the front of the thighs. Knees stay soft — this is a hinge, not a squat. Lower until you feel a strong hamstring stretch (typically mid-shin for the bell). Drive through both heels equally to stand. Pause 1 sec at the top, squeeze glutes. Lower over 3 sec on the eccentric.",
+      "Sit down and back, knees tracking over the toes, to at least parallel (deeper if it feels good). Drive evenly through both feet to stand. Even split left and right — no favoring.",
     nwbCues:
-      "BILATERAL LOAD: both feet share the weight evenly — this is the first true symmetric loading of the left side. Start with a kettlebell ≤ 50% of the load you'd have used pre-injury. PT will progress the load week-by-week. If the left hip or femur catches, cramps, or feels asymmetric, STOP the set and report to PT before next session. NO valgus collapse on the left knee on the way up — drive through the heel, not the toe.",
-    why: "Hip hinge is the foundation of every standing posterior-chain movement. KB-loaded bilateral RDL re-grooves the pattern at sub-maximal load before barbell RDLs come back. Bilateral loading also exposes any left-vs-right asymmetry that's hidden in single-leg work — PT uses the bell drift left/right as a signal.",
-    safety: "caution",
+      "Both legs share the load equally — stand up by pushing the floor away with BOTH feet. Pick a weight you can own for clean reps and progress it like any lifter; no cap.",
+    why: "The big bilateral knee+hip extension pattern — the foundation lift for rebuilding lower-body strength.",
+    safety: "safe",
     phaseUnlock: FWB,
-    swaps: ["Deep RDLs", "45° Back Extension", "SL Hip Thrust (Right)"],
+    swaps: ["Bilateral Leg Press", "TRX Squat (Bilateral)", "Hack Squat (Right)"],
     amp: [
-      "BASE: Single kettlebell, both hands, slow even tempo.",
-      "AMP 1: Pair of kettlebells (suitcase carry RDL) — increases grip + obliques load without bumping spinal load much.",
-      "AMP 2: 3-sec pause at the bottom of each rep (deep hamstring stretch).",
-    ],
-    constraints: {
-      requiresIliopsoas: false,
-      maxHipFlexion: 90,
-      requiresWeightBearing: true,
-    },
-    muscles: {
-      primary: ["hamstrings", "gluteus maximus", "erector spinae"],
-      secondary: ["forearm flexors", "rhomboids", "lower trapezius"],
-    },
-  },
-
-  "Bilateral Leg Press (PT Load)": {
-    id: "bilateral_leg_press_pt",
-    name: "Bilateral Leg Press (PT Load)",
-    requires: ["legpress"],
-    category: "legs",
-    sets: [["3", "10-12"], ["3", "10-12"], ["3", "8-10"]],
-    rest: 120,
-    tempo: "3-1-1",
-    setup:
-      "Sit in the leg press. Both feet on the plate, hip-width apart, mid-foot placement. Back flat against the pad. Hip flexion at the bottom of the rep stays under 90° — keep feet HIGH on the plate to bias glutes and reduce the hip angle. Start the working set with a load PT has prescribed for the current week — explicitly LOWER than your prior bilateral capacity.",
-    execution:
-      "Press the sled to ~95% extension (do NOT lock the knees). Lower over 3 sec until just before 90° hip flexion. Drive through BOTH heels evenly. Watch the screen / mirror — if you see the left hip dropping back or the left knee tracking inside the foot, abort the rep and reset.",
-    nwbCues:
-      "FIRST BILATERAL LP: this is the headline FWB exercise. Both legs press together for the first time since the injury. Do NOT chase old numbers — PT explicitly caps the load (typically 40–60% of pre-injury bilateral 1RM in early FWB). Stop immediately if: left hip pain, left groin sharp pinch, asymmetric leg drive, valgus knee tracking. Report any of these to PT before the next session. The previous SL Leg Press (Right) variants stay available as a fallback if the symmetric pattern doesn't feel right.",
-    why: "Bilateral leg press is the bridge from single-leg cross-education work back to integrated barbell squatting. Allowing the machine to constrain the bar path means the patient can focus on equal force production left-vs-right under controlled load. PT-capped weight gives a safety margin while the femoral neck remodel completes.",
-    safety: "caution",
-    phaseUnlock: FWB,
-    swaps: ["SL Leg Press (Right)", "TRX Squat (Bilateral)", "Hack Squat (Right)"],
-    amp: [
-      "BASE: PT-prescribed load, 3-sec eccentric.",
-      "AMP 1: Add a 2-sec pause just before reaching 90° hip flexion (bottom isometric).",
-      "AMP 2: 1.5 reps (full press → halfway down → press → full down → press).",
+      "BASE: Clean, controlled reps to parallel.",
+      "AMP 1: 3-second eccentric, no bounce out of the hole.",
+      "AMP 2: 2-second pause at the bottom before driving up.",
     ],
     machineVariants: [
       {
-        id: "45_sled",
-        label: "45° Sled (Incline)",
-        icon: "\u{1F9B5}",
-        description: "Standard 45° incline sled leg press",
+        id: "barbell_back_squat",
+        label: "Barbell Back Squat",
+        icon: "\u{1F3CB}️",
+        description: "Free-weight back squat in a rack",
         setupCues: [
-          "Both feet HIGH on plate (above center) to bias glutes and reduce hip flexion",
-          "Hip-width stance, mid-foot or slightly toed-out",
-          "Back flat against pad",
+          "Set safety pins just below your bottom depth",
+          "Bar on traps (high-bar) or rear delts (low-bar)",
+          "Feet shoulder-width, toes slightly out",
         ],
+        status: "preferred",
       },
       {
-        id: "seated_horizontal",
-        label: "Seated/Horizontal",
-        icon: "\u{1F4BA}",
-        description: "Seated or horizontal leg press machine",
+        id: "smith_squat",
+        label: "Smith Machine Squat",
+        icon: "\u{1F6E0}️",
+        description: "Fixed-bar path for more stability",
         setupCues: [
-          "Both feet centered on the press plate, hip-width apart",
-          "Adjust seat depth so hip flexion stays under 90° at bottom of rep",
+          "Feet slightly forward of the bar line",
+          "Brace, unrack with a small twist",
+          "The fixed path lets you push depth confidently",
         ],
+        requires: ["smith"],
+        status: "secondary",
+      },
+      {
+        id: "goblet_squat",
+        label: "Goblet Squat",
+        icon: "\u{1F3FA}",
+        description: "Dumbbell/kettlebell at the chest — easy to scale",
+        setupCues: [
+          "Hold one dumbbell or kettlebell vertical against the chest",
+          "Elbows inside the knees at the bottom",
+          "Great for higher-rep volume days",
+        ],
+        requires: ["dumbbells"],
+        status: "secondary",
       },
     ],
-    constraints: {
-      requiresIliopsoas: false,
-      maxHipFlexion: 90,
-      requiresWeightBearing: true,
-    },
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 130, requiresWeightBearing: true },
+    movementTags: [
+      "weight_bearing_bilateral",
+      "closed_chain",
+      "deep_squat",
+      "knee_flexion_over_90",
+      "standing",
+      "valsalva_required",
+    ],
     muscles: {
       primary: ["quadriceps", "gluteus maximus"],
-      secondary: ["hamstrings", "hip adductors", "gastrocnemius"],
+      secondary: ["adductor magnus", "erector spinae", "hamstrings"],
     },
   },
 
@@ -122,30 +108,204 @@ export const FWB_ADDITIONS: Record<string, Exercise> = {
     rest: 90,
     tempo: "3-1-1",
     setup:
-      "Anchor TRX overhead. Stand bilateral, hip-width, facing the anchor. Grip both handles, arms extended forward at chest height. Lean back slightly so the straps are taut — the TRX takes some of your bodyweight, making this a deload squat. Crutches parked within reach.",
+      "Anchor TRX overhead. Stand bilateral, hip-width, facing the anchor. Grip both handles, arms extended at chest height. Lean back slightly so the straps are taut.",
     execution:
-      "Sit straight back and down, keeping the chest tall. The TRX assists the eccentric — you should feel like you're lowering into a chair. Drive through both heels to stand. Use the strap tension as little as possible on the way down (eccentric stays slow) and as much as needed on the way up (concentric stays controlled). Knees track over toes, no valgus collapse.",
+      "Sit straight back and down, chest tall — the TRX assists as much or as little as you want (more lean-back = more assistance). Drive through both heels to stand. Knees track over toes, heels planted.",
     nwbCues:
-      "BILATERAL SQUAT WITH ASSISTANCE: this is the first squat pattern allowed in the FWB phase. The TRX deload turns it into a body-weight-minus-strap-tension squat — start with deep lean-back (more deload) and progress to nearly vertical (less deload) over weeks. If left hip groin pain appears, increase the lean-back angle to deload further. If pain persists at maximum deload, STOP and report to PT. NO heel-rise: both heels stay planted. Watch for left foot turning out as a compensation.",
-    why: "TRX-assisted squat is the lowest-load squat pattern that still teaches the bilateral standing squat motor pattern. The strap-deload lets the patient train the movement before they can train the load. Used in nearly every ACL / FAI / femoral neck return-to-sport protocol as the first bilateral squat.",
-    safety: "caution",
+      "A scalable bilateral squat — use the strap tension to dial difficulty (deep lean-back for an easy deload, near-vertical for full bodyweight). Both heels stay planted, even load left and right.",
+    why: "The lowest-load bilateral squat pattern — great as a warm-up, a higher-rep finisher, or a deload option on heavy-squat days.",
+    safety: "safe",
     phaseUnlock: FWB,
-    swaps: ["Bilateral Leg Press (PT Load)", "Bulgarian Split Squat", "Hack Squat (Right)"],
+    swaps: ["Bilateral Squat", "Bilateral Leg Press", "Hack Squat (Right)"],
     amp: [
       "BASE: Moderate lean-back, body weight, 3-sec eccentric.",
-      "AMP 1: Less lean-back (more vertical = less strap assistance).",
+      "AMP 1: Less lean-back (more vertical = less assistance).",
       "AMP 2: Pause-squat — 3-sec pause at the bottom before driving up.",
     ],
-    constraints: {
-      requiresIliopsoas: false,
-      maxHipFlexion: 90,
-      requiresWeightBearing: true,
-    },
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 110, requiresWeightBearing: true },
+    movementTags: [
+      "weight_bearing_bilateral",
+      "closed_chain",
+      "knee_flexion_over_90",
+      "standing",
+    ],
     muscles: {
       primary: ["quadriceps", "gluteus maximus"],
       secondary: ["hamstrings", "hip adductors", "gastrocnemius", "rectus abdominis"],
     },
   },
+
+  "Bilateral Leg Press": {
+    id: "bilateral_leg_press_fwb",
+    name: "Bilateral Leg Press",
+    requires: ["legpress"],
+    category: "legs",
+    sets: [["3", "8-10"], ["3", "10-12"], ["3", "12-15"]],
+    rest: 120,
+    tempo: "2-1-2",
+    setup:
+      "Sit in the leg press, both feet mid-platform shoulder-width, back and hips flat against the pad. Release the safeties.",
+    execution:
+      "Lower the platform under control until the knees reach ~90° (or deeper if comfortable), then press back evenly through both feet without locking out hard. Keep the load even left to right.",
+    nwbCues:
+      "Both legs, even drive — push through the whole foot, heels down. Load it like a normal training lift and progress it; no cap.",
+    why: "Closed-chain bilateral quad/glute loading with the back supported — lets you push heavier load than free squats. A staple leg builder.",
+    safety: "safe",
+    phaseUnlock: FWB,
+    swaps: ["Bilateral Squat", "SL Leg Press (Right)", "Bilateral Leg Extension"],
+    amp: [
+      "BASE: Even tempo, controlled.",
+      "AMP 1: 3-second eccentric.",
+      "AMP 2: Rest-pause — to failure, 15s rest, squeeze out 3-5 more.",
+    ],
+    machineVariants: [
+      {
+        id: "45_sled",
+        label: "45° Sled (Incline)",
+        icon: "\u{1F9B5}",
+        description: "Standard 45° incline sled leg press",
+        setupCues: [
+          "Feet centered or slightly high on the plate, hip-width",
+          "Mid-foot or slightly toed-out",
+          "Back flat against the pad",
+        ],
+      },
+      {
+        id: "seated_horizontal",
+        label: "Seated/Horizontal",
+        icon: "\u{1F4BA}",
+        description: "Seated or horizontal leg press machine",
+        setupCues: [
+          "Both feet centered on the press plate, hip-width apart",
+          "Set seat depth for a comfortable bottom position",
+        ],
+      },
+    ],
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 110, requiresWeightBearing: true },
+    movementTags: [
+      "weight_bearing_bilateral",
+      "closed_chain",
+      "knee_flexion_45_to_90",
+      "hip_flexion_45_to_90",
+      "seated",
+    ],
+    muscles: {
+      primary: ["quadriceps", "gluteus maximus"],
+      secondary: ["hamstrings", "hip adductors", "gastrocnemius"],
+    },
+  },
+
+  // ==================== POSTERIOR CHAIN ====================
+
+  "RDL (Kettlebell, Bilateral)": {
+    id: "rdl_kb_bilateral",
+    name: "RDL (Kettlebell, Bilateral)",
+    requires: ["kettlebell"],
+    category: "legs",
+    sets: [["3", "10-12"], ["3", "8-10"], ["3", "6-8"]],
+    rest: 90,
+    tempo: "3-1-1",
+    setup:
+      "Stand hip-width holding a kettlebell (or two) at the hips with both hands. Soft knee bend, neutral spine, ribs stacked over pelvis.",
+    execution:
+      "Hinge at the hips, pushing the bell straight down the front of the thighs. Knees stay soft — this is a hinge, not a squat. Lower until you feel a strong hamstring stretch (around mid-shin). Drive through both heels to stand, squeeze glutes, pause 1 sec at the top. 3-sec eccentric.",
+    nwbCues:
+      "Both feet share the weight evenly. Neutral spine throughout — no rounding. Drive through the heels, not the toes. Load it and progress it like normal; depth is set by your hamstring flexibility.",
+    why: "Hip hinge is the foundation of every standing posterior-chain movement. Bilateral KB RDL is the primary hamstring/glute strength builder and the double-leg counterpart to the single-leg version.",
+    safety: "safe",
+    phaseUnlock: FWB,
+    swaps: ["Single-Leg KB RDL", "Bilateral Seated Leg Curl", "Bilateral Hip Thrust"],
+    amp: [
+      "BASE: Single kettlebell, both hands, slow even tempo.",
+      "AMP 1: Pair of kettlebells (suitcase grip) for more grip + oblique load.",
+      "AMP 2: 3-sec pause at the bottom of the stretch.",
+    ],
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 90, requiresWeightBearing: true },
+    movementTags: [
+      "weight_bearing_bilateral",
+      "closed_chain",
+      "standing",
+      "neutral_spine_only",
+      "hip_flexion_45_to_90",
+    ],
+    muscles: {
+      primary: ["hamstrings", "gluteus maximus", "erector spinae"],
+      secondary: ["forearm flexors", "rhomboids", "lower trapezius"],
+    },
+  },
+
+  "Single-Leg KB RDL": {
+    id: "rdl_kb_single_leg",
+    name: "Single-Leg KB RDL",
+    requires: ["kettlebell"],
+    category: "legs",
+    sets: [["3", "8-10/side"], ["3", "8-10/side"], ["3", "10-12/side"]],
+    rest: 90,
+    tempo: "3-1-1",
+    setup:
+      "Hold a kettlebell in one hand. Stand on the working leg, small bend in that knee. The other leg is light, ready to extend behind as a counterweight.",
+    execution:
+      "Hinge at the working hip, letting the rear leg float straight back as the torso lowers — body forms a 'T'. Keep hips square (don't let the back hip open). Lower to a hamstring stretch, then drive the standing-leg hip to stand tall. All reps one side, then switch.",
+    nwbCues:
+      "Train BOTH sides equally — the left leg is fully cleared for single-leg loading. Hips stay level and square; floating-leg toe points down. If balance is shaky, lightly touch a rack with the free hand.",
+    why: "Single-leg hinge — hammers each hamstring/glute independently and rebuilds left-side balance and hip stability. Mirrors the PT progression.",
+    safety: "safe",
+    phaseUnlock: FWB,
+    swaps: ["RDL (Kettlebell, Bilateral)", "SL Hip Thrust (Right)", "B-Stance Hip Thrust (Right-Dominant)"],
+    amp: [
+      "BASE: Moderate load, focus on balance and square hips.",
+      "AMP 1: 3-second eccentric, controlled float.",
+      "AMP 2: Deficit — stand on a low platform for extra range.",
+    ],
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 90, requiresWeightBearing: true },
+    movementTags: [
+      "weight_bearing_unilateral",
+      "single_leg_balance",
+      "closed_chain",
+      "standing",
+      "neutral_spine_only",
+      "balance_demand_high",
+    ],
+    muscles: {
+      primary: ["hamstrings", "gluteus maximus"],
+      secondary: ["gluteus medius", "erector spinae", "adductor magnus"],
+    },
+  },
+
+  // ==================== GLUTE / BFR ====================
+
+  "BFR Glute Bridge": {
+    id: "bfr_glute_bridge_fwb",
+    name: "BFR Glute Bridge",
+    requires: ["bands", "mat"],
+    category: "legs",
+    sets: [["1", "30"], ["3", "15"]],
+    rest: 30,
+    tempo: "2-1-2",
+    setup:
+      "Apply the BFR cuffs/bands high on both upper thighs (close to the hip crease) at the prescribed tightness — snug, not painful (~7/10 perceived tightness for legs). Lie supine on the mat, knees bent, feet flat hip-width.",
+    execution:
+      "Drive through the heels to lift the hips into a straight line from knees to shoulders, squeezing the glutes hard at the top. Lower with control. BFR protocol: 30 reps, then 3×15 with only ~30s rest between sets — keep the cuffs on throughout.",
+    nwbCues:
+      "Blood-flow-restriction training is low-load / high-rep — light or bodyweight load is the point, the cuffs do the work. Keep rest short (30s). Remove the cuffs immediately if you feel numbness, tingling, or sharp pain. Both feet drive evenly.",
+    why: "BFR drives a high-intensity hypertrophy/strength stimulus at light loads — efficient glute/quad work with minimal joint load. Part of the FWB PT block.",
+    safety: "safe",
+    phaseUnlock: FWB,
+    swaps: ["Bilateral Hip Thrust", "SL Glute Bridge (Right)", "Banded Clamshells"],
+    amp: [
+      "BASE: Bodyweight, 30 + 3×15 with cuffs, 30s rest.",
+      "AMP 1: Add a light barbell or plate across the hips.",
+      "AMP 2: 2-second hold at the top of every rep.",
+    ],
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 40, requiresWeightBearing: false },
+    movementTags: ["supine", "closed_chain", "knee_flexion_45_to_90"],
+    muscles: {
+      primary: ["gluteus maximus"],
+      secondary: ["hamstrings", "quadriceps"],
+    },
+  },
+
+  // ==================== CALVES ====================
 
   "Standing Calf Raise (Bilateral)": {
     id: "standing_calf_raise_bilateral",
@@ -156,25 +316,22 @@ export const FWB_ADDITIONS: Record<string, Exercise> = {
     rest: 60,
     tempo: "2-1-2",
     setup:
-      "Stand bilateral on the edge of a low plyobox or step. Forefeet on the box, heels hanging off. Hands on a wall or rack for balance — light fingertip touch only, no body weight. Hip-width stance, weight distributed evenly across both forefeet.",
+      "Stand bilateral on the edge of a low plyobox or step, forefeet on the box, heels hanging off. Light fingertip touch on a wall or rack for balance. Hip-width stance, weight even across both forefeet.",
     execution:
-      "Lower the heels as far as comfortable (deep ankle dorsiflexion). Pause 1 sec at the stretch. Drive up onto the balls of both feet, squeezing the calves at the top for 1 sec. Lower over 2 sec on the eccentric. Both heels move together — no left/right asymmetry.",
+      "Lower the heels into a deep stretch, pause 1 sec, then drive up onto the balls of both feet and squeeze the calves for 1 sec at the top. 2-sec eccentric. Both heels move together.",
     nwbCues:
-      "FIRST BILATERAL CALF RAISE: equal weight on both feet is the goal. If you notice yourself unconsciously shifting weight to the right, deliberately re-center. The left calf may fatigue faster than the right after months of disuse — that's expected; reduce reps on the left's behalf rather than overloading it. NO bouncing at the bottom of the stretch — controlled stretch + pause. Stop if left Achilles or posterior heel pain appears.",
-    why: "Calf raises rebuild the gastroc-soleus complex bilaterally. The bilateral standing version restores the eccentric heel-lowering pattern that's used in every step of normal gait. Bodyweight bilateral is the prerequisite for adding loaded versions later.",
+      "Even weight on both feet — re-center if you drift to the right. Controlled stretch + pause, no bouncing at the bottom.",
+    why: "Rebuilds the gastroc-soleus complex bilaterally and restores the eccentric heel-lowering used in every step of gait. Progress to loaded versions as it gets easy.",
     safety: "safe",
     phaseUnlock: FWB,
     swaps: ["Standing Calf Raise (R)", "R-Leg Calf Raise on Foot Plate"],
     amp: [
-      "BASE: Body weight, 2-sec eccentric, 1-sec pause at top + bottom.",
-      "AMP 1: Hold a kettlebell or single dumbbell at chest (goblet position) for added load.",
-      "AMP 2: Switch to a single calf raise on each leg — the right side already has this in the library; the left side is the new addition this phase.",
+      "BASE: Body weight, 2-sec eccentric, 1-sec pause top + bottom.",
+      "AMP 1: Hold a kettlebell or dumbbell at the chest (goblet) for load.",
+      "AMP 2: Single-leg calf raises, alternating sides.",
     ],
-    constraints: {
-      requiresIliopsoas: false,
-      maxHipFlexion: 0,
-      requiresWeightBearing: true,
-    },
+    constraints: { requiresIliopsoas: false, maxHipFlexion: 0, requiresWeightBearing: true },
+    movementTags: ["weight_bearing_bilateral", "closed_chain", "standing"],
     muscles: {
       primary: ["gastrocnemius", "soleus"],
       secondary: ["tibialis anterior"],

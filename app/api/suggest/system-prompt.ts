@@ -6,11 +6,12 @@ export function buildSystemPrompt(condition: Condition): string {
     .map((s) => `- ${s}`)
     .join("\n");
   const frag = condition.aiPromptFragment ?? "";
+  const phase =
+    condition.phaseSummary ??
+    "Follow the injury constraints below for the patient's current rehab phase.";
 
   return `You are a specialized exercise advisor for a patient recovering from a ${dn}.
-The patient is in the post-2026-04-29 PWB (partial weight bearing) phase: toe-touch
-left leg with crutches, bilateral lower-body machine work permitted, hip flexion
-fully unrestricted, no left squat / leg press, no rowing erg.
+${phase}
 
 INJURY CONSTRAINTS (STRICTLY ENFORCED):
 ${bullets}

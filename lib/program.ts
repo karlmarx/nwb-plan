@@ -86,9 +86,10 @@ export interface ProgramPhase {
 }
 
 /**
- * The Full Weight-Bearing phase. As of 2026-05 the PT progression moved
- * Karl from PWB to bilateral standing weight-bearing under load monitoring
- * (see CLAUDE.md "Key Constraints" and the `fnsf_phase_fwb` entry in
+ * The Full Weight-Bearing phase. As of 2026-05 Karl is fully cleared for
+ * unrestricted resistance training — the FWB lifts (squat, leg press, KB RDL
+ * single + double, BFR bridges, calf raises) are part of PT (see CLAUDE.md
+ * "Key Constraints" and the `fnsf_phase_fwb` entry in
  * lib/conditions/fnsf-left.ts). Color matches the condition pack's FWB phase.
  */
 export const FWB_PHASE: ProgramPhase = {
@@ -96,10 +97,10 @@ export const FWB_PHASE: ProgramPhase = {
   name: "FWB",
   longName: "Full Weight Bearing",
   startDate: new Date("2026-05-13T16:00:00Z"),
-  durationDays: 28,
+  durationDays: 42,
   status: "active",
   color: "#facc15",
-  desc: "Full weight-bearing return. Bilateral standing patterns (KB RDL, leg press, TRX squat, calf raises) under PT load monitoring at sub-maximal loads.",
+  desc: "Full weight-bearing. Unrestricted resistance training — squat, leg press, KB RDL, BFR bridges, calf raises. Back to normal gym work.",
 };
 
 /**
