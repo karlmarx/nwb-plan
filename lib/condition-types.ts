@@ -327,6 +327,11 @@ export interface Condition {
    *  the global copy, only condition-specific cues differ. */
   exerciseOverrides?: Record<string, ExerciseCopyOverride>;
 
+  /** One-line current-phase summary for the AI system prompt. Single source
+   *  of truth for the phase line so it can't drift from the constraints —
+   *  `buildSystemPrompt` reads this instead of hardcoding the phase. */
+  phaseSummary?: string;
+
   /** Optional condition-specific AI system-prompt fragment. Composed with
    *  the global suggest prompt scaffold at request time. */
   aiPromptFragment?: string;

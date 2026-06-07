@@ -184,6 +184,7 @@ export interface Phase {
 export const EQUIPMENT: Record<string, EquipmentItem> = {
   barbell: { name: "Barbell", icon: "\u{1F3CB}\uFE0F", category: "weights" },
   dumbbells: { name: "Dumbbells", icon: "\u{1F4AA}", category: "weights" },
+  kettlebell: { name: "Kettlebell", icon: "\u{1F3CB}️", category: "weights" },
   ezbar: { name: "EZ-Bar", icon: "\u{1F529}", category: "weights" },
   cables: { name: "Cable Machine", icon: "\u{1F527}", category: "machines" },
   legpress: { name: "Leg Press", icon: "\u{1F9B5}", category: "machines" },
@@ -3835,6 +3836,10 @@ export const WORKOUTS: Record<string, Workout> = {
     color: "#10b981",
     hevy: "https://hevy.com/routine/FKCWOPCUE4H",
     exercises: [
+      "Bilateral Squat",
+      "Bilateral Leg Press",
+      "TRX Squat (Bilateral)",
+      "BFR Glute Bridge",
       "SL Leg Press (Right)",
       "SL Leg Extension (Right)",
       "Bilateral Leg Extension",
@@ -3849,13 +3854,7 @@ export const WORKOUTS: Record<string, Workout> = {
       "Dead Bug (R Leg Only)",
       "Reverse Crunch (Bilateral)",
     ],
-    removed: [
-      { name: "Pistol Squats", reason: "Deep hip flexion damages labrum" },
-      {
-        name: "Bulgarian Split Squat",
-        reason: "Exceeds 90\u00B0 flexion limit",
-      },
-    ],
+    removed: [],
   },
   "Legs B": {
     title: "Legs B \u2014 Posterior Chain",
@@ -3863,6 +3862,9 @@ export const WORKOUTS: Record<string, Workout> = {
     color: "#10b981",
     hevy: "https://hevy.com/routine/s5QsLGXsVAy",
     exercises: [
+      "RDL (Kettlebell, Bilateral)",
+      "Single-Leg KB RDL",
+      "Standing Calf Raise (Bilateral)",
       "Low-Box Step-Up (Right)",
       "SL Hip Thrust (Right)",
       "B-Stance Hip Thrust (Right-Dominant)",
@@ -3874,16 +3876,7 @@ export const WORKOUTS: Record<string, Workout> = {
       "Stir the Pot",
       "Captain's Chair Knee Raise (Bilateral)",
     ],
-    removed: [
-      {
-        name: "Seated Ham Curl",
-        reason: "Compresses ischial tuberosity (tendinopathy)",
-      },
-      {
-        name: "Deep RDLs",
-        reason: "Violent eccentric load on tendinosis",
-      },
-    ],
+    removed: [],
   },
   Recovery: {
     title: "Active Recovery (Sunday)",
